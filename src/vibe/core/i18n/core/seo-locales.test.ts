@@ -26,6 +26,9 @@ describe("seo-locales", () => {
     expect(canonicalSeoLocale("fr-DE")).toBe("fr-FR");
     expect(canonicalSeoLocale("en-PL")).toBe("en-GLOBAL");
     expect(canonicalSeoLocale("en-DE")).toBe("en-GLOBAL");
+    expect(canonicalSeoLocale("hi-GLOBAL")).toBe("hi-IN");
+    expect(canonicalSeoLocale("hi-US")).toBe("hi-IN");
+    expect(canonicalSeoLocale("en-IN")).toBe("en-IN");
   });
 
   it("announces GLOBAL as the bare language", () => {
@@ -49,6 +52,9 @@ describe("seo-locales", () => {
         "es",
         "sk-SK",
         "sk",
+        "en-IN",
+        "hi-IN",
+        "hi",
         "pl-PL",
         "pl",
         "x-default",
@@ -57,6 +63,9 @@ describe("seo-locales", () => {
     expect(alternates["de"]).toBe("https://example.com/de-DE/models");
     expect(alternates["es"]).toBe("https://example.com/es-ES/models");
     expect(alternates["sk"]).toBe("https://example.com/sk-SK/models");
+    expect(alternates["en-IN"]).toBe("https://example.com/en-IN/models");
+    expect(alternates["hi-IN"]).toBe("https://example.com/hi-IN/models");
+    expect(alternates["hi"]).toBe("https://example.com/hi-IN/models");
     expect(alternates["x-default"]).toBe(
       "https://example.com/en-GLOBAL/models",
     );

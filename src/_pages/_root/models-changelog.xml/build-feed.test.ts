@@ -90,6 +90,7 @@ describe("model changelog view", () => {
       "it-IT",
       "es-ES",
       "sk-SK",
+      "hi-IN",
     ];
     for (const locale of locales) {
       const view = buildChangelogPageView(locale, ALL, EVENTS);

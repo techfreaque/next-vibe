@@ -1,5 +1,6 @@
 "use client";
 
+import { toIntlLocale } from "next-vibe/core/i18n/core/language-utils";
 import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
@@ -117,7 +118,7 @@ export function CreditHistoryContainer({
   const to = isAdmin ? form?.watch("to") : undefined;
   const transactions = value?.transactions ?? [];
   const pagination = value?.paginationInfo;
-  const lang = locale.split("-")[0];
+  const lang = toIntlLocale(locale);
   const numbers = new Intl.NumberFormat(lang, { maximumFractionDigits: 6 });
   const signedNumbers = new Intl.NumberFormat(lang, {
     maximumFractionDigits: 6,

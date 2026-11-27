@@ -20,7 +20,7 @@ export const translations = {
     referral:
       "Referral program: {{direct}}% recurring commission on referred payments, plus a {{upline}}% pool shared across {{levels}} upline levels. Paid out as credits or BTC/USDC, minimum payout {{minPayout}}.",
     languages:
-      "Site languages: English ({{en}}), German ({{de}}), Polish ({{pl}}), French ({{fr}}), Italian ({{it}}), Spanish ({{es}}), and Slovak ({{sk}}).",
+      "Site languages: English ({{en}}), German ({{de}}), Polish ({{pl}}), French ({{fr}}), Italian ({{it}}), Spanish ({{es}}), Slovak ({{sk}}), and Hindi ({{hi}}).",
   },
   pages: {
     heading: "Main pages",

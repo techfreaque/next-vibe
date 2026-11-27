@@ -351,6 +351,7 @@ export const translations = {
     it: "Italian",
     es: "Spanish",
     sk: "Slovak",
+    hi: "Hindi",
     en: "English",
     de: "German",
     pl: "Polish",

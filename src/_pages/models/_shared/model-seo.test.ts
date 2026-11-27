@@ -87,6 +87,8 @@ const LOCALES: readonly CountryLanguage[] = [
   "it-IT",
   "es-ES",
   "sk-SK",
+  "en-IN",
+  "hi-IN",
 ];
 
 function factsOf(id: ChatModelId): ModelFacts {

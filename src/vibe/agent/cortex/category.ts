@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Cortex",
     "es-ES": "Cortex",
     "sk-SK": "Cortex",
+    "hi-IN": "Cortex",
   },
   description: {
     "en-US": "Browse files and folders in AI memory.",
@@ -30,6 +31,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Sfogli file e cartelle nella memoria dell’IA.",
     "es-ES": "Explore los archivos y carpetas de la memoria de la IA.",
     "sk-SK": "Prezerajte si súbory a priečinky v pamäti AI.",
+    "hi-IN": "AI मेमोरी में फ़ाइलें और फ़ोल्डर देखें।",
   },
   group: "ai",
   icon: "brain",
@@ -49,6 +51,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Toda la estructura de carpetas de la memoria de la IA de un vistazo.",
         "sk-SK": "Celá štruktúra priečinkov pamäte AI na jeden pohľad.",
+        "hi-IN": "AI मेमोरी का पूरा फ़ोल्डर स्ट्रक्चर एक नज़र में।",
       },
       "cortex-search": {
         "en-US": "Find any file by name or content.",
@@ -59,6 +62,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Trovi qualsiasi file per nome o contenuto.",
         "es-ES": "Encuentre cualquier archivo por nombre o contenido.",
         "sk-SK": "Nájdite ľubovoľný súbor podľa názvu alebo obsahu.",
+        "hi-IN": "नाम या कंटेंट से कोई भी फ़ाइल खोजें।",
       },
       "cortex-terminals": {
         "en-US": "Open terminal sessions and where each one is.",
@@ -69,6 +73,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Sessioni di terminale aperte e la loro cartella corrente.",
         "es-ES": "Sesiones de terminal abiertas y su carpeta actual.",
         "sk-SK": "Otvorené relácie terminálu a ich aktuálne priečinky.",
+        "hi-IN": "खुले टर्मिनल सेशन और हर एक कहाँ है।",
       },
     },
   },

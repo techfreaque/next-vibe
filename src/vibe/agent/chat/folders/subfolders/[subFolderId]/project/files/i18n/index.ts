@@ -8,6 +8,7 @@ export const scopedTranslation = createScopedTranslation({
   pl: () => require("./pl").translations,
   fr: () => require("./fr").translations,
   sk: () => require("./sk").translations,
+  hi: () => require("./hi").translations,
 });
 
 export type FolderProjectFilesT = ReturnType<

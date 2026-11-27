@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Contabilità",
     "es-ES": "Contabilidad",
     "sk-SK": "Účtovníctvo",
+    "hi-IN": "अकाउंटिंग",
   },
   description: {
     "en-US": "Review journals, outstanding balances and open periods.",
@@ -32,6 +33,7 @@ export const category: CategoryDefinition = {
       "Revise los asientos, los saldos pendientes y los períodos abiertos.",
     "sk-SK":
       "Skontrolujte účtovné zápisy, neuhradené položky a otvorené obdobia.",
+    "hi-IN": "जर्नल, बकाया बैलेंस और खुली अवधियाँ देखें।",
     "en-GLOBAL": "Review journals, outstanding balances and open periods.",
   },
   group: "business",
@@ -62,6 +64,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Todos los asientos contabilizados, filtrables por cuenta y fecha.",
         "sk-SK": "Všetky zaúčtované zápisy s filtrom podľa účtu a dátumu.",
+        "hi-IN": "हर पोस्ट की गई एंट्री, अकाउंट और तारीख से फ़िल्टर की हुई।",
       },
       "coa-profit-loss": {
         "en-US": "Income, expenses and profit for the period.",
@@ -72,6 +75,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ricavi, costi e utile del periodo.",
         "es-ES": "Ingresos, gastos y beneficio del periodo.",
         "sk-SK": "Výnosy, náklady a zisk za obdobie.",
+        "hi-IN": "अवधि की आमदनी, खर्च और मुनाफ़ा।",
       },
       "coa-balance-sheet": {
         "en-US": "Assets, liabilities and equity on any date.",
@@ -82,6 +86,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Attività, passività e patrimonio netto a qualsiasi data.",
         "es-ES": "Activos, pasivos y patrimonio en cualquier fecha.",
         "sk-SK": "Aktíva, záväzky a vlastné imanie k ľubovoľnému dňu.",
+        "hi-IN": "किसी भी तारीख पर एसेट, देनदारी और इक्विटी।",
       },
       "coa-receivables-aging": {
         "en-US": "Customer invoices still unpaid, grouped by age.",
@@ -92,6 +97,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fatture clienti non pagate, raggruppate per anzianità.",
         "es-ES": "Facturas de clientes pendientes, agrupadas por antigüedad.",
         "sk-SK": "Neuhradené faktúry zákazníkov zoskupené podľa veku.",
+        "hi-IN": "अभी तक बिना पेमेंट के कस्टमर इनवॉइस, उम्र के हिसाब से ग्रुप किए।",
       },
       "coa-payables-aging": {
         "en-US": "Supplier bills you still owe, grouped by due date.",
@@ -103,6 +109,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Facturas de proveedores pendientes, agrupadas por vencimiento.",
         "sk-SK": "Neuhradené faktúry dodávateľov zoskupené podľa splatnosti.",
+        "hi-IN": "सप्लायर बिल जो अभी चुकाने बाकी हैं, ड्यू डेट के हिसाब से ग्रुप किए।",
       },
       "coa-period-list": {
         "en-US": "Open and close accounting periods.",
@@ -113,6 +120,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Apra e chiuda i periodi contabili.",
         "es-ES": "Abra y cierre periodos contables.",
         "sk-SK": "Otvárajte a uzatvárajte účtovné obdobia.",
+        "hi-IN": "अकाउंटिंग अवधियाँ खोलें और बंद करें।",
       },
     },
   },
@@ -134,6 +142,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Account",
         "es-ES": "Cuentas",
         "sk-SK": "Účty",
+        "hi-IN": "अकाउंट",
       },
     },
     Journal: {
@@ -148,6 +157,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Libro giornale",
         "es-ES": "Libro diario",
         "sk-SK": "Účtovný denník",
+        "hi-IN": "जर्नल",
       },
     },
     Ledger: {
@@ -162,6 +172,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Libro mastro",
         "es-ES": "Libro mayor",
         "sk-SK": "Hlavná kniha",
+        "hi-IN": "लेजर",
       },
     },
     Periods: {
@@ -176,6 +187,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Periodi",
         "es-ES": "Períodos",
         "sk-SK": "Účtovné obdobia",
+        "hi-IN": "अवधियाँ",
       },
     },
     Accounting: {
@@ -190,6 +202,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Configurazione iniziale",
         "es-ES": "Configuración inicial",
         "sk-SK": "Nastavenie",
+        "hi-IN": "सेटअप",
       },
     },
   },

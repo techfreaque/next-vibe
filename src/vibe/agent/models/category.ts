@@ -13,6 +13,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Modelli",
     "es-ES": "Modelos",
     "sk-SK": "Modely",
+    "hi-IN": "मॉडल",
     "en-GLOBAL": "Models",
   },
   description: {
@@ -27,6 +28,7 @@ export const category: CategoryDefinition = {
       "Consulte los modelos disponibles y los cambios en los catálogos de proveedores.",
     "sk-SK":
       "Skontrolujte dostupnosť modelov a zmeny v katalógoch poskytovateľov.",
+    "hi-IN": "मॉडल की उपलब्धता और प्रोवाइडर कैटलॉग के बदलाव देखें।",
     "en-GLOBAL": "Browse model availability and provider catalog changes.",
   },
   group: "ai",
@@ -45,6 +47,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Esplori i modelli disponibili e confronti i prezzi.",
         "es-ES": "Consulte los modelos disponibles y compare los precios.",
         "sk-SK": "Prezrite si dostupné modely a porovnajte ceny.",
+        "hi-IN": "उपलब्ध मॉडल देखें और कीमतों की तुलना करें।",
       },
       "model-catalog-scan": {
         "en-US": "New upstream models, price drift and announced shutdowns.",
@@ -61,6 +64,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Nuevos modelos de los proveedores, cambios de precio y cierres anunciados.",
         "sk-SK": "Nové modely poskytovateľov, zmeny cien a ohlásené vypnutia.",
+        "hi-IN": "नए अपस्ट्रीम मॉडल, कीमतों में बदलाव और घोषित शटडाउन।",
       },
       "refusal-index-leaderboard": {
         "en-US": "How often each model answers, hedges or refuses.",
@@ -71,6 +75,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Quanto spesso ogni modello risponde, divaga o rifiuta.",
         "es-ES": "Con qué frecuencia cada modelo responde, evade o se niega.",
         "sk-SK": "Ako často každý model odpovie, vyhne sa alebo odmietne.",
+        "hi-IN": "हर मॉडल कितनी बार जवाब देता है, टालता है या मना करता है।",
       },
     },
   },

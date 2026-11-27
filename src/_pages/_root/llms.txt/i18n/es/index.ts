@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     referral:
       "Programa de referencia: comisión recurrente {{direct}} % en pagos referidos, además de una piscina {{upline}} % compartida a través de los niveles fijos de {{levels}}. Pagado como créditos o BTC / USDC, pago mínimo {{minPayout}}.",
     languages:
-      "Idiomas del sitio: inglés ({{en}}), alemán ({{de}}), polaco ({{pl}}), francés ({{fr}}), italiano ({{it}}), español ({{es}}) y eslovaco ({{sk}}).",
+      "Idiomas del sitio: inglés ({{en}}), alemán ({{de}}), polaco ({{pl}}), francés ({{fr}}), italiano ({{it}}), español ({{es}}), eslovaco ({{sk}}) e hindi ({{hi}}).",
   },
   pages: {
     heading: "Páginas principales",

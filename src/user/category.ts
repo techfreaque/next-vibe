@@ -25,6 +25,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Account",
     "es-ES": "Cuenta",
     "sk-SK": "Účet",
+    "hi-IN": "अकाउंट",
   },
   description: {
     "en-US": "Find users and review their account access.",
@@ -36,6 +37,7 @@ export const category: CategoryDefinition = {
     "es-ES": "Busque usuarios y revise sus permisos de acceso.",
     "sk-SK":
       "Vyhľadajte používateľov a skontrolujte ich prístupové oprávnenia.",
+    "hi-IN": "यूज़र खोजें और उनका अकाउंट एक्सेस देखें।",
     "en-GLOBAL": "Find users and review their account access.",
   },
   group: "people",
@@ -67,6 +69,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Accesso e registrazione",
         "es-ES": "Acceso y registro",
         "sk-SK": "Prihlásenie a registrácia",
+        "hi-IN": "लॉगिन और साइनअप",
       },
     },
     profile: {
@@ -81,6 +84,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Profilo",
         "es-ES": "Perfil",
         "sk-SK": "Profil",
+        "hi-IN": "प्रोफ़ाइल",
       },
     },
     sessions: {
@@ -95,6 +99,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Sessioni",
         "es-ES": "Sesiones",
         "sk-SK": "Relácie",
+        "hi-IN": "सेशन",
       },
     },
     directory: {
@@ -109,6 +114,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Elenco",
         "es-ES": "Directorio",
         "sk-SK": "Adresár",
+        "hi-IN": "डायरेक्टरी",
       },
     },
     manageUsers: {
@@ -123,6 +129,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Gestione utenti",
         "es-ES": "Gestión de usuarios",
         "sk-SK": "Správa používateľov",
+        "hi-IN": "यूज़र मैनेज करें",
       },
     },
     userStats: {
@@ -137,6 +144,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Iscrizioni",
         "es-ES": "Registros",
         "sk-SK": "Registrácie",
+        "hi-IN": "साइनअप",
       },
     },
     remoteInstances: {
@@ -151,6 +159,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Istanze remote",
         "es-ES": "Instancias remotas",
         "sk-SK": "Vzdialené inštancie",
+        "hi-IN": "रिमोट इंस्टेंस",
       },
     },
     remoteSelf: {
@@ -165,6 +174,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Il mio account",
         "es-ES": "Mi cuenta",
         "sk-SK": "Môj účet",
+        "hi-IN": "खुद",
       },
     },
   },

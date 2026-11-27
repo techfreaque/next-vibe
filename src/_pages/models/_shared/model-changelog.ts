@@ -20,7 +20,10 @@ import {
   type ContentLevelValue,
 } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import {
+  getLanguageFromLocale,
+  toIntlLocale,
+} from "next-vibe/core/i18n/core/language-utils";
 
 import {
   MODEL_CHANGELOG_EVENTS,
@@ -129,7 +132,7 @@ function formatPercent(
 ): string {
   const ratio =
     change.from === 0 ? 1 : Math.abs(change.to - change.from) / change.from;
-  return new Intl.NumberFormat(getLanguageFromLocale(locale), {
+  return new Intl.NumberFormat(toIntlLocale(locale), {
     style: "percent",
     maximumFractionDigits: ratio < 0.1 ? 1 : 0,
   }).format(ratio);

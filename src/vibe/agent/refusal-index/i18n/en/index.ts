@@ -128,6 +128,10 @@ export const translations = {
         label: "Question (Slovak)",
         description: "Display translation for public samples (optional)",
       },
+      textHi: {
+        label: "Question (Hindi)",
+        description: "Display translation for public samples (optional)",
+      },
       generatedBy: { label: "Proposed by" },
       active: {
         label: "Active",

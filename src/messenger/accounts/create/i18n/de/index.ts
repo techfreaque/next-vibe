@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
     it: "Italienisch",
     es: "Spanisch",
     sk: "Slowakisch",
+    hi: "Hindi",
     en: "Englisch",
     de: "Deutsch",
     pl: "Polnisch",

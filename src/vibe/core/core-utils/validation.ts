@@ -1,5 +1,6 @@
 import type { ZodError, ZodIssue } from "zod";
 import { z } from "zod";
+import hindiZodLocale from "zod/v4/locales/hi.js";
 import slovakZodLocale from "zod/v4/locales/sk.js";
 
 import { sanitizeLogText } from "../../logger/telemetry-privacy";
@@ -20,6 +21,13 @@ import {
 } from "./format-validation-error";
 
 const { localeError: slovakZodError } = slovakZodLocale();
+const { localeError: hindiZodError } = hindiZodLocale();
+
+/** Zod default messages for site languages whose Zod defaults are not English. */
+const zodLocaleErrors: Partial<Record<Languages, typeof slovakZodError>> = {
+  [Languages.SK]: slovakZodError,
+  [Languages.HI]: hindiZodError,
+};
 
 /**
  * Validate data against a schema
@@ -56,22 +64,26 @@ export function validateData<TSchema extends z.ZodType>(
   // Not an endpoint handler, so there is no `t` prop to inherit - this is one of
   // the framework entry points that has to build its own from the request locale.
   const { t } = sharedScopedTranslation.scopedT(locale);
+  const zodLocaleError = zodLocaleErrors[getLanguageFromLocale(locale)];
+  const localeZodError =
+    zodLocaleError === undefined
+      ? undefined
+      : (
+          issue: Parameters<typeof slovakZodError>[0],
+        ): ReturnType<typeof slovakZodError> =>
+          issue.code === "invalid_format" && issue.format === "email"
+            ? t("validation.invalidEmail")
+            : zodLocaleError(issue);
 
   try {
     // reportInput puts the offending value on each issue, so the log says WHAT
     // was rejected (e.g. which model id) - summarizeIssueForLog redacts it.
     const result = schema.safeParse(data, {
       reportInput: true,
-      // A per-parse error map supplies Slovak defaults while schema-defined
-      // messages retain precedence and other requests keep their own defaults.
-      error:
-        endpoint?.requestErrorMap?.(locale) ??
-        (getLanguageFromLocale(locale) === Languages.SK
-          ? (issue): ReturnType<typeof slovakZodError> =>
-              issue.code === "invalid_format" && issue.format === "email"
-                ? t("validation.invalidEmail")
-                : slovakZodError(issue)
-          : undefined),
+      // A per-parse error map supplies Slovak and Hindi defaults while
+      // schema-defined messages retain precedence and other requests keep
+      // their own defaults.
+      error: endpoint?.requestErrorMap?.(locale) ?? localeZodError,
     });
 
     if (!result.success) {

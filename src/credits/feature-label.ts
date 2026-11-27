@@ -103,6 +103,7 @@ const META_LOADERS: Record<
   it: () => import("@/generated/endpoints/meta/it"),
   es: () => import("@/generated/endpoints/meta/es"),
   sk: () => import("@/generated/endpoints/meta/sk"),
+  hi: () => import("@/generated/endpoints/meta/hi"),
 };
 
 /**

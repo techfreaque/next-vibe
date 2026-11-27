@@ -1,0 +1,1 @@
+ALTER TABLE "refusal_index_questions" ADD COLUMN "text_hi" text;

@@ -76,6 +76,9 @@ describe("llms.txt", () => {
     expect(resolveLlmsLocale("es-MX")).toBe("es-ES");
     expect(resolveLlmsLocale("sk")).toBe("sk-SK");
     expect(resolveLlmsLocale("sk-DE")).toBe("sk-SK");
+    expect(resolveLlmsLocale("hi")).toBe("hi-IN");
+    expect(resolveLlmsLocale("hi-GLOBAL")).toBe("hi-IN");
+    expect(resolveLlmsLocale("en-IN")).toBe("en-IN");
     expect(resolveLlmsLocale("it-CH")).toBe("it-IT");
     expect(resolveLlmsLocale("fr")).toBe("fr-FR");
     expect(resolveLlmsLocale("FR-fr")).toBe("fr-FR");

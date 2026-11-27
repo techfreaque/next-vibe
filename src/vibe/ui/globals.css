@@ -36,9 +36,15 @@
 @custom-variant light (&:where(html:not(.dark), html:not(.dark) *));
 
 @theme {
-  /* Typography - Inter (next/font on Next.js, fontsource on Vite/TanStack) */
+  /* Typography - Inter (next/font on Next.js, fontsource on Vite/TanStack).
+     Inter has no Devanagari: Hindi glyphs fall through to Noto Sans
+     Devanagari (next/font, fetched only when Devanagari text is on the page)
+     or the OS Devanagari face (Android Noto, Windows Nirmala UI, Apple
+     Kohinoor). */
   --font-sans:
     var(--font-inter, "Inter Variable"), "Inter Variable", "Inter",
+    var(--font-devanagari, "Noto Sans Devanagari"), "Noto Sans Devanagari",
+    "Nirmala UI", "Kohinoor Devanagari", "Devanagari Sangam MN", "Mangal",
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   /* Container query breakpoints */
@@ -571,6 +577,17 @@
 
   p {
     @apply leading-relaxed;
+  }
+
+  /* Devanagari matras sit above and below the line: tight leading clips
+     them and negative tracking breaks conjuncts. */
+  body:lang(hi) {
+    line-height: 1.65;
+  }
+
+  :lang(hi) :is(h1, h2, h3, h4, h5, h6) {
+    line-height: 1.35;
+    letter-spacing: normal;
   }
 }
 

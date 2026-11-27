@@ -4,25 +4,36 @@
  */
 
 import { format } from "date-fns";
-import { de, enUS, es, fr, it, type Locale, pl, sk } from "date-fns/locale";
+import { de, enUS, es, fr, hi, it, type Locale, pl, sk } from "date-fns/locale";
 import type z from "zod";
 
 import { dateSchema } from "../../definition/common.schema";
 import { languageConfig } from "..";
 import type { CountryLanguage, Currencies } from "./config";
-import { getCountryFromLocale, getLanguageFromLocale } from "./language-utils";
+import {
+  getCountryFromLocale,
+  getLanguageFromLocale,
+  toIntlLocale,
+} from "./language-utils";
 
 /**
  * Get locale string from CountryLanguage format
- * Converts "en-GLOBAL" to "en-US", "de-DE" to "de-DE", etc.
+ * Converts "en-GLOBAL" to "en", keeps "de-DE" and "en-IN" (regional grouping).
  */
 function getLocaleString(countryLanguage: CountryLanguage): string {
-  return countryLanguage.endsWith("-GLOBAL")
-    ? getLanguageFromLocale(countryLanguage)
-    : countryLanguage;
+  return toIntlLocale(countryLanguage);
 }
 
-const dateLocales = { de, en: enUS, es, fr, it, pl, sk };
+/** date-fns Hindi with Western digits (its ordinal day is Devanagari). */
+const hiWestern: Locale = {
+  ...hi,
+  localize: {
+    ...hi.localize,
+    ordinalNumber: (value) => String(value),
+  },
+};
+
+const dateLocales = { de, en: enUS, es, fr, hi: hiWestern, it, pl, sk };
 
 function getDateFnsLocale(countryLanguage: CountryLanguage): Locale {
   return dateLocales[getLanguageFromLocale(countryLanguage)];

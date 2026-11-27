@@ -12,9 +12,10 @@ import {
 import { coreEnv } from "next-vibe/core/env";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { htmlLang } from "next-vibe/core/i18n/core/language-utils";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { Body } from "next-vibe/ui/components/body";
-import { inter } from "next-vibe/ui/components/font";
+import { devanagari, inter } from "next-vibe/ui/components/font";
 import { Head } from "next-vibe/ui/components/head";
 import { Html } from "next-vibe/ui/components/html";
 import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
@@ -136,9 +137,9 @@ export function TanstackPage({
     // "system" can't be resolved on the server: render dark, the head theme
     // script swaps to the OS scheme before first paint.
     <Html
-      lang={locale}
+      lang={htmlLang(locale)}
       dir="ltr"
-      className={`${theme === "light" ? "light" : "dark"} ${inter.variable}`.trim()}
+      className={`${theme === "light" ? "light" : "dark"} ${inter.variable} ${devanagari.variable}`.trim()}
       suppressHydrationWarning
     >
       <Head>

@@ -79,7 +79,7 @@ function createScopedEndpointsMetaPlugin(
       build.onResolve(
         {
           filter:
-            /\/system\/generated\/endpoints-meta\/(en|de|pl|fr|it|es|sk)$/,
+            /\/system\/generated\/endpoints-meta\/(en|de|pl|fr|it|es|sk|hi)$/,
         },
         () => ({
           // eslint-disable-next-line i18next/no-literal-string

@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     referral:
       "Programma di riferimento: {{direct}} % commissione ricorrente sui pagamenti rifatti, più un pool {{upline}}% condiviso attraverso i livelli di upline {{levels}}. Pagato come crediti o BTC / USDC, pagamento minimo {{minPayout}}.",
     languages:
-      "Lingue del sito: inglese ({{en}}), tedesco ({{de}}), polacco ({{pl}}), francese ({{fr}}), italiano ({{it}}), spagnolo ({{es}}) e slovacco ({{sk}}).",
+      "Lingue del sito: inglese ({{en}}), tedesco ({{de}}), polacco ({{pl}}), francese ({{fr}}), italiano ({{it}}), spagnolo ({{es}}), slovacco ({{sk}}) e hindi ({{hi}}).",
   },
   pages: {
     heading: "Pagine principali",

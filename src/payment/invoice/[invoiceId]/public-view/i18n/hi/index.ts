@@ -1,0 +1,86 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "पेमेंट्स",
+  tags: { payment: "payment", invoice: "invoice" },
+  get: {
+    title: "इनवॉइस देखें",
+    titleShort: "इनवॉइस देखें",
+    description: "सुरक्षित टोकन लिंक से पब्लिक इनवॉइस व्यू",
+    form: {
+      title: "इनवॉइस",
+      description: "अपने इनवॉइस की जानकारी देखें",
+    },
+    response: {
+      id: "इनवॉइस ID",
+      invoiceNumber: "इनवॉइस नंबर",
+      currency: "करेंसी",
+      status: "स्टेटस",
+      amount: "राशि",
+      dueDate: "देय तिथि",
+      notes: "नोट्स",
+      createdAt: "जारी करने की तिथि",
+      companyName: "कंपनी",
+      companyEmail: "कंपनी का ईमेल",
+      paymentUrl: "ऑनलाइन पेमेंट लिंक",
+      bankIban: "IBAN",
+      bankBic: "BIC",
+      qrKind: "QR पेमेंट स्टैंडर्ड",
+      qrSvg: "पेमेंट QR कोड",
+      lineId: "लाइन ID",
+      lineDescription: "विवरण",
+      productId: "प्रोडक्ट",
+      quantity: "मात्रा",
+      unitPrice: "यूनिट कीमत",
+      taxRate: "टैक्स दर",
+      taxAmount: "टैक्स",
+      lineTotal: "लाइन का कुल",
+      sortOrder: "ऑर्डर",
+      lineCreatedAt: "बनाया गया",
+      lineUpdatedAt: "अपडेट किया गया",
+    },
+    errors: {
+      unauthorized: {
+        title: "अनधिकृत",
+        description: "ऑथेंटिकेशन ज़रूरी है",
+      },
+      validation: {
+        title: "अमान्य लिंक",
+        description: "इनवॉइस लिंक ग़लत या ख़राब है",
+      },
+      server: { title: "सर्वर एरर", description: "सर्वर में आंतरिक एरर" },
+      unknown: {
+        title: "अज्ञात एरर",
+        description: "कोई अज्ञात एरर हुआ",
+      },
+      network: {
+        title: "नेटवर्क एरर",
+        description: "नेटवर्क एरर हुआ",
+      },
+      forbidden: {
+        title: "एक्सेस नहीं मिला",
+        description: "इनवॉइस लिंक ग़लत है या एक्सपायर हो चुका है",
+      },
+      notFound: { title: "नहीं मिला", description: "इनवॉइस नहीं मिला" },
+      conflict: { title: "टकराव", description: "इनवॉइस की स्थिति में टकराव" },
+      unsavedChanges: {
+        title: "बिना सेव किए बदलाव",
+        description: "बिना सेव किए बदलाव हैं",
+      },
+    },
+    success: { title: "इनवॉइस", description: "आपके इनवॉइस की जानकारी" },
+  },
+  invoiceId: { label: "इनवॉइस ID", description: "देखा जाने वाला इनवॉइस" },
+  token: {
+    label: "व्यू टोकन",
+    description: "आपके इनवॉइस ईमेल में मिला सुरक्षित एक्सेस टोकन",
+  },
+  widget: {
+    submit: "इनवॉइस देखें",
+    payOnline: "ऑनलाइन पे करें",
+    bankTransfer: "बैंक ट्रांसफ़र",
+    scanToPay: "अपने बैंकिंग ऐप से स्कैन करें",
+    epcQr: "SEPA GiroCode (EPC)",
+    payBySquareQr: "PAY by square",
+  },
+};

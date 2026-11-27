@@ -5,7 +5,7 @@ import {
   getEstimatedImageOutputTokens,
 } from "next-vibe/agent/models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { toIntlLocale } from "next-vibe/core/i18n/core/language-utils";
 
 import { formatCreditAmount } from "@/products/credit-money";
 
@@ -25,7 +25,7 @@ export function getSkillMessagePrice(
     return { credits, creditLabel, basis: null };
   }
 
-  const formatter = new Intl.NumberFormat(getLanguageFromLocale(locale));
+  const formatter = new Intl.NumberFormat(toIntlLocale(locale));
   return {
     credits,
     creditLabel,

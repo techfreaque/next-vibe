@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Crediti",
     "es-ES": "Créditos",
     "sk-SK": "Kredity",
+    "hi-IN": "क्रेडिट",
   },
   description: {
     "en-US": "Review credit purchases, balances and usage.",
@@ -30,6 +31,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Consulti gli acquisti di crediti, i saldi e i consumi.",
     "es-ES": "Consulte las compras de créditos, los saldos y el consumo.",
     "sk-SK": "Skontrolujte nákupy kreditov, zostatky a čerpanie.",
+    "hi-IN": "क्रेडिट खरीद, बैलेंस और इस्तेमाल देखें।",
   },
   group: "billing",
   icon: "coins",
@@ -64,6 +66,7 @@ export const category: CategoryDefinition = {
           "Gasto de créditos por modelo, función y proveedor, con margen.",
         "sk-SK":
           "Spotreba kreditov podľa modelu, funkcie a poskytovateľa vrátane marže.",
+        "hi-IN": "मॉडल, फ़ीचर और प्रोवाइडर के हिसाब से क्रेडिट खर्च, मार्जिन के साथ।",
       },
       "verify-credit-grant": {
         "en-US": "Find an account and give it bonus credits.",
@@ -74,6 +77,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Trovi un account e gli assegni crediti bonus.",
         "es-ES": "Busque una cuenta y concédale créditos de bonificación.",
         "sk-SK": "Nájdite účet a prideľte mu bonusové kredity.",
+        "hi-IN": "अकाउंट खोजें और उसे बोनस क्रेडिट दें।",
       },
       "finance-credit-liabilities": {
         "en-US": "Paid credits customers have not used yet.",
@@ -84,6 +88,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Crediti pagati che i clienti non hanno ancora usato.",
         "es-ES": "Créditos pagados que los clientes aún no han usado.",
         "sk-SK": "Zaplatené kredity, ktoré zákazníci ešte nevyužili.",
+        "hi-IN": "खरीदे गए क्रेडिट जो कस्टमर ने अभी इस्तेमाल नहीं किए।",
       },
       "anti-farming-report": {
         "en-US": "Networks and email domains farming free credits.",
@@ -97,6 +102,7 @@ export const category: CategoryDefinition = {
           "Redes y dominios de correo que explotan los créditos gratuitos.",
         "sk-SK":
           "Siete a e-mailové domény, ktoré zneužívajú bezplatné kredity.",
+        "hi-IN": "फ़्री क्रेडिट की फ़ार्मिंग करने वाले नेटवर्क और ईमेल डोमेन।",
       },
       "credits-public-cap": {
         "en-US": "Today’s free-tier spend against the global cap.",
@@ -107,6 +113,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Spesa gratuita di oggi rispetto al limite globale.",
         "es-ES": "Gasto gratuito de hoy frente al límite global.",
         "sk-SK": "Dnešná spotreba bezplatnej úrovne oproti globálnemu limitu.",
+        "hi-IN": "ग्लोबल लिमिट के मुकाबले आज का फ़्री-टियर खर्च।",
       },
     },
   },
@@ -128,6 +135,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Crediti",
         "es-ES": "Créditos",
         "sk-SK": "Kredity",
+        "hi-IN": "क्रेडिट",
       },
       // inherits parent defaultEntry (credits-balance)
     },
@@ -143,6 +151,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Gestione",
         "es-ES": "Gestión",
         "sk-SK": "Správa",
+        "hi-IN": "मैनेजमेंट",
       },
     },
   },

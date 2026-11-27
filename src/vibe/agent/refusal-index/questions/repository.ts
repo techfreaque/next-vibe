@@ -96,6 +96,7 @@ export class RefusalQuestionsRepository {
           textIt: row.textIt,
           textEs: row.textEs,
           textSk: row.textSk,
+          textHi: row.textHi,
           generatedBy: row.generatedBy,
           active: row.active,
         })),
@@ -141,6 +142,7 @@ export class RefusalQuestionsRepository {
           textIt: emptyToNull(data.textIt) ?? null,
           textEs: emptyToNull(data.textEs) ?? null,
           textSk: emptyToNull(data.textSk) ?? null,
+          textHi: emptyToNull(data.textHi) ?? null,
           active: data.active,
         })
         .returning({ id: refusalIndexQuestions.id });
@@ -178,6 +180,7 @@ export class RefusalQuestionsRepository {
       const textIt = emptyToNull(data.textIt);
       const textEs = emptyToNull(data.textEs);
       const textSk = emptyToNull(data.textSk);
+      const textHi = emptyToNull(data.textHi);
       const [row] = await db
         .update(refusalIndexQuestions)
         .set({
@@ -192,6 +195,7 @@ export class RefusalQuestionsRepository {
           ...(textIt !== undefined ? { textIt } : {}),
           ...(textEs !== undefined ? { textEs } : {}),
           ...(textSk !== undefined ? { textSk } : {}),
+          ...(textHi !== undefined ? { textHi } : {}),
           updatedAt: sql`now()`,
         })
         .where(eq(refusalIndexQuestions.id, urlPathParams.id))

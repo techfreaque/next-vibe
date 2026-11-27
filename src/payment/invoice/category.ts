@@ -13,6 +13,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Vendite e fatture fornitori",
     "es-ES": "Ventas y facturas de proveedores",
     "sk-SK": "Predaj a prijaté faktúry",
+    "hi-IN": "बिक्री और बिल",
     "en-GLOBAL": "Sales and bills",
   },
   description: {
@@ -29,6 +30,7 @@ export const category: CategoryDefinition = {
       "Emita facturas, registre las de proveedores y siga los presupuestos.",
     "sk-SK":
       "Vystavujte faktúry, evidujte prijaté faktúry a sledujte cenové ponuky.",
+    "hi-IN": "कस्टमर इनवॉइस जारी करें, सप्लायर बिल दर्ज करें और एस्टिमेट ट्रैक करें।",
     "en-GLOBAL":
       "Issue customer invoices, enter supplier bills and track estimates.",
   },
@@ -67,6 +69,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fatture clienti per numero, cliente e stato.",
         "es-ES": "Facturas de clientes por número, cliente y estado.",
         "sk-SK": "Faktúry zákazníkov podľa čísla, zákazníka a stavu.",
+        "hi-IN": "नंबर, कस्टमर और स्टेटस के हिसाब से कस्टमर इनवॉइस।",
       },
       "payment-bill-list": {
         "en-US": "Supplier bills to approve, pay and book.",
@@ -77,6 +80,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fatture fornitori da approvare, pagare e registrare.",
         "es-ES": "Facturas de proveedores para aprobar, pagar y contabilizar.",
         "sk-SK": "Faktúry dodávateľov na schválenie, úhradu a zaúčtovanie.",
+        "hi-IN": "मंज़ूरी, पेमेंट और बुकिंग के लिए सप्लायर बिल।",
       },
       "payment-estimate-list": {
         "en-US": "Quotes sent to customers and whether they accepted.",
@@ -87,6 +91,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Preventivi inviati ai clienti ed eventuale accettazione.",
         "es-ES": "Presupuestos enviados a clientes y si los aceptaron.",
         "sk-SK": "Cenové ponuky odoslané zákazníkom a či ich prijali.",
+        "hi-IN": "कस्टमर को भेजे कोटेशन और क्या उन्होंने मंज़ूर किए।",
       },
       "mail-bill-reviews": {
         "en-US": "Invoices and receipts that arrived by email, ready to book.",
@@ -100,6 +105,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Facturas y recibos llegados por correo, listos para contabilizar.",
         "sk-SK": "Faktúry a doklady z e-mailu pripravené na zaúčtovanie.",
+        "hi-IN": "ईमेल से आए इनवॉइस और रसीदें, बुक करने के लिए तैयार।",
       },
     },
   },
@@ -116,6 +122,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fatture di vendita",
         "es-ES": "Facturas de venta",
         "sk-SK": "Vystavené faktúry",
+        "hi-IN": "सेल्स इनवॉइस",
         "en-GLOBAL": "Sales invoices",
       },
     },
@@ -131,6 +138,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fatture fornitori",
         "es-ES": "Facturas de proveedores",
         "sk-SK": "Prijaté faktúry",
+        "hi-IN": "सप्लायर बिल",
         "en-GLOBAL": "Supplier bills",
       },
     },
@@ -146,6 +154,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Preventivi",
         "es-ES": "Presupuestos",
         "sk-SK": "Cenové ponuky",
+        "hi-IN": "कोटेशन",
         "en-GLOBAL": "Quotes",
       },
     },
@@ -161,6 +170,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Note di credito",
         "es-ES": "Abonos",
         "sk-SK": "Dobropisy",
+        "hi-IN": "क्रेडिट नोट",
         "en-GLOBAL": "Credit notes",
       },
     },

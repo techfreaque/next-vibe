@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Aziende",
     "es-ES": "Empresas",
     "sk-SK": "Firmy",
+    "hi-IN": "कंपनियाँ",
   },
   description: {
     "en-US": "Manage legal entities, company settings and team access.",
@@ -32,6 +33,7 @@ export const category: CategoryDefinition = {
     "es-ES":
       "Gestione las empresas, su configuración y los accesos del equipo.",
     "sk-SK": "Spravujte firmy, ich nastavenia a prístupy členov tímu.",
+    "hi-IN": "कानूनी इकाइयाँ, कंपनी सेटिंग्स और टीम एक्सेस मैनेज करें।",
     "en-GLOBAL": "Manage legal entities, company settings and team access.",
   },
   group: "people",
@@ -57,6 +59,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Passi da un’azienda all’altra e ne modifichi i dati.",
         "es-ES": "Cambie de empresa y edite sus datos.",
         "sk-SK": "Prepínajte medzi spoločnosťami a upravujte ich údaje.",
+        "hi-IN": "कंपनियों के बीच स्विच करें और उनकी जानकारी बदलें।",
       },
     },
   },
@@ -78,6 +81,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Aziende",
         "es-ES": "Empresas",
         "sk-SK": "Firmy",
+        "hi-IN": "कंपनियाँ",
       },
       // inherits parent defaultEntry (companies-list)
     },
@@ -93,6 +97,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Membri",
         "es-ES": "Miembros",
         "sk-SK": "Členovia",
+        "hi-IN": "मेंबर",
       },
     },
   },

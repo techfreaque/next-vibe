@@ -18,6 +18,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Notifiche",
     "es-ES": "Notificaciones",
     "sk-SK": "Oznámenia",
+    "hi-IN": "नोटिफ़िकेशन",
   },
   description: {
     "en-US": "Finished work, alerts and replies, unread first.",
@@ -29,6 +30,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Attività concluse, avvisi e risposte, prima i non letti.",
     "es-ES": "Tareas terminadas, alertas y respuestas, primero lo no leído.",
     "sk-SK": "Dokončené úlohy, upozornenia a odpovede, neprečítané navrchu.",
+    "hi-IN": "पूरे हुए काम, अलर्ट और जवाब, अनपढ़े पहले।",
   },
   group: "business",
   icon: "bell",
@@ -52,6 +54,7 @@ export const category: CategoryDefinition = {
         "es-ES": "Todo lo que terminó en su ausencia, primero lo no leído.",
         "sk-SK":
           "Všetko, čo sa dokončilo počas vašej neprítomnosti, neprečítané navrchu.",
+        "hi-IN": "आपकी गैरमौजूदगी में जो भी पूरा हुआ, अनपढ़ा पहले।",
       },
     },
   },

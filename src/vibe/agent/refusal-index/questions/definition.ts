@@ -88,6 +88,11 @@ const questionRowSchemaFields = {
     hidden: true,
     schema: z.string().nullable(),
   }),
+  textHi: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    hidden: true,
+    schema: z.string().nullable(),
+  }),
   generatedBy: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
     label: "questions.fields.generatedBy.label" as const,
@@ -310,6 +315,14 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXTAREA,
         label: "questions.fields.textSk.label" as const,
         description: "questions.fields.textSk.description" as const,
+        columns: 6,
+        schema: z.string().max(4000).optional(),
+      }),
+      textHi: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "questions.fields.textHi.label" as const,
+        description: "questions.fields.textHi.description" as const,
         columns: 6,
         schema: z.string().max(4000).optional(),
       }),

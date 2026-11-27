@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     referral:
       "Program poleceń: {{direct}}% stałej prowizji od płatności poleconych osób, plus pula {{upline}}% dzielona na {{levels}} poziomów wyżej. Wypłata w kredytach albo w BTC/USDC, minimalna wypłata {{minPayout}}.",
     languages:
-      "Serwis jest dostępny w języku angielskim ({{en}}), niemieckim ({{de}}), polskim ({{pl}}), francuskim ({{fr}}), włoskim ({{it}}), hiszpańskim ({{es}}) i słowackim ({{sk}}).",
+      "Serwis jest dostępny w języku angielskim ({{en}}), niemieckim ({{de}}), polskim ({{pl}}), francuskim ({{fr}}), włoskim ({{it}}), hiszpańskim ({{es}}), słowackim ({{sk}}) i hindi ({{hi}}).",
   },
   pages: {
     heading: "Główne strony",

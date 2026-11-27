@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Punto vendita",
     "es-ES": "Punto de venta",
     "sk-SK": "Predajné miesto",
+    "hi-IN": "POS",
   },
   description: {
     "en-US": "Open a till, record sales and close the shift.",
@@ -32,6 +33,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Apra la cassa, registri le vendite e chiuda il turno.",
     "es-ES": "Abra la caja, registre ventas y cierre el turno.",
     "sk-SK": "Otvorte pokladnicu, zaevidujte predaj a uzavrite zmenu.",
+    "hi-IN": "काउंटर खोलें, बिक्री दर्ज करें और शिफ़्ट बंद करें।",
   },
   group: "business",
   icon: "shopping-cart",
@@ -51,6 +53,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Vendite in cassa per terminale, sessione e stato.",
         "es-ES": "Ventas en caja por terminal, sesión y estado.",
         "sk-SK": "Predaje v pokladni podľa terminálu, zmeny a stavu.",
+        "hi-IN": "टर्मिनल, सेशन और स्टेटस के हिसाब से काउंटर बिक्री।",
       },
       "pos-terminals": {
         "en-US": "Tills and devices that take payments.",
@@ -61,6 +64,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Casse e dispositivi che incassano i pagamenti.",
         "es-ES": "Cajas y dispositivos que cobran los pagos.",
         "sk-SK": "Pokladne a zariadenia, ktoré prijímajú platby.",
+        "hi-IN": "पेमेंट लेने वाले काउंटर और डिवाइस।",
       },
       "products-catalog-list": {
         "en-US": "The products your tills can sell.",
@@ -71,6 +75,7 @@ export const category: CategoryDefinition = {
         "it-IT": "I prodotti che le sue casse possono vendere.",
         "es-ES": "Los productos que pueden vender sus cajas.",
         "sk-SK": "Produkty, ktoré môžu vaše pokladne predávať.",
+        "hi-IN": "वे प्रोडक्ट जो आपके काउंटर बेच सकते हैं।",
       },
     },
   },
@@ -92,6 +97,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ordini",
         "es-ES": "Pedidos",
         "sk-SK": "Objednávky",
+        "hi-IN": "ऑर्डर",
       },
     },
     "POS: Sessions": {
@@ -106,6 +112,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Sessioni",
         "es-ES": "Sesiones",
         "sk-SK": "Pokladničné zmeny",
+        "hi-IN": "सेशन",
       },
     },
     "POS: Terminals": {
@@ -120,6 +127,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Terminali",
         "es-ES": "Terminales",
         "sk-SK": "Terminály",
+        "hi-IN": "टर्मिनल",
       },
     },
     "POS: Products": {
@@ -134,6 +142,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Prodotti",
         "es-ES": "Productos",
         "sk-SK": "Produkty",
+        "hi-IN": "प्रोडक्ट",
       },
     },
   },

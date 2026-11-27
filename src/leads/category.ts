@@ -25,6 +25,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Contatti commerciali",
     "es-ES": "Prospectos",
     "sk-SK": "Potenciálni zákazníci",
+    "hi-IN": "लीड",
   },
   description: {
     "en-US":
@@ -39,6 +40,7 @@ export const category: CategoryDefinition = {
       "Revisa el origen, las conversiones y los prospectos más recientes.",
     "sk-SK":
       "Skontrolujte zdroje kontaktov, konverzie a najnovších potenciálnych zákazníkov.",
+    "hi-IN": "देखें कि लीड कहाँ से आए, कैसे कन्वर्ट हुए और हाल में कौन आया।",
     "en-GLOBAL":
       "Review where leads came from, how they converted and who arrived recently.",
   },
@@ -67,6 +69,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Tutti i lead con fonte, stato e fase della campagna.",
         "es-ES": "Todos los leads con origen, estado y etapa de campaña.",
         "sk-SK": "Všetky leady so zdrojom, stavom a fázou kampane.",
+        "hi-IN": "हर लीड, सोर्स, स्टेटस और कैंपेन स्टेज के साथ।",
       },
       "acquisition-report": {
         "en-US": "See which sources bring visitors, leads and signups.",
@@ -80,6 +83,7 @@ export const category: CategoryDefinition = {
         "es-ES": "Vea qué fuentes traen visitas, leads y registros.",
         "sk-SK":
           "Pozrite si, ktoré zdroje prinášajú návštevy, leady a registrácie.",
+        "hi-IN": "देखें कौन से सोर्स विज़िटर, लीड और साइनअप लाते हैं।",
       },
       "funnel-report": {
         "en-US": "Find where visitors drop off before they pay.",
@@ -90,6 +94,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Scopra dove i visitatori abbandonano prima di pagare.",
         "es-ES": "Detecte dónde abandonan los visitantes antes de pagar.",
         "sk-SK": "Zistite, kde návštevníci odpadávajú pred platbou.",
+        "hi-IN": "पता करें कि विज़िटर पेमेंट से पहले कहाँ छोड़ देते हैं।",
       },
       "abuse-report": {
         "en-US":
@@ -108,6 +113,8 @@ export const category: CategoryDefinition = {
           "Oleadas de bots y consumo de créditos gratuitos, por red y agente.",
         "sk-SK":
           "Vlny botov a míňanie bezplatných kreditov podľa siete a prehliadača.",
+        "hi-IN":
+          "बॉट की बाढ़ और फ़्री क्रेडिट उड़ाने वाले, नेटवर्क और यूज़र एजेंट के हिसाब से।",
       },
       "leads-import-status": {
         "en-US": "Progress and errors of every CSV import.",
@@ -118,6 +125,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Avanzamento ed errori di ogni importazione CSV.",
         "es-ES": "Progreso y errores de cada importación CSV.",
         "sk-SK": "Priebeh a chyby každého importu CSV.",
+        "hi-IN": "हर CSV इंपोर्ट की प्रोग्रेस और एरर।",
       },
     },
   },
@@ -143,6 +151,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Analisi",
         "es-ES": "Análisis",
         "sk-SK": "Analytika",
+        "hi-IN": "एनालिटिक्स",
       },
     },
     Management: {
@@ -157,6 +166,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Gestione",
         "es-ES": "Gestión",
         "sk-SK": "Správa",
+        "hi-IN": "मैनेजमेंट",
       },
       // inherits parent defaultEntry (acquisition-report)
     },
@@ -172,6 +182,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Importazione",
         "es-ES": "Importación",
         "sk-SK": "Import",
+        "hi-IN": "इंपोर्ट",
       },
     },
     Leads: {
@@ -186,6 +197,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Contatti commerciali",
         "es-ES": "Prospectos",
         "sk-SK": "Potenciálni zákazníci",
+        "hi-IN": "लीड",
       },
     },
     emailCampaignsProcessing: {
@@ -200,6 +212,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Campagne",
         "es-ES": "Campañas",
         "sk-SK": "Kampane",
+        "hi-IN": "कैंपेन",
       },
     },
     emailCampaignsJourneys: {
@@ -214,6 +227,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Percorsi",
         "es-ES": "Secuencias",
         "sk-SK": "Komunikačné scenáre",
+        "hi-IN": "जर्नी",
       },
     },
     emailCampaignsQueue: {
@@ -228,6 +242,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Coda",
         "es-ES": "Cola",
         "sk-SK": "Front",
+        "hi-IN": "कतार",
       },
     },
     emailCampaignsStats: {
@@ -242,6 +257,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Statistiche campagne",
         "es-ES": "Estadísticas de campañas",
         "sk-SK": "Štatistiky kampaní",
+        "hi-IN": "कैंपेन आँकड़े",
       },
     },
     growth: {
@@ -256,6 +272,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Crescita",
         "es-ES": "Crecimiento",
         "sk-SK": "Rast",
+        "hi-IN": "ग्रोथ",
       },
     },
     outreach: {
@@ -270,6 +287,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Primi contatti",
         "es-ES": "Contacto inicial",
         "sk-SK": "Oslovovanie zákazníkov",
+        "hi-IN": "आउटरीच",
       },
     },
     leadMagnetIntegrations: {
@@ -284,6 +302,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Integrazioni",
         "es-ES": "Integraciones",
         "sk-SK": "Integrácie",
+        "hi-IN": "इंटीग्रेशन",
       },
     },
   },

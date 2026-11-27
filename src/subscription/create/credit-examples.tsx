@@ -18,7 +18,7 @@ import {
   estimateReferenceChatTurnCredits,
 } from "next-vibe/agent/models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { toIntlLocale } from "next-vibe/core/i18n/core/language-utils";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
@@ -81,7 +81,7 @@ export function CreditExamples({
   if (examples.length === 0) {
     return null;
   }
-  const numbers = new Intl.NumberFormat(getLanguageFromLocale(locale));
+  const numbers = new Intl.NumberFormat(toIntlLocale(locale));
 
   return (
     <Div

@@ -63,6 +63,7 @@ export function QuestionsWidget(): JSX.Element {
           textIt: question.textIt ?? "",
           textEs: question.textEs ?? "",
           textSk: question.textSk ?? "",
+          textHi: question.textHi ?? "",
         },
         renderInModal: true,
         popNavigationOnSuccess: 1,

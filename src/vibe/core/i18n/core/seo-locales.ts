@@ -19,6 +19,8 @@ export const SEO_LOCALES: readonly CountryLanguage[] = [
   "sk-SK",
   "en-GLOBAL",
   "en-US",
+  "en-IN",
+  "hi-IN",
 ];
 
 /** hreflang="x-default" target. */

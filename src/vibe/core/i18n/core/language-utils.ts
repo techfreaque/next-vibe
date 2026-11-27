@@ -1,3 +1,4 @@
+import { languageNames } from "..";
 import type {
   Countries,
   CountryInfo,
@@ -34,11 +35,13 @@ function groupCountries(language: Languages): {
   const countries = availableCountries.filter((country) =>
     country.languages.includes(language),
   );
-  const primary = availableCountries.find(
-    (country) => country.language === language,
-  );
+  // A language without a region of its own (Hindi) leads with its home
+  // region (India), not GLOBAL.
+  const primary =
+    availableCountries.find((country) => country.language === language) ??
+    countries.find((country) => country.code !== "GLOBAL");
   return {
-    name: primary?.langName ?? language,
+    name: languageNames[language],
     countries: primary
       ? [primary, ...countries.filter((country) => country !== primary)]
       : countries,
@@ -82,6 +85,7 @@ class LanguageMapper {
         it: groupCountries("it"),
         es: groupCountries("es"),
         sk: groupCountries("sk"),
+        hi: groupCountries("hi"),
       };
     }
     return this._languageGroupMap;
@@ -210,4 +214,20 @@ export function languageForCountry(
   current: Languages,
 ): Languages {
   return country.languages.includes(current) ? current : country.language;
+}
+
+/**
+ * BCP 47 tag for Intl formatters. Keeps the region so regional conventions
+ * apply (en-IN and hi-IN group digits as 12,34,567). GLOBAL is not a region,
+ * so a GLOBAL locale formats as the bare language. Hindi pins Western digits.
+ */
+export function toIntlLocale(locale: CountryLanguage): string {
+  const tag = htmlLang(locale);
+  return getLanguageFromLocale(locale) === "hi" ? `${tag}-u-nu-latn` : tag;
+}
+
+/** `<html lang>` value: hi-IN, en-IN, de-DE; a GLOBAL locale is the bare language. */
+export function htmlLang(locale: CountryLanguage): string {
+  const { language, country } = getLanguageAndCountryFromLocale(locale);
+  return country === "GLOBAL" ? language : locale;
 }

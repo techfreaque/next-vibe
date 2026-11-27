@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Prodotti",
     "es-ES": "Productos",
     "sk-SK": "Produkty",
+    "hi-IN": "प्रोडक्ट",
   },
   description: {
     "en-US": "Manage products, services, plans and prices.",
@@ -29,6 +30,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Gestisca prodotti, servizi, piani e prezzi.",
     "es-ES": "Gestione productos, servicios, planes y precios.",
     "sk-SK": "Spravujte produkty, služby, predplatné a ceny.",
+    "hi-IN": "प्रोडक्ट, सर्विस, प्लान और कीमतें मैनेज करें।",
     "en-GLOBAL": "Manage products, services, plans and prices.",
   },
   group: "business",
@@ -48,6 +50,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Piani, pacchetti di crediti e prodotti che vende.",
         "es-ES": "Planes, paquetes de créditos y productos que vende.",
         "sk-SK": "Plány, balíky kreditov a tovar, ktorý predávate.",
+        "hi-IN": "आपके बेचे जाने वाले प्लान, क्रेडिट पैक और सामान।",
       },
       "products-category-list": {
         "en-US": "Groups that keep the catalog in order.",
@@ -58,6 +61,7 @@ export const category: CategoryDefinition = {
         "it-IT": "I gruppi che ordinano il catalogo.",
         "es-ES": "Los grupos que ordenan el catálogo.",
         "sk-SK": "Skupiny, ktoré udržiavajú katalóg v poriadku.",
+        "hi-IN": "कैटलॉग को व्यवस्थित रखने वाले ग्रुप।",
       },
     },
   },
@@ -79,6 +83,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Catalogo",
         "es-ES": "Catálogo",
         "sk-SK": "Katalóg",
+        "hi-IN": "कैटलॉग",
       },
       // inherits parent defaultEntry (products-catalog-list)
     },
@@ -94,6 +99,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Categorie",
         "es-ES": "Categorías",
         "sk-SK": "Kategórie",
+        "hi-IN": "कैटेगरी",
       },
     },
   },

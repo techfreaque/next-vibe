@@ -138,7 +138,7 @@ function runCommandCapture(
 const ROUTE_PATTERN = /(?:^|\/)route\.ts$/;
 const DEFINITION_FILE_PATTERN = /(?:^|\/)definition\.ts$/;
 const MARKDOWN_FILE_PATTERN = /\.mdx?$/;
-const I18N_LANG_PATTERN = /\/i18n\/(?:en|de|pl|fr|it|es|sk)\/index\.ts$/;
+const I18N_LANG_PATTERN = /\/i18n\/(?:en|de|pl|fr|it|es|sk|hi)\/index\.ts$/;
 const I18N_INDEX_PATTERN = /\/i18n\/index\.ts$/;
 // All generator output now lives under the single top-level src/generated/
 // (was system/generated + app-tanstack + app-native). One pattern covers them all.

@@ -141,6 +141,10 @@ export const translations: typeof enTranslations = {
         label: "Pytanie (słowacki)",
         description: "Tłumaczenie do publicznych przykładów (opcjonalne)",
       },
+      textHi: {
+        label: "Pytanie (hindi)",
+        description: "Tłumaczenie do publicznych przykładów (opcjonalne)",
+      },
       generatedBy: { label: "Zaproponował" },
       active: {
         label: "Aktywne",

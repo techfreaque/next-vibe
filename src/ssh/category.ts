@@ -21,6 +21,7 @@ export const category: CategoryDefinition = {
     "it-IT": "SSH e infrastruttura",
     "es-ES": "SSH e infraestructura",
     "sk-SK": "SSH a infraštruktúra",
+    "hi-IN": "SSH और इन्फ़्रा",
   },
   description: {
     "en-US": "Open a shell on your servers and manage their login accounts.",
@@ -35,6 +36,7 @@ export const category: CategoryDefinition = {
       "Abra una terminal en sus servidores y gestione sus cuentas de acceso.",
     "sk-SK":
       "Otvorte shell na svojich serveroch a spravujte prihlasovacie účty.",
+    "hi-IN": "अपने सर्वर पर शेल खोलें और उनके लॉगिन अकाउंट मैनेज करें।",
   },
   group: "platform",
   icon: "terminal",
@@ -53,6 +55,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Server e istanze su cui aprire una shell.",
         "es-ES": "Servidores e instancias en los que abrir una terminal.",
         "sk-SK": "Servery a inštancie, na ktorých otvoríte shell.",
+        "hi-IN": "वे सर्वर और इंस्टेंस जिन पर आप शेल खोल सकते हैं।",
       },
       ssh_linux_users_list_GET: {
         "en-US": "Login accounts on the host operating system.",
@@ -63,6 +66,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Account di accesso del sistema operativo host.",
         "es-ES": "Cuentas de acceso del sistema operativo del host.",
         "sk-SK": "Prihlasovacie účty v operačnom systéme hostiteľa.",
+        "hi-IN": "होस्ट ऑपरेटिंग सिस्टम के लॉगिन अकाउंट।",
       },
     },
   },
@@ -84,6 +88,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Connessioni",
         "es-ES": "Conexiones",
         "sk-SK": "Pripojenia",
+        "hi-IN": "कनेक्शन",
       },
     },
     Linux: {
@@ -98,6 +103,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Utenti Linux",
         "es-ES": "Usuarios de Linux",
         "sk-SK": "Používatelia Linuxu",
+        "hi-IN": "Linux यूज़र",
       },
     },
   },

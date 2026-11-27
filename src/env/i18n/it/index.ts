@@ -73,5 +73,6 @@ export const translations: typeof enTranslations = {
     it: "Italiano",
     es: "Spagnolo",
     sk: "Slovacco",
+    hi: "Hindi",
   },
 };

@@ -9,7 +9,10 @@ import type {
   CountryLanguage,
   Currencies,
 } from "next-vibe/core/i18n/core/config";
-import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import {
+  getCountryFromLocale,
+  toIntlLocale,
+} from "next-vibe/core/i18n/core/language-utils";
 
 import type { SubscriptionPlanValue } from "@/subscription/enum";
 import { SubscriptionPlan } from "@/subscription/enum";
@@ -718,7 +721,7 @@ export interface SubscriptionTier {
 }
 
 function formatCreditsLabel(credits: number, locale: CountryLanguage): string {
-  return new Intl.NumberFormat(locale.split("-")[0]).format(credits);
+  return new Intl.NumberFormat(toIntlLocale(locale)).format(credits);
 }
 
 /** All active subscription tiers for a locale, cheapest first. */

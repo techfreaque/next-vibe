@@ -25,7 +25,9 @@ const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefau
 // Routing accepts regional variants independently of the indexable locale set.
 const supportedLocales: CountryLanguage[] = Object.values(
   languageConfig.countryInfo,
-).map(({ language, code }): CountryLanguage => `${language}-${code}`);
+).flatMap(({ languages, code }) =>
+  languages.map((language): CountryLanguage => `${language}-${code}`),
+);
 
 /**
  * Middleware implementation

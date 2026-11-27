@@ -13,6 +13,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Pubblicazione",
     "es-ES": "Publicaciones",
     "sk-SK": "Publikovanie",
+    "hi-IN": "पब्लिशिंग",
     "en-GLOBAL": "Publishing",
   },
   description: {
@@ -24,6 +25,7 @@ export const category: CategoryDefinition = {
       "Gestisca le discussioni del forum e l’indicizzazione delle pagine.",
     "es-ES": "Gestione los debates del foro y la indexación de las páginas.",
     "sk-SK": "Spravujte diskusie vo fóre a indexovanie stránok.",
+    "hi-IN": "फ़ोरम चर्चाएँ और सर्च इंडेक्सिंग मैनेज करें।",
     "en-GLOBAL": "Manage forum discussions and search indexing.",
   },
   group: "content",
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Conversazioni pubbliche condivise con la community.",
         "es-ES": "Conversaciones públicas compartidas con la comunidad.",
         "sk-SK": "Verejné konverzácie zdieľané s komunitou.",
+        "hi-IN": "मेंबर्स के कम्युनिटी के साथ शेयर किए पब्लिक थ्रेड।",
       },
       "chat-moderation": {
         "en-US": "Reported and hidden public posts, most urgent first.",
@@ -58,6 +61,7 @@ export const category: CategoryDefinition = {
           "Publicaciones públicas denunciadas u ocultas, primero las más urgentes.",
         "sk-SK":
           "Nahlásené a skryté verejné príspevky, najnaliehavejšie navrchu.",
+        "hi-IN": "रिपोर्ट किए और छिपाए गए पब्लिक पोस्ट, सबसे ज़रूरी पहले।",
       },
     },
   },
@@ -74,6 +78,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Forum",
         "es-ES": "Foro",
         "sk-SK": "Fórum",
+        "hi-IN": "फ़ोरम",
         "en-GLOBAL": "Forum",
       },
     },
@@ -89,6 +94,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Indicizzazione",
         "es-ES": "Indexación",
         "sk-SK": "Indexovanie stránok",
+        "hi-IN": "सर्च इंडेक्सिंग",
         "en-GLOBAL": "Search indexing",
       },
     },

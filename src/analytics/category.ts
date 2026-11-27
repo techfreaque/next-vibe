@@ -21,6 +21,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Analisi",
     "es-ES": "Analítica",
     "sk-SK": "Analytika",
+    "hi-IN": "एनालिटिक्स",
   },
   description: {
     "en-US": "Track acquisition, revenue and operating trends.",
@@ -30,6 +31,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Segua acquisizione, ricavi e andamento operativo.",
     "es-ES": "Consulte la captación, los ingresos y la evolución operativa.",
     "sk-SK": "Sledujte získavanie zákazníkov, výnosy a prevádzkové výsledky.",
+    "hi-IN": "नए यूज़र, रेवेन्यू और ऑपरेटिंग ट्रेंड ट्रैक करें।",
     "en-GLOBAL": "Track acquisition, revenue and operating trends.",
   },
   group: "analytics",
@@ -68,6 +70,7 @@ export const category: CategoryDefinition = {
           "Tráfico, registros, pagadores, ingresos y coste de IA en cualquier periodo.",
         "sk-SK":
           "Návštevnosť, registrácie, platiaci, tržby a náklady na AI za ľubovoľné obdobie.",
+        "hi-IN": "किसी भी अवधि का ट्रैफ़िक, साइनअप, पेमेंट करने वाले, रेवेन्यू और AI खर्च।",
       },
       "acquisition-report": {
         "en-US": "See which sources bring visitors, leads and signups.",
@@ -81,6 +84,7 @@ export const category: CategoryDefinition = {
         "es-ES": "Vea qué fuentes traen visitas, leads y registros.",
         "sk-SK":
           "Pozrite si, ktoré zdroje prinášajú návštevy, leady a registrácie.",
+        "hi-IN": "देखें कौन से सोर्स विज़िटर, लीड और साइनअप लाते हैं।",
       },
       "funnel-report": {
         "en-US": "Find where visitors drop off before they pay.",
@@ -91,6 +95,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Scopra dove i visitatori abbandonano prima di pagare.",
         "es-ES": "Detecte dónde abandonan los visitantes antes de pagar.",
         "sk-SK": "Zistite, kde návštevníci odpadávajú pred platbou.",
+        "hi-IN": "पता करें कि विज़िटर पेमेंट से पहले कहाँ छोड़ देते हैं।",
       },
       "vibe-sense-graphs": {
         "en-US": "Build and run metric graphs on live platform data.",
@@ -102,6 +107,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Crei ed esegua grafi di metriche sui dati in tempo reale.",
         "es-ES": "Cree y ejecute grafos de métricas con datos en vivo.",
         "sk-SK": "Zostavte a spúšťajte grafy metrík nad živými dátami.",
+        "hi-IN": "लाइव प्लेटफ़ॉर्म डेटा पर मेट्रिक ग्राफ़ बनाएँ और चलाएँ।",
       },
     },
   },
@@ -124,6 +130,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Attività",
         "es-ES": "Negocio",
         "sk-SK": "Podnikanie",
+        "hi-IN": "बिज़नेस",
       },
     },
     "Vibe Sense": {
@@ -138,6 +145,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Vibe Sense",
         "es-ES": "Vibe Sense",
         "sk-SK": "Vibe Sense",
+        "hi-IN": "Vibe Sense",
       },
     },
     Indicators: {
@@ -152,6 +160,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Indicatori",
         "es-ES": "Indicadores",
         "sk-SK": "Ukazovatele",
+        "hi-IN": "इंडिकेटर",
       },
     },
     Evaluators: {
@@ -166,6 +175,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Valutatori",
         "es-ES": "Evaluadores",
         "sk-SK": "Vyhodnocovanie",
+        "hi-IN": "इवैल्युएटर",
       },
     },
     Transformers: {
@@ -180,6 +190,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Trasformatori",
         "es-ES": "Transformadores",
         "sk-SK": "Transformácie",
+        "hi-IN": "ट्रांसफ़ॉर्मर",
       },
     },
     leadsData: {
@@ -194,6 +205,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati sui contatti commerciali",
         "es-ES": "Datos de prospectos",
         "sk-SK": "Údaje o potenciálnych zákazníkoch",
+        "hi-IN": "लीड डेटा",
       },
     },
     usersData: {
@@ -208,6 +220,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati degli utenti",
         "es-ES": "Datos de usuarios",
         "sk-SK": "Údaje o používateľoch",
+        "hi-IN": "यूज़र डेटा",
       },
     },
     messengerData: {
@@ -222,6 +235,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati di messaggistica",
         "es-ES": "Datos de mensajería",
         "sk-SK": "Údaje o správach",
+        "hi-IN": "मैसेंजर डेटा",
       },
     },
     paymentsData: {
@@ -236,6 +250,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati sui pagamenti",
         "es-ES": "Datos de pagos",
         "sk-SK": "Údaje o platbách",
+        "hi-IN": "पेमेंट डेटा",
       },
     },
     creditsData: {
@@ -250,6 +265,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati sui crediti",
         "es-ES": "Datos de créditos",
         "sk-SK": "Údaje o kreditoch",
+        "hi-IN": "क्रेडिट डेटा",
       },
     },
     subscriptionsData: {
@@ -264,6 +280,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati sugli abbonamenti",
         "es-ES": "Datos de suscripciones",
         "sk-SK": "Údaje o predplatnom",
+        "hi-IN": "सब्सक्रिप्शन डेटा",
       },
     },
     referralData: {
@@ -278,6 +295,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati sugli inviti",
         "es-ES": "Datos de referidos",
         "sk-SK": "Údaje o odporúčaniach",
+        "hi-IN": "रेफ़रल डेटा",
       },
     },
     newsletterData: {
@@ -292,6 +310,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati della newsletter",
         "es-ES": "Datos del boletín",
         "sk-SK": "Údaje o newsletteri",
+        "hi-IN": "न्यूज़लेटर डेटा",
       },
     },
     chatData: {
@@ -306,6 +325,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati delle chat",
         "es-ES": "Datos del chat",
         "sk-SK": "Údaje o chatoch",
+        "hi-IN": "चैट डेटा",
       },
     },
     systemData: {
@@ -320,6 +340,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati di sistema",
         "es-ES": "Datos del sistema",
         "sk-SK": "Systémové údaje",
+        "hi-IN": "सिस्टम डेटा",
       },
     },
     financeData: {
@@ -334,6 +355,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Dati finanziari",
         "es-ES": "Datos financieros",
         "sk-SK": "Finančné údaje",
+        "hi-IN": "फ़ाइनेंस डेटा",
       },
     },
   },

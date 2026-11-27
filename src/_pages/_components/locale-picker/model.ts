@@ -45,6 +45,7 @@ const FEATURED: Record<Languages, readonly Countries[]> = {
   es: ["ES", "MX", "AR", "CO", "US", "GLOBAL"],
   pl: ["PL", "GLOBAL"],
   sk: ["SK", "GLOBAL"],
+  hi: ["IN", "GLOBAL"],
 };
 
 export function normalizeSearch(value: string): string {

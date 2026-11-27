@@ -1514,6 +1514,13 @@
       "when": 1795754385458,
       "tag": "20261127043945_web_vitals",
       "breakpoints": true
+    },
+    {
+      "idx": 216,
+      "version": "7",
+      "when": 1795754625888,
+      "tag": "20261127044345_refusal_index_text_hi",
+      "breakpoints": true
     }
   ]
 }

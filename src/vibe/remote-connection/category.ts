@@ -13,6 +13,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Istanze collegate",
     "es-ES": "Instancias conectadas",
     "sk-SK": "Pripojené inštancie",
+    "hi-IN": "कनेक्टेड इंस्टेंस",
     "en-GLOBAL": "Connected instances",
   },
   description: {
@@ -25,6 +26,7 @@ export const category: CategoryDefinition = {
     "es-ES":
       "Consulte las instancias vinculadas y el estado de sus conexiones.",
     "sk-SK": "Skontrolujte pripojené inštancie a stav ich spojenia.",
+    "hi-IN": "कनेक्टेड इंस्टेंस और उनका कनेक्शन स्टेटस देखें।",
   },
   group: "system",
   icon: "network",
@@ -48,6 +50,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Istanze collegate e stato di ogni connessione.",
         "es-ES": "Instancias vinculadas y el estado de cada conexión.",
         "sk-SK": "Prepojené inštancie a stav každého pripojenia.",
+        "hi-IN": "जुड़े इंस्टेंस और हर कनेक्शन की हेल्थ।",
       },
     },
   },

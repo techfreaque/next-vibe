@@ -6,6 +6,7 @@
 
 "use client";
 
+import { toIntlLocale } from "next-vibe/core/i18n/core/language-utils";
 import {
   formatCurrency,
   formatDate,
@@ -234,7 +235,7 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
     });
   }
 
-  const numbers = new Intl.NumberFormat(locale.split("-")[0], {
+  const numbers = new Intl.NumberFormat(toIntlLocale(locale), {
     maximumFractionDigits: 2,
   });
   const typeLabel = (purchase: Purchase): string => {

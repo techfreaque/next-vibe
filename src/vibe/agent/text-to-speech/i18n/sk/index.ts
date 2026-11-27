@@ -112,6 +112,7 @@ export const translations: typeof enTranslations = {
     pl: "Poľština",
     es: "Španielčina",
     sk: "Slovenčina",
+    hi: "Hindčina",
     fr: "Francúzština",
     it: "Taliančina",
   },

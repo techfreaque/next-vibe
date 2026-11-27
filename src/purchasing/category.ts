@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Acquisti",
     "es-ES": "Compras",
     "sk-SK": "Nákup",
+    "hi-IN": "खरीदारी",
   },
   description: {
     "en-US": "Manage suppliers, purchase orders and deliveries.",
@@ -29,6 +30,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Gestisca i fornitori, gli ordini di acquisto e le consegne.",
     "es-ES": "Gestione proveedores, pedidos de compra y entregas.",
     "sk-SK": "Spravujte dodávateľov, nákupné objednávky a dodávky.",
+    "hi-IN": "सप्लायर, परचेज़ ऑर्डर और डिलीवरी मैनेज करें।",
     "en-GLOBAL": "Manage suppliers, purchase orders and deliveries.",
   },
   group: "business",
@@ -56,6 +58,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ordini di acquisto per fornitore e stato.",
         "es-ES": "Pedidos de compra por proveedor y estado.",
         "sk-SK": "Nákupné objednávky podľa dodávateľa a stavu.",
+        "hi-IN": "वेंडर और स्टेटस के हिसाब से परचेज़ ऑर्डर।",
       },
       "purchasing-vendors": {
         "en-US": "The suppliers you buy from.",
@@ -66,6 +69,7 @@ export const category: CategoryDefinition = {
         "it-IT": "I fornitori da cui acquista.",
         "es-ES": "Los proveedores a los que compra.",
         "sk-SK": "Dodávatelia, od ktorých nakupujete.",
+        "hi-IN": "वे सप्लायर जिनसे आप खरीदते हैं।",
       },
       "payment-bill-list": {
         "en-US": "Bills from your vendors, ready to approve and pay.",
@@ -77,6 +81,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fatture dei fornitori, pronte da approvare e pagare.",
         "es-ES": "Facturas de sus proveedores, listas para aprobar y pagar.",
         "sk-SK": "Faktúry od dodávateľov pripravené na schválenie a úhradu.",
+        "hi-IN": "आपके वेंडर के बिल, मंज़ूरी और पेमेंट के लिए तैयार।",
       },
     },
   },
@@ -98,6 +103,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ordini",
         "es-ES": "Pedidos",
         "sk-SK": "Nákupné objednávky",
+        "hi-IN": "ऑर्डर",
       },
     },
     "Purchasing: Vendors": {
@@ -112,6 +118,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fornitori",
         "es-ES": "Proveedores",
         "sk-SK": "Dodávatelia",
+        "hi-IN": "वेंडर",
       },
     },
   },

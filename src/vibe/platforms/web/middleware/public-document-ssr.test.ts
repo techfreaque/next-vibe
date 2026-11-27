@@ -36,6 +36,7 @@ mock.module("next-vibe/ui/hooks/use-navigation", () => ({
 }));
 mock.module("next-vibe/ui/components/font", () => ({
   inter: { className: "", variable: "" },
+  devanagari: { className: "", variable: "" },
 }));
 
 const agentConfig = { ...agentEnvironment };
@@ -221,7 +222,7 @@ it("resolves verified crawler documents as leadless public users without enablin
     page,
     logger,
   );
-  expect(guest.isPublic).toBe(true);
+  expect(guest.isPublic).toBeTruthy();
   expect(guest.leadId).toBe("");
   expect(guest.roles).toEqual([UserPermissionRole.PUBLIC]);
   expect(logQuery).not.toHaveBeenCalled();

@@ -90,6 +90,7 @@ function localizedQuestion(sample: Sample, locale: CountryLanguage): string {
     it: sample.questionIt,
     es: sample.questionEs,
     sk: sample.questionSk,
+    hi: sample.questionHi,
   };
   return byLanguage[language] ?? sample.questionEn;
 }

@@ -81,6 +81,7 @@ class EndpointsMetaGenerator {
     "it-IT",
     "es-ES",
     "sk-SK",
+    "hi-IN",
   ];
 
   /** Mapping from CountryLanguage to short file basename */
@@ -94,6 +95,7 @@ class EndpointsMetaGenerator {
     "it-IT": "it",
     "es-ES": "es",
     "sk-SK": "sk",
+    "hi-IN": "hi",
   };
 
   private static readonly HTTP_METHODS: Methods[] = [

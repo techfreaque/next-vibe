@@ -1,0 +1,206 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "न्यूज़लेटर",
+  enum: {
+    preferences: {
+      marketing: "मार्केटिंग",
+      productNews: "प्रोडक्ट न्यूज़",
+      companyUpdates: "कंपनी अपडेट",
+      industryInsights: "इंडस्ट्री की जानकारी",
+      events: "इवेंट",
+    },
+    creditBonus: {
+      active: "बोनस चालू",
+      pendingConfirmation: "अनलॉक करने के लिए ईमेल कन्फ़र्म करें",
+      claimedElsewhere: "किसी दूसरे अकाउंट ने पहले ही ले लिया",
+      accountRequired: "फ़्री अकाउंट ज़रूरी",
+    },
+  },
+  tags: {
+    newsletter: "न्यूज़लेटर",
+    subscription: "सब्सक्रिप्शन",
+  },
+  email: {
+    label: "ईमेल पता",
+    description: "न्यूज़लेटर के लिए आपका ईमेल पता",
+    placeholder: "user@example.com",
+    helpText: "इसी पते पर हम आपको न्यूज़लेटर भेजेंगे",
+  },
+  name: {
+    label: "नाम",
+    description: "आपका नाम (वैकल्पिक)",
+    placeholder: "राहुल शर्मा",
+    helpText: "इससे हम न्यूज़लेटर को आपके लिए पर्सनल बना पाते हैं",
+  },
+  preferences: {
+    label: "न्यूज़लेटर पसंद",
+    description: "चुनें कि आपको किस तरह के न्यूज़लेटर चाहिए",
+    placeholder: "अपनी पसंद चुनें",
+    helpText: "आप इन्हें कभी भी बदल सकते हैं",
+  },
+  leadId: {
+    label: "Lead ID",
+    description: "वैकल्पिक लीड पहचान",
+    placeholder: "123e4567-e89b-12d3-a456-426614174000",
+    helpText: "सिर्फ़ अंदरूनी इस्तेमाल के लिए",
+  },
+  response: {
+    success: "न्यूज़लेटर सब्सक्राइब हो गया",
+    message: "सफलता मैसेज",
+    leadId: "लीड पहचान",
+    subscriptionId: "सब्सक्रिप्शन ID",
+    userId: "User ID",
+    creditBonus: "फ़्री क्रेडिट बोनस",
+    bonusCredits: "हर महीने के बोनस क्रेडिट",
+    alreadySubscribed: "यह ईमेल पता पहले से हमारे न्यूज़लेटर में है",
+  },
+  errors: {
+    email_generation_failed: "ईमेल नहीं बन पाया",
+    badRequest: {
+      title: "गलत रिक्वेस्ट",
+      description: "रिक्वेस्ट के पैरामीटर गलत हैं",
+    },
+    internal: {
+      title: "अंदरूनी एरर",
+      description: "आपका सब्सक्रिप्शन प्रोसेस करते समय एरर आया",
+      detail: "सब्सक्रिप्शन फ़ेल हुआ: {{error}}",
+    },
+  },
+  post: {
+    title: "न्यूज़लेटर सब्सक्रिप्शन",
+    titleShort: "सब्सक्राइब करें",
+    description: "न्यूज़लेटर अपडेट और नोटिफ़िकेशन सब्सक्राइब करें",
+    form: {
+      title: "न्यूज़लेटर सब्सक्रिप्शन",
+      description: "अपने न्यूज़लेटर सब्सक्रिप्शन की पसंद सेट करें",
+    },
+    response: {
+      title: "सब्सक्रिप्शन का जवाब",
+      description: "न्यूज़लेटर सब्सक्रिप्शन की पुष्टि का डेटा",
+    },
+    errors: {
+      unauthorized: {
+        title: "अनुमति नहीं",
+        description: "लॉग इन ज़रूरी है",
+      },
+      validation: {
+        title: "वैलिडेशन एरर",
+        description: "रिक्वेस्ट के पैरामीटर गलत हैं",
+      },
+      internal: {
+        title: "अंदरूनी एरर",
+        description: "आपका सब्सक्रिप्शन प्रोसेस करते समय एरर आया",
+      },
+      forbidden: {
+        title: "मना है",
+        description: "एक्सेस की अनुमति नहीं है",
+      },
+      conflict: {
+        title: "पहले से सब्सक्राइब है",
+        description: "यह ईमेल पता पहले से हमारे न्यूज़लेटर में है",
+      },
+      badRequest: {
+        title: "गलत रिक्वेस्ट",
+        description: "रिक्वेस्ट के पैरामीटर गलत हैं",
+      },
+    },
+    success: {
+      title: "सब्सक्राइब हो गया",
+      description: "आप हमारे न्यूज़लेटर से जुड़ गए हैं",
+    },
+  },
+  repository: {
+    starting: "न्यूज़लेटर सब्सक्रिप्शन शुरू हो रहा है",
+    linking_to_lead: "न्यूज़लेटर सब्सक्रिप्शन को लीड से जोड़ा जा रहा है",
+    lead_found: "न्यूज़लेटर सब्सक्रिप्शन के लिए लीड मिली",
+    lead_updated: "लीड में न्यूज़लेटर सब्सक्रिप्शन डेटा अपडेट हुआ",
+    lead_update_failed: "लीड में न्यूज़लेटर डेटा अपडेट नहीं हो पाया",
+    lead_not_found: "लीड नहीं मिली या अपडेट के लायक नहीं है",
+    lead_linking_error: "न्यूज़लेटर से लीड जोड़ते समय एरर",
+    missing_lead_id: "leadId के बिना न्यूज़लेटर सब्सक्रिप्शन की कोशिश हुई",
+    already_subscribed: "यूज़र पहले से न्यूज़लेटर में है",
+    reactivating: "न्यूज़लेटर सब्सक्रिप्शन फिर से चालू हो रहा है",
+    creating_new: "नया न्यूज़लेटर सब्सक्रिप्शन बन रहा है",
+    created_successfully: "न्यूज़लेटर सब्सक्रिप्शन बन गया",
+    subscription_failed: "न्यूज़लेटर सब्सक्रिप्शन फ़ेल हुआ",
+  },
+  sms: {
+    no_phone_number: "न्यूज़लेटर वेलकम SMS के लिए कोई फ़ोन नंबर नहीं है",
+    sending_welcome: "न्यूज़लेटर सब्सक्राइबर को वेलकम SMS भेजा जा रहा है",
+    welcome_error: "न्यूज़लेटर वेलकम SMS भेजने में एरर",
+    no_admin_phone: "कोई एडमिन फ़ोन नंबर सेट नहीं है, SMS नोटिफ़िकेशन छोड़ा जा रहा है",
+    sending_admin_notification:
+      "न्यूज़लेटर सब्सक्रिप्शन के लिए एडमिन नोटिफ़िकेशन SMS भेजा जा रहा है",
+    admin_notification_error: "एडमिन नोटिफ़िकेशन SMS भेजने में एरर",
+    welcome: {
+      message: "नमस्ते {{name}}! हमारे न्यूज़लेटर में आपका स्वागत है। अपडेट के लिए जुड़े रहें!",
+    },
+    admin_notification: {
+      message:
+        "नया न्यूज़लेटर सब्सक्रिप्शन: {{displayName}} ({{email}}) ने सब्सक्राइब किया",
+    },
+  },
+  route: {
+    sms_failed_continuing: "SMS नोटिफ़िकेशन फ़ेल हुए, फिर भी आगे बढ़ रहे हैं",
+  },
+  emailTemplates: {
+    welcome: {
+      name: "न्यूज़लेटर वेलकम ईमेल",
+      description: "नए न्यूज़लेटर सब्सक्राइबर को भेजा जाने वाला वेलकम ईमेल",
+      category: "न्यूज़लेटर",
+      preview: {
+        email: {
+          label: "ईमेल पता",
+          description: "सब्सक्राइबर का ईमेल पता",
+        },
+        name: {
+          label: "सब्सक्राइबर का नाम",
+          description: "सब्सक्राइबर का नाम (वैकल्पिक)",
+        },
+        leadId: {
+          label: "Lead ID",
+          description: "एनालिटिक्स के लिए लीड ट्रैकिंग पहचान",
+        },
+        userId: {
+          label: "User ID",
+          description: "यूज़र अकाउंट की पहचान (वैकल्पिक)",
+        },
+      },
+    },
+  },
+  emailTemplate: {
+    welcome: {
+      title: "{{appName}} न्यूज़लेटर में आपका स्वागत है!",
+      subject: "{{appName}} में स्वागत है: अनसेंसर्ड AI की हर खबर",
+      preview: "आप जुड़ गए! अनसेंसर्ड AI, नए मॉडल और खास टिप्स की ताज़ा खबरें पाएँ।",
+      greeting_with_name: "नमस्ते {{name}}!",
+      greeting: "नमस्ते!",
+      message:
+        "{{appName}} न्यूज़लेटर में आपका स्वागत है! अब आप AI के उन शौकीनों की कम्युनिटी का हिस्सा हैं जो AI से ईमानदार, अनसेंसर्ड बातचीत चाहते हैं।",
+      what_to_expect: "आपको ये मिलेगा:",
+      benefit_1: "नए AI मॉडल की घोषणाएँ और अपडेट",
+      benefit_2: "अनसेंसर्ड AI का पूरा फ़ायदा उठाने के टिप्स और ट्रिक्स",
+      benefit_3: "खास ऑफ़र और नए फ़ीचर्स का अर्ली एक्सेस",
+      benefit_4: "कम्युनिटी की खास बातें और सफलता की कहानियाँ",
+      frequency: "हम हर कुछ हफ़्तों में अपडेट भेजेंगे। कभी स्पैम नहीं, हमेशा काम की बात।",
+      unsubscribe_text: "ये ईमेल नहीं चाहिए?",
+      unsubscribe_link: "अनसब्सक्राइब करें",
+      confirm_title: "बस एक क्लिक: हर महीने +{{bonusCredits}} फ़्री क्रेडिट",
+      confirm_text:
+        "यह पता कन्फ़र्म करें और जब तक आप सब्सक्राइब रहेंगे, आपके अकाउंट को हर महीने {{bonusCredits}} एक्स्ट्रा फ़्री क्रेडिट मिलेंगे।",
+      confirm_button: "कन्फ़र्म करें, +{{bonusCredits}} क्रेडिट अनलॉक करें",
+    },
+    admin_notification: {
+      title: "नया न्यूज़लेटर सब्सक्रिप्शन",
+      subject: "नया न्यूज़लेटर सब्सक्रिप्शन",
+      preview: "एक नए यूज़र ने न्यूज़लेटर सब्सक्राइब किया है",
+      message: "एक नए यूज़र ने न्यूज़लेटर सब्सक्राइब किया है।",
+      subscriber_details: "सब्सक्राइबर की जानकारी",
+      email: "ईमेल",
+      name: "नाम",
+      preferences: "पसंद",
+      view_in_admin: "एडमिन पैनल में देखें",
+    },
+  },
+};

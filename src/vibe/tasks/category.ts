@@ -13,6 +13,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Attività pianificate",
     "es-ES": "Tareas programadas",
     "sk-SK": "Naplánované úlohy",
+    "hi-IN": "शेड्यूल किया काम",
     "en-GLOBAL": "Scheduled work",
   },
   description: {
@@ -23,6 +24,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Verifichi le attività pianificate, le esecuzioni e gli errori.",
     "es-ES": "Revise las tareas programadas, las ejecuciones y los fallos.",
     "sk-SK": "Skontrolujte naplánované úlohy, ich priebeh a zlyhania.",
+    "hi-IN": "शेड्यूल किए जॉब, टास्क रन और फ़ेलियर जाँचें।",
     "en-GLOBAL": "Inspect scheduled jobs, task runs and failures.",
   },
   group: "system",
@@ -42,6 +44,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Compruebe el estado de las tareas y sus próximas ejecuciones.",
         "sk-SK": "Skontrolujte stav úloh a ich najbližšie spustenia.",
+        "hi-IN": "टास्क स्टेटस और आने वाले रन जाँचें।",
       },
       "cron-stats": {
         "en-US": "Failing, stuck and overdue tasks with success rates.",
@@ -56,6 +59,7 @@ export const category: CategoryDefinition = {
           "Attività fallite, bloccate o in ritardo, con tasso di successo.",
         "es-ES": "Tareas fallidas, bloqueadas o atrasadas, con tasa de éxito.",
         "sk-SK": "Zlyhané, zaseknuté a oneskorené úlohy s mierou úspešnosti.",
+        "hi-IN": "फ़ेल, अटके और लेट टास्क, सफलता दर के साथ।",
       },
       "cron-queue": {
         "en-US": "What runs next, in order of start time.",
@@ -66,6 +70,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Cosa parte dopo, in ordine di avvio.",
         "es-ES": "Lo que se ejecuta a continuación, por hora de inicio.",
         "sk-SK": "Čo sa spustí ďalej, podľa času spustenia.",
+        "hi-IN": "आगे क्या चलेगा, शुरू होने के समय के क्रम में।",
       },
       "cron-history": {
         "en-US": "Past runs with result, duration and errors.",
@@ -76,6 +81,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Esecuzioni passate con esito, durata ed errori.",
         "es-ES": "Ejecuciones anteriores con resultado, duración y errores.",
         "sk-SK": "Minulé spustenia s výsledkom, trvaním a chybami.",
+        "hi-IN": "पिछले रन, नतीजे, अवधि और एरर के साथ।",
       },
     },
   },

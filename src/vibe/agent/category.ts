@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Agente IA",
     "es-ES": "Agente de IA",
     "sk-SK": "Agent AI",
+    "hi-IN": "AI एजेंट",
   },
   description: {
     "en-US": "Explore models, skills and conversations.",
@@ -28,6 +29,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Esplori modelli, competenze e conversazioni.",
     "es-ES": "Explore modelos, habilidades y conversaciones.",
     "sk-SK": "Prezrite si modely, zručnosti a konverzácie.",
+    "hi-IN": "मॉडल, स्किल और बातचीत देखें।",
     "en-GLOBAL": "Explore models, skills and conversations.",
   },
   group: "ai",
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
       "it-IT": "IA",
       "es-ES": "IA",
       "sk-SK": "AI",
+      "hi-IN": "AI",
     },
     summary: { alias: "ai-admin-summary", scope: "platform" },
     actions: ["skill-create"],
@@ -65,6 +68,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Esplori i modelli disponibili e confronti i prezzi.",
         "es-ES": "Consulte los modelos disponibles y compare los precios.",
         "sk-SK": "Prezrite si dostupné modely a porovnajte ceny.",
+        "hi-IN": "उपलब्ध मॉडल देखें और कीमतों की तुलना करें।",
       },
       skills: {
         "en-US": "Browse reusable instructions and tools for agents.",
@@ -81,6 +85,7 @@ export const category: CategoryDefinition = {
           "Explore instrucciones y herramientas reutilizables para agentes.",
         "sk-SK":
           "Prezrite si opakovane použiteľné pokyny a nástroje pre agentov.",
+        "hi-IN": "एजेंट के लिए दोबारा इस्तेमाल होने वाले निर्देश और टूल देखें।",
       },
       "agent-chat-threads": {
         "en-US": "Open your saved agent conversations.",
@@ -91,6 +96,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Apra le conversazioni salvate con gli agenti.",
         "es-ES": "Abra sus conversaciones guardadas con agentes.",
         "sk-SK": "Otvorte svoje uložené konverzácie s agentmi.",
+        "hi-IN": "अपनी सेव की गई एजेंट बातचीत खोलें।",
       },
       "task-list": {
         "en-US": "Check task status and upcoming runs.",
@@ -102,6 +108,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Compruebe el estado de las tareas y sus próximas ejecuciones.",
         "sk-SK": "Skontrolujte stav úloh a ich najbližšie spustenia.",
+        "hi-IN": "टास्क स्टेटस और आने वाले रन जाँचें।",
       },
       "chat-moderation": {
         "en-US": "Reported and hidden public posts, most urgent first.",
@@ -116,6 +123,7 @@ export const category: CategoryDefinition = {
           "Publicaciones públicas denunciadas u ocultas, primero las más urgentes.",
         "sk-SK":
           "Nahlásené a skryté verejné príspevky, najnaliehavejšie navrchu.",
+        "hi-IN": "रिपोर्ट किए और छिपाए गए पब्लिक पोस्ट, सबसे ज़रूरी पहले।",
       },
       "skill-moderation": {
         "en-US": "Community skills with reports, most reported first.",
@@ -130,6 +138,7 @@ export const category: CategoryDefinition = {
           "Skills de la comunidad denunciadas, primero las más denunciadas.",
         "sk-SK":
           "Zručnosti komunity s hláseniami, najčastejšie nahlásené navrchu.",
+        "hi-IN": "रिपोर्ट वाली कम्युनिटी स्किल, सबसे ज़्यादा रिपोर्ट वाली पहले।",
       },
     },
   },
@@ -151,6 +160,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Inferenza",
         "es-ES": "Inferencia",
         "sk-SK": "Inferencia",
+        "hi-IN": "इन्फ़रेंस",
       },
     },
     Generation: {
@@ -165,6 +175,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Generazione",
         "es-ES": "Generación",
         "sk-SK": "Generovanie",
+        "hi-IN": "जनरेशन",
       },
     },
     Tools: {
@@ -179,6 +190,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Strumenti",
         "es-ES": "Herramientas",
         "sk-SK": "Nástroje",
+        "hi-IN": "टूल",
       },
     },
     Search: {
@@ -193,6 +205,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ricerca",
         "es-ES": "Búsqueda",
         "sk-SK": "Vyhľadávanie",
+        "hi-IN": "सर्च",
       },
     },
     chat: {
@@ -207,6 +220,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Chat",
         "es-ES": "Chat",
         "sk-SK": "Chat",
+        "hi-IN": "चैट",
       },
     },
     chatFavorites: {
@@ -221,6 +235,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Preferiti",
         "es-ES": "Favoritos",
         "sk-SK": "Obľúbené",
+        "hi-IN": "फ़ेवरेट",
       },
     },
     chatOrganization: {
@@ -235,6 +250,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Organizzazione",
         "es-ES": "Organización",
         "sk-SK": "Organizácia",
+        "hi-IN": "संगठन",
       },
     },
     chatSettings: {
@@ -249,6 +265,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Impostazioni chat",
         "es-ES": "Configuración del chat",
         "sk-SK": "Nastavenia chatu",
+        "hi-IN": "चैट सेटिंग्स",
       },
     },
     skillsManagement: {
@@ -263,6 +280,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Skill",
         "es-ES": "Skills",
         "sk-SK": "Zručnosti",
+        "hi-IN": "स्किल",
       },
     },
     skillsCommunity: {
@@ -277,6 +295,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Skill della community",
         "es-ES": "Skills de la comunidad",
         "sk-SK": "Zručnosti komunity",
+        "hi-IN": "कम्युनिटी स्किल",
       },
     },
     skillsModeration: {
@@ -291,6 +310,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Moderazione delle skill",
         "es-ES": "Moderación de skills",
         "sk-SK": "Moderovanie zručností",
+        "hi-IN": "स्किल मॉडरेशन",
       },
     },
     threadsManagement: {
@@ -305,6 +325,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Conversazioni",
         "es-ES": "Conversaciones",
         "sk-SK": "Konverzácie",
+        "hi-IN": "थ्रेड",
       },
     },
     threadsSharing: {
@@ -319,6 +340,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Condivisione delle conversazioni",
         "es-ES": "Conversaciones compartidas",
         "sk-SK": "Zdieľanie konverzácií",
+        "hi-IN": "थ्रेड शेयरिंग",
       },
     },
     threadsSearch: {
@@ -333,6 +355,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ricerca nelle conversazioni",
         "es-ES": "Búsqueda de conversaciones",
         "sk-SK": "Vyhľadávanie konverzácií",
+        "hi-IN": "थ्रेड सर्च",
       },
     },
     messagesModerating: {
@@ -347,6 +370,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Messaggi",
         "es-ES": "Mensajes",
         "sk-SK": "Správy",
+        "hi-IN": "मैसेज",
       },
     },
     messagesSearch: {
@@ -361,6 +385,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ricerca nei messaggi",
         "es-ES": "Búsqueda de mensajes",
         "sk-SK": "Vyhľadávanie správ",
+        "hi-IN": "मैसेज सर्च",
       },
     },
     messagesFiles: {
@@ -375,6 +400,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Allegati dei messaggi",
         "es-ES": "Archivos de mensajes",
         "sk-SK": "Súbory v správach",
+        "hi-IN": "मैसेज फ़ाइलें",
       },
     },
     tasksCron: {
@@ -389,6 +415,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Attività pianificate",
         "es-ES": "Tareas programadas",
         "sk-SK": "Naplánované úlohy",
+        "hi-IN": "शेड्यूल टास्क",
       },
     },
   },

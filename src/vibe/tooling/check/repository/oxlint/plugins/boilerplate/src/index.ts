@@ -297,7 +297,8 @@ function isI18nLangFile(context: BoilerplateRuleContext): boolean {
       filename.includes("/i18n/fr/index.ts") ||
       filename.includes("/i18n/it/index.ts") ||
       filename.includes("/i18n/es/index.ts") ||
-      filename.includes("/i18n/sk/index.ts")) &&
+      filename.includes("/i18n/sk/index.ts") ||
+      filename.includes("/i18n/hi/index.ts")) &&
     !filename.includes("/i18n/en/")
   );
 }

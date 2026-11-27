@@ -6,16 +6,27 @@ import { Glob } from "bun";
 
 // Run with Bun so the verifier reads the same TypeScript dictionaries as SSR.
 // --allow-protected lists the explicitly deferred design scopes separately.
+// --locale=hi checks Hindi, which is still being rolled out: scopes without a
+// hi dictionary are counted as pending unless --strict makes them errors.
 const allowProtected = process.argv.includes("--allow-protected");
+const strict = process.argv.includes("--strict");
 const siteLocales = ["it", "es", "sk"];
+const rolloutLocales = ["hi"];
 const requestedLocale = process.argv
   .find((argument) => argument.startsWith("--locale="))
   ?.slice("--locale=".length);
-if (requestedLocale !== undefined && !siteLocales.includes(requestedLocale)) {
+if (
+  requestedLocale !== undefined &&
+  !siteLocales.includes(requestedLocale) &&
+  !rolloutLocales.includes(requestedLocale)
+) {
   process.stderr.write(`Unsupported locale: ${requestedLocale}\n`);
   process.exit(1);
 }
 const locales = requestedLocale === undefined ? siteLocales : [requestedLocale];
+const pending = [];
+// Hindi copy keeps Western digits (0-9), never Devanagari numerals.
+const devanagariDigits = /[\u0966-\u096F]/;
 const protectedScope =
   /^src\/(?:_pages\/skill\/\[skillId\]\/|vibe\/agent\/(?:chat\/folder[^/]*\/|ai-stream\/stream\/widget\/chat-ui\/))/;
 const root = resolve(import.meta.dirname, "..");
@@ -62,6 +73,11 @@ function compare(source, translated, path) {
     if (translated.includes("—")) {
       errors.push(`${path} contains an em dash`);
     }
+    if (path.includes("/hi.") || /\/hi(?:\.|$)/.test(path)) {
+      if (devanagariDigits.test(translated) && !devanagariDigits.test(source)) {
+        errors.push(`${path} uses Devanagari digits`);
+      }
+    }
   } else if (source !== translated) {
     errors.push(`${path} changes a non-text value`);
   }
@@ -92,7 +108,11 @@ for (const english of [
     }
     const path = join(root, scope, lang, "index.ts");
     if (!existsSync(path)) {
-      errors.push(`${scope} is missing ${lang}`);
+      if (rolloutLocales.includes(lang) && !strict) {
+        pending.push(`${scope}/${lang}`);
+      } else {
+        errors.push(`${scope} is missing ${lang}`);
+      }
       continue;
     }
     if (!new RegExp(`^\\s*${lang}:\\s*`, "m").test(loader)) {
@@ -110,6 +130,11 @@ for (const english of [
 process.stdout.write(
   `${scopes} scopes, ${strings} translated string entries compared, ${errors.length} errors\n`,
 );
+if (pending.length) {
+  process.stdout.write(
+    `${pending.length} scopes have no ${locales.join("/")} dictionary yet (English fallback; --strict lists them as errors)\n`,
+  );
+}
 for (const scope of deferred) {
   process.stdout.write(`Deferred design scope: ${scope}\n`);
 }

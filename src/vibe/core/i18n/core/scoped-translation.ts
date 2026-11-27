@@ -70,6 +70,7 @@ export function createScopedTranslation<
   const TIT,
   const TES,
   const TSK,
+  const THI,
 >(translationsByLanguage: {
   en: TEN;
   de: LazyOrEager<TDE>;
@@ -78,6 +79,7 @@ export function createScopedTranslation<
   it?: LazyOrEager<TIT>;
   es?: LazyOrEager<TES>;
   sk?: LazyOrEager<TSK>;
+  hi?: LazyOrEager<THI>;
 }): {
   readonly ScopedTranslationKey: DotNotation<TEN>;
   readonly scopedT: (locale: CountryLanguage) => {

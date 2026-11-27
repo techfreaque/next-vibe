@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     referral:
       "Empfehlungsprogramm: {{direct}} % wiederkehrende Provision auf vermittelte Zahlungen, dazu ein Pool von {{upline}} % über {{levels}} Upline-Ebenen. Auszahlung als Credits oder in BTC/USDC, Mindestauszahlung {{minPayout}}.",
     languages:
-      "Sprachen der Website: Englisch ({{en}}), Deutsch ({{de}}), Polnisch ({{pl}}), Französisch ({{fr}}), Italienisch ({{it}}), Spanisch ({{es}}) und Slowakisch ({{sk}}).",
+      "Sprachen der Website: Englisch ({{en}}), Deutsch ({{de}}), Polnisch ({{pl}}), Französisch ({{fr}}), Italienisch ({{it}}), Spanisch ({{es}}), Slowakisch ({{sk}}) und Hindi ({{hi}}).",
   },
   pages: {
     heading: "Wichtige Seiten",

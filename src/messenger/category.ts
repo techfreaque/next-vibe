@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Messaggistica",
     "es-ES": "Mensajería",
     "sk-SK": "Správy",
+    "hi-IN": "मैसेंजर",
   },
   description: {
     "en-US": "Manage connected mailboxes and read incoming messages.",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
     "es-ES":
       "Gestione los buzones conectados y consulte los mensajes recibidos.",
     "sk-SK": "Spravujte pripojené schránky a čítajte prijaté správy.",
+    "hi-IN": "कनेक्टेड मेलबॉक्स मैनेज करें और आने वाले मैसेज पढ़ें।",
   },
   group: "comms",
   icon: "mail",
@@ -66,6 +68,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Correo recibido en la dirección de la plataforma, lo más reciente primero.",
         "sk-SK": "Pošta na adresu platformy, najnovšia navrchu.",
+        "hi-IN": "प्लेटफ़ॉर्म के पते पर भेजे गए मेल, नए पहले।",
       },
       "messenger-inbox": {
         "en-US": "Read mail in your connected mailboxes.",
@@ -76,6 +79,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Legga la posta delle caselle collegate.",
         "es-ES": "Lea el correo de sus buzones conectados.",
         "sk-SK": "Čítajte poštu v pripojených schránkach.",
+        "hi-IN": "अपने कनेक्टेड मेलबॉक्स में मेल पढ़ें।",
       },
       "messenger-messages": {
         "en-US": "Every email the platform sent, searchable and filtered.",
@@ -86,6 +90,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ogni email inviata, con ricerca e filtri.",
         "es-ES": "Cada correo enviado, con búsqueda y filtros.",
         "sk-SK": "Každý odoslaný e-mail s vyhľadávaním a filtrami.",
+        "hi-IN": "प्लेटफ़ॉर्म का भेजा हर ईमेल, सर्च और फ़िल्टर के साथ।",
       },
       "email-stats": {
         "en-US": "Sends, opens, clicks and bounces over time.",
@@ -96,6 +101,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Invii, aperture, clic e rimbalzi nel tempo.",
         "es-ES": "Envíos, aperturas, clics y rebotes a lo largo del tiempo.",
         "sk-SK": "Odoslané, otvorené, kliknutia a nedoručené v čase.",
+        "hi-IN": "समय के साथ भेजे, खोले, क्लिक और बाउंस हुए ईमेल।",
       },
       "messenger-accounts": {
         "en-US": "The accounts the platform sends from, on every channel.",
@@ -108,6 +114,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Las cuentas desde las que envía la plataforma, en todos los canales.",
         "sk-SK": "Účty, z ktorých platforma posiela, na všetkých kanáloch.",
+        "hi-IN": "हर चैनल पर वे अकाउंट जिनसे प्लेटफ़ॉर्म भेजता है।",
       },
     },
   },
@@ -129,6 +136,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Account",
         "es-ES": "Cuentas",
         "sk-SK": "Účty",
+        "hi-IN": "अकाउंट",
       },
       // inherits parent defaultEntry (messenger-accounts)
     },
@@ -144,6 +152,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Posta in arrivo",
         "es-ES": "Bandeja de entrada",
         "sk-SK": "Doručená pošta",
+        "hi-IN": "इनबॉक्स",
       },
     },
     Messages: {
@@ -158,6 +167,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Messaggi",
         "es-ES": "Mensajes",
         "sk-SK": "Správy",
+        "hi-IN": "मैसेज",
       },
     },
     Providers: {
@@ -172,6 +182,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fornitori",
         "es-ES": "Proveedores",
         "sk-SK": "Poskytovatelia",
+        "hi-IN": "प्रोवाइडर",
       },
     },
   },

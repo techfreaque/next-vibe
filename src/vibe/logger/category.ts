@@ -13,6 +13,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Stato del sistema",
     "es-ES": "Estado del sistema",
     "sk-SK": "Stav systému",
+    "hi-IN": "सिस्टम हेल्थ",
     "en-GLOBAL": "System health",
   },
   description: {
@@ -30,6 +31,7 @@ export const category: CategoryDefinition = {
       "Consulta los errores abiertos, las tareas fallidas y el estado de las instancias conectadas.",
     "sk-SK":
       "Skontrolujte otvorené chyby, neúspešné naplánované úlohy a stav pripojených inštancií.",
+    "hi-IN": "अनसुलझे एरर, फ़ेल होते शेड्यूल टास्क और कनेक्टेड इंस्टेंस की हेल्थ देखें।",
     "en-GLOBAL":
       "Review unresolved errors, failing scheduled tasks and connected instance health.",
   },
@@ -65,6 +67,7 @@ export const category: CategoryDefinition = {
           "Errores sin resolver con recuento, tendencia y usuarios afectados.",
         "sk-SK":
           "Nevyriešené chyby s počtom, trendom a dotknutými používateľmi.",
+        "hi-IN": "अनसुलझे एरर, गिनती, ट्रेंड और प्रभावित यूज़र के साथ।",
       },
       "task-health": {
         "en-US": "Running tasks, recent failures and open incidents.",
@@ -75,6 +78,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Attività in corso, errori recenti e incidenti aperti.",
         "es-ES": "Tareas en curso, fallos recientes e incidentes abiertos.",
         "sk-SK": "Bežiace úlohy, posledné zlyhania a otvorené incidenty.",
+        "hi-IN": "चल रहे टास्क, हाल के फ़ेलियर और खुली घटनाएँ।",
       },
       health: {
         "en-US": "Server status and diagnostics right now.",
@@ -85,6 +89,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Stato del server e diagnostica in tempo reale.",
         "es-ES": "Estado del servidor y diagnóstico en tiempo real.",
         "sk-SK": "Aktuálny stav servera a diagnostika.",
+        "hi-IN": "अभी का सर्वर स्टेटस और डायग्नॉस्टिक्स।",
       },
       "remote-connections": {
         "en-US": "Linked instances and the health of each connection.",
@@ -95,6 +100,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Istanze collegate e stato di ogni connessione.",
         "es-ES": "Instancias vinculadas y el estado de cada conexión.",
         "sk-SK": "Prepojené inštancie a stav každého pripojenia.",
+        "hi-IN": "जुड़े इंस्टेंस और हर कनेक्शन की हेल्थ।",
       },
       "task-budget-caps": {
         "en-US": "Credit limits that stop runaway background tasks.",
@@ -109,6 +115,7 @@ export const category: CategoryDefinition = {
           "Límites de créditos que detienen tareas en segundo plano descontroladas.",
         "sk-SK":
           "Limity kreditov, ktoré zastavia nekontrolované úlohy na pozadí.",
+        "hi-IN": "क्रेडिट लिमिट जो बेकाबू बैकग्राउंड टास्क रोकती हैं।",
       },
     },
   },

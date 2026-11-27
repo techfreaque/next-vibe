@@ -1,5 +1,6 @@
 "use client";
 
+import { toIntlLocale } from "next-vibe/core/i18n/core/language-utils";
 import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
 import { Alert } from "next-vibe/ui/components/alert";
 import { Button } from "next-vibe/ui/components/button";
@@ -56,7 +57,7 @@ export function GrantRecipientContainer({
   const navigate = useRelatedEntityNavigation();
   const locale = useWidgetLocale();
   const { t: tSubscription } = subscriptionTranslation.scopedT(locale);
-  const numbers = new Intl.NumberFormat(locale.split("-")[0], {
+  const numbers = new Intl.NumberFormat(toIntlLocale(locale), {
     maximumFractionDigits: 2,
   });
   const canAct = isInteractive && !responseOnly;
@@ -254,7 +255,7 @@ export function AdminAddCreditsContainer({
   const t = useWidgetTranslation<typeof definitions.POST>();
   const form = useWidgetForm<typeof definitions.POST>();
   const locale = useWidgetLocale();
-  const numbers = new Intl.NumberFormat(locale.split("-")[0], {
+  const numbers = new Intl.NumberFormat(toIntlLocale(locale), {
     maximumFractionDigits: 2,
   });
   const user = useWidgetUser();

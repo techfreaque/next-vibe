@@ -5,7 +5,7 @@
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { toIntlLocale } from "next-vibe/core/i18n/core/language-utils";
 
 import { FREE_CREDIT_SIGNED_IN_TOTAL } from "./constants";
 import { ProductIds, productsRepository } from "./repository-client";
@@ -31,7 +31,7 @@ function formatMoney(
   currency: string,
   locale: CountryLanguage,
 ): string {
-  return new Intl.NumberFormat(getLanguageFromLocale(locale), {
+  return new Intl.NumberFormat(toIntlLocale(locale), {
     style: "currency",
     currency,
     minimumFractionDigits: 2,
@@ -72,7 +72,7 @@ export function formatCreditAmount(
   credits: number,
   locale: CountryLanguage,
 ): string {
-  const language = getLanguageFromLocale(locale);
+  const language = toIntlLocale(locale);
   const abs = Math.abs(credits);
   if (abs > 0 && abs < 0.01) {
     return new Intl.NumberFormat(language, {

@@ -221,7 +221,7 @@ const nextConfig: NextConfig = {
         splitChunks.cacheGroups = {
           ...splitChunks.cacheGroups,
           i18nLocales: {
-            test: /[\\/](?:i18n|layout-i18n|i18n[\\/]shared)[\\/](de|pl|fr|it|es|sk)[\\/]/,
+            test: /[\\/](?:i18n|layout-i18n|i18n[\\/]shared)[\\/](de|pl|fr|it|es|sk|hi)[\\/]/,
             chunks: "async",
             // Each lazy dictionary keeps its own module boundary. In production
             // its build-scoped URL lets webpack compute the filename from the

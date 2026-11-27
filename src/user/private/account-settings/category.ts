@@ -17,6 +17,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Il mio account",
     "es-ES": "Mi cuenta",
     "sk-SK": "Môj účet",
+    "hi-IN": "मेरा अकाउंट",
     "en-GLOBAL": "My account",
   },
   description: {
@@ -29,6 +30,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Gestisca il profilo, l’accesso, la fatturazione e le chiavi API.",
     "es-ES": "Gestione su perfil, el acceso, la facturación y sus claves API.",
     "sk-SK": "Spravujte svoj profil, prihlasovanie, fakturáciu a kľúče API.",
+    "hi-IN": "अपनी प्रोफ़ाइल, साइन-इन, बिलिंग और API कीज़ मैनेज करें।",
     "en-GLOBAL": "Manage your profile, sign-in, billing and API keys.",
   },
   landing: {
@@ -50,6 +52,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Modifichi nome, email e dati del profilo.",
         "es-ES": "Edite su nombre, correo y datos de perfil.",
         "sk-SK": "Upravte meno, e-mail a údaje profilu.",
+        "hi-IN": "अपना नाम, ईमेल और प्रोफ़ाइल जानकारी बदलें।",
       },
       "user-sessions": {
         "en-US":
@@ -66,6 +69,7 @@ export const category: CategoryDefinition = {
           "Vea los dispositivos conectados y cierre la sesión en los que no reconozca.",
         "sk-SK":
           "Pozrite si prihlásené zariadenia a odhláste tie, ktorým nedôverujete.",
+        "hi-IN": "साइन-इन डिवाइस देखें और जिन पर भरोसा नहीं, उन्हें साइन आउट करें।",
       },
       subscription_GET: {
         "en-US": "Check your plan, renewal date and credits.",
@@ -77,6 +81,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Controlli piano, data di rinnovo e crediti.",
         "es-ES": "Consulte su plan, la fecha de renovación y sus créditos.",
         "sk-SK": "Skontrolujte plán, dátum obnovenia a kredity.",
+        "hi-IN": "अपना प्लान, रिन्यूअल की तारीख और क्रेडिट जाँचें।",
       },
       payment_GET: {
         "en-US": "Your most recent payments and their status.",
@@ -87,6 +92,7 @@ export const category: CategoryDefinition = {
         "it-IT": "I suoi ultimi pagamenti e il loro stato.",
         "es-ES": "Sus pagos más recientes y su estado.",
         "sk-SK": "Vaše posledné platby a ich stav.",
+        "hi-IN": "आपके हाल के पेमेंट और उनका स्टेटस।",
       },
       user_private_me_addresses_GET: {
         "en-US": "Set the billing address printed on your invoices.",
@@ -97,6 +103,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Imposti l’indirizzo di fatturazione delle sue fatture.",
         "es-ES": "Defina la dirección de facturación de sus facturas.",
         "sk-SK": "Nastavte fakturačnú adresu na vašich faktúrach.",
+        "hi-IN": "इनवॉइस पर छपने वाला बिलिंग पता सेट करें।",
       },
       "api-keys": {
         "en-US": "Create and revoke keys for the API.",
@@ -107,6 +114,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Crei e revochi le chiavi per l’API.",
         "es-ES": "Cree y revoque claves para la API.",
         "sk-SK": "Vytvárajte a rušte kľúče k API.",
+        "hi-IN": "API के लिए कीज़ बनाएँ और रद्द करें।",
       },
     },
   },
@@ -136,6 +144,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fatturazione",
         "es-ES": "Facturación",
         "sk-SK": "Fakturácia",
+        "hi-IN": "बिलिंग",
         "en-GLOBAL": "Billing",
       },
     },

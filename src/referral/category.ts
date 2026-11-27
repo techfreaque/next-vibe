@@ -21,6 +21,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Inviti",
     "es-ES": "Referidos",
     "sk-SK": "Odporúčania",
+    "hi-IN": "रेफ़रल",
   },
   description: {
     "en-US": "Review referral earnings and outstanding payouts.",
@@ -33,6 +34,7 @@ export const category: CategoryDefinition = {
     "es-ES":
       "Revise las comisiones por recomendaciones y los pagos pendientes.",
     "sk-SK": "Skontrolujte provízie za odporúčania a sumy na vyplatenie.",
+    "hi-IN": "रेफ़रल कमाई और बाकी पेआउट देखें।",
   },
   group: "billing",
   icon: "share-2",
@@ -62,6 +64,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Clic, iscrizioni, ricavi e commissioni per ogni codice.",
         "es-ES": "Clics, registros, ingresos y comisiones de cada código.",
         "sk-SK": "Kliknutia, registrácie, tržby a provízie pre každý kód.",
+        "hi-IN": "हर कोड के क्लिक, साइनअप, रेवेन्यू और कमीशन।",
       },
       referral_admin_payouts_GET: {
         "en-US": "Approve or reject partner payout requests.",
@@ -73,6 +76,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Approvi o rifiuti le richieste di pagamento dei partner.",
         "es-ES": "Apruebe o rechace las solicitudes de pago de los socios.",
         "sk-SK": "Schváľte alebo zamietnite žiadosti partnerov o výplatu.",
+        "hi-IN": "पार्टनर के पेआउट अनुरोध मंज़ूर या रिजेक्ट करें।",
       },
       "referral-code-report": {
         "en-US": "One code end to end: owner, conversions, money and payouts.",
@@ -90,6 +94,7 @@ export const category: CategoryDefinition = {
           "Un código de principio a fin: titular, conversiones, ingresos y pagos.",
         "sk-SK":
           "Jeden kód od začiatku do konca: vlastník, konverzie, peniaze a výplaty.",
+        "hi-IN": "एक कोड शुरू से आखिर तक: मालिक, कन्वर्ज़न, पैसा और पेआउट।",
       },
     },
   },
@@ -111,6 +116,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Programma",
         "es-ES": "Programa",
         "sk-SK": "Program",
+        "hi-IN": "प्रोग्राम",
       },
       // inherits parent defaultEntry (admins: referral-overview, customers: referral-stats)
     },
@@ -126,6 +132,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Liquidazioni",
         "es-ES": "Desembolsos",
         "sk-SK": "Výplaty",
+        "hi-IN": "पेआउट",
       },
     },
   },

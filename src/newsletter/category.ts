@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Newsletter",
     "es-ES": "Boletín",
     "sk-SK": "Newsletter",
+    "hi-IN": "न्यूज़लेटर",
   },
   description: {
     "en-US": "Review subscribers, scheduled campaigns and delivery results.",
@@ -35,6 +36,7 @@ export const category: CategoryDefinition = {
       "Consulte los suscriptores, las campañas programadas y los resultados de los envíos.",
     "sk-SK":
       "Skontrolujte odberateľov, plánované kampane a výsledky doručovania.",
+    "hi-IN": "सब्सक्राइबर, शेड्यूल किए कैंपेन और डिलीवरी के नतीजे देखें।",
   },
   group: "analytics",
   icon: "send",
@@ -61,6 +63,7 @@ export const category: CategoryDefinition = {
         "es-ES": "Enviados, abiertos, clics y rebotes por recorrido e idioma.",
         "sk-SK":
           "Odoslané, otvorené, kliknuté a nedoručené podľa cesty a jazyka.",
+        "hi-IN": "हर जर्नी और भाषा के हिसाब से भेजे, खोले, क्लिक और बाउंस हुए।",
       },
       "campaign-queue": {
         "en-US": "Leads waiting for their next campaign email.",
@@ -71,6 +74,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Lead in attesa della prossima email della campagna.",
         "es-ES": "Leads a la espera de su próximo correo de campaña.",
         "sk-SK": "Leady čakajúce na ďalší e-mail kampane.",
+        "hi-IN": "अगले कैंपेन ईमेल का इंतज़ार कर रहे लीड।",
       },
       lifecycle: {
         "en-US": "Journeys, enrollments and conversions, with the kill switch.",
@@ -85,6 +89,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Recorridos, inscripciones y conversiones, con el interruptor de emergencia.",
         "sk-SK": "Cesty, zápisy a konverzie s núdzovým vypínačom.",
+        "hi-IN": "जर्नी, एनरोलमेंट और कन्वर्ज़न, किल स्विच के साथ।",
       },
       "campaign-journey-variants": {
         "en-US": "The email journeys leads can be enrolled in.",
@@ -96,6 +101,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Los recorridos de correo en los que se puede inscribir a los leads.",
         "sk-SK": "E-mailové cesty, do ktorých možno zaradiť leady.",
+        "hi-IN": "वे ईमेल जर्नी जिनमें लीड जोड़े जा सकते हैं।",
       },
     },
   },
@@ -117,6 +123,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Statistiche campagne",
         "es-ES": "Estadísticas de campañas",
         "sk-SK": "Štatistiky kampaní",
+        "hi-IN": "कैंपेन आँकड़े",
       },
     },
     emailCampaignsProcessing: {
@@ -131,6 +138,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Campagne",
         "es-ES": "Campañas",
         "sk-SK": "Kampane",
+        "hi-IN": "कैंपेन",
       },
     },
     emailCampaignsJourneys: {
@@ -145,6 +153,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Percorsi",
         "es-ES": "Secuencias",
         "sk-SK": "Komunikačné scenáre",
+        "hi-IN": "जर्नी",
       },
     },
     emailCampaignsQueue: {
@@ -159,6 +168,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Coda",
         "es-ES": "Cola",
         "sk-SK": "Front",
+        "hi-IN": "कतार",
       },
     },
     Subscriptions: {
@@ -173,6 +183,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Abbonamenti",
         "es-ES": "Suscripciones",
         "sk-SK": "Predplatné",
+        "hi-IN": "सब्सक्रिप्शन",
       },
     },
   },

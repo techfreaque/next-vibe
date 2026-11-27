@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Sistema",
     "es-ES": "Sistema",
     "sk-SK": "Systém",
+    "hi-IN": "सिस्टम",
   },
   description: {
     "en-US": "Environment settings and the production configuration.",
@@ -30,6 +31,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Impostazioni dell’ambiente e configurazione di produzione.",
     "es-ES": "Ajustes del entorno y configuración de producción.",
     "sk-SK": "Nastavenia prostredia a produkčná konfigurácia.",
+    "hi-IN": "एनवायरनमेंट सेटिंग्स और प्रोडक्शन कॉन्फ़िगरेशन।",
   },
   group: "system",
   icon: "settings",
@@ -52,6 +54,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Configurazione dell’ambiente, raggruppata per modulo.",
         "es-ES": "Configuración del entorno, agrupada por módulo.",
         "sk-SK": "Konfigurácia prostredia zoskupená podľa modulov.",
+        "hi-IN": "एनवायरनमेंट कॉन्फ़िगरेशन, मॉड्यूल के हिसाब से ग्रुप किया।",
       },
       "vibe_env_settings_export-env_GET": {
         "en-US": "Download a production .env with a deploy checklist.",
@@ -63,6 +66,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Scarichi un .env di produzione con la checklist di rilascio.",
         "es-ES": "Descargue un .env de producción con su lista de despliegue.",
         "sk-SK": "Stiahnite produkčný .env s kontrolným zoznamom nasadenia.",
+        "hi-IN": "डिप्लॉय चेकलिस्ट के साथ प्रोडक्शन .env डाउनलोड करें।",
       },
     },
   },
@@ -84,6 +88,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Generatori",
         "es-ES": "Generadores",
         "sk-SK": "Generátory",
+        "hi-IN": "जनरेटर",
       },
     },
     Build: {
@@ -98,6 +103,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Compilazione",
         "es-ES": "Compilación",
         "sk-SK": "Zostavenie",
+        "hi-IN": "बिल्ड",
       },
     },
     Check: {
@@ -112,6 +118,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Verifica",
         "es-ES": "Verificación",
         "sk-SK": "Kontrola",
+        "hi-IN": "चेक",
       },
     },
     serverManagement: {
@@ -126,6 +133,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Server",
         "es-ES": "Servidor",
         "sk-SK": "Server",
+        "hi-IN": "सर्वर",
       },
     },
     serverGuard: {
@@ -140,6 +148,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Protezione",
         "es-ES": "Protección",
         "sk-SK": "Ochrana",
+        "hi-IN": "गार्ड",
       },
     },
     serverElectron: {
@@ -154,6 +163,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Electron",
         "es-ES": "Electron",
         "sk-SK": "Electron",
+        "hi-IN": "Electron",
       },
     },
     settingsEnv: {
@@ -168,6 +178,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Impostazioni",
         "es-ES": "Configuración",
         "sk-SK": "Nastavenia",
+        "hi-IN": "सेटिंग्स",
       },
     },
     settingsKeys: {
@@ -182,6 +193,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Chiavi",
         "es-ES": "Claves",
         "sk-SK": "Kľúče",
+        "hi-IN": "कीज़",
       },
     },
     interfacesCli: {
@@ -196,6 +208,7 @@ export const category: CategoryDefinition = {
         "it-IT": "CLI",
         "es-ES": "CLI",
         "sk-SK": "CLI",
+        "hi-IN": "CLI",
       },
     },
     interfacesMcp: {
@@ -210,6 +223,7 @@ export const category: CategoryDefinition = {
         "it-IT": "MCP",
         "es-ES": "MCP",
         "sk-SK": "MCP",
+        "hi-IN": "MCP",
       },
     },
     interfacesFrame: {
@@ -224,6 +238,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Frame",
         "es-ES": "Frame",
         "sk-SK": "Vkladanie do stránok",
+        "hi-IN": "फ़्रेम",
       },
     },
     tasksCron: {
@@ -238,6 +253,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Attività cron",
         "es-ES": "Tareas cron",
         "sk-SK": "Plánované úlohy",
+        "hi-IN": "क्रॉन टास्क",
       },
     },
     tasksMonitoring: {
@@ -252,6 +268,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Monitoraggio",
         "es-ES": "Monitoreo",
         "sk-SK": "Monitorovanie",
+        "hi-IN": "मॉनिटरिंग",
       },
     },
     tasksPulse: {
@@ -266,6 +283,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Pulse",
         "es-ES": "Pulse",
         "sk-SK": "Pulse",
+        "hi-IN": "पल्स",
       },
     },
     tasksSync: {
@@ -280,6 +298,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Sincronizzazione",
         "es-ES": "Sincronización",
         "sk-SK": "Synchronizácia",
+        "hi-IN": "सिंक",
       },
     },
   },

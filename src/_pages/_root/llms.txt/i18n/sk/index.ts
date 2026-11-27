@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     referral:
       "Program odporúčaní: za platby odporučených používateľov pravidelne získavaš províziu {{direct}} %. Ďalších {{upline}} % sa rozdeľuje medzi {{levels}} úrovní sprostredkovateľov. Odmenu si môžeš vybrať v kreditoch, BTC alebo USDC. Minimálna suma na výplatu je {{minPayout}}.",
     languages:
-      "Jazyky webu: angličtina ({{en}}), nemčina ({{de}}), poľština ({{pl}}), francúzština ({{fr}}), taliančina ({{it}}), španielčina ({{es}}) a slovenčina ({{sk}}).",
+      "Jazyky webu: angličtina ({{en}}), nemčina ({{de}}), poľština ({{pl}}), francúzština ({{fr}}), taliančina ({{it}}), španielčina ({{es}}), slovenčina ({{sk}}) a hindčina ({{hi}}).",
   },
   pages: {
     heading: "Hlavné stránky",

@@ -13,6 +13,8 @@ const LOCALES = [
   "it-IT",
   "es-ES",
   "sk-SK",
+  "en-IN",
+  "hi-IN",
 ] as const;
 
 /**

@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Inventario",
     "es-ES": "Inventario",
     "sk-SK": "Zásoby",
+    "hi-IN": "इन्वेंटरी",
   },
   description: {
     "en-US": "Track physical stock, warehouse movements and transfers.",
@@ -32,6 +33,7 @@ export const category: CategoryDefinition = {
     "es-ES":
       "Controle las existencias, los movimientos y los traslados entre almacenes.",
     "sk-SK": "Sledujte stav zásob, skladové pohyby a presuny medzi skladmi.",
+    "hi-IN": "फ़िज़िकल स्टॉक, वेयरहाउस मूवमेंट और ट्रांसफ़र ट्रैक करें।",
     "en-GLOBAL": "Track physical stock, warehouse movements and transfers.",
   },
   group: "business",
@@ -62,6 +64,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Giacenze per magazzino, con avviso di scorte basse.",
         "es-ES": "Existencias por almacén, con aviso de stock bajo.",
         "sk-SK": "Zásoby v každom sklade s upozornením na nízky stav.",
+        "hi-IN": "हर वेयरहाउस का स्टॉक, कम स्टॉक की चेतावनी के साथ।",
       },
       "inventory-warehouses": {
         "en-US": "Every warehouse and stock location you run.",
@@ -72,6 +75,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Tutti i magazzini e i punti di stoccaggio.",
         "es-ES": "Todos sus almacenes y ubicaciones de stock.",
         "sk-SK": "Všetky sklady a skladové miesta.",
+        "hi-IN": "आपके सभी वेयरहाउस और स्टॉक लोकेशन।",
       },
       "inventory-transfers": {
         "en-US": "Stock moved between warehouses, open and done.",
@@ -82,6 +86,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Trasferimenti tra magazzini, aperti e completati.",
         "es-ES": "Traslados entre almacenes, abiertos y completados.",
         "sk-SK": "Presuny medzi skladmi, otvorené aj dokončené.",
+        "hi-IN": "वेयरहाउस के बीच भेजा गया स्टॉक, बाकी और पूरा।",
       },
     },
   },
@@ -103,6 +108,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Scorte",
         "es-ES": "Existencias",
         "sk-SK": "Stav zásob",
+        "hi-IN": "स्टॉक",
       },
     },
     "Inventory: Transfers": {
@@ -117,6 +123,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Trasferimenti",
         "es-ES": "Transferencias",
         "sk-SK": "Presuny zásob",
+        "hi-IN": "ट्रांसफ़र",
       },
     },
     "Inventory: Warehouses": {
@@ -131,6 +138,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Magazzini",
         "es-ES": "Almacenes",
         "sk-SK": "Sklady",
+        "hi-IN": "वेयरहाउस",
       },
     },
   },

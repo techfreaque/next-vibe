@@ -143,6 +143,10 @@ export const translations: typeof enTranslations = {
         label: "Otázka po slovensky",
         description: "Nepovinný preklad otázky pre verejné ukážky",
       },
+      textHi: {
+        label: "Otázka v hindčine",
+        description: "Nepovinný preklad otázky pre verejné ukážky",
+      },
       generatedBy: { label: "Autor návrhu" },
       active: {
         label: "Aktívna",

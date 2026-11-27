@@ -25,6 +25,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Pagamenti",
     "es-ES": "Pagos",
     "sk-SK": "Platby",
+    "hi-IN": "पेमेंट",
   },
   description: {
     "en-US": "Track payments, refunds and processor settlement.",
@@ -38,6 +39,7 @@ export const category: CategoryDefinition = {
     "es-ES":
       "Revise los pagos, los reembolsos y las liquidaciones de los procesadores.",
     "sk-SK": "Sledujte platby, refundácie a zúčtovanie platieb.",
+    "hi-IN": "पेमेंट, रिफ़ंड और प्रोसेसर सेटलमेंट ट्रैक करें।",
     "en-GLOBAL": "Track payments, refunds and processor settlement.",
   },
   group: "billing",
@@ -75,6 +77,7 @@ export const category: CategoryDefinition = {
         "es-ES": "Ingresos por procesador, plan y divisa, con MRR y bajas.",
         "sk-SK":
           "Tržby podľa spracovateľa, plánu a meny vrátane MRR a odchodov.",
+        "hi-IN": "प्रोसेसर, प्लान और करेंसी के हिसाब से रेवेन्यू, MRR और चर्न के साथ।",
       },
       "payment-processor": {
         "en-US": "Checkouts, renewals, failed payments and webhook runs.",
@@ -86,6 +89,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Checkout, rinnovi, pagamenti falliti e webhook ricevuti.",
         "es-ES": "Pagos, renovaciones, cobros fallidos y webhooks recibidos.",
         "sk-SK": "Platby, obnovenia, neúspešné platby a prijaté webhooky.",
+        "hi-IN": "चेकआउट, रिन्यूअल, फ़ेल पेमेंट और वेबहुक रन।",
       },
       "processor-accounting": {
         "en-US": "Match processor payouts and fees to your books.",
@@ -100,6 +104,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Concilie liquidaciones y comisiones de los procesadores con la contabilidad.",
         "sk-SK": "Spárujte výplaty a poplatky spracovateľov s účtovníctvom.",
+        "hi-IN": "प्रोसेसर पेआउट और फ़ीस को अपने खातों से मिलाएँ।",
       },
       "products-catalog-list": {
         "en-US": "Plans, credit packs and goods you sell.",
@@ -110,6 +115,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Piani, pacchetti di crediti e prodotti che vende.",
         "es-ES": "Planes, paquetes de créditos y productos que vende.",
         "sk-SK": "Plány, balíky kreditov a tovar, ktorý predávate.",
+        "hi-IN": "आपके बेचे जाने वाले प्लान, क्रेडिट पैक और सामान।",
       },
     },
   },
@@ -135,6 +141,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Transazioni",
         "es-ES": "Transacciones",
         "sk-SK": "Transakcie",
+        "hi-IN": "ट्रांज़ैक्शन",
       },
     },
     Providers: {
@@ -149,6 +156,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fornitori",
         "es-ES": "Proveedores",
         "sk-SK": "Poskytovatelia platieb",
+        "hi-IN": "प्रोवाइडर",
       },
     },
   },

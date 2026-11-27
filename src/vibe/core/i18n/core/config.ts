@@ -51,6 +51,7 @@ export const LanguagesOptions = [
   { value: Languages.IT, label: "languages.it" as const },
   { value: Languages.ES, label: "languages.es" as const },
   { value: Languages.SK, label: "languages.sk" as const },
+  { value: Languages.HI, label: "languages.hi" as const },
 ];
 
 // Create a proper enum-like object for CountryLanguageValues that works with z.enum()

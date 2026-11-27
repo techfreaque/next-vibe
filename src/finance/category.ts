@@ -21,6 +21,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Finanze",
     "es-ES": "Finanzas",
     "sk-SK": "Financie",
+    "hi-IN": "फ़ाइनेंस",
   },
   description: {
     "en-US": "Review monthly profit, provider costs and bank transactions.",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
       "Revise el resultado mensual, los costes de los proveedores y los movimientos bancarios.",
     "sk-SK":
       "Skontrolujte mesačný výsledok, náklady na poskytovateľov a bankové pohyby.",
+    "hi-IN": "मासिक मुनाफ़ा, प्रोवाइडर खर्च और बैंक ट्रांज़ैक्शन देखें।",
     "en-GLOBAL": "Review monthly profit, provider costs and bank transactions.",
   },
   group: "system",
@@ -60,6 +62,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ricavi, costi e risultato netto registrati, mese per mese.",
         "es-ES": "Ingresos, gastos y resultado neto contabilizados, mes a mes.",
         "sk-SK": "Zaúčtované tržby, náklady a čistý výsledok po mesiacoch.",
+        "hi-IN": "हर महीने का बुक किया रेवेन्यू, खर्च और शुद्ध नतीजा।",
       },
       "finance-status": {
         "en-US": "Provider balances, margin and cost alerts.",
@@ -70,6 +73,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Saldi dei fornitori, margine e avvisi sui costi.",
         "es-ES": "Saldos de proveedores, margen y alertas de costes.",
         "sk-SK": "Zostatky u poskytovateľov, marža a upozornenia na náklady.",
+        "hi-IN": "प्रोवाइडर बैलेंस, मार्जिन और खर्च अलर्ट।",
       },
       "bank-statement-lines": {
         "en-US": "Imported bank lines waiting for a journal entry.",
@@ -80,6 +84,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Righe bancarie importate in attesa di una registrazione.",
         "es-ES": "Líneas bancarias importadas a la espera de un asiento.",
         "sk-SK": "Importované bankové riadky čakajúce na zaúčtovanie.",
+        "hi-IN": "इंपोर्ट की गई बैंक एंट्री जो जर्नल एंट्री का इंतज़ार कर रही हैं।",
       },
       "bank-connections": {
         "en-US": "Import transactions from a connected bank account.",
@@ -90,6 +95,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Importi i movimenti da un conto bancario collegato.",
         "es-ES": "Importe movimientos de una cuenta bancaria conectada.",
         "sk-SK": "Importujte transakcie z pripojeného bankového účtu.",
+        "hi-IN": "कनेक्टेड बैंक अकाउंट से ट्रांज़ैक्शन इंपोर्ट करें।",
       },
       "mail-bill-reviews": {
         "en-US": "Invoices and receipts that arrived by email, ready to book.",
@@ -103,6 +109,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Facturas y recibos llegados por correo, listos para contabilizar.",
         "sk-SK": "Faktúry a doklady z e-mailu pripravené na zaúčtovanie.",
+        "hi-IN": "ईमेल से आए इनवॉइस और रसीदें, बुक करने के लिए तैयार।",
       },
       "supplier-evidence": {
         "en-US": "Provider balances and supplier documents in one place.",
@@ -113,6 +120,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Saldi e documenti dei fornitori in un unico posto.",
         "es-ES": "Saldos y documentos de proveedores en un solo lugar.",
         "sk-SK": "Zostatky a doklady dodávateľov na jednom mieste.",
+        "hi-IN": "प्रोवाइडर बैलेंस और सप्लायर दस्तावेज़ एक ही जगह।",
       },
     },
   },
@@ -134,6 +142,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Passività per crediti",
         "es-ES": "Pasivos por créditos",
         "sk-SK": "Záväzky za kredity",
+        "hi-IN": "क्रेडिट देनदारी",
       },
     },
     "Finance: Suppliers": {
@@ -148,6 +157,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Fornitori",
         "es-ES": "Proveedores",
         "sk-SK": "Dodávatelia",
+        "hi-IN": "सप्लायर",
       },
     },
     "Bank reconciliation": {
@@ -162,6 +172,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Riconciliazione bancaria",
         "es-ES": "Conciliación bancaria",
         "sk-SK": "Párovanie bankových pohybov",
+        "hi-IN": "बैंक मिलान",
       },
     },
     Monitoring: {
@@ -176,6 +187,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Monitoraggio",
         "es-ES": "Monitoreo",
         "sk-SK": "Monitorovanie",
+        "hi-IN": "मॉनिटरिंग",
       },
     },
   },

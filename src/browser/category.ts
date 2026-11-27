@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Browser",
     "es-ES": "Navegador",
     "sk-SK": "Prehliadač",
+    "hi-IN": "ब्राउज़र",
   },
   group: "platform",
   icon: "globe",
@@ -42,6 +43,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Pagine",
         "es-ES": "Páginas",
         "sk-SK": "Stránky",
+        "hi-IN": "पेज",
       },
       // inherits parent defaultEntry (browser-new-page)
     },
@@ -57,6 +59,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Interazione",
         "es-ES": "Interacción",
         "sk-SK": "Interakcia",
+        "hi-IN": "इंटरैक्शन",
       },
     },
     Inspection: {
@@ -71,6 +74,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ispezione",
         "es-ES": "Inspección",
         "sk-SK": "Kontrola",
+        "hi-IN": "जाँच",
       },
     },
     DevTools: {
@@ -85,6 +89,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Strumenti di sviluppo",
         "es-ES": "Herramientas de desarrollo",
         "sk-SK": "Nástroje pre vývojárov",
+        "hi-IN": "DevTools",
       },
     },
   },

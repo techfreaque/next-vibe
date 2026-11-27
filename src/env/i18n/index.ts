@@ -11,6 +11,7 @@ export const configScopedTranslation = createScopedTranslation({
   it: () => require("./it").translations,
   es: () => require("./es").translations,
   sk: () => require("./sk").translations,
+  hi: () => require("./hi").translations,
 });
 export type ConfigTranslationKey =
   (typeof configScopedTranslation)["ScopedTranslationKey"];

@@ -13,6 +13,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Contatti e collaborazioni",
     "es-ES": "Prospección y colaboraciones",
     "sk-SK": "Oslovovanie a spolupráce",
+    "hi-IN": "आउटरीच और डील",
     "en-GLOBAL": "Outreach and deals",
   },
   description: {
@@ -28,6 +29,7 @@ export const category: CategoryDefinition = {
       "Siga los acuerdos con creadores, los enlaces de campañas y los costes de marketing.",
     "sk-SK":
       "Sledujte spolupráce s tvorcami, odkazy kampaní a marketingové náklady.",
+    "hi-IN": "क्रिएटर डील, कैंपेन लिंक और मार्केटिंग खर्च ट्रैक करें।",
     "en-GLOBAL": "Track creator deals, campaign links and marketing costs.",
   },
   group: "analytics",
@@ -57,6 +59,8 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Cada contacto propuesto, en qué punto está y qué devolvieron los acuerdos.",
         "sk-SK": "Každý oslovený kontakt, jeho stav a čo dohody priniesli.",
+        "hi-IN":
+          "हर संपर्क जिसे पिच किया गया, उसकी स्थिति और किन डील से पैसा वापस आया।",
       },
       "growth-campaign-links": {
         "en-US": "Tagged links per channel with visits, signups and payers.",
@@ -73,6 +77,7 @@ export const category: CategoryDefinition = {
           "Enlaces etiquetados por canal, con visitas, registros y pagadores.",
         "sk-SK":
           "Označené odkazy podľa kanála s návštevami, registráciami a platiacimi.",
+        "hi-IN": "हर चैनल के टैग किए लिंक, विज़िट, साइनअप और पेमेंट करने वालों के साथ।",
       },
       "growth-channel-spend-list": {
         "en-US": "Spend per channel and the cost of each paying user.",
@@ -83,6 +88,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Spesa per canale e costo di ogni utente pagante.",
         "es-ES": "Gasto por canal y coste de cada usuario de pago.",
         "sk-SK": "Výdavky podľa kanála a cena každého platiaceho používateľa.",
+        "hi-IN": "हर चैनल का खर्च और हर पेमेंट करने वाले यूज़र की लागत।",
       },
     },
   },

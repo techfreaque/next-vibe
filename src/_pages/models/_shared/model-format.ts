@@ -15,7 +15,7 @@ import {
 } from "next-vibe/agent/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/labels/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { toIntlLocale } from "next-vibe/core/i18n/core/language-utils";
 
 import { getCreditUnitPrice } from "@/products/credit-money";
 
@@ -87,7 +87,7 @@ export function tierLine(
 }
 
 export function formatNumber(value: number, locale: CountryLanguage): string {
-  return new Intl.NumberFormat(getLanguageFromLocale(locale), {
+  return new Intl.NumberFormat(toIntlLocale(locale), {
     maximumFractionDigits: 2,
   }).format(value);
 }
@@ -133,13 +133,13 @@ export function formatMoney(credits: number, locale: CountryLanguage): string {
   const { amount, currency } = getCreditUnitPrice(locale);
   const value = credits * amount;
   if (value > 0 && value < 0.01) {
-    return new Intl.NumberFormat(getLanguageFromLocale(locale), {
+    return new Intl.NumberFormat(toIntlLocale(locale), {
       style: "currency",
       currency,
       maximumSignificantDigits: 2,
     }).format(value);
   }
-  return new Intl.NumberFormat(getLanguageFromLocale(locale), {
+  return new Intl.NumberFormat(toIntlLocale(locale), {
     style: "currency",
     currency,
     minimumFractionDigits: 2,

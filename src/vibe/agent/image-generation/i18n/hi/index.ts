@@ -1,0 +1,347 @@
+// oxlint-disable boilerplate/i18n-pattern -- imports model translations shared across scoped files
+import { translations as modelTranslations } from "../../../models/i18n/hi";
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: {
+    image: "इमेज",
+    generation: "जनरेशन",
+    ai: "AI",
+  },
+  post: {
+    title: "इमेज बनाएँ",
+    titleShort: "इमेज बनाएँ",
+    dynamicTitle: "इमेज: {{prompt}}",
+    description:
+      "टेक्स्ट प्रॉम्प्ट से इमेज बनाएँ। उपलब्ध मॉडल और उनकी क्षमताएँ देखने के लिए models टूल को modelType=image के साथ चलाएँ। खास मॉडल चुनने के लिए मॉडल id दें, या यूज़र का डिफ़ॉल्ट इस्तेमाल करने के लिए खाली छोड़ें। लैंडस्केप या पोर्ट्रेट आउटपुट के लिए aspectRatio (जैसे 16:9) दें। इमेज-टू-इमेज के लिए वैकल्पिक रूप से inputMediaUrl दें (URL को रेफ़रेंस या शुरुआती बिंदु की तरह इस्तेमाल करता है)। imageUrl के साथ फ़ाइल की असली width, height और outputAspectRatio लौटाता है।",
+    form: {
+      title: "इमेज जनरेशन",
+      description: "इमेज बनाने के लिए प्रॉम्प्ट लिखें",
+    },
+    prompt: {
+      label: "प्रॉम्प्ट",
+      description: "बताएँ कि कैसी इमेज बनानी है",
+      placeholder: "पहाड़ी झील पर सूर्यास्त, फ़ोटोरियलिस्टिक...",
+    },
+    model: {
+      label: "मॉडल",
+      description:
+        "इमेज जनरेशन मॉडल की id। यूज़र का डिफ़ॉल्ट इस्तेमाल करने के लिए खाली छोड़ें। उपलब्ध मॉडल देखने के लिए models टूल (modelType=image) इस्तेमाल करें।",
+    },
+    approxCost: "~क्रेडिट",
+    size: {
+      label: "साइज़",
+      description: "आउटपुट इमेज का आकार चुनें",
+      square1024: "स्क्वायर (1024×1024)",
+      landscape1792: "लैंडस्केप (1792×1024)",
+      portrait1792: "पोर्ट्रेट (1024×1792)",
+    },
+    quality: {
+      label: "क्वालिटी",
+      description: "आउटपुट इमेज की क्वालिटी चुनें",
+      standard: "स्टैंडर्ड",
+      hd: "HD",
+    },
+    aspectRatio: {
+      label: "एस्पेक्ट रेशियो",
+      description:
+        "आउटपुट का एस्पेक्ट रेशियो: 16:9 या 21:9 लैंडस्केप, 9:16 पोर्ट्रेट, 4:3, 3:4, 3:2, 2:3, 1:1। खाली हो तो स्क्वायर। हर मॉडल अपने सपोर्ट किए सबसे नज़दीकी रेशियो पर चलता है। नतीजे में असली width, height और रेशियो बताए जाते हैं, इसलिए इमेज का वर्णन उन्हीं से करें, आपने जो माँगा था उससे नहीं।",
+    },
+    inputMediaUrl: {
+      label: "रेफ़रेंस इमेज URL",
+      description:
+        "इमेज-टू-इमेज जनरेशन के लिए इमेज URL। मॉडल इस इमेज को एडिट या रीस्टाइल करता है। सिर्फ़ उन्हीं मॉडल पर चलता है जो इमेज इनपुट सपोर्ट करते हैं।",
+      placeholder: "https://example.com/image.jpg",
+    },
+    download: "डाउनलोड करें",
+    dimensionSeparator: "×",
+    backButton: {
+      label: "वापस",
+    },
+    submitButton: {
+      text: "इमेज बनाएँ",
+      label: "इमेज बनाएँ",
+      loadingText: "बन रही है...",
+    },
+    response: {
+      imageUrl: "बनाई गई इमेज का URL",
+      creditCost: "खर्च हुए क्रेडिट",
+      jobId: "Async जॉब ID",
+      width: "चौड़ाई (px)",
+      height: "ऊँचाई (px)",
+      outputAspectRatio: "एस्पेक्ट रेशियो",
+    },
+    errors: {
+      referenceUnavailable:
+        "रेफ़रेंस इमेज उपलब्ध नहीं है। या तो हटा दी गई है, या ऐसी चैट की है जिसे आप खोल नहीं सकते। इसी चैट की कोई इमेज इस्तेमाल करें या दोबारा अपलोड करें।",
+      validation_failed: {
+        title: "वैलिडेशन एरर",
+        description: "अपना प्रॉम्प्ट और सेटिंग्स जाँचें",
+      },
+      network_error: {
+        title: "नेटवर्क एरर",
+        description: "इमेज जनरेशन सर्विस से कनेक्ट नहीं हो पाया",
+      },
+      unauthorized: {
+        title: "अनधिकृत",
+        description: "इमेज बनाने के लिए साइन इन करें",
+      },
+      forbidden: {
+        title: "मना है",
+        description: "आपको यह फ़ीचर इस्तेमाल करने की अनुमति नहीं है",
+      },
+      not_found: {
+        title: "नहीं मिला",
+        description: "माँगा गया मॉडल नहीं मिला",
+      },
+      server_error: {
+        title: "सर्वर एरर",
+        description: "इमेज जनरेशन के दौरान अनपेक्षित एरर आया",
+      },
+      unknown_error: {
+        title: "अज्ञात एरर",
+        description: "कोई अज्ञात एरर आया",
+      },
+      unsaved_changes: {
+        title: "बिना सेव किए बदलाव",
+        description: "इमेज बनाने से पहले अपने बदलाव सेव करें",
+      },
+      conflict: {
+        title: "टकराव",
+        description: "इमेज जनरेशन के दौरान टकराव हो गया",
+      },
+      notAnImageModel:
+        "चुना गया मॉडल इमेज जनरेशन सपोर्ट नहीं करता। कोई इमेज मॉडल चुनें।",
+      notConfigured:
+        "{{label}} सेट नहीं है। अपनी .env फ़ाइल में {{envKey}} जोड़ें। key यहाँ से लें: {{url}}",
+      providerUnavailable:
+        "{{label}} अभी उपलब्ध नहीं है। दूसरा मॉडल यहाँ से चुनें: {{url}}",
+      insufficientCredits: "क्रेडिट कम हैं। बैलेंस: {{balance}}, ज़रूरी: {{minimum}}",
+      balanceCheckFailed: "आपका क्रेडिट बैलेंस जाँचा नहीं जा सका",
+      unsupportedSize:
+        "मॉडल {{model}} साइज़ {{size}} सपोर्ट नहीं करता। सपोर्टेड साइज़: {{supported}}",
+      unsupportedQuality:
+        "मॉडल {{model}} क्वालिटी {{quality}} सपोर्ट नहीं करता। सपोर्टेड क्वालिटी: {{supported}}",
+      unsupportedAspectRatio:
+        "मॉडल {{model}} एस्पेक्ट रेशियो {{aspectRatio}} सपोर्ट नहीं करता। सपोर्टेड रेशियो: {{supported}}",
+      modelNoReferenceImage:
+        "मॉडल {{model}} रेफ़रेंस इमेज नहीं लेता। रेफ़रेंस इस्तेमाल करने के लिए इमेज-टू-इमेज मॉडल चुनें (जिसके इनपुट में image हो)।",
+      generationFailed: "इमेज जनरेशन फ़ेल हो गया",
+      generationFailedWithReason: "इमेज जनरेशन फ़ेल हो गया: {{error}}",
+      contentRejected:
+        "इमेज प्रोवाइडर के कंटेंट फ़िल्टर ने मना कर दिया: {{error}}। यह इनकार है, आउटेज नहीं। प्रॉम्प्ट बदलकर लिखें या अनसेंसर्ड मॉडल चुनें। आपसे कोई चार्ज नहीं लिया गया।",
+      providerOutage:
+        "इमेज प्रोवाइडर अभी डाउन है या ओवरलोड है: {{error}}। यह आउटेज है, इनकार नहीं। एक मिनट बाद फिर कोशिश करें या दूसरा मॉडल चुनें। आपसे कोई चार्ज नहीं लिया गया।",
+      providerError: "इमेज प्रोवाइडर एरर: {{error}}",
+      noImageUrl: "प्रोवाइडर ने कोई इमेज URL नहीं लौटाया",
+      noImageGenerated:
+        "मॉडल ने कोई इमेज नहीं लौटाई। आम तौर पर इसका मतलब है कि प्रॉम्प्ट मना कर दिया गया (जैसे हथियार, असली लोग या कॉपीराइट वाले किरदार), या यह मॉडल उस रिक्वेस्ट को सपोर्ट नहीं करता। प्रॉम्प्ट बदलकर लिखें या दूसरा इमेज मॉडल चुनें। ध्यान दें: इस जैसे टेक्स्ट-टू-इमेज मॉडल रेफ़रेंस इमेज इस्तेमाल नहीं करते। इस कोशिश का कोई चार्ज नहीं लगा।",
+      creditsFailed: "इमेज जनरेशन के क्रेडिट नहीं कट पाए",
+      apiKeyNotConfigured: "API key सेट नहीं है",
+      externalServiceError: "एक्सटर्नल सर्विस एरर: {{message}}",
+      requestAborted: "रिक्वेस्ट रद्द हो गई",
+      requestTimedOut: "इमेज जनरेशन का इंतज़ार करते हुए रिक्वेस्ट टाइमआउट हो गई",
+      requestFailed: "रिक्वेस्ट फ़ेल हुई: {{message}}",
+      pollFailed: "पोल रिक्वेस्ट स्टेटस {{status}} के साथ फ़ेल हुई",
+      nonJsonResponse:
+        "प्रोवाइडर ने non-JSON रिस्पॉन्स लौटाया (HTTP {{status}}): {{body}}",
+    },
+    success: {
+      title: "इमेज बन गई",
+      description: "आपकी इमेज सफलतापूर्वक बन गई",
+    },
+  },
+  models: {
+    selector: {
+      bestForFilter: "इस फ़िल्टर के लिए सबसे बढ़िया",
+      setupRequired: "सेटअप ज़रूरी है",
+      providerUnconfigured: "प्रोवाइडर की API key सेट नहीं है",
+      addEnvKey: ".env में जोड़ें",
+      noMatchingModels: "आपके फ़िल्टर से कोई मॉडल मेल नहीं खाता",
+      noModelsWarning:
+        "इन फ़िल्टर से कोई मॉडल मेल नहीं खाता। आगे बढ़ने के लिए सेटिंग्स बदलें।",
+      allModelsCount: "{{count}} मॉडल उपलब्ध",
+      filteredModelsCount: "{{count}} मॉडल मेल खाते हैं",
+      showAllModels: "सभी {{count}} मॉडल दिखाएँ",
+      showFiltered: "फ़िल्टर किए हुए दिखाएँ",
+      creditsExact: "{{cost}} क्रेडिट",
+      creditsSingle: "1 क्रेडिट",
+      free: "फ़्री",
+      autoSelectedModel: "फ़िल्टर के हिसाब से:",
+      manualSelectedModel: "चुना गया:",
+      skillSelectedModel: "स्किल का मॉडल:",
+      selectModelBelow: "नीचे से मॉडल चुनें",
+      sortBy: "इसके हिसाब से क्रम",
+      sortThen: "फिर:",
+      showLess: "कम दिखाएँ",
+      showMore: "{{count}} और दिखाएँ",
+      showLegacyModels: "{{count}} पुराने मॉडल दिखाएँ",
+      autoMode: "फ़िल्टर के हिसाब से",
+      manualMode: "खुद चुनें",
+      skillMode: "स्किल का डिफ़ॉल्ट",
+      autoModeDescription: "आपके फ़िल्टर के हिसाब से अपने आप सबसे अच्छा मॉडल चुनता है",
+      manualModeDescription: "जो चाहें वही मॉडल चुनें",
+      characterBasedModeDescription: "वही मॉडल जिसके लिए यह स्किल बनी है",
+      typeChat: "चैट",
+      typeImage: "इमेज",
+      typeVideo: "वीडियो",
+      typeAudio: "ऑडियो",
+      filters: "फ़िल्टर",
+      filtersActive: "फ़िल्टर ({{count}})",
+      clearFilter: "हटाएँ",
+      inherited: "विरासत में मिला",
+      platformDefault: "डिफ़ॉल्ट",
+      searchPlaceholder: "मॉडल खोजें…",
+      noSearchResults: '"{{query}}" के लिए कोई मॉडल नहीं मिला',
+      searchExtrasGroup: "मौजूदा फ़िल्टर से बाहर",
+    },
+    tiers: {
+      intelligence: {
+        quick: "तेज़",
+        smart: "स्मार्ट",
+        brilliant: "बेहतरीन",
+        quickDesc: "तेज़ और किफ़ायती",
+        smartDesc: "संतुलित क्वालिटी",
+        brilliantDesc: "गहरी सोच",
+      },
+      price: {
+        cheap: "बजट",
+        standard: "स्टैंडर्ड",
+        premium: "प्रीमियम",
+        cheapDesc: "प्रति मैसेज 0-3 क्रेडिट",
+        standardDesc: "प्रति मैसेज 3-9 क्रेडिट",
+        premiumDesc: "प्रति मैसेज 9+ क्रेडिट",
+      },
+      content: {
+        mainstream: "मेनस्ट्रीम",
+        open: "ओपन",
+        uncensored: "अनसेंसर्ड",
+        mainstreamDesc: "स्टैंडर्ड सेफ़्टी",
+        openDesc: "कम पाबंदियाँ",
+        uncensoredDesc: "कोई पाबंदी नहीं",
+      },
+    },
+    sort: { intelligence: "इंटेलिजेंस", price: "कीमत", content: "कंटेंट" },
+    ranges: {
+      intelligenceRange: {
+        minLabel: "न्यूनतम इंटेलिजेंस",
+        maxLabel: "अधिकतम इंटेलिजेंस",
+      },
+      priceRange: { minLabel: "न्यूनतम कीमत", maxLabel: "अधिकतम कीमत" },
+      contentRange: { minLabel: "न्यूनतम कंटेंट", maxLabel: "अधिकतम कंटेंट" },
+    },
+    credits: { credit: "{{count}} क्रेडिट", credits: "{{count}} क्रेडिट" },
+    creditDisplay: {
+      badge: {
+        approxPerMsg: "~{{cost}} क्रेडिट/मैसेज",
+        exactPerMsg: "{{cost}} क्रेडिट/मैसेज",
+        perImg: "{{cost}} क्रेडिट/इमेज",
+        perClip: "{{cost}} क्रेडिट/क्लिप",
+        ratePerChar: "{{rate}} क्रेडिट/अक्षर",
+        ratePerSec: "{{rate}} क्रेडिट/सेकंड",
+        approxChars: "~{{count}} अक्षर",
+        seconds: "{{count}} सेकंड",
+        lessThanMin: "<0.1",
+      },
+      tokenBased: {
+        header: "प्रति मैसेज खर्च",
+        costRangeLabel: "आम तौर पर:",
+        costRangeValue: "{{min}} - {{max}} क्रेडिट",
+        examplesLabel: "उदाहरण:",
+        examples: {
+          short: "छोटी बातचीत",
+          medium: "मध्यम बातचीत",
+          long: "लंबी बातचीत",
+        },
+        triggersCompacting: "⚡ कॉम्पैक्टिंग चालू होती है",
+        tokensCount: "{{count}} टोकन",
+        explanation: "हर मैसेज पर AI आपकी पूरी बातचीत का इतिहास प्रोसेस करता है।",
+        compactingLabel: "✨ ऑटो-कॉम्पैक्टिंग:",
+        compactingExplanation:
+          " {{threshold}} टोकन पर पुराने मैसेज अपने आप समरी में बदल जाते हैं।",
+      },
+      fixed: {
+        title: "{{model}} की कीमत",
+        freeDescription: "यह मॉडल पूरी तरह फ़्री है। कोई क्रेडिट नहीं लगता।",
+        fixedDescription:
+          "इस मॉडल में हर मैसेज का खर्च तय है, चाहे मैसेज कितना भी लंबा हो।",
+        costPerMessage: "प्रति मैसेज खर्च:",
+        freeExplanation: "यह फ़्री मॉडल है। इस्तेमाल की कोई सीमा नहीं।",
+        freeHighlight: "टेस्टिंग और प्रयोग के लिए एकदम सही।",
+        simpleLabel: "सीधी कीमत:",
+        simpleExplanation: " हर मैसेज का खर्च बराबर है, छोटा हो या लंबा।",
+      },
+      media: {
+        perImage: "प्रति इमेज",
+        perClip: "प्रति क्लिप",
+        perSecond: "प्रति सेकंड",
+        perClipDuration: "प्रति क्लिप ({{duration}} सेकंड)",
+        costPerImage: "प्रति इमेज खर्च:",
+        costPerClip: "प्रति क्लिप खर्च:",
+        costPerSecond: "प्रति सेकंड खर्च:",
+        imageDescription: "हर बनाई गई इमेज का खर्च तय है, रेज़ोल्यूशन चाहे जो हो।",
+        clipDescription: "हर बनाई गई ऑडियो क्लिप का खर्च तय है।",
+        videoDescription:
+          "बनाए गए वीडियो के हर सेकंड के हिसाब से चार्ज ({{duration}} सेकंड डिफ़ॉल्ट)।",
+        ttsDescription: "स्पीच में बदले गए हर अक्षर के हिसाब से चार्ज।",
+        ttsPricing: "दर:",
+        ttsScenarios: {
+          short: "छोटा वाक्य",
+          medium: "आम मैसेज",
+          long: "लंबा लेख",
+        },
+        ttsExample:
+          "100 शब्दों का मैसेज (~600 अक्षर) लगभग {{count}} क्रेडिट का पड़ता है",
+        sttDescription: "ट्रांसक्राइब किए गए ऑडियो के हर सेकंड के हिसाब से चार्ज।",
+        sttPricing: "दर:",
+        sttScenarios: {
+          short: "छोटा वॉइस नोट",
+          medium: "वॉइस मैसेज",
+          long: "पूरा एक मिनट",
+        },
+        sttExample: "1 मिनट की रिकॉर्डिंग लगभग {{count}} क्रेडिट की पड़ती है",
+        costPerChar: "प्रति अक्षर खर्च:",
+        costPerClipMusic: "प्रति क्लिप खर्च:",
+        videoBreakdown:
+          "{{costPerSecond}} क्रेडिट/सेकंड × {{duration}} सेकंड = {{total}} क्रेडिट",
+        imageHeader: "इमेज जनरेशन का खर्च",
+        videoHeader: "वीडियो जनरेशन का खर्च",
+        musicHeader: "म्यूज़िक जनरेशन का खर्च",
+        ttsHeader: "टेक्स्ट-टू-स्पीच का खर्च",
+        sttHeader: "स्पीच-टू-टेक्स्ट का खर्च",
+      },
+      creditValue: "1 क्रेडिट = {{value}}",
+    },
+    modelUtilities: {
+      adultExplicit: "एडल्ट/एक्सप्लिसिट कंटेंट",
+      adultImplied: "एडल्ट/सांकेतिक कंटेंट",
+      analysis: "एनालिसिस",
+      chat: "चैट",
+      coding: "कोडिंग",
+      conspiracy: "कॉन्सपिरेसी थ्योरी",
+      controversial: "विवादित विषय",
+      creative: "क्रिएटिव राइटिंग",
+      fast: "तेज़",
+      harmful: "संभावित रूप से हानिकारक कंटेंट",
+      illegalInfo: "गैरकानूनी जानकारी",
+      imageGen: "इमेज जनरेशन",
+      musicGen: "म्यूज़िक जनरेशन",
+      tts: "टेक्स्ट से स्पीच",
+      stt: "स्पीच से टेक्स्ट",
+      videoGen: "वीडियो जनरेशन",
+      legacy: "पुराना",
+      medicalAdvice: "मेडिकल सलाह",
+      offensiveLanguage: "अभद्र भाषा",
+      politicalLeft: "वामपंथी राजनीतिक विचार",
+      politicalRight: "दक्षिणपंथी राजनीतिक विचार",
+      reasoning: "एडवांस्ड रीज़निंग",
+      roleplay: "रोलप्ले",
+      roleplayDark: "डार्क रोलप्ले",
+      smart: "स्मार्ट",
+      uncensored: "अनसेंसर्ड",
+      violence: "हिंसा",
+      vision: "विज़न",
+    },
+    names: modelTranslations.names,
+  },
+};

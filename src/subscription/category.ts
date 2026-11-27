@@ -22,6 +22,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Abbonamenti",
     "es-ES": "Suscripciones",
     "sk-SK": "Predplatné",
+    "hi-IN": "सब्सक्रिप्शन",
   },
   description: {
     "en-US": "Find active plans, renewals and cancellations.",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
     "es-ES":
       "Consulte los planes activos, las renovaciones y las cancelaciones.",
     "sk-SK": "Skontrolujte aktívne predplatné, obnovenia a zrušenia.",
+    "hi-IN": "एक्टिव प्लान, रिन्यूअल और कैंसलेशन खोजें।",
   },
   group: "billing",
   icon: "refresh-cw",
@@ -61,6 +63,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Tutti gli abbonamenti con piano, stato e rinnovo.",
         "es-ES": "Todas las suscripciones con plan, estado y renovación.",
         "sk-SK": "Všetky predplatné s plánom, stavom a dátumom obnovenia.",
+        "hi-IN": "हर सब्सक्रिप्शन, प्लान, स्टेटस और रिन्यूअल तारीख के साथ।",
       },
       "subscription-admin-stats": {
         "en-US": "Subscription, credit and referral revenue in one view.",
@@ -74,6 +77,7 @@ export const category: CategoryDefinition = {
           "Ingresos de suscripciones, créditos y referidos de un vistazo.",
         "sk-SK":
           "Tržby z predplatného, kreditov a odporúčaní na jednom mieste.",
+        "hi-IN": "सब्सक्रिप्शन, क्रेडिट और रेफ़रल रेवेन्यू एक ही व्यू में।",
       },
       "subscription-admin-purchases": {
         "en-US": "Every credit pack bought, by whom and when.",
@@ -84,6 +88,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Ogni pacchetto di crediti acquistato, da chi e quando.",
         "es-ES": "Cada paquete de créditos comprado, por quién y cuándo.",
         "sk-SK": "Každý kúpený balík kreditov, kto a kedy.",
+        "hi-IN": "हर खरीदा गया क्रेडिट पैक, किसने और कब।",
       },
       "products-catalog-list": {
         "en-US": "The plans and credit packs customers can buy.",
@@ -95,6 +100,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Los planes y paquetes de créditos que pueden comprar los clientes.",
         "sk-SK": "Plány a balíky kreditov, ktoré si zákazníci môžu kúpiť.",
+        "hi-IN": "वे प्लान और क्रेडिट पैक जो कस्टमर खरीद सकते हैं।",
       },
     },
   },
@@ -116,6 +122,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Abbonamenti",
         "es-ES": "Suscripciones",
         "sk-SK": "Predplatné",
+        "hi-IN": "सब्सक्रिप्शन",
       },
     },
     Management: {
@@ -130,6 +137,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Gestione",
         "es-ES": "Gestión",
         "sk-SK": "Správa",
+        "hi-IN": "मैनेजमेंट",
       },
     },
     subscriptionAnalytics: {
@@ -144,6 +152,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Analisi",
         "es-ES": "Analítica",
         "sk-SK": "Analytika",
+        "hi-IN": "एनालिटिक्स",
       },
     },
   },

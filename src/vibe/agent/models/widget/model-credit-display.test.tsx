@@ -15,7 +15,13 @@ test("credit badges use the decimal separator of the site locale", () => {
   const model = { ...imageModel, creditCostPerImage: 1 };
   const price = getModelPrice(model);
   expect(Number.isInteger(price)).toBe(false);
-  for (const locale of ["sk-SK", "sk-GLOBAL", "en-US"] as const) {
+  for (const locale of [
+    "sk-SK",
+    "sk-GLOBAL",
+    "en-US",
+    "en-IN",
+    "hi-IN",
+  ] as const) {
     const html = renderToStaticMarkup(
       <ModelCreditDisplay
         modelId={model.id}

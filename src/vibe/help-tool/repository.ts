@@ -296,6 +296,7 @@ export class HelpRepository {
       it: () => import("@/generated/endpoints/meta/it"),
       es: () => import("@/generated/endpoints/meta/es"),
       sk: () => import("@/generated/endpoints/meta/sk"),
+      hi: () => import("@/generated/endpoints/meta/hi"),
     };
     const endMetadataLoad = RunningTaskRegistry.beginPhase(
       `help:metadata-import:${language}`,

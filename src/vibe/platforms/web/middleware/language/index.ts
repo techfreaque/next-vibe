@@ -111,6 +111,36 @@ function languageOf(locale: string): string {
 }
 
 /**
+ * Fallback locale for a bare language (/hi/, Accept-Language: hi). A language
+ * that is the default of some region falls back to its GLOBAL variant. A
+ * language that is only a secondary regional language (Hindi in India) falls
+ * back to its first region instead: hi -> hi-IN, not hi-GLOBAL.
+ */
+function languageFallbackLocale(
+  supportedLocales: CountryLanguage[],
+  language: string,
+): CountryLanguage | undefined {
+  const regions = Object.values(languageConfig.countryInfo);
+  const isRegionalDefault = regions.some(
+    (region) => region.language === language,
+  );
+  const home = isRegionalDefault
+    ? undefined
+    : regions.find(
+        (region) =>
+          region.code !== "GLOBAL" &&
+          region.languages.some((regional) => regional === language),
+      );
+  return (
+    (home
+      ? findLocale(supportedLocales, `${language}-${home.code}`)
+      : undefined) ??
+    supportedLocales.find((locale) => locale === `${language}-GLOBAL`) ??
+    supportedLocales.find((locale) => languageOf(locale) === language)
+  );
+}
+
+/**
  * Negotiate the best supported locale: cookie, then Accept-Language, then the
  * default. With `language` set, only locales of that language qualify, and the
  * GLOBAL variant of that language is the fallback.
@@ -165,6 +195,15 @@ function negotiateLocale(
       continue;
     }
 
+    // The visitor's country wins over the browser's region for that
+    // country's default language: an en-US browser in India gets en-IN.
+    if (geo && geo.language === langCode) {
+      const regional = findLocale(supportedLocales, `${langCode}-${geo.code}`);
+      if (regional) {
+        return regional;
+      }
+    }
+
     // Try exact match first
     const exact = supportedLocales.find((locale) => locale === normalized);
     if (exact) {
@@ -177,20 +216,11 @@ function negotiateLocale(
         return regional;
       }
     }
-    // Prefer GLOBAL variant for the language if available
-    const globalLocale = supportedLocales.find(
-      (locale) => locale === `${langCode}-GLOBAL`,
-    );
-    if (globalLocale) {
-      return globalLocale;
-    }
 
-    // Find any locale with matching language
-    const matchingLocale = supportedLocales.find(
-      (locale) => languageOf(locale) === langCode,
-    );
-    if (matchingLocale) {
-      return matchingLocale;
+    // GLOBAL variant of the language, or its home region (hi -> hi-IN)
+    const fallbackLocale = languageFallbackLocale(supportedLocales, langCode);
+    if (fallbackLocale) {
+      return fallbackLocale;
     }
   }
 
@@ -204,9 +234,7 @@ function negotiateLocale(
     }
   }
   if (language !== undefined) {
-    const languageLocale =
-      supportedLocales.find((locale) => locale === `${language}-GLOBAL`) ??
-      supportedLocales.find((locale) => languageOf(locale) === language);
+    const languageLocale = languageFallbackLocale(supportedLocales, language);
     if (languageLocale) {
       return languageLocale;
     }

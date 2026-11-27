@@ -25,6 +25,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Utenti",
     "es-ES": "Usuarios",
     "sk-SK": "Používatelia",
+    "hi-IN": "यूज़र",
     "en-GLOBAL": "Users",
   },
   description: {
@@ -37,6 +38,7 @@ export const category: CategoryDefinition = {
     "it-IT": "Cerchi gli utenti e ne gestisca gli account e gli accessi.",
     "es-ES": "Busque usuarios y gestione sus cuentas y permisos.",
     "sk-SK": "Vyhľadajte používateľov a spravujte ich účty a prístupové práva.",
+    "hi-IN": "लोग खोजें, एक्सेस देखें और यूज़र अकाउंट मैनेज करें।",
     "en-GLOBAL": "Find people, review access and manage user accounts.",
   },
   landing: {
@@ -57,6 +59,7 @@ export const category: CategoryDefinition = {
         "es-ES":
           "Cada cuenta con lo que pagó, lo que gasta y su última actividad.",
         "sk-SK": "Každý účet s platbami, spotrebou a poslednou aktivitou.",
+        "hi-IN": "हर अकाउंट, उसका पेमेंट, खर्च और आखिरी बार एक्टिव होने का समय।",
       },
       "users-stats": {
         "en-US": "Who signed up, from where, and who stayed and paid.",
@@ -68,6 +71,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Chi si è iscritto, da dove, e chi è rimasto e ha pagato.",
         "es-ES": "Quién se registró, desde dónde, y quién se quedó y pagó.",
         "sk-SK": "Kto sa zaregistroval, odkiaľ a kto zostal a zaplatil.",
+        "hi-IN": "किसने साइन अप किया, कहाँ से, और कौन रुका और पेमेंट किया।",
       },
     },
   },

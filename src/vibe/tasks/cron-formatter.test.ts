@@ -20,15 +20,31 @@ const HOURLY = "0 * * * *";
 const EVERY_MINUTE = "* * * * *";
 const DAILY_6AM = "0 6 * * *";
 
+describe("Fixed-time schedule descriptions", () => {
+  it("reads the hour and minute together in a task's time zone", () => {
+    expect(formatCronSchedule("45 17 1 1 *", "Europe/Vienna", "de-DE", logger)).toBe(
+      "Um 17:45 am 1. im Januar in Europe/Vienna",
+    );
+    expect(formatCronSchedule("45 17 * * *", "UTC", "en-US", logger)).toMatch(/^At 5:45\sPM$/u);
+    expect(formatCronSchedule("45 17 * * *", "UTC", "sk-SK", logger)).toBe("O 17:45");
+  });
+});
+
 describe("Slovak schedule descriptions", () => {
   for (const locale of ["sk-SK", "sk-GLOBAL"] as const) {
     it(`uses a 24-hour clock and resolves range boundaries for ${locale}`, () => {
-      expect(formatCronSchedule("0 14-16 * * *", "UTC", locale, logger)).toBe(
-        "Od 14:00 do 16:00",
-      );
-      expect(formatCronSchedule("5-9 * * * *", "UTC", locale, logger)).toBe(
-        "Od 5. do 9. minúty",
-      );
+      expect(formatCronSchedule("0 14-16 * * *", "UTC", locale, logger)).toBe("Od 14:00 do 16:00");
+      expect(formatCronSchedule("5-9 * * * *", "UTC", locale, logger)).toBe("Od 5. do 9. minúty");
+    });
+  }
+});
+
+describe("Hindi schedule descriptions", () => {
+  for (const locale of ["hi-IN", "hi-GLOBAL"] as const) {
+    it(`renders ${locale} with Western digits`, () => {
+      const text = formatCronSchedule("45 17 * * *", "Asia/Kolkata", locale, logger);
+      expect(text).toContain("45");
+      expect(text).not.toMatch(/[\u0966-\u096F]/u);
     });
   }
 });
@@ -39,12 +55,8 @@ describe("isCronTaskDue - catch-up semantics", () => {
   });
 
   it("a task that never ran is due on the next pulse (startup catch-up)", () => {
-    expect(
-      isCronTaskDue(logger, HOURLY, new Date("2026-11-09T14:37:00Z"), null),
-    ).toBe(true);
-    expect(
-      isCronTaskDue(logger, DAILY_6AM, new Date("2026-11-09T14:37:00Z"), null),
-    ).toBe(true);
+    expect(isCronTaskDue(logger, HOURLY, new Date("2026-11-09T14:37:00Z"), null)).toBe(true);
+    expect(isCronTaskDue(logger, DAILY_6AM, new Date("2026-11-09T14:37:00Z"), null)).toBe(true);
   });
 
   describe("hourly task", () => {
@@ -152,82 +164,40 @@ describe("isCronTaskDue - catch-up semantics", () => {
 
     it("REGRESSION: is NOT due right after boot/creation", () => {
       expect(
-        isCronTaskDue(
-          logger,
-          DAILY_8AM,
-          new Date("2026-11-09T22:06:03Z"),
-          null,
-          created,
-        ),
+        isCronTaskDue(logger, DAILY_8AM, new Date("2026-11-09T22:06:03Z"), null, created),
       ).toBe(false);
     });
 
     it("stays not due until the next scheduled occurrence", () => {
       expect(
-        isCronTaskDue(
-          logger,
-          DAILY_8AM,
-          new Date("2026-11-10T07:59:30Z"),
-          null,
-          created,
-        ),
+        isCronTaskDue(logger, DAILY_8AM, new Date("2026-11-10T07:59:30Z"), null, created),
       ).toBe(false);
     });
 
     it("is due once the first occurrence after creation has elapsed", () => {
       expect(
-        isCronTaskDue(
-          logger,
-          DAILY_8AM,
-          new Date("2026-11-10T08:00:20Z"),
-          null,
-          created,
-        ),
+        isCronTaskDue(logger, DAILY_8AM, new Date("2026-11-10T08:00:20Z"), null, created),
       ).toBe(true);
       // Pulse drift / downtime past the slot still catches up.
       expect(
-        isCronTaskDue(
-          logger,
-          DAILY_8AM,
-          new Date("2026-11-10T13:00:00Z"),
-          null,
-          created,
-        ),
+        isCronTaskDue(logger, DAILY_8AM, new Date("2026-11-10T13:00:00Z"), null, created),
       ).toBe(true);
     });
 
     it("every-minute one-shot (import jobs) still fires within a minute", () => {
       const at = new Date("2026-11-09T14:00:30Z");
-      expect(
-        isCronTaskDue(
-          logger,
-          EVERY_MINUTE,
-          new Date("2026-11-09T14:00:45Z"),
-          null,
-          at,
-        ),
-      ).toBe(false);
-      expect(
-        isCronTaskDue(
-          logger,
-          EVERY_MINUTE,
-          new Date("2026-11-09T14:01:05Z"),
-          null,
-          at,
-        ),
-      ).toBe(true);
+      expect(isCronTaskDue(logger, EVERY_MINUTE, new Date("2026-11-09T14:00:45Z"), null, at)).toBe(
+        false,
+      );
+      expect(isCronTaskDue(logger, EVERY_MINUTE, new Date("2026-11-09T14:01:05Z"), null, at)).toBe(
+        true,
+      );
     });
 
     it("unanchored never-ran tasks keep startup catch-up", () => {
-      expect(
-        isCronTaskDue(
-          logger,
-          DAILY_8AM,
-          new Date("2026-11-09T22:06:03Z"),
-          null,
-          null,
-        ),
-      ).toBe(true);
+      expect(isCronTaskDue(logger, DAILY_8AM, new Date("2026-11-09T22:06:03Z"), null, null)).toBe(
+        true,
+      );
     });
   });
 });

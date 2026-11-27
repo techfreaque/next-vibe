@@ -909,6 +909,7 @@ export const translations: typeof enTranslations = {
     it: "Italien",
     es: "Espagnol",
     sk: "Slovaque",
+    hi: "Hindi",
     en: "Anglais",
     de: "Allemand",
     pl: "Polonais",

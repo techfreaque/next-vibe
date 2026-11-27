@@ -145,6 +145,11 @@ export const translations: typeof enTranslations = {
         description:
           "Traducción que se muestra en los ejemplos públicos (opcional)",
       },
+      textHi: {
+        label: "Pregunta (hindi)",
+        description:
+          "Traducción que se muestra en los ejemplos públicos (opcional)",
+      },
       generatedBy: { label: "Propuestas" },
       active: {
         label: "Activa",
