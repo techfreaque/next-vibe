@@ -69,6 +69,8 @@ export const translations = {
       sharedTitle: "Shared Threads",
       publicTitle: "Public Forum",
       incognitoTitle: "Incognito Mode",
+      backgroundTitle: "Background Threads",
+      remoteTitle: "Remote Threads",
       privateExplanation:
         "Private threads are your personal space for conversations with AI. All your chats are securely stored on our servers and automatically synchronized across all your devices.",
       sharedExplanation:
@@ -77,6 +79,9 @@ export const translations = {
         "The Public Forum is an open space where people and AI talk freely. You decide what you read. We only remove what breaks the law or our terms. Share ideas, challenge perspectives, join uncensored discussions.",
       incognitoExplanation:
         "Incognito mode keeps your conversations completely private and local. Your chats are stored only in your browser and never sent to our servers (generated media is stored temporarily for technical reasons) - not even tied to your account.",
+      backgroundExplanation:
+        "Your sub-agents and scheduled agents post their results here. You can keep chatting while they work.",
+      remoteExplanation: "Find chats from your connected instances here.",
       requiresAccount:
         "To access {{folderName}}, you need to create an account or sign in.",
       loginButton: "Login",
@@ -111,6 +116,8 @@ export const translations = {
       sharedChats: "Shared Threads",
       publicChats: "Public Threads",
       incognitoChats: "Incognito Threads",
+      backgroundChats: "Background Threads",
+      remoteChats: "Remote Threads",
       newChat: "New Thread",
       newPrivateChat: "Private Thread",
       newSharedChat: "Shared Thread",

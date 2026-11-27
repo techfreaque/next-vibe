@@ -71,6 +71,8 @@ export const translations: typeof enTranslations = {
       sharedTitle: "Wątki udostępnione",
       publicTitle: "Forum publiczne",
       incognitoTitle: "Tryb incognito",
+      backgroundTitle: "Wątki w tle",
+      remoteTitle: "Wątki zdalne",
       privateExplanation:
         "Wątki prywatne to Twoja osobista przestrzeń do rozmów z AI. Wszystkie Twoje czaty są bezpiecznie przechowywane na naszych serwerach i automatycznie synchronizowane na wszystkich Twoich urządzeniach.",
       sharedExplanation:
@@ -79,6 +81,10 @@ export const translations: typeof enTranslations = {
         "Forum publiczne to otwarta przestrzeń, w której ludzie i AI rozmawiają swobodnie. Ty decydujesz, co czytasz. Usuwamy tylko to, co łamie prawo lub nasz regulamin. Dziel się pomysłami, kwestionuj perspektywy i bierz udział w niecenzurowanych dyskusjach.",
       incognitoExplanation:
         "Tryb incognito zachowuje Twoje rozmowy całkowicie prywatne i lokalne. Twoje czaty są przechowywane tylko w Twojej przeglądarce i nigdy nie są wysyłane na nasze serwery (wygenerowane media przechowujemy tymczasowo ze względów technicznych) - nawet nie są powiązane z Twoim kontem.",
+      backgroundExplanation:
+        "Dłuższe zadania nie muszą blokować Twojej rozmowy. Wątki w tle to miejsce, gdzie Twoje podagenty i zaplanowane agenty w tle działają samodzielnie i zwracają gotowe wyniki.",
+      remoteExplanation:
+        "Własne instancje nie muszą rozpraszać rozmów po różnych narzędziach. Wątki zdalne zbierają w jednym miejscu czaty zsynchronizowane z Twoich połączonych instancji.",
       requiresAccount:
         "Aby uzyskać dostęp do {{folderName}}, musisz utworzyć konto lub się zalogować.",
       loginButton: "Zaloguj się",
@@ -113,6 +119,8 @@ export const translations: typeof enTranslations = {
       sharedChats: "Udostępnione czaty",
       publicChats: "Publiczne czaty",
       incognitoChats: "Czaty incognito",
+      backgroundChats: "Wątki w tle",
+      remoteChats: "Wątki zdalne",
       newChat: "Nowy czat",
       newPrivateChat: "Prywatny Thread",
       newSharedChat: "Udostępniony Thread",

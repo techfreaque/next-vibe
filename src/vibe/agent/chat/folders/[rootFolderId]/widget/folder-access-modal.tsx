@@ -17,7 +17,12 @@ import { Link } from "next-vibe/ui/components/link";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
-import { scopedTranslation } from "../i18n";
+import { isDefaultFolderId } from "../../../config";
+import {
+  type FolderByIdT,
+  type FolderByIdTranslationKey,
+  scopedTranslation,
+} from "../i18n";
 
 interface FolderAccessModalProps {
   open: boolean;
@@ -26,49 +31,66 @@ interface FolderAccessModalProps {
   locale: CountryLanguage;
 }
 
+interface FolderAccessContentKeys {
+  readonly title: FolderByIdTranslationKey;
+  readonly explanation: FolderByIdTranslationKey;
+  readonly folderName: FolderByIdTranslationKey;
+}
+
 /**
- * Get the folder-specific content based on folder ID
+ * Exhaustive map from every root folder ID to its modal translation keys.
+ * Adding a new DefaultFolderId without entries here fails the type check.
  */
-function getFolderContent(
-  folderId: string,
-  t: ReturnType<typeof scopedTranslation.scopedT>["t"],
+export const FOLDER_ACCESS_CONTENT = {
+  [DefaultFolderId.PRIVATE]: {
+    title: "widget.accessModal.privateTitle",
+    explanation: "widget.accessModal.privateExplanation",
+    folderName: "widget.common.privateChats",
+  },
+  [DefaultFolderId.SHARED]: {
+    title: "widget.accessModal.sharedTitle",
+    explanation: "widget.accessModal.sharedExplanation",
+    folderName: "widget.common.sharedChats",
+  },
+  [DefaultFolderId.PUBLIC]: {
+    title: "widget.accessModal.publicTitle",
+    explanation: "widget.accessModal.publicExplanation",
+    folderName: "widget.common.publicChats",
+  },
+  [DefaultFolderId.INCOGNITO]: {
+    title: "widget.accessModal.incognitoTitle",
+    explanation: "widget.accessModal.incognitoExplanation",
+    folderName: "widget.common.incognitoChats",
+  },
+  [DefaultFolderId.BACKGROUND]: {
+    title: "widget.accessModal.backgroundTitle",
+    explanation: "widget.accessModal.backgroundExplanation",
+    folderName: "widget.common.backgroundChats",
+  },
+  [DefaultFolderId.REMOTE]: {
+    title: "widget.accessModal.remoteTitle",
+    explanation: "widget.accessModal.remoteExplanation",
+    folderName: "widget.common.remoteChats",
+  },
+} as const satisfies Record<DefaultFolderId, FolderAccessContentKeys>;
+
+/**
+ * Resolve localized modal copy for a root folder.
+ */
+export function getFolderAccessContent(
+  folderId: DefaultFolderId,
+  t: FolderByIdT,
 ): {
   title: string;
   explanation: string;
   folderName: string;
 } {
-  switch (folderId) {
-    case DefaultFolderId.PRIVATE:
-      return {
-        title: t("widget.accessModal.privateTitle"),
-        explanation: t("widget.accessModal.privateExplanation"),
-        folderName: t("widget.common.privateChats"),
-      };
-    case DefaultFolderId.SHARED:
-      return {
-        title: t("widget.accessModal.sharedTitle"),
-        explanation: t("widget.accessModal.sharedExplanation"),
-        folderName: t("widget.common.sharedChats"),
-      };
-    case DefaultFolderId.PUBLIC:
-      return {
-        title: t("widget.accessModal.publicTitle"),
-        explanation: t("widget.accessModal.publicExplanation"),
-        folderName: t("widget.common.publicChats"),
-      };
-    case DefaultFolderId.INCOGNITO:
-      return {
-        title: t("widget.accessModal.incognitoTitle"),
-        explanation: t("widget.accessModal.incognitoExplanation"),
-        folderName: t("widget.common.incognitoChats"),
-      };
-    default:
-      return {
-        title: t("widget.accessModal.title"),
-        explanation: "",
-        folderName: "",
-      };
-  }
+  const keys = FOLDER_ACCESS_CONTENT[folderId];
+  return {
+    title: t(keys.title),
+    explanation: t(keys.explanation),
+    folderName: t(keys.folderName),
+  };
 }
 
 export function FolderAccessModal({
@@ -78,7 +100,13 @@ export function FolderAccessModal({
   locale,
 }: FolderAccessModalProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const { title, explanation, folderName } = getFolderContent(folderId, t);
+  const { title, explanation, folderName } = isDefaultFolderId(folderId)
+    ? getFolderAccessContent(folderId, t)
+    : {
+        title: t("widget.accessModal.title"),
+        explanation: "",
+        folderName: t("widget.accessModal.title"),
+      };
 
   // Construct proper locale-aware routes
   const loginUrl: Route<`/${CountryLanguage}/user/login`> = `/${locale}/user/login`;

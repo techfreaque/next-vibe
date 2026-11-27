@@ -71,6 +71,8 @@ export const translations: typeof enTranslations = {
       sharedTitle: "Zdieľané konverzácie",
       publicTitle: "Verejné fórum",
       incognitoTitle: "Režim inkognito",
+      backgroundTitle: "Konverzácie na pozadí",
+      remoteTitle: "Vzdialené konverzácie",
       privateExplanation:
         "Súkromné konverzácie sú váš priestor na rozhovory s AI. Bezpečne ich ukladáme na serveroch a automaticky ich synchronizujeme medzi vašimi zariadeniami.",
       sharedExplanation:
@@ -79,6 +81,10 @@ export const translations: typeof enTranslations = {
         "Verejné fórum je otvorený priestor na rozhovory ľudí aj AI. Sami rozhodujete, čo si prečítate. Odstraňujeme len obsah, ktorý porušuje zákon alebo naše podmienky. Podeľte sa o nápady, spochybnite zaužívané názory alebo sa zapojte do diskusie bez cenzúry.",
       incognitoExplanation:
         "V režime inkognito sa vaše konverzácie ukladajú len v prehliadači. Neposielajú sa na naše servery a nepriraďujú sa k účtu. Vygenerované médiá sa z technických dôvodov ukladajú dočasne.",
+      backgroundExplanation:
+        "Dlhšie úlohy nemusia blokovať váš čet. V konverzáciách na pozadí bežia vaši podagenti a naplánovaní agenti na pozadí, ktorí po dokončení nahlásia výsledky.",
+      remoteExplanation:
+        "Vlastné inštancie nemusia rozdeľovať vaše rozhovory medzi rôzne nástroje. Vzdialené konverzácie zhromažďujú čety synchronizované z vašich pripojených inštancií na jednom mieste.",
       requiresAccount:
         "Ak chcete otvoriť priečinok „{{folderName}}“, vytvorte si účet alebo sa prihláste.",
       loginButton: "Prihlásiť sa",
@@ -113,6 +119,8 @@ export const translations: typeof enTranslations = {
       sharedChats: "Zdieľané konverzácie",
       publicChats: "Verejné konverzácie",
       incognitoChats: "Konverzácie inkognito",
+      backgroundChats: "Konverzácie na pozadí",
+      remoteChats: "Vzdialené konverzácie",
       newChat: "Nová konverzácia",
       newPrivateChat: "Súkromná konverzácia",
       newSharedChat: "Zdieľaná konverzácia",

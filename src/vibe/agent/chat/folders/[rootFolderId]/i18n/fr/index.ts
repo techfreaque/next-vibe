@@ -71,6 +71,8 @@ export const translations: typeof enTranslations = {
       sharedTitle: "Fils partagés",
       publicTitle: "Forum public",
       incognitoTitle: "Mode incognito",
+      backgroundTitle: "Fils en arrière-plan",
+      remoteTitle: "Fils distants",
       privateExplanation:
         "Les fils privés sont votre espace personnel pour discuter avec l'IA. Toutes vos discussions sont stockées en sécurité sur nos serveurs et synchronisées automatiquement sur tous vos appareils.",
       sharedExplanation:
@@ -79,6 +81,10 @@ export const translations: typeof enTranslations = {
         "Le forum public est un espace ouvert où humains et IA dialoguent librement. Vous choisissez ce que vous lisez. Nous ne retirons que ce qui enfreint la loi ou nos conditions d'utilisation. Partagez vos idées, confrontez les points de vue, participez à des discussions non censurées.",
       incognitoExplanation:
         "Le mode incognito garde vos discussions entièrement privées et locales. Vos discussions sont stockées uniquement dans votre navigateur et ne sont jamais envoyées à nos serveurs (les médias générés sont stockés temporairement pour des raisons techniques). Elles ne sont même pas liées à votre compte.",
+      backgroundExplanation:
+        "Les tâches longues ne doivent pas bloquer votre discussion. Les fils en arrière-plan accueillent vos sous-agents et agents planifiés, qui travaillent seuls et vous rendent compte une fois terminés.",
+      remoteExplanation:
+        "Gérer vos propres instances ne devrait pas disperser vos discussions. Les fils distants regroupent au même endroit les échanges synchronisés depuis vos instances connectées.",
       requiresAccount:
         "Pour accéder à {{folderName}}, créez un compte ou connectez-vous.",
       loginButton: "Se connecter",
@@ -113,6 +119,8 @@ export const translations: typeof enTranslations = {
       sharedChats: "Fils partagés",
       publicChats: "Fils publics",
       incognitoChats: "Fils incognito",
+      backgroundChats: "Fils en arrière-plan",
+      remoteChats: "Fils distants",
       newChat: "Nouveau fil",
       newPrivateChat: "Fil privé",
       newSharedChat: "Fil partagé",

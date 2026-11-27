@@ -71,6 +71,8 @@ export const translations: typeof enTranslations = {
       sharedTitle: "Geteilte Threads",
       publicTitle: "Öffentliches Forum",
       incognitoTitle: "Inkognito-Modus",
+      backgroundTitle: "Hintergrund-Threads",
+      remoteTitle: "Remote-Threads",
       privateExplanation:
         "Private Threads sind Ihr persönlicher Bereich für Gespräche mit KI. Alle Ihre Chats werden sicher auf unseren Servern gespeichert und automatisch auf allen Ihren Geräten synchronisiert.",
       sharedExplanation:
@@ -79,8 +81,12 @@ export const translations: typeof enTranslations = {
         "Das öffentliche Forum ist ein offener Raum, in dem Menschen und KI frei diskutieren. Sie entscheiden, was Sie lesen. Wir entfernen nur, was gegen Gesetze oder unsere Nutzungsbedingungen verstößt. Teilen Sie Ideen, hinterfragen Sie Perspektiven und diskutieren Sie unzensiert.",
       incognitoExplanation:
         "Der Inkognito-Modus hält Ihre Gespräche völlig privat und lokal. Ihre Chats werden nur in Ihrem Browser gespeichert und niemals an unsere Server gesendet (generierte Medien speichern wir aus technischen Gründen vorübergehend) - nicht einmal mit Ihrem Konto verknüpft.",
+      backgroundExplanation:
+        "Hier findest du die Ergebnisse deiner Sub-Agenten und geplanten Aufgaben. Während sie laufen, kannst du weiterchatten.",
+      remoteExplanation:
+        "Hier findest du die Chats deiner verbundenen Instanzen.",
       requiresAccount:
-        "Um auf {{folderName}} zuzugreifen, müssen Sie ein Konto erstellen oder sich anmelden.",
+        "Für {{folderName}} bitte anmelden oder ein Konto erstellen.",
       loginButton: "Anmelden",
       signupButton: "Registrieren",
       close: "Schließen",
@@ -113,6 +119,8 @@ export const translations: typeof enTranslations = {
       sharedChats: "Geteilte Threads",
       publicChats: "Öffentliche Threads",
       incognitoChats: "Inkognito-Threads",
+      backgroundChats: "Hintergrund-Threads",
+      remoteChats: "Remote-Threads",
       newChat: "Neuer Thread",
       newPrivateChat: "Privater Thread",
       newSharedChat: "Geteilter Thread",
