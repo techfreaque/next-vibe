@@ -259,10 +259,10 @@ export class LeadsListRepository {
               SELECT COUNT(*)::int FROM lead_lead_links lll
               JOIN leads other_l
                 ON other_l.id = CASE
-                  WHEN lll.lead_id_1 = "leads"."id" THEN lll.lead_id_2
+                  WHEN lll.lead_id_1 = ${leads.id} THEN lll.lead_id_2
                   ELSE lll.lead_id_1
                 END
-              WHERE (lll.lead_id_1 = "leads"."id" OR lll.lead_id_2 = "leads"."id")
+              WHERE (lll.lead_id_1 = ${leads.id} OR lll.lead_id_2 = ${leads.id})
                 AND other_l.is_bot = false
             )`,
             hasLinkedUser: sql<boolean>`EXISTS (

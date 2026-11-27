@@ -269,3 +269,48 @@ test("excludes is_bot flagged crawler leads and their visits from growth stats a
   const details = await AcquisitionRepository.leadDetails([botLead], "USD");
   expect(details.get(botLead)).toMatchObject({ visits: 1 });
 });
+
+test("prefers journeys, then the earliest signup link, then the earliest legacy conversion", async () => {
+  const ids = Array.from(
+    { length: 10 },
+    (_, index) => `45c83992-bbe4-496a-82a0-2d84e837e${index + 100}`,
+  );
+  const [
+    journeyUser, linkedUser, legacyUser, journeyLead, otherJourneyLead,
+    earliestLink, laterLink, linkedLegacy, earliestLegacy, laterLegacy,
+  ] = ids;
+  await pg.query(
+    `INSERT INTO users (id, created_at)
+     VALUES ($1, '2026-09-01'), ($2, '2026-09-01'), ($3, '2026-09-01')`,
+    [journeyUser, linkedUser, legacyUser],
+  );
+  await pg.query(
+    `INSERT INTO leads (id, created_at, signed_up_at, converted_user_id)
+     VALUES ($1, '2026-09-01', null, null),
+            ($2, '2026-09-01', null, null),
+            ($3, '2026-09-01', null, null),
+            ($4, '2026-09-01', null, null),
+            ($5, '2026-09-01', '2026-09-02', $8),
+            ($6, '2026-09-01', '2026-09-02', $9),
+            ($7, '2026-09-02', '2026-09-02', $9)`,
+    [journeyLead, otherJourneyLead, earliestLink, laterLink, linkedLegacy,
+      earliestLegacy, laterLegacy, linkedUser, legacyUser],
+  );
+  await pg.query(
+    "INSERT INTO growth_journeys (lead_id, user_id) VALUES ($1, $2)",
+    [journeyLead, journeyUser],
+  );
+  await pg.query(
+    `INSERT INTO user_lead_links (lead_id, user_id, link_reason, linked_at)
+     VALUES ($1, $4, 'signup', '2026-09-01'),
+            ($2, $5, 'signup', '2026-09-01'),
+            ($3, $5, 'signup', '2026-09-02')`,
+    [otherJourneyLead, earliestLink, laterLink, journeyUser, linkedUser],
+  );
+
+  const { AcquisitionRepository } = await import("./acquisition-repository");
+  const details = await AcquisitionRepository.leadDetails(ids.slice(3), "EUR");
+  expect(ids.slice(3).map((id) => details.get(id)?.signups)).toEqual([
+    1, 0, 1, 0, 0, 1, 0,
+  ]);
+});

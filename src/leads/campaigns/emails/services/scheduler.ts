@@ -60,13 +60,13 @@ import { abTestingService } from "./ab-testing";
  * sends COLD lead campaigns and one-off newsletter blasts. Rows of the retired
  * types that were enqueued before 2026-11-17 are never sent from here.
  */
-const LIFECYCLE_OWNED_CAMPAIGN_TYPES = [
+export const LIFECYCLE_OWNED_CAMPAIGN_TYPES = [
   CampaignType.SIGNUP_NURTURE,
   CampaignType.RETENTION,
   CampaignType.WINBACK,
 ] as const;
 /** NEWSLETTER rows with these variants are blasts; any other NEWSLETTER row is the retired nurture. */
-const NEWSLETTER_BLAST_VARIANTS = [
+export const NEWSLETTER_BLAST_VARIANTS = [
   EmailJourneyVariant.NEWSLETTER_MAY_2026,
   EmailJourneyVariant.NEWSLETTER_NOV_2026,
 ] as const;

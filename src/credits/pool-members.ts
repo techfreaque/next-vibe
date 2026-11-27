@@ -43,12 +43,12 @@ export function userPoolLeadIdsSql(
       UNION
       SELECT nxt.lead_id
       FROM pool_leads pl
-      JOIN ${leadLeadLinks} ll
-        ON (ll.lead_id_1 = pl.lead_id OR ll.lead_id_2 = pl.lead_id)
-        AND ll.link_reason <> 'ip_match'
       CROSS JOIN LATERAL (
-        SELECT CASE WHEN ll.lead_id_1 = pl.lead_id
-          THEN ll.lead_id_2 ELSE ll.lead_id_1 END AS lead_id
+        SELECT ll.lead_id_2 AS lead_id FROM ${leadLeadLinks} ll
+        WHERE ll.lead_id_1 = pl.lead_id AND ll.link_reason <> 'ip_match'
+        UNION ALL
+        SELECT ll.lead_id_1 FROM ${leadLeadLinks} ll
+        WHERE ll.lead_id_2 = pl.lead_id AND ll.link_reason <> 'ip_match'
       ) nxt
       WHERE NOT EXISTS (
         SELECT 1 FROM ${userLeadLinks} other_ull
@@ -85,11 +85,12 @@ export function guestPoolLeadIdsSql(
       UNION
       SELECT nxt.lead_id
       FROM guest_leads gl
-      JOIN ${leadLeadLinks} ll
-        ON ll.lead_id_1 = gl.lead_id OR ll.lead_id_2 = gl.lead_id
       CROSS JOIN LATERAL (
-        SELECT CASE WHEN ll.lead_id_1 = gl.lead_id
-          THEN ll.lead_id_2 ELSE ll.lead_id_1 END AS lead_id
+        SELECT ll.lead_id_2 AS lead_id FROM ${leadLeadLinks} ll
+        WHERE ll.lead_id_1 = gl.lead_id
+        UNION ALL
+        SELECT ll.lead_id_1 FROM ${leadLeadLinks} ll
+        WHERE ll.lead_id_2 = gl.lead_id
       ) nxt
       WHERE NOT EXISTS (
         SELECT 1 FROM ${userLeadLinks} owned_ull

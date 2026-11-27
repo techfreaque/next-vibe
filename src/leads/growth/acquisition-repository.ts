@@ -92,21 +92,20 @@ const acquiredUsers = sql`
   SELECT u.id, u.created_at, coalesce(j.lead_id, signup.lead_id, legacy.id) AS lead_id
   FROM users u
   LEFT JOIN growth_journeys j ON j.user_id = u.id
-  LEFT JOIN LATERAL (
-    SELECT link.lead_id FROM user_lead_links link
-    WHERE j.lead_id IS NULL AND link.user_id = u.id AND link.link_reason = 'signup'
-    ORDER BY link.linked_at, link.lead_id
-    LIMIT 1
-  ) signup ON true
-  LEFT JOIN LATERAL (
-    -- The outer-only conditions sit inside the subquery so Postgres skips
-    -- the (unindexed) leads scan for every account that already has a lead.
-    SELECT l.id FROM leads l
-    WHERE j.lead_id IS NULL AND signup.lead_id IS NULL
-      AND l.converted_user_id = u.id AND l.signed_up_at IS NOT NULL
-    ORDER BY l.created_at, l.id
-    LIMIT 1
-  ) legacy ON true
+  LEFT JOIN (
+    SELECT DISTINCT ON (link.user_id) link.user_id, link.lead_id
+    FROM user_lead_links link WHERE link.link_reason = 'signup'
+    ORDER BY link.user_id, link.linked_at, link.lead_id
+  ) signup ON signup.user_id = u.id AND j.lead_id IS NULL
+  LEFT JOIN (
+    -- Resolve legacy conversions in one scan. A per-user lookup repeatedly
+    -- scans leads when returning accounts have no journey or signup link.
+    SELECT DISTINCT ON (l.converted_user_id) l.converted_user_id, l.id
+    FROM leads l
+    WHERE l.converted_user_id IS NOT NULL AND l.signed_up_at IS NOT NULL
+    ORDER BY l.converted_user_id, l.created_at, l.id
+  ) legacy ON legacy.converted_user_id = u.id
+    AND j.lead_id IS NULL AND signup.lead_id IS NULL
 `;
 
 // Recorded live stamps also cover incognito, where message history is absent.

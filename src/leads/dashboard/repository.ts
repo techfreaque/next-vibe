@@ -12,8 +12,8 @@ import {
   type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { databaseFailureDiagnostics } from "next-vibe/database/error-diagnostics";
 import { leads } from "next-vibe/identity/lead/db";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -212,10 +212,12 @@ export class LeadsDashboardRepository {
         summary: summarizeLeads(dashboard, t("widget.unnamedLead")),
       });
     } catch (error) {
-      const parsed = parseError(error);
-      logger.error("Failed to load leads dashboard", {
-        error: parsed.message,
-      });
+      logger.error(
+        "Failed to load leads dashboard",
+        error instanceof Error
+          ? databaseFailureDiagnostics(error)
+          : { errorType: typeof error },
+      );
       return fail({
         message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

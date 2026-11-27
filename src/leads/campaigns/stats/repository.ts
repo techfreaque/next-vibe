@@ -50,8 +50,13 @@ import {
 } from "next-vibe/unified-ui/analytics/window-sql";
 import type { QueryResultRow } from "pg";
 
+import { CampaignType } from "@/messenger/accounts/enum";
 import { MessageStatus } from "@/messenger/messages/enum";
 
+import {
+  LIFECYCLE_OWNED_CAMPAIGN_TYPES,
+  NEWSLETTER_BLAST_VARIANTS,
+} from "../emails/services/scheduler";
 import { journeyVariantFromFilter, stageFromFilter } from "../filter-map";
 import type {
   CampaignAutomation,
@@ -122,7 +127,21 @@ export function campaignRowsCte(filters: {
   stage?: CampaignStatsGetRequestOutput["stage"];
   locale?: string;
 }): SQL {
-  const where: SQL[] = [sql`TRUE`];
+  const where: SQL[] = [
+    // Rows of the retired post-signup types (and the retired newsletter
+    // nurture) that were queued before 2026-11-17 never leave this queue: the
+    // lifecycle engine owns that mail now. Unsent ones are not "due".
+    sql`NOT (e.status = ${MessageStatus.PENDING} AND e.sent_at IS NULL AND (
+      e.campaign_type IN (${sql.join(
+        LIFECYCLE_OWNED_CAMPAIGN_TYPES.map((type) => sql`${type}`),
+        sql`, `,
+      )})
+      OR (e.campaign_type = ${CampaignType.NEWSLETTER} AND e.journey_variant NOT IN (${sql.join(
+        NEWSLETTER_BLAST_VARIANTS.map((variant) => sql`${variant}`),
+        sql`, `,
+      )}))
+    ))`,
+  ];
   const variant = journeyVariantFromFilter(filters.journeyVariant);
   if (variant) {
     where.push(sql`e.journey_variant = ${variant}`);
