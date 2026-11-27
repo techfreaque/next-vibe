@@ -14,6 +14,11 @@ import type { z } from "zod";
 
 // Import env modules
 import {
+  apiKeysEnv,
+  apiKeysEnvExamples,
+  apiKeysEnvSchema,
+} from "../../api-keys/env";
+import {
   browserEnv,
   browserEnvExamples,
   browserEnvSchema,
@@ -173,6 +178,11 @@ export const envModules: Record<
     examples: EnvExample[];
   }
 > = {
+  apiKeys: {
+    env: apiKeysEnv,
+    schema: apiKeysEnvSchema,
+    examples: apiKeysEnvExamples,
+  },
   browser: {
     env: browserEnv,
     schema: browserEnvSchema,
@@ -295,7 +305,8 @@ export const envModules: Record<
 };
 
 // Combined schema using merge
-export const envSchema = browserEnvSchema
+export const envSchema = apiKeysEnvSchema
+  .merge(browserEnvSchema)
   .merge(protectionEnvSchema)
   .merge(bankConnectionEnvSchema)
   .merge(financeEnvSchema)

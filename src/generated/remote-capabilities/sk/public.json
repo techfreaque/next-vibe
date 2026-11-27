@@ -2982,6 +2982,115 @@
           },
           "schemaType": "primitive"
         },
+        "paymentUrl": {
+          "type": "text",
+          "label": "Odkaz na online platbu",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "bankIban": {
+          "type": "text",
+          "label": "IBAN",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "bankBic": {
+          "type": "text",
+          "label": "BIC",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "qrKind": {
+          "type": "text",
+          "label": "Platobný QR štandard",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "EPC": "EPC",
+                    "PAY_BY_SQUARE": "PAY_BY_SQUARE"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "EPC": "EPC",
+                  "PAY_BY_SQUARE": "PAY_BY_SQUARE"
+                },
+                "options": ["EPC", "PAY_BY_SQUARE"]
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "qrSvg": {
+          "type": "text",
+          "label": "Platobný QR kód",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "lines": {
           "type": "container",
           "columns": 12,

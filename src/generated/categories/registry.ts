@@ -2766,15 +2766,22 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Ktoré zákonné požiadavky vašej krajiny spĺňate a čo opraviť.",
         },
         "tax-vat-return": {
-          "en-US": "Slovak DPH return lines and the kontrolný výkaz XML.",
-          "en-GLOBAL": "Slovak DPH return lines and the kontrolný výkaz XML.",
+          "en-US":
+            "Your VAT return for the period, in your country's official format.",
+          "en-GLOBAL":
+            "Your VAT return for the period, in your country's official format.",
           "de-DE":
-            "Slowakische Umsatzsteuererklärung und Kontrollmeldung (KV DPH) als XML.",
-          "pl-PL": "Słowacka deklaracja VAT i kontrolny výkaz w XML.",
-          "fr-FR": "Déclaration de TVA slovaque et kontrolný výkaz en XML.",
-          "it-IT": "Dichiarazione IVA slovacca e kontrolný výkaz in XML.",
-          "es-ES": "Declaración de IVA eslovaca y kontrolný výkaz en XML.",
-          "sk-SK": "Daňové priznanie k DPH a kontrolný výkaz v XML.",
+            "Ihre Umsatzsteuer-Voranmeldung für den Zeitraum im amtlichen Format Ihres Landes.",
+          "pl-PL":
+            "Twoja deklaracja VAT za wybrany okres w urzędowym formacie Twojego kraju.",
+          "fr-FR":
+            "Votre déclaration de TVA pour la période, au format officiel de votre pays.",
+          "it-IT":
+            "La sua dichiarazione IVA per il periodo, nel formato ufficiale del suo Paese.",
+          "es-ES":
+            "Su declaración de IVA del período, en el formato oficial de su país.",
+          "sk-SK":
+            "Vaše daňové priznanie k DPH za obdobie v úradnom formáte vašej krajiny.",
         },
       },
     },
