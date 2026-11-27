@@ -1,5 +1,6 @@
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, mkdtemp, readdir, readFile, writeFile } from "node:fs/promises";
+import * as os from "node:os";
+import { dirname, join } from "node:path";
 
 import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test";
 
@@ -12,19 +13,25 @@ import { install, uninstall } from "./setup";
 const logger = createLogger(false, defaultLocale);
 const fixtures = join(paths.getProjectRoot(), ".tmp/todelete");
 
-describe("Codex MCP setup", () => {
+describe("Project MCP setup", () => {
   let root: string;
   let codexConfig: string;
+  let antigravityConfig: string;
   let restoreRoot: () => void;
 
   beforeEach(async () => {
     await mkdir(fixtures, { recursive: true });
-    const prefix =
-      process.platform === "win32" ? "codex setup " : 'codex setup "quoted" ';
+    const prefix = process.platform === "win32" ? "codex setup " : 'codex setup "quoted" ';
     root = await mkdtemp(join(fixtures, prefix));
     codexConfig = join(root, ".codex/config.toml");
+    const home = join(root, "home");
+    antigravityConfig = join(home, ".gemini/config/mcp_config.json");
     const projectRoot = spyOn(paths, "getProjectRoot").mockReturnValue(root);
-    restoreRoot = (): void => projectRoot.mockRestore();
+    const homeDirectory = spyOn(os, "homedir").mockReturnValue(home);
+    restoreRoot = (): void => {
+      projectRoot.mockRestore();
+      homeDirectory.mockRestore();
+    };
   });
 
   afterEach(() => {
@@ -37,9 +44,7 @@ describe("Codex MCP setup", () => {
     expect(result.changed).toContain(codexConfig);
 
     const config = await readFile(codexConfig, "utf8");
-    const { mcpServers } = JSON.parse(
-      await readFile(join(root, ".mcp.json"), "utf8"),
-    );
+    const { mcpServers } = JSON.parse(await readFile(join(root, ".mcp.json"), "utf8"));
     expect(Bun.TOML.parse(config)).toEqual({
       mcp_servers: {
         atlas: {
@@ -73,8 +78,7 @@ describe("Codex MCP setup", () => {
     const installed = await readFile(codexConfig, "utf8");
     await writeFile(
       codexConfig,
-      installed.replace("startup_timeout_sec = 60", "startup_timeout_sec = 1") +
-        after,
+      installed.replace("startup_timeout_sec = 60", "startup_timeout_sec = 1") + after,
     );
 
     expect((await install(logger)).failed).toBeUndefined();
@@ -97,11 +101,9 @@ describe("Codex MCP setup", () => {
   });
 
   it("preserves marker text inside a multiline user setting", async () => {
-    const existing = [
-      "developer_instructions = '''",
-      "# BEGIN next-vibe MCP servers",
-      "'''",
-    ].join("\n");
+    const existing = ["developer_instructions = '''", "# BEGIN next-vibe MCP servers", "'''"].join(
+      "\n",
+    );
     await mkdir(join(root, ".codex"));
     await writeFile(codexConfig, existing);
 
@@ -112,5 +114,49 @@ describe("Codex MCP setup", () => {
     expect(await readFile(codexConfig, "utf8")).toBe(generated);
     expect((await uninstall(logger)).changed).toContain(codexConfig);
     expect(await readFile(codexConfig, "utf8")).toBe(existing);
+  });
+
+  it("merges Antigravity servers, backs up the existing config and preserves custom entries", async () => {
+    const path = antigravityConfig;
+    const directory = dirname(path);
+    const custom = {
+      mcpServers: { custom: { command: "probe", args: ["an argument"] } },
+      setting: true,
+    };
+    const existing = JSON.stringify(custom);
+    await mkdir(directory, { recursive: true });
+    await writeFile(path, existing);
+
+    const installed = await install(logger);
+    expect(installed.failed).toBeUndefined();
+    expect(installed.changed).toContain(path);
+    const { mcpServers } = JSON.parse(await readFile(join(root, ".mcp.json"), "utf8"));
+    const generated = await readFile(path, "utf8");
+    expect(JSON.parse(generated)).toEqual({
+      ...custom,
+      mcpServers: { ...custom.mcpServers, ...mcpServers },
+    });
+    const backup = (await readdir(directory)).find((file) => file.endsWith(".bak"));
+    expect(backup).toBeDefined();
+    if (backup) {
+      expect(await readFile(join(directory, backup), "utf8")).toBe(existing);
+    }
+
+    expect((await install(logger)).changed).not.toContain(path);
+    expect(await readFile(path, "utf8")).toBe(generated);
+    expect((await readdir(directory)).filter((name) => name.endsWith(".bak"))).toHaveLength(1);
+    expect((await uninstall(logger)).changed).toContain(path);
+    expect(JSON.parse(await readFile(path, "utf8"))).toEqual(custom);
+  });
+
+  it("leaves malformed Antigravity config intact and reports the path", async () => {
+    const path = antigravityConfig;
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, "{");
+
+    const result = await install(logger);
+    expect(result.failed).toContain(".gemini/config/mcp_config.json");
+    expect(result.changed).not.toContain(path);
+    expect(await readFile(path, "utf8")).toBe("{");
   });
 });

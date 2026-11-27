@@ -13,9 +13,12 @@
 
 import "server-only";
 
+import { randomUUID } from "node:crypto";
 import { existsSync, promises as fs } from "node:fs";
+import { homedir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 
 import chalk from "chalk";
 import { parseTOML } from "confbox/toml";
@@ -25,7 +28,7 @@ import { getProjectRoot } from "@/env/paths";
 
 import { coreEnv, getRuntimeInvocation } from "../../core/env";
 import type { SetupResult } from "../../core/setup/types";
-import type { WidgetData } from "../../core/utils/json";
+import { type WidgetData, WidgetDataSchema } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
 
@@ -66,6 +69,10 @@ const mcpTemplateSchema = z.object({
 });
 
 type McpTemplate = z.infer<typeof mcpTemplateSchema>;
+
+const sharedJsonSchema = z
+  .object({ mcpServers: z.record(z.string(), WidgetDataSchema).optional() })
+  .catchall(WidgetDataSchema);
 
 const CODEX_BLOCK_START = "# BEGIN next-vibe MCP servers";
 const CODEX_BLOCK_END = "# END next-vibe MCP servers";
@@ -158,7 +165,7 @@ function mergeCodexConfig(
 }
 
 /**
- * Where each editor reads project-scoped MCP config, and in what shape.
+ * Where each editor reads MCP config, and in what shape.
  *
  * VS Code uses the top-level `servers` key and an explicit `type` discriminator.
  * Codex reads TOML and shares the file with other project settings.
@@ -178,6 +185,10 @@ type McpTarget = {
   | {
       readonly format: "toml";
       readonly render: (template: McpTemplate) => string;
+    }
+  | {
+      readonly format: "user-json";
+      readonly render: (template: McpTemplate) => McpTemplate;
     }
 );
 
@@ -226,6 +237,12 @@ const MCP_TARGETS: readonly McpTarget[] = [
     editor: "Codex",
     format: "toml",
     render: renderCodexConfig,
+  },
+  {
+    path: ".gemini/config/mcp_config.json",
+    editor: "Antigravity",
+    format: "user-json",
+    render: (template) => template,
   },
 ];
 
@@ -375,10 +392,57 @@ async function resolveMcpTemplate(): Promise<TemplateResult> {
   };
 }
 
-/**
- * Write every editor's MCP config from the template. The JSON targets are
- * generated files. Codex shares its project config with user settings.
- */
+async function updateSharedJson(
+  destination: string,
+  template: McpTemplate,
+  operation: "install" | "uninstall",
+): Promise<{ changed: boolean; failed?: string }> {
+  const existing = existsSync(destination)
+    ? await fs.readFile(destination, "utf8")
+    : undefined;
+  let parsed: ReturnType<typeof sharedJsonSchema.safeParse>;
+  try {
+    parsed = sharedJsonSchema.safeParse(
+      existing?.trim() ? JSON.parse(existing) : {},
+    );
+  } catch {
+    return { changed: false, failed: "Expected valid JSON." };
+  }
+  if (!parsed.success) {
+    return { changed: false, failed: "Expected an MCP server map." };
+  }
+  const config = parsed.data;
+  const servers = { ...config.mcpServers };
+  for (const [name, server] of Object.entries(template.mcpServers)) {
+    if (operation === "install") {
+      servers[name] = server;
+    } else if (isDeepStrictEqual(servers[name], server)) {
+      // A server edited after setup now belongs to the user.
+      delete servers[name];
+    }
+  }
+  if (isDeepStrictEqual(config.mcpServers ?? {}, servers)) {
+    return { changed: false };
+  }
+
+  const revision = randomUUID();
+  if (existing !== undefined) {
+    await fs.writeFile(`${destination}.${revision}.bak`, existing, {
+      flag: "wx",
+      mode: 0o600,
+    });
+  }
+  const temporary = `${destination}.${revision}.tmp`;
+  await fs.writeFile(
+    temporary,
+    `${JSON.stringify({ ...config, mcpServers: servers }, null, 2)}\n`,
+    { flag: "wx", mode: 0o600 },
+  );
+  await fs.rename(temporary, destination);
+  return { changed: true };
+}
+
+/** Write generated configs and merge the shared Codex and Antigravity files. */
 async function writeMcpConfigs(): Promise<{
   changed: string[];
   failed?: string;
@@ -390,7 +454,10 @@ async function writeMcpConfigs(): Promise<{
   const projectRoot = getProjectRoot();
   const writtenPaths: string[] = [];
   for (const target of MCP_TARGETS) {
-    const destination = join(projectRoot, target.path);
+    const destination = join(
+      target.format === "user-json" ? homedir() : projectRoot,
+      target.path,
+    );
     try {
       // On Bun, recursive mkdir can fail with EEXIST for an existing directory.
       const directory = dirname(destination);
@@ -410,6 +477,21 @@ async function writeMcpConfigs(): Promise<{
           return { changed: writtenPaths, failed: merged.failed };
         }
         await fs.writeFile(destination, merged.content, "utf8");
+      } else if (target.format === "user-json") {
+        const result = await updateSharedJson(
+          destination,
+          target.render(resolved.template),
+          "install",
+        );
+        if (result.failed !== undefined) {
+          return {
+            changed: writtenPaths,
+            failed: `Could not write ${target.path}: ${result.failed}`,
+          };
+        }
+        if (!result.changed) {
+          continue;
+        }
       } else {
         const content = JSON.stringify(
           target.render(resolved.template),
@@ -429,13 +511,30 @@ async function writeMcpConfigs(): Promise<{
   return { changed: writtenPaths };
 }
 
-/** Remove generated configs and the managed block in the shared Codex config. */
+/** Remove generated files and entries still owned by setup in shared configs. */
 async function removeMcpConfigs(): Promise<string[]> {
   const projectRoot = getProjectRoot();
   const removedPaths: string[] = [];
   for (const target of MCP_TARGETS) {
-    const destination = join(projectRoot, target.path);
+    const destination = join(
+      target.format === "user-json" ? homedir() : projectRoot,
+      target.path,
+    );
     if (!existsSync(destination)) {
+      continue;
+    }
+    if (target.format === "user-json") {
+      const resolved = await resolveMcpTemplate();
+      if (resolved.ok) {
+        const result = await updateSharedJson(
+          destination,
+          target.render(resolved.template),
+          "uninstall",
+        );
+        if (result.changed) {
+          removedPaths.push(destination);
+        }
+      }
       continue;
     }
     if (target.format === "toml") {
@@ -463,7 +562,13 @@ export const description = "MCP config";
 
 /** Repo-relative and POSIX — an absolute Windows path buries the point. */
 function forDisplay(absolutePath: string): string {
-  return relative(getProjectRoot(), absolutePath).replaceAll("\\", "/");
+  const projectPath = relative(getProjectRoot(), absolutePath).replaceAll(
+    "\\",
+    "/",
+  );
+  return projectPath.startsWith("../")
+    ? `~/${relative(homedir(), absolutePath).replaceAll("\\", "/")}`
+    : projectPath;
 }
 
 export async function install(logger: EndpointLogger): Promise<SetupResult> {
