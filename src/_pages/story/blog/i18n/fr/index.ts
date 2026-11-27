@@ -102,6 +102,22 @@ export const translations: typeof enTranslations = {
         "Aucun réglage ne coupe les refus de Claude, et tout « Claude non censuré » est une astuce. Gardez Claude pour la prose, confiez le reste à des modèles non censurés dans le même fil.",
       readTime: "7 min de lecture",
     },
+    azureOpenAiAlternatives: {
+      title:
+        "Alternatives non censurées à Azure OpenAI. Même SDK, sans couche de filtrage.",
+      category: "Guide développeur",
+      excerpt:
+        "Azure filtre chaque modèle par défaut, n'autorise la désactivation qu'après une demande approuvée et interdit de toute façon les chatbots érotiques et romantiques. Ce qui le remplace, avec le changement de code.",
+      readTime: "10 min de lecture",
+    },
+    bedrockAlternatives: {
+      title:
+        "Alternatives non censurées à AWS Bedrock. Sans minutes de capacité.",
+      category: "Guide développeur",
+      excerpt:
+        "Les Guardrails sont optionnels, les refus des modèles et la politique AWS ne le sont pas. Le coût de Custom Model Import, les architectures acceptées et la migration du code Claude sur Bedrock vers une clé compatible Anthropic.",
+      readTime: "8 min de lecture",
+    },
     openrouterAlternatives: {
       title: "Alternatives à OpenRouter. Une clé, moins de refus.",
       category: "Guide développeur",

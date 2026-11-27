@@ -4,6 +4,8 @@ export const translations: typeof enTranslations = {
   title: "Porównanie platform",
   verify:
     "Dodatkowe opcje sprawdziliśmy {{date}} w podlinkowanych oficjalnych źródłach. Na telefonie przesuń tabelę w bok, by zobaczyć wszystkie kolumny. Limity zależą od planu i kraju.",
+  verifyRange:
+    "Dodatkowe opcje sprawdzone w linkowanych oficjalnych źródłach między {{from}} a {{to}}. Na telefonie przewiń tabelę w bok, żeby zobaczyć wszystkie kolumny. Limity zależą od planu i regionu.",
   related: "Więcej porównań alternatyw",
   kind: {
     chat: "Czat z mniejszą liczbą odmów",
@@ -59,6 +61,8 @@ export const translations: typeof enTranslations = {
     localOption: "Na urządzeniu z modelem lokalnym",
     upstream: "Zależy od dostawcy modelu",
     noLogs: "Według dostawcy prompty nie są zapisywane",
+    noDisk:
+      "Dostawca deklaruje, że nie zapisuje danych wejściowych API na dysku",
   },
   api: {
     separate: "Osobna usługa API",
@@ -173,7 +177,7 @@ export const translations: typeof enTranslations = {
       "Bramka AI ze śledzeniem zapytań i podglądem kosztów. Przed wysłaniem poufnych danych sprawdź logi.",
     eden: "Jedno API do modeli językowych, OCR i tłumaczenia. Funkcje zależą od wybranego dostawcy.",
     together:
-      "Inferencja bez zarządzania serwerem i dedykowane punkty dostępu do otwartych modeli. Sprawdź, czy dostępny jest potrzebny model.",
+      "Inferencja serverless i dedykowana z API OpenAI, Responses i Anthropic Messages, plus obrazy, wideo i mowa. Brak modeli bez cenzury, a regulamin zakazuje pornografii.",
     bifrost:
       "Hostuj bramkę w Go z przełączaniem awaryjnym i cache’em semantycznym. Sam konfigurujesz instalację i dostęp do dostawców.",
     truefoundry:
@@ -181,7 +185,7 @@ export const translations: typeof enTranslations = {
     llmGateway:
       "Zgodność z OpenAI i Anthropic oraz opcja własnego hostingu. Rozliczenia i przechowywanie danych zależą od wdrożenia.",
     deepInfra:
-      "Inferencja otwartych modeli i prywatne wdrożenia GPU. Wybierz model z katalogu albo skonfiguruj infrastrukturę.",
+      "Jedna z najtańszych za token opcji dla standardowych modeli open, domyślnie 200 równoległych zapytań na model. W katalogu nie ma modeli bez cenzury ani do roleplayu.",
     bedrock:
       "Zarządzany katalog modeli z kontrolą dostępu AWS. Modele i funkcje zależą od regionu.",
     kong: "Dodaje routing modeli i reguły do bramki API. Sprawdź wtyczki dostępne w swojej wersji.",
@@ -212,7 +216,7 @@ export const translations: typeof enTranslations = {
     sandbase:
       "Łączy wywołania modeli, dane z sieci i izolowane środowiska kodu w jednym API. Bezpłatne zapytania mają dzienny limit.",
     openUncensored:
-      "Klucz prepaid zamiast konta: 58 abliterowanych i nieocenzurowanych modeli tekstowych plus modele obrazu i wideo, ułożone według zmierzonych odmów. Płacisz cenę tokenów dostawcy, który obsłużył zapytanie, doładowanie od 5 $.",
+      "Przedpłacony klucz bez konta i bez maila: 58 modeli tekstowych, prawie wszystkie abliterowane, plus fine-tuny RP, 20 modeli obrazu i 3 wideo. Cena dostawcy bez prowizji, doładowania od 5 USD, które nigdy nie wygasają. Brak darmowego planu i czatu w przeglądarce.",
     risuAi:
       "Klient czatu z postaciami open source z lorebookami, czatami grupowymi, obrazami emocji i TTS. API modelu podłączasz i opłacasz sam.",
     agnai:
@@ -222,19 +226,29 @@ export const translations: typeof enTranslations = {
     talemate:
       "Wieloagentowy silnik do roleplayu z narratorem, reżyserem i śledzeniem stanu świata. Narzędzie do samodzielnej instalacji dla zaawansowanych.",
     featherless:
-      "Stały miesięczny dostęp do tysięcy otwartych modeli, w tym nieocenzurowanych finetune'ów, przez jeden klucz API. Plan Chat ogranicza kontekst i równoległe zapytania.",
+      "Ponad 50 000 modeli z Hugging Face pod jednym kluczem, 1398 oznaczonych jako abliterated i 1605 jako uncensored. Plan Chat za 25 USD daje nielimitowane tokeny, ale tylko 32K kontekstu, mało równoległych zapytań i użytek wyłącznie prywatny.",
     arliAi:
-      "Plany bez limitu tokenów na modele otwarte i bez ograniczeń plus obrazy. Tańsze plany pozwalają na jedno zapytanie naraz.",
+      "Nielimitowane tokeny w planach ryczałtowych od 15 USD: około 121 modeli tekstowych, wiele z nich derestricted lub dostrojonych bez cenzury, plus generowanie obrazów. Core i Plus obsługują jedno zapytanie naraz.",
     infermatic:
-      "Plany miesięczne na niewielki zestaw nieocenzurowanych modeli tekstowych, z deklaracją braku logów. Darmowy plan ma jeden model i nie ma API.",
+      "Ryczałt od 9 USD za wyselekcjonowane fine-tuny 70B bez cenzury i do roleplayu, z deklaracją braku logów. Darmowy plan działa tylko w przeglądarce, a plany indywidualne nie mogą zasilać aplikacji.",
     chutes:
-      "Zdecentralizowana inferencja z płatnością za token: tekst, obrazy, wideo i audio. Bez darmowego planu.",
+      "Zdecentralizowana inferencja płatna za token, większość modeli tekstowych w poufnych obliczeniach, płatność kryptowalutami. Brak modeli bez cenzury i brak darmowego planu.",
     kagi: "Asystent z wieloma modelami w pakiecie z wyszukiwarką Kagi. Wątki domyślnie znikają po 24 godzinach, a flagowe modele wymagają najwyższego planu.",
     huggingChat:
       "Czat z modelami otwartymi przez automatyczny router. Kod czatu jest otwarty, a inferencja rozlicza się w kredytach Hugging Face.",
     zai: "Własny czat Zhipu do modeli GLM, z osobnym API. Polityka prywatności wymienia treść wiadomości jako dane do trenowania modeli.",
     ourDream:
       "Kreator towarzyszy dla dorosłych z czatem, obrazami i wideo. Media działają na monetach, które kupisz tylko z aktywnym planem.",
+    refuseless:
+      "Hosting tylko przez API dla abliterowanych GLM 5.3, DeepSeek V4.1 Flash i Kimi K3.1 Pro z kontekstem 1 mln, w formatach OpenAI, Responses i Anthropic Messages. Wymaga zweryfikowanego maila, bez aplikacji czatu.",
+    nearAi:
+      "API w poufnych obliczeniach z dwoma abliterowanymi modelami i atestacją sprzętową. Bez wniosku, bez weryfikacji tożsamości, płatność za token.",
+    uncensoredLlmAi:
+      "Przedpłacona brama z 332 abliterowanymi i nieocenzurowanymi modelami czatu oraz codzienną kontrolą odmów. Karta lub krypto od 3 USD, bez odsprzedaży bez pisemnej zgody.",
+    abliterationAi:
+      "Własne modele abliterowane w formatach OpenAI i Anthropic, region UE i warstwa polityk na Twoje własne reguły. Plany od 20 USD miesięcznie.",
+    mancer:
+      "Fine-tuny do roleplayu, jak MythoMax i Magnum, z darmowym planem MythoLite. Brak modeli abliterowanych, a regulamin zakazuje treści obscenicznych i lubieżnych.",
   },
   articles: {
     "nofiltergpt-alternatives": {
@@ -257,7 +271,7 @@ export const translations: typeof enTranslations = {
       question:
         "Który zamiennik OpenRouter nadaje się do aplikacji produkcyjnej?",
       answer:
-        "Vercel daje dostęp w chmurze bez narzutu na tokeny. LiteLLM lub Bifrost uruchomisz samodzielnie z własnymi kontami dostawców. Do monitoringu lub ustawiania reguł porównaj Portkey, Cloudflare i Helicone. Sprawdź przełączanie awaryjne, retencję danych i opłaty.",
+        "Do ruchu bez cenzury: OpenUncensored, Refuseless lub NEAR AI Cloud dla abliterowanych wag w cenie dostawcy, {{appName}}, jeśli na jednym kluczu potrzebujesz też modeli mainstream, mediów i czatu. Do routingu własnych kont u dostawców: LiteLLM lub Bifrost na własnym serwerze, Vercel jako usługa bez narzutu na tokeny. Sprawdź fallbacki, retencję i opłaty, zanim przeniesiesz ruch.",
     },
     "venice-ai-alternatives": {
       question:

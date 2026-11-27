@@ -4,6 +4,8 @@ export const translations: typeof enTranslations = {
   title: "Comparatif des plateformes",
   verify:
     "Nous avons vérifié les autres options le {{date}} à partir des sources officielles indiquées. Sur mobile, faites défiler le tableau de côté pour voir toutes les colonnes. Les limites dépendent du forfait et du pays.",
+  verifyRange:
+    "Autres options vérifiées sur les sources officielles liées entre le {{from}} et le {{to}}. Sur mobile, faites défiler le tableau de côté pour voir toutes les colonnes. Les limites dépendent du forfait et de la région.",
   related: "Autres guides sur les alternatives",
   kind: {
     chat: "Chat qui refuse moins de demandes",
@@ -60,6 +62,7 @@ export const translations: typeof enTranslations = {
     localOption: "Sur l’appareil avec un modèle local",
     upstream: "Selon le fournisseur du modèle",
     noLogs: "Le fournisseur déclare ne garder aucun journal des requêtes",
+    noDisk: "Le fournisseur affirme ne stocker aucune entrée d’API sur disque",
   },
   api: {
     separate: "API vendue séparément",
@@ -174,7 +177,7 @@ export const translations: typeof enTranslations = {
       "Passerelle IA avec traçage des requêtes et suivi des dépenses. Vérifiez la journalisation avant d’envoyer des données sensibles.",
     eden: "Une API pour les modèles de langue, l’OCR ou la traduction. Les fonctions dépendent du fournisseur choisi.",
     together:
-      "Inférence sans serveur à gérer et points d’accès dédiés aux modèles ouverts. Vérifiez que votre modèle figure au catalogue.",
+      "Inférence serverless et dédiée avec les API OpenAI, Responses et Anthropic Messages, plus images, vidéo et voix. Aucun modèle non censuré, et ses conditions interdisent la pornographie.",
     bifrost:
       "Hébergez une passerelle en Go avec basculement et cache sémantique. À vous de gérer le déploiement et les accès fournisseurs.",
     truefoundry:
@@ -182,7 +185,7 @@ export const translations: typeof enTranslations = {
     llmGateway:
       "Compatibilité OpenAI et Anthropic, avec autohébergement possible. Facturation et conservation dépendent du déploiement.",
     deepInfra:
-      "Inférence hébergée pour modèles ouverts et déploiements GPU privés. Choisissez dans le catalogue ou montez l’infrastructure.",
+      "Parmi les moins chers au token pour les modèles ouverts standard, avec 200 requêtes simultanées par modèle par défaut. Aucun modèle non censuré ni de jeu de rôle dans son catalogue.",
     bedrock:
       "Catalogue de modèles géré avec les contrôles d’accès AWS. Les modèles et les fonctions dépendent de la région.",
     kong: "Ajoute le routage des modèles et les règles à une passerelle API. Vérifiez les extensions de votre édition.",
@@ -213,7 +216,7 @@ export const translations: typeof enTranslations = {
     sandbase:
       "Réunit les appels aux modèles, les données web et les bacs à sable de code derrière une API. Les appels gratuits sont limités par jour.",
     openUncensored:
-      "Une clé prépayée, sans compte : 58 modèles de texte abliterated et non censurés, plus des modèles d’image et de vidéo, classés selon les refus mesurés. Facturé au prix par token du fournisseur qui répond, recharge dès 5 $.",
+      "Clé prépayée, sans compte ni e-mail : 58 modèles de texte, presque tous abliterated, plus des fine-tunes de jeu de rôle, 20 modèles d’image et 3 de vidéo. Prix du fournisseur sans commission, recharges dès 5 USD qui n’expirent jamais. Pas d’offre gratuite, pas de chat web.",
     risuAi:
       "Client open source de chat avec des personnages : lorebooks, chats de groupe, images d’émotion et synthèse vocale. Vous fournissez et payez l’API du modèle.",
     agnai:
@@ -223,19 +226,29 @@ export const translations: typeof enTranslations = {
     talemate:
       "Moteur de jeu de rôle multi-agents avec narrateur, metteur en scène et suivi de l’état du monde. Un outil à installer soi-même, pour utilisateurs avancés.",
     featherless:
-      "Accès mensuel forfaitaire à des milliers de modèles ouverts, fine-tunes non censurés compris, avec une seule clé d’API. L’offre Chat plafonne le contexte et les requêtes parallèles.",
+      "Plus de 50 000 modèles Hugging Face derrière une seule clé, dont 1 398 étiquetés abliterated et 1 605 uncensored. L’offre Chat à 25 USD donne des tokens illimités, mais 32K de contexte, peu de requêtes parallèles et un usage strictement personnel.",
     arliAi:
-      "Abonnements à tokens illimités pour des modèles ouverts et débridés, plus des images. Les offres moins chères n’autorisent qu’une requête à la fois.",
+      "Tokens illimités avec des forfaits fixes dès 15 USD : environ 121 modèles de texte, dont beaucoup de fine-tunes derestricted ou non censurés, plus la génération d’images. Core et Plus traitent une seule requête à la fois.",
     infermatic:
-      "Abonnements mensuels pour une petite sélection de modèles de texte non censurés, avec une promesse d’absence de journaux. L’offre gratuite a un seul modèle et pas d’API.",
+      "Forfaits fixes dès 9 USD pour une sélection de fine-tunes 70B non censurés et de jeu de rôle, avec promesse de non-journalisation. L’offre gratuite se limite au web, et les forfaits individuels ne peuvent pas alimenter des applications.",
     chutes:
-      "Inférence décentralisée payée au token pour le texte, les images, la vidéo et l’audio. Pas d’offre gratuite.",
+      "Inférence décentralisée payée au token, la plupart des modèles de texte en calcul confidentiel, crypto acceptée. Aucun modèle non censuré et aucune offre gratuite.",
     kagi: "Assistant multi-modèles inclus avec la recherche Kagi. Les fils s’effacent après 24 heures par défaut, et les modèles phares exigent l’offre la plus haute.",
     huggingChat:
       "Chat avec des modèles ouverts via un routeur automatique. Le code du chat est open source, et l’inférence se facture en crédits Hugging Face.",
     zai: "Le chat de Zhipu pour ses modèles GLM, avec une API séparée. Sa politique de confidentialité mentionne le contenu des messages pour l’entraînement des modèles.",
     ourDream:
       "Créateur de compagnons adultes avec chat, images et vidéo. Les médias consomment des pièces qu’on ne peut acheter qu’avec un abonnement actif.",
+    refuseless:
+      "Hébergeur 100 % API pour GLM 5.3, DeepSeek V4.1 Flash et Kimi K3.1 Pro en versions abliterated, avec 1M de contexte, aux formats OpenAI, Responses et Anthropic Messages. E-mail vérifié requis, pas d’application de chat.",
+    nearAi:
+      "API en calcul confidentiel avec deux modèles abliterated et une attestation matérielle. Pas de dossier, pas de contrôle d’identité, paiement au token.",
+    uncensoredLlmAi:
+      "Passerelle prépayée listant 332 modèles de chat abliterated et non censurés, avec un contrôle quotidien des refus. Carte ou crypto dès 3 USD, revente interdite sans accord écrit.",
+    abliterationAi:
+      "Ses propres modèles abliterated aux formats OpenAI et Anthropic, une région UE et une couche de politiques pour vos propres règles. Forfaits dès 20 USD par mois.",
+    mancer:
+      "Fine-tunes de jeu de rôle comme MythoMax et Magnum, avec une offre gratuite MythoLite. Aucun modèle abliterated, et ses conditions interdisent le contenu obscène ou lubrique.",
   },
   articles: {
     "nofiltergpt-alternatives": {
@@ -257,7 +270,7 @@ export const translations: typeof enTranslations = {
     "openrouter-alternatives": {
       question: "Quelle alternative à OpenRouter choisir en production ?",
       answer:
-        "Vercel propose un accès hébergé sans majoration sur les jetons. LiteLLM et Bifrost s’installent avec vos propres comptes fournisseurs. Pour la supervision ou le contrôle des règles, comparez Portkey, Cloudflare et Helicone. Vérifiez les solutions de secours, la conservation des données et les frais.",
+        "Pour du trafic non censuré : OpenUncensored, Refuseless ou NEAR AI Cloud pour des poids abliterated au prix du fournisseur, {{appName}} si vous voulez aussi des modèles grand public, des médias et un chat avec la même clé. Pour router vos propres comptes fournisseurs : LiteLLM ou Bifrost en auto-hébergement, Vercel en hébergé sans majoration sur les tokens. Vérifiez les fallbacks, la rétention et les frais avant de déplacer votre trafic.",
     },
     "venice-ai-alternatives": {
       question:

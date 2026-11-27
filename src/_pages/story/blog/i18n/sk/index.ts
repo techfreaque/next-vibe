@@ -101,6 +101,22 @@ export const translations: typeof enTranslations = {
         "Claude nemá prepínač, ktorým vypneš odmietanie. Niektoré služby sa za necenzurovaný Claude iba vydávajú. Claude môže písať prózu a zvyšok prevezme model bez cenzúry v rovnakom vlákne.",
       readTime: "7 min čítania",
     },
+    azureOpenAiAlternatives: {
+      title:
+        "Alternatívy k Azure OpenAI bez cenzúry. Rovnaké SDK, žiadna vrstva filtrov.",
+      category: "Pre vývojárov",
+      excerpt:
+        "Azure predvolene filtruje každý model, vypnutie filtra povolí len po schválenej žiadosti a erotické a romantické chatboty aj tak zakazuje. Čo ho nahradí, aj so zmenou kódu.",
+      readTime: "10 min čítania",
+    },
+    bedrockAlternatives: {
+      title:
+        "Alternatívy k AWS Bedrock bez cenzúry. Žiadne platené minúty kapacity.",
+      category: "Pre vývojárov",
+      excerpt:
+        "Guardrails sú voliteľné, odmietnutia modelov a pravidlá AWS nie. Koľko stojí Custom Model Import, ktoré architektúry sedia a ako presunúť kód Claude z Bedrocku na kľúč kompatibilný s Anthropic.",
+      readTime: "8 min čítania",
+    },
     openrouterAlternatives: {
       title: "Alternatívy k OpenRouter: jeden kľúč, menej odmietnutí",
       category: "Pre vývojárov",

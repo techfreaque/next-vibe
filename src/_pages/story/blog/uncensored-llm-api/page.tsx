@@ -45,14 +45,23 @@ import {
 } from "../../_shared/article";
 import { ArticleCode } from "../../_shared/article-code";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
-import { LINK_CLASS } from "../../compare/_shared/compare-data";
 import {
-  isVersusKey,
-  type PlatformKey,
-  PLATFORMS,
-  versusPath,
-} from "../../compare/_shared/platforms";
-import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
+  formatCompareDate,
+  LINK_CLASS,
+} from "../../compare/_shared/compare-data";
+import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
+import type { UsParams } from "../../compare/_shared/us-facts";
+import {
+  CloudAlternatives,
+  CloudRulesTable,
+  PriceTable,
+} from "../_cloud-alternatives/components";
+import {
+  CLOUD_ALTERNATIVE_KEYS,
+  CLOUD_CHECKED_DATE,
+  CLOUD_RULES,
+} from "../_cloud-alternatives/data";
+import type { OurTokenPrice } from "../_cloud-alternatives/prices";
 import {
   findOwnWorldviewRow,
   UncensoredModelTable,
@@ -69,43 +78,59 @@ interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-/** Other places to get uncensored models over an API, in list order. */
-const OTHER_APIS: readonly PlatformKey[] = [
-  "venice",
-  "nanoGpt",
-  "uncensoredAi",
-  "openRouter",
-  "ollama",
-];
-
 const FAQ_KEYS: readonly (
   | "free"
   | "ids"
   | "sdk"
+  | "abliterated"
+  | "noFilter"
+  | "vertex"
   | "refuse"
   | "logs"
   | "local"
-)[] = ["free", "ids", "sdk", "refuse", "logs", "local"];
+)[] = [
+  "free",
+  "ids",
+  "sdk",
+  "abliterated",
+  "noFilter",
+  "vertex",
+  "refuse",
+  "logs",
+  "local",
+];
 
 export interface UncensoredApiPostPageData {
   locale: CountryLanguage;
   baseUrl: string;
   subPrice: string;
   rows: UncensoredRow[];
+  us: UsParams;
+  prices: OurTokenPrice[];
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<UncensoredApiPostPageData> {
   const { locale } = await params;
-  const rows = (await loadUncensoredRows(locale)).filter(
-    (row) => row.apiCallable,
+  const [{ loadUsFacts, usParams }, { loadOurTokenPrices }] = await Promise.all(
+    [
+      import("../../compare/_shared/us-facts"),
+      import("../_cloud-alternatives/prices"),
+    ],
   );
+  const [allRows, facts, prices] = await Promise.all([
+    loadUncensoredRows(locale),
+    loadUsFacts(locale),
+    loadOurTokenPrices(),
+  ]);
   return {
     locale,
     baseUrl: buildPublicApiBaseUrl(envClient.NEXT_PUBLIC_APP_URL, locale),
     subPrice: getApiAccessPrices(locale).subPrice,
-    rows,
+    rows: allRows.filter((row) => row.apiCallable),
+    us: usParams(facts),
+    prices,
   };
 }
 
@@ -158,10 +183,11 @@ export function TanstackPage({
   baseUrl,
   subPrice,
   rows,
+  us,
+  prices,
 }: UncensoredApiPostPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
-  const { t: compareT } = compareScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
   const own = findOwnWorldviewRow(rows);
@@ -173,6 +199,8 @@ export function TanstackPage({
     ownModel: own?.name ?? "",
     maxTokens: V1_MAX_OUTPUT_TOKENS,
     example: example?.id ?? "",
+    markup: us.markup,
+    date: formatCompareDate(CLOUD_CHECKED_DATE, locale),
   };
   const prompt = t("code.prompt");
   const faq = FAQ_KEYS.map((key) => ({
@@ -323,38 +351,79 @@ export function TanstackPage({
           </Callout>
         </ArticleSection>
 
+        {prices.length > 0 && (
+          <ArticleSection
+            id="abliterated"
+            title={t("abliterated.title")}
+            intro={t("abliterated.intro")}
+          >
+            <PriceTable locale={locale} prices={prices} us={us} />
+            <ArticleP>{t("abliterated.honest", stats)}</ArticleP>
+          </ArticleSection>
+        )}
+
+        <ArticleSection
+          id="no-content-filter"
+          title={t("noFilter.title")}
+          intro={t("noFilter.intro")}
+        >
+          <CloudRulesTable locale={locale} us={us} />
+          <ArticleH3>{CLOUD_RULES.vertex.name}</ArticleH3>
+          <ArticleP>{t("noFilter.vertex")}</ArticleP>
+          <ArticleH3>{CLOUD_RULES.together.name}</ArticleH3>
+          <ArticleP>{t("noFilter.together")}</ArticleP>
+          <ArticleH3>{CLOUD_RULES.azure.name}</ArticleH3>
+          <ArticleP>{t("noFilter.azure")}</ArticleP>
+          <CardLink
+            href={`/${locale}/story/blog/azure-openai-alternatives`}
+            label={t("noFilter.azureLink")}
+          />
+          <ArticleH3>{CLOUD_RULES.bedrock.name}</ArticleH3>
+          <ArticleP>{t("noFilter.bedrock")}</ArticleP>
+          <CardLink
+            href={`/${locale}/story/blog/bedrock-alternatives`}
+            label={t("noFilter.bedrockLink")}
+          />
+        </ArticleSection>
+
         <ArticleSection
           id="others"
           title={t("others.title")}
           intro={t("others.intro", stats)}
         >
-          {OTHER_APIS.map((key) => {
-            const platform = PLATFORMS[key];
-            return (
-              <Div
-                key={key}
-                data-platform={key}
-                className="flex flex-col gap-2"
-              >
-                <ArticleH3>{platform.name}</ArticleH3>
-                <ArticleP>{compareT(`platforms.${key}.api`)}</ArticleP>
-                <ArticleP>{compareT(`platforms.${key}.models`)}</ArticleP>
-                {isVersusKey(key) && (
-                  <CardLink
-                    href={`/${locale}${versusPath(key)}`}
-                    label={t("others.versusLink", {
-                      appName,
-                      name: platform.name,
-                    })}
-                  />
-                )}
-              </Div>
-            );
-          })}
-          <CardLink
-            href={`/${locale}/story/blog/openai-anthropic-compatible-api`}
-            label={t("others.routerLink")}
+          <CloudAlternatives
+            locale={locale}
+            us={us}
+            keys={CLOUD_ALTERNATIVE_KEYS}
           />
+          <Div className="flex flex-col">
+            <CardLink
+              href={`/${locale}/story/blog/openai-anthropic-compatible-api`}
+              label={t("others.routerLink")}
+            />
+            <CardLink
+              href={`/${locale}/story/blog/openrouter-alternatives`}
+              label={t("others.openRouterAlternatives")}
+            />
+            <CardLink
+              href={`/${locale}/story/blog/venice-ai-alternatives`}
+              label={t("others.veniceAlternatives")}
+            />
+            <CardLink
+              href={`/${locale}/story/blog/freedomgpt-alternatives`}
+              label={t("others.freedomGptAlternatives")}
+            />
+            <CompareInlineLinks
+              locale={locale}
+              versus={[
+                "venice",
+                "nanoGpt",
+                "openRouter",
+                "uncensoredAi",
+                "freedomGpt",
+              ]}
+            />
+          </Div>
         </ArticleSection>
 
         <ArticleSection id="faq" title={t("faq.title")}>

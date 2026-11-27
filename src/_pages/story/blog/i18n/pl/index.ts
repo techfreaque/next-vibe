@@ -102,6 +102,22 @@ export const translations: typeof enTranslations = {
         "Żaden przełącznik nie wyłącza odmów Claude'a, a każdy \"Claude bez cenzury\" to sztuczka. Zostaw Claude'a do prozy, resztę oddaj modelom bez cenzury w tym samym wątku.",
       readTime: "7 min czytania",
     },
+    azureOpenAiAlternatives: {
+      title:
+        "Alternatywy dla Azure OpenAI bez cenzury. To samo SDK, bez warstwy filtrów.",
+      category: "Przewodnik dla deweloperów",
+      excerpt:
+        "Azure domyślnie filtruje każdy model, wyłączenie filtra wymaga zatwierdzonego wniosku, a erotyczne i romantyczne chatboty i tak są zakazane. Co w zamian, razem ze zmianą kodu.",
+      readTime: "10 min czytania",
+    },
+    bedrockAlternatives: {
+      title:
+        "Alternatywy dla AWS Bedrock bez cenzury. Bez płacenia za minuty mocy.",
+      category: "Przewodnik dla deweloperów",
+      excerpt:
+        "Guardrails są opcjonalne, odmowy modeli i polityka AWS już nie. Ile kosztuje Custom Model Import, które architektury pasują i jak przenieść kod Claude z Bedrocka na klucz zgodny z Anthropic.",
+      readTime: "8 min czytania",
+    },
     openrouterAlternatives: {
       title: "Alternatywy dla OpenRoutera. Jeden klucz, mniej odmów.",
       category: "Przewodnik dla deweloperów",

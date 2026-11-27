@@ -99,6 +99,20 @@ export const translations = {
         'No switch turns Claude\'s refusals off, and every "uncensored Claude" is a trick. Keep Claude for prose and hand the rest to uncensored models in the same thread.',
       readTime: "7 min read",
     },
+    azureOpenAiAlternatives: {
+      title: "Uncensored Azure OpenAI alternatives. Same SDK, no filter layer.",
+      category: "Developer Guide",
+      excerpt:
+        "Azure filters every model by default, gates the off switch behind an approved application and bans erotic and romantic chatbots anyway. What replaces it, with the code change.",
+      readTime: "10 min read",
+    },
+    bedrockAlternatives: {
+      title: "Uncensored AWS Bedrock alternatives. No capacity minutes.",
+      category: "Developer Guide",
+      excerpt:
+        "Guardrails are optional, refusals and the AWS policy are not. Custom Model Import costs, which architectures fit, and moving Claude-on-Bedrock code to an Anthropic-compatible key.",
+      readTime: "8 min read",
+    },
     openrouterAlternatives: {
       title: "OpenRouter alternatives. One key, fewer refusals.",
       category: "Developer Guide",

@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
       "{{appName}} a ďalšie alternatívy ({{count}}) podľa údajov na ich stránkach o cenách, filtroch a súkromí.",
   },
   intro: {
-    lead: "FreedomGPT ponúka stovky modelov v jednom predplatnom vrátane modelov bez cenzúry. Dobrý nápad. Podrobnosti nájdeš v jeho častých otázkach a zásadách ochrany súkromia. Desktopovú aplikáciu už roky nikto neaktualizoval.",
+    lead: "FreedomGPT ponúka jedno predplatné na stovky modelov, aj bez cenzúry. Dobrý nápad. Háčiky: tie necenzurované modely nikdy nemenuje, jeho zásady ochrany súkromia súkromie nesľubujú a desktopová aplikácia sa roky neaktualizovala.",
     p2: "Pozri sa, čo FreedomGPT skutočne sľubuje, na čo ti vystačia jeho kredity a čo ponúkajú alternatívy ({{count}}). Údaje o FreedomGPT sú k {{fgDate}}, o ostatných k {{date}}. Uvádzame aj to, v čom sú lepší než my.",
     relation:
       "Sme zákazníkom FreedomGPT. {{freedomGptExamples}} na {{appName}} prevádzkujeme cez API od FreedomGPT.",
@@ -27,22 +27,23 @@ export const translations: typeof enTranslations = {
   fg: {
     title: "Čo ponúka FreedomGPT",
     intro:
-      "Vychádzame z domovskej stránky, cenníka, zásad ochrany súkromia, dokumentácie API a GitHubu. Zdroje sme čítali {{fgDate}}.",
+      "Z jeho domovskej stránky, cenníka, podmienok, zásad ochrany súkromia a dokumentácie API, prečítaných {{fgDate}}.",
     models:
-      "Modely: domovská stránka uvádza vyše 400 v jednom predplatnom, napríklad ChatGPT, Claude, Gemini, Grok, Kimi, GLM, DeepSeek, Qwen, Llama a Mistral. Nechýbajú modely bez cenzúry na písanie, hranie rolí a výskum.",
+      "Modely: domovská stránka sľubuje viac než 400 modelov v jednom predplatnom a uvádza ChatGPT, Claude, Gemini, Grok, Kimi, GLM, DeepSeek, Qwen, Llama a ďalšie. Necenzurované možnosti sľubuje, ale žiadny necenzurovaný model nemenuje. Jeho API štandardne používa model Liberty a nehovorí, čo to je.",
     filter:
-      "Filter: podľa častých otázok označenie „bez cenzúry“ nezaručuje odpoveď na každé zadanie. Pravidlá modelu aj služby platia naďalej.",
+      "Filter: jeho podmienky dovoľujú používanie len na zákonné a etické účely a nič konkrétnejšie neuvádzajú. Minimálny vek nie je uvedený.",
     price:
       "Cena: vyskúšaš zdarma, bez karty aj bez účtu. Pro stojí {{proPrice}} mesačne za {{proCredits}} kreditov. Podľa vlastných odhadov vyjde prémiová odpoveď približne na {{replyCost}} kreditov, obrázok na {{imageCost}} a päťsekundové video na {{videoCost}}.",
     bonus:
       "Registračný bonus: 100 kreditov iba pre oprávnené nové registrácie cez Google, Apple alebo X. Za registráciu e-mailom a heslom bonus nezískaš.",
     privacy:
-      "Súkromie: domovská stránka upozorňuje, že služba nezaručuje anonymitu ani okamžité vymazanie dát. Podľa zásad ochrany súkromia putujú správy, hlasové nahrávky a obrázky k externým poskytovateľom AI. Doba uchovávania nie je uvedená.",
-    apps: "Aplikácie a API: web, iPhone, iPad a Android. Kľúč API získaš v ovládacom paneli. Dokumentácia ceny neuvádza. Posledná zmena v otvorenom kóde desktopovej aplikácie je z {{desktopDate}}.",
+      "Súkromie: domovská stránka ti radí nepredpokladať anonymitu ani nulové uchovávanie. Zásady ochrany súkromia hovoria, že FreedomGPT môže zbierať a ukladať akékoľvek informácie, ktoré mu poskytneš, že používatelia nemajú nárok na očakávanie súkromia a že správy idú poskytovateľom AI na generovanie odpovedí. Dobu uchovávania neuvádza.",
+    apps: "Aplikácie a API: web, iPhone a Android. API má endpointy pre čet, obrázky, telefonické hovory a video, ale odpovede prichádzajú vo vlastnom formáte FreedomGPT, nie v schéme OpenAI, a dokumentácia neuvádza ceny za token. Posledný commit open source desktopovej aplikácie je z {{desktopDate}}.",
     why: "Alternatívu hľadajú ľudia, ktorí chcú vedieť, čo dostanú za mesačný poplatok, potrebujú udržiavanú offline aplikáciu alebo nechcú mať čety uložené na serveri.",
     sourceHome: "Domovská stránka FreedomGPT",
     sourcePricing: "Cenník FreedomGPT",
     sourcePrivacy: "Zásady ochrany súkromia FreedomGPT",
+    sourceTerms: "Podmienky používania FreedomGPT",
     sourceApi: "Dokumentácia API FreedomGPT",
     sourceRepo: "Repozitár desktopovej aplikácie FreedomGPT",
   },
@@ -115,7 +116,7 @@ export const translations: typeof enTranslations = {
   privacy: {
     title: "Čo sa deje s tvojimi četmi",
     intro: "Takto to jednotlivé služby uvádzajú vo svojich podmienkach.",
-    fg: "FreedomGPT sprístupňuje správy, hlasové nahrávky a obrázky externým poskytovateľom AI. Doba uchovávania nie je uvedená. Domovská stránka upozorňuje, že služba nezaručuje anonymitu.",
+    fg: "FreedomGPT: jeho zásady hovoria, že používatelia nemajú nárok na očakávanie súkromia a že môže ukladať všetko, čo mu poskytneš. Správy idú poskytovateľom AI. Doba uchovávania nie je uvedená. Jeho vlastná domovská stránka radí nepredpokladať anonymitu.",
     us: "V režime inkognito na {{appName}} ostávajú čety len v lokálnom úložisku prehliadača. Keď vymažeš údaje prehliadača, zmiznú aj čety.",
     local:
       "V LM Studio a Ollama beží model na tvojom počítači a zadanie z neho neodchádza. Potrebuješ vlastný hardvér.",
@@ -147,11 +148,13 @@ export const translations: typeof enTranslations = {
     },
     api: {
       q: "Ktorá alternatíva má API bez cenzúry?",
-      a: "Venice, NanoGPT, uncensored.ai, Gab AI a {{appName}} ponúkajú API kompatibilné s OpenAI. API má aj FreedomGPT, ale ceny v dokumentácii neuvádza. Na {{appName}} sprístupní API ktorýkoľvek plán od {{apiSubPrice}} mesačne.",
+      a: "Venice, NanoGPT, uncensored.ai, Gab AI aj {{appName}} ponúkajú API kompatibilné s OpenAI. Má ho aj FreedomGPT, ale vo vlastnom formáte odpovedí a bez cien v dokumentácii. Na abliterované váhy len cez API ich za cenu poskytovateľa predávajú OpenUncensored, Refuseless a NEAR AI Cloud. Na {{appName}} odomkne API ktorýkoľvek plán od {{apiSubPrice}} mesačne.",
     },
     gabLink: "Porovnanie alternatív k Gab AI",
     nofilterLink: "Porovnanie alternatív k NoFilterGPT",
     noGpuLink: "Ako používať modely bez cenzúry bez GPU",
+    openRouterLink: "Alternatívy k OpenRouter bez cenzúry v porovnaní",
+    apiLink: "API LLM bez cenzúry: ID modelov, kód a limity",
   },
   cta: {
     title: "Pozri si cenu. Potom sa spýtaj na čokoľvek.",

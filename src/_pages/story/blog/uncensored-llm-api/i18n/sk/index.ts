@@ -4,24 +4,24 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "API pre LLM bez cenzúry a SDK OpenAI | {{appName}}",
     description:
-      "Necenzurované a abliterované modely cez API kompatibilné s OpenAI a Anthropic. ID modelov, kontext, ceny, limity a príklady v curl a Pythone.",
+      "Necenzurované a abliterované modely cez API kompatibilné s OpenAI a Anthropic. ID modelov, ceny oproti iným hostiteľom, čo naozaj dovoľujú Vertex, Azure, Bedrock a Together, kód a limity.",
     category: "Pre vývojárov",
     imageAlt:
       "API pre LLM bez cenzúry s koncovými bodmi kompatibilnými s OpenAI",
     keywords:
-      "API pre LLM bez cenzúry, API pre AI bez cenzúry, API pre abliterované modely, API pre abliterované LLM, API bez cenzúry kompatibilné s OpenAI, NSFW LLM API, API bez filtrov obsahu, Chat Completions bez cenzúry, hostované abliterované modely, alternatíva k Venice API, {{appName}}",
+      "API pre LLM bez cenzúry, API pre AI bez cenzúry, API pre abliterované modely, API pre abliterované LLM, LLM API bez filtra obsahu, LLM API bez filtrov, API bez cenzúry kompatibilné s OpenAI, NSFW LLM API, Gemini API vypnutie safety settings, Vertex AI bez cenzúry, Together AI bez cenzúry, alternatíva k Azure OpenAI bez cenzúry, alternatíva k Bedrock bez cenzúry, hostované abliterované modely, alternatíva k Venice API, {{appName}}",
   },
   hero: {
     backToBlog: "Späť na blog",
     category: "Pre vývojárov",
-    readTime: "8 min čítania",
+    readTime: "12 min čítania",
     title: "API pre jazykové modely bez cenzúry. S tvojím SDK.",
     subtitle:
       "Modely bez cenzúry ({{count}}) s jedným kľúčom kompatibilným s OpenAI aj Anthropic. Aktuálne ID modelov, kontext a ceny z nášho registra.",
   },
   intro: {
     lead: "Tvoja aplikácia potrebuje model, ktorý odpovie bez poučovania a bez toho, aby odmietal polovicu testovacích zadaní. Bežné API obsahujú filtre. Ak si chceš abliterovaný model spustiť sám, potrebuješ výkonné grafické karty.",
-    p2: "{{appName}} ponúka {{count}} modelov bez cenzúry cez tie isté koncové body /v1 ako bežné modely. Zmeň základnú adresu, ponechaj si SDK OpenAI alebo Anthropic a vyber identifikátor modelu bez cenzúry. Tu je zoznam, kód, limity a podmienky.",
+    p2: "{{appName}} ponúka {{count}} modelov bez cenzúry cez tie isté koncové body /v1 ako bežné modely. Zmeň základnú adresu, ponechaj si SDK OpenAI alebo Anthropic a vyber identifikátor modelu bez cenzúry. Tu je zoznam, kód, ceny vedľa iných hostiteľov, čo naozaj dovoľujú veľké cloudy a úprimný háčik.",
     access:
       "API vyžaduje platený účet. Sprístupní ho každý plán od {{subPrice}} mesačne. Bezplatné a bežné bonusové kredity ho neodomknú.",
     accessLink: "Odomknúť API",
@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
       "Abliterovaný model: Bežný alebo otvorený model s váhami upravenými tak, aby menej odmietal. Základný tréning, znalosti a pohľad na svet sa nemenia. Dobrá predvolená voľba pre väčšinu aplikácií.",
     fineTuned:
       "Doladený model: Otvorený model dodatočne trénovaný na nefiltrovaných dátach. Často má voľnejší štýl a používa sa na beletriu či hranie rolí.",
-    own: "{{ownModel}}: Trénovaný na knihách a dokumentoch zakázaných v hlavnom prúde internetu. Vyjadruje aj odlišné politické názory, ktoré bežné modely neponúkajú.",
+    own: "{{ownModel}}: Trénovaný na knihách a dokumentoch zakázaných v hlavnom prúde internetu, výsledkom je model s opačnými politickými názormi. Použi ho, keď chceš postoje, ktoré bežné modely nedajú.",
     link: "Abliterácia, doladenie či vlastný svetonázor: podrobné vysvetlenie",
   },
   limits: {
@@ -86,21 +86,46 @@ export const translations: typeof enTranslations = {
   },
   privacy: {
     title: "Čo sa deje s tvojimi zadaniami",
-    intro: "Na účtovanie uchovávame údaje o spotrebe.",
+    intro: "API si necháva účet, nie históriu četu.",
     noStore:
-      "API neukladá konverzácie ani nevytvára vlákna. Na našej strane ostáva doklad o spotrebe s názvom modelu a počtom účtovaných kreditov.",
+      "API nevytvára vlákna četu. Zaznamená sa len záznam o účtovaní: ktorý model a koľko kreditov.",
     upstream:
-      "Zadanie odošleme poskytovateľovi, ktorý model prevádzkuje. So zadaním nakladá podľa vlastných podmienok.",
+      "Každé zadanie prechádza cez nás k poskytovateľovi, ktorý model prevádzkuje. Na to, čo dostane, sa vzťahujú jeho podmienky. Naše zásady ochrany súkromia neobsahujú samostatný sľub o neukladaní logov ani o netrénovaní, posudzuj nás preto podľa toho, čo naozaj hovoria.",
     callout:
       "Ak zadania nesmú opustiť tvoju infraštruktúru, spusti abliterovaný model na vlastnom hardvéri. V ostatných prípadoch sa API nasadzuje rýchlejšie.",
+  },
+  abliterated: {
+    title: "API pre abliterované modely: kto ponúka ktoré váhy",
+    intro:
+      "Tie isté abliterované váhy sú u viacerých hostiteľov. Tu je, koľko každý účtuje za token, prečítané dnes z ich verejných zoznamov modelov.",
+    honest:
+      "Úprimné zhodnotenie: v cene vyhrávajú smerovače. OpenUncensored a Refuseless predávajú GLM 5.3 Flash a DeepSeek V4.1 Flash abliterated za $0.12 za vstup. Naša cena v zozname zahŕňa maržu {{markup}}%. Platíš ju za jeden kľúč k modelom bez cenzúry, otvoreným aj bežným, za médiá, formát Anthropic a čet, ktorý môže používať tvoj tím.",
+  },
+  noFilter: {
+    title: "LLM API bez filtra obsahu: čo naozaj znamená vypnuté",
+    intro:
+      "Každý veľký cloud ti dovolí znížiť filter. Žiadny neodstráni naučené odmietanie modelu ani jeho zásady používania.",
+    vertex:
+      "Vertex AI a Gemini API: bezpečnostné prahy sa dajú nastaviť na OFF a OFF je na Vertex predvolené od gemini-3.5-flash. Ochrana detí a ďalšie základné škody ostávajú blokované a alignment Gemini stále odmieta. Prohibited Use Policy od Googlu zakazuje sexuálne explicitný obsah a obchádzanie bezpečnostných filtrov, s výnimkami pre vzdelávaciu, dokumentárnu, vedeckú alebo umeleckú prácu. Vlastné váhy: Model Garden self-deploy na kontajneroch vLLM alebo TGI.",
+    together:
+      "Together AI: 24 serverless modelov na četovanie, žiadny bez cenzúry. Podmienky zakazujú obscénny obsah a pornografiu. Vlastné váhy bežia na dedikovaných koncových bodoch od $5.49 za hodinu H100 a nahrávať sa dajú len fine-tuny architektúry, ktorú Together už podporuje.",
+    azure:
+      "Azure OpenAI: filtre predvolene zapnuté, vypnutie až po schválenej žiadosti a Code of Conduct každopádne zakazuje erotických a romantických chatbotov.",
+    bedrock:
+      "AWS Bedrock: žiadny filter, kým nepripojíš Guardrail, ale odmietnutia a zásady AWS ostávajú. Abliterované váhy potrebujú Custom Model Import, účtovaný za minútu kapacity.",
+    azureLink: "Alternatívy k Azure OpenAI bez cenzúry, celé",
+    bedrockLink: "Alternatívy k AWS Bedrock bez cenzúry, celé",
   },
   others: {
     title: "Ďalšie možnosti API bez cenzúry",
     intro:
-      "Niektoré využívame aj my. Údaje sme prevzali z dokumentácie a cenníkov poskytovateľov.",
+      "Niektoré využívame aj my. Údaje sme prevzali z ich dokumentácie, zoznamov modelov a cenníkov, prečítané {{date}}.",
     versusLink: "{{appName}} a {{name}}: úplné porovnanie",
     routerLink:
       "Prechod z OpenRouter: jeden kľúč pre všetky modely a tri formáty",
+    openRouterAlternatives: "Alternatívy k OpenRouter, porovnanie",
+    veniceAlternatives: "Alternatívy k Venice AI, porovnanie",
+    freedomGptAlternatives: "Alternatívy k FreedomGPT, porovnanie",
   },
   faq: {
     title: "Časté otázky",
@@ -122,7 +147,19 @@ export const translations: typeof enTranslations = {
     },
     logs: {
       q: "Ukladá {{appName}} moje zadania z API?",
-      a: "Z API uchovávame len údaje o spotrebe: model a počet účtovaných kreditov. Poskytovateľ modelu vidí zadanie a nakladá s ním podľa svojich podmienok.",
+      a: "API nevytvára vlákna četu, uchováva len záznam o účtovaní: model a počet účtovaných kreditov. Každé zadanie prechádza cez nás k poskytovateľovi, ktorý model prevádzkuje, podľa jeho vlastných podmienok. Naše zásady ochrany súkromia neobsahujú samostatný sľub o neukladaní logov. Ak to potrebuješ v zmluve, hostuj si to sám.",
+    },
+    abliterated: {
+      q: "Ktoré API ponúka abliterované modely?",
+      a: "OpenUncensored, Refuseless, NEAR AI Cloud, NanoGPT, Venice a {{appName}} ponúkajú abliterované váhy cez API kompatibilné s OpenAI. Smerovače sú za token najlacnejšie. {{appName}} pridáva bežné modely, médiá a webový čet pod rovnakým kľúčom.",
+    },
+    noFilter: {
+      q: "Existuje LLM API bez filtra obsahu?",
+      a: "Bedrock bez Guardrail a Gemini so safety settings na OFF nepridávajú vrstvu filtra, ale ich modely si ponechávajú naučené odmietanie a ich zásady zakazujú sexuálny obsah. Azure vyžaduje na vypnutie filtrov schválenú žiadosť. Pre modely, ktoré neodmietajú, použi abliterované alebo doladené váhy: hostované tu, na smerovačoch vyššie alebo na vlastných GPU.",
+    },
+    vertex: {
+      q: "Môžem vypnúť bezpečnostné filtre Gemini?",
+      a: "Áno. V Gemini API majú kategórie, ktoré nenastavíš, od Gemini 2.5 predvolene Off a na Vertex je OFF predvolené od gemini-3.5-flash. Základné škody, napríklad ochrana detí, ostávajú blokované, naučené odmietanie Gemini ostáva a zásady Googlu zakazujú sexuálne explicitný obsah a obchádzanie bezpečnostných filtrov.",
     },
     local: {
       q: "Oplatí sa mi hostovať abliterované modely?",

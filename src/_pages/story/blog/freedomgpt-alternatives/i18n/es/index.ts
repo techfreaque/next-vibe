@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
       "{{count}} alternativas y {{appName}}, comparadas según lo que dicen sus propias páginas de precios, privacidad y filtros.",
   },
   intro: {
-    lead: "FreedomGPT promete una suscripción para cientos de modelos, también sin censura. Buena idea. Las trampas están en su propio FAQ, en su política de privacidad y en una app de escritorio que nadie actualiza desde hace años.",
+    lead: "FreedomGPT vende una sola suscripción para cientos de modelos, algunos sin censura. Buena idea. Las pegas: nunca dice cuáles son esos modelos sin censura, su política de privacidad no promete privacidad y su app de escritorio lleva años sin actualizarse.",
     p2: "Aquí va lo que FreedomGPT promete de verdad, lo que compran sus créditos y {{count}} alternativas verificadas en sus propias páginas. FreedomGPT a {{fgDate}}, el resto a {{date}}. También decimos dónde nos ganan.",
     relation:
       "Para ser claros: somos clientes de FreedomGPT. {{freedomGptExamples}} funciona en {{appName}} a través de la API de la propia FreedomGPT.",
@@ -27,22 +27,23 @@ export const translations: typeof enTranslations = {
   fg: {
     title: "Lo que te da FreedomGPT",
     intro:
-      "Según su página de inicio, sus precios, su política de privacidad, su documentación de API y GitHub, leídos el {{fgDate}}.",
+      "Según su página de inicio, su página de precios, sus términos, su política de privacidad y la documentación de su API, leídos el {{fgDate}}.",
     models:
-      "Modelos: la página de inicio anuncia más de 400 modelos en una suscripción y nombra ChatGPT, Claude, Gemini, Grok, Kimi, GLM, DeepSeek, Qwen, Llama, Mistral y más, junto a opciones sin censura para escribir, rol e investigación.",
+      "Modelos: la página de inicio presume de más de 400 modelos en una suscripción y nombra ChatGPT, Claude, Gemini, Grok, Kimi, GLM, DeepSeek, Qwen, Llama y más. Promete opciones sin censura, pero no nombra ningún modelo sin censura. Su API usa por defecto un modelo llamado Liberty y no dice qué es.",
     filter:
-      "Filtro: su propio FAQ dice que la etiqueta sin censura no garantiza respuesta a cada petición y que las reglas del modelo y del servicio siguen vigentes.",
+      "Filtro: sus términos permiten el uso solo para fines legales y éticos y no detallan nada más. No indica una edad mínima.",
     price:
       "Precio: prueba gratis sin tarjeta y sin cuenta. Pro cuesta {{proPrice}} al mes por {{proCredits}} créditos. Sus propias estimaciones: unos {{replyCost}} créditos por respuesta premium, {{imageCost}} por imagen, {{videoCost}} por un vídeo de cinco segundos.",
     bonus:
       "Bono de registro: 100 créditos, pero solo para cuentas nuevas de Google, Apple o X que cumplan los requisitos. Si te registras con correo y contraseña, no recibes nada.",
     privacy:
-      "Privacidad: la propia página de inicio pide no dar por hecho anonimato ni retención cero. La política de privacidad dice que mensajes, grabaciones de voz e imágenes van a proveedores de IA externos y no indica cuánto tiempo se guardan.",
-    apps: "Apps y API: web, iPhone, iPad y Android. La clave de API sale del panel y la documentación no muestra precios. El último commit de la app de escritorio de código abierto es del {{desktopDate}}.",
+      "Privacidad: la página de inicio te dice que no des por hecho el anonimato ni la retención cero. La política de privacidad dice que FreedomGPT puede recopilar y guardar cualquier información que facilites, que los usuarios no tienen ninguna expectativa de privacidad y que los mensajes van a proveedores de IA para generar las respuestas. No indica ningún plazo de retención.",
+    apps: "Apps y API: web, iPhone y Android. La API tiene endpoints de chat, imagen, llamadas telefónicas y video, pero las respuestas llegan en el formato propio de FreedomGPT, no en el esquema de OpenAI, y la documentación no lista precios por token. El último commit de su app de escritorio de código abierto es del {{desktopDate}}.",
     why: "Por qué la gente busca otra cosa: quiere saber qué compra de verdad un mes, una app sin conexión que siga mantenida o una política que deje los chats fuera de un servidor.",
     sourceHome: "Página de inicio de FreedomGPT",
     sourcePricing: "Precios de FreedomGPT",
     sourcePrivacy: "Política de privacidad de FreedomGPT",
+    sourceTerms: "Términos de servicio de FreedomGPT",
     sourceApi: "Documentación de API de FreedomGPT",
     sourceRepo: "Repositorio de la app de escritorio de FreedomGPT",
   },
@@ -114,7 +115,7 @@ export const translations: typeof enTranslations = {
   privacy: {
     title: "Privacidad: lee la política, no el eslogan",
     intro: "Lo que cada uno deja por escrito.",
-    fg: "FreedomGPT: mensajes, grabaciones de voz e imágenes se comparten con proveedores de IA externos. Sin plazo de conservación. Su propia página de inicio desaconseja contar con el anonimato.",
+    fg: "FreedomGPT: su política dice que los usuarios no tienen ninguna expectativa de privacidad y que puede guardar todo lo que le facilites. Los mensajes van a proveedores de IA. No indica plazo de retención. Su propia página de inicio dice que no des por hecho el anonimato.",
     us: "{{appName}} en incógnito: los chats viven en el almacenamiento local de tu navegador, no en nuestros servidores. Borra los datos del navegador y desaparecen.",
     local:
       "LM Studio y Ollama: el modelo corre en tu equipo y el prompt nunca sale de él. El precio es tu propio hardware.",
@@ -146,11 +147,13 @@ export const translations: typeof enTranslations = {
     },
     api: {
       q: "¿Qué alternativa tiene una API sin censura?",
-      a: "Venice, NanoGPT, uncensored.ai, Gab AI y {{appName}} ofrecen APIs compatibles con OpenAI. FreedomGPT también tiene una, sin precios en su documentación. En {{appName}} cualquier plan desde {{apiSubPrice}} al mes desbloquea la API.",
+      a: "Venice, NanoGPT, uncensored.ai, Gab AI y {{appName}} ofrecen API compatibles con OpenAI. FreedomGPT también tiene una, pero en su propio formato de respuesta y sin precios en la documentación. Para pesos abliterados solo por API, OpenUncensored, Refuseless y NEAR AI Cloud los venden a precio del proveedor. En {{appName}}, cualquier plan desde {{apiSubPrice}} al mes desbloquea la API.",
     },
     gabLink: "Alternativas a Gab AI, comparadas",
     nofilterLink: "Alternativas a NoFilterGPT, comparadas",
     noGpuLink: "Modelos sin censura sin tarjeta gráfica",
+    openRouterLink: "Alternativas a OpenRouter sin censura, comparadas",
+    apiLink: "API de LLM sin censura: IDs de modelos, código y límites",
   },
   cta: {
     title: "Sabe lo que pagas. Luego pregunta lo que quieras.",

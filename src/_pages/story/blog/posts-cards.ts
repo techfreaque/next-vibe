@@ -13,6 +13,8 @@ import { type BlogPostSlug, formatPostDate } from "./posts-meta";
 
 /** i18n key under `posts.*` for each post, in display order. */
 const POST_CARD_KEYS = [
+  ["azure-openai-alternatives", "azureOpenAiAlternatives"],
+  ["bedrock-alternatives", "bedrockAlternatives"],
   ["ai-agent-runs-a-startup", "aiAgentRunsAStartup"],
   ["ai-ops-agent-tudo-sobre-ia", "tudoSobreIa"],
   ["claude-alternatives", "claudeAlternatives"],

@@ -2,25 +2,99 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "OpenRouter-Alternativen mit unzensierten Modellen | {{appName}}",
+    title: "Unzensierte OpenRouter-Alternativen im Vergleich | {{appName}}",
     description:
-      "OpenRouter im Vergleich mit Vercel AI Gateway, LiteLLM, Portkey, Cloudflare, NanoGPT und {{appName}}. Gebühren, Eigenbetrieb, Filter und Datenschutz.",
+      "OpenRouter führt keine abliterierten Modelle. Vergleiche OpenUncensored, Refuseless, NEAR AI Cloud, NanoGPT, Venice, Featherless und {{appName}} bei unzensierten Modellen, Gebühren, Datenschutz und API-Formaten.",
     category: "Entwickler-Guide",
-    imageAlt: "OpenRouter-Alternativen für Entwickler im Vergleich",
+    imageAlt: "Unzensierte OpenRouter-Alternativen für Entwickler im Vergleich",
     keywords:
-      "OpenRouter Alternative, OpenRouter Alternativen, OpenRouter vs NanoGPT, Seiten wie OpenRouter, LLM API Gateway, unzensierte LLM API, ein API-Schlüssel für alle Modelle, OpenAI-kompatible API, Anthropic-kompatible API, OpenRouter unzensierte Modelle, {{appName}}",
+      "unzensierte OpenRouter Alternative, OpenRouter Alternative, OpenRouter Alternativen, OpenRouter unzensierte Modelle, abliterierte Modelle API, unzensierte LLM API, Seiten wie OpenRouter, LLM API Gateway, OpenAI kompatible API, Anthropic kompatible API, OpenUncensored, Refuseless, NEAR AI Cloud, UncensoredLLM.ai, abliteration.ai, Featherless, OpenRouter vs NanoGPT, uncensored OpenRouter alternative, {{appName}}",
   },
   hero: {
     backToBlog: "Zurück zum Blog",
     category: "Entwickler-Guide",
-    readTime: "9 Min. Lesezeit",
-    title: "OpenRouter-Alternativen für Modellrouting",
+    readTime: "11 Min. Lesezeit",
+    title: "Unzensierte OpenRouter-Alternativen",
     subtitle:
-      "{{count}} Alternativen und {{appName}} im Vergleich: API-Formate, unzensierte Modelle, Gebühren. Geprüft am {{date}}.",
+      "{{count}} Alternativen und {{appName}}, verglichen bei unzensierter Abdeckung, API-Formaten und Gebühren. Geprüft am {{date}}.",
   },
   intro: {
-    lead: "OpenRouter verbindet eine API mit vielen Anbietern und bietet einen Webchat. Der Standardtarif nennt 5,5 % Plattformgebühr. Andere Gateways lohnen sich, wenn du den Router selbst betreiben, Limits feiner steuern oder anders abrechnen willst.",
-    p2: "Wir haben Cloud-Gateways, selbst betriebene Proxys und Apps mit unzensierten Modellen anhand offizieller Dokumentation und Preise geprüft. Wir kaufen selbst bei OpenRouter ein. {{openRouterModels}} unserer Modelle laufen darüber.",
+    lead: "OpenRouter bündelt 477 Modelle hinter einem Schlüssel. Für unzensierte Arbeit ist das Regal dünn: 17 Roleplay- oder unzensierte Tunes, und kein einziges abliteriertes Modell.",
+    p2: "Deshalb haben wir unzensierte API-Hosts, Flatrate-Roleplay-Hosts, Gateways und Apps anhand ihrer eigenen Doku, Preise und Modelllisten geprüft. Auch wir kaufen Modellzugang bei OpenRouter ein: {{openRouterModels}} unserer Modelle laufen darüber.",
+  },
+  shelf: {
+    title: "Was OpenRouter für unzensierte Arbeit bietet",
+    intro:
+      "Aus der öffentlichen Modellliste und den Bedingungen, gelesen am {{orDate}}.",
+    tunes:
+      "17 von 477 Modellen passen nach Name oder Beschreibung zu Roleplay oder unzensiert: Venice Uncensored (ein Dolphin-Mistral-24B-Tune), Hermes 4 405B, Cydonia, Skyfall, Magnum v4 72B, Euryale, MythoMax und eine Handvoll Aion-RP-Modelle.",
+    abliterated:
+      "Keine einzige Modell-ID enthält abliterated oder uncensored. Die abliterierten Versionen von GLM 5.3, DeepSeek V4.1 Flash und Kimi K3.1 Pro, die die unzensierten Router verkaufen, fehlen dort.",
+    rules:
+      "Regeln: 18+, automatische CSAM-Prüfung, sonst gelten die Bedingungen des jeweiligen Modells. Standardmodelle lehnen weiter ab, was ihre Hersteller ablehnen.",
+    callout:
+      "Du brauchst abliterierte Gewichte? Dann ist OpenRouter der falsche Router. Du brauchst Roleplay-Feintunes? Da hat es ein ordentliches Regal.",
+  },
+  apis: {
+    title: "Unzensierte API-Alternativen im Einzelnen",
+    intro:
+      "API-first-Dienste, die abliterierte oder unzensierte Gewichte verkaufen. Von ihren eigenen Seiten, gelesen am {{marketDate}}.",
+    visit: "{{name}} besuchen",
+    openUncensored: {
+      heading: "OpenUncensored: ein Router nur für unzensierte Modelle",
+      body: "58 Text-, 20 Bild- und 3 Videomodelle, fast alle abliteriert, geroutet an Venice, NanoGPT, Refuseless und andere. Keine Provision auf Anbieterpreise, Aufladungen ab 5 USD, die nie verfallen, und kein Konto: Dein API-Schlüssel ist das Konto. OpenAI, Responses und Anthropic Messages unter einer Basis-URL.",
+      catch:
+        "Haken: kein Gratis-Kontingent, kein Web-Chat (nur eine Desktop-App) und Anfrage-Metadaten werden bis zu zwei Jahre gespeichert.",
+    },
+    refuseless: {
+      heading:
+        "Refuseless: die günstigsten abliterierten Builds, die wir gefunden haben",
+      body: "Abliterierte Versionen von GLM 5.3, GLM 5.3 Flash, DeepSeek V4.1 Flash und Kimi K3.1 Pro mit 1 Mio. Kontext. DeepSeek V4.1 Flash abliterated kostet 0,12 USD Input und 0,45 USD Output pro Million Tokens. Chat Completions, Responses und Anthropic Messages, Claude Code inklusive.",
+      catch:
+        "Haken: nur API, verifizierte E-Mail nötig, und die Seiten zu Preisen, Datenschutz und Bedingungen blockierten unseren Reader.",
+    },
+    nearAi: {
+      heading: "NEAR AI Cloud: abliterierte Modelle in Confidential Compute",
+      body: "Hardware-Attestierung, sodass laut Anbieter weder NEAR noch der Cloud-Host deine Prompts lesen können. Zwei abliterierte Modelle: Qwen 3.8 27B für 0,04 USD Input und 1,35 USD Output pro Million Tokens sowie DeepSeek V4.1 Flash 1017. Kein Antrag, keine Identitätsprüfung, Bezahlung pro Token.",
+      catch:
+        "Haken: nur das OpenAI-Format und ein winziges unzensiertes Regal.",
+    },
+    uncensoredLlmAi: {
+      heading: "UncensoredLLM.ai: der größte unzensierte Katalog",
+      body: "332 Chatmodelle plus 13 Bild- und Videomodelle, mit täglicher Prüfung auf Ablehnungen. OpenAI-, Anthropic- und Gemini-Format mit einem Prepaid-Schlüssel. Karte oder Krypto ab 3 USD, und das Guthaben verfällt nie.",
+      catch:
+        "Haken: kein Weiterverkauf und keine weiterberechnete API ohne schriftliche Erlaubnis. Datenschutzbedingungen waren auf den gelesenen Seiten nicht veröffentlicht.",
+    },
+    abliterationAi: {
+      heading:
+        "abliteration.ai: eigene abliterierte Modelle, Datenschutz schriftlich",
+      body: "Eigene abliterierte Modelle im OpenAI- und Anthropic-Format. Laut Anbieter werden Prompts und Ausgaben im Arbeitsspeicher verarbeitet, standardmäßig nie gespeichert und nie zum Training genutzt. Dazu eine EU-Region und ein Policy-Gateway für deine eigenen Regeln.",
+      catch:
+        "Haken: teurer als Refuseless oder NEAR AI bei ähnlichen Gewichten, und die Basismodelle bleiben ungenannt.",
+    },
+    flatRate: {
+      heading:
+        "Featherless, Infermatic, Arli AI: Flatrate für intensives Roleplay",
+      body: "Featherless führt über 50.000 Hugging-Face-Modelle, davon 1.398 als abliterated getaggt, mit einem Flatrate-Tarif Chat für 25 USD. Infermatic verkauft kuratierte 70B-Roleplay-Tunes ab 9 USD im Monat. Arli AI bietet Tarife mit unbegrenzten Tokens ab 15 USD und derestricted Feintunes. Alle drei sagen, dass sie keine Prompt-Logs führen.",
+      catch:
+        "Haken: Einzeltarife dürfen keine Apps antreiben, und du bekommst 1 bis 6 parallele Anfragen.",
+    },
+    deepInfra: {
+      heading: "DeepInfra: günstige Standardmodelle, keine unzensierten",
+      body: "Pro Token einer der günstigsten Anbieter für Standard-Open-Modelle: DeepSeek V4.1 Flash für 0,14 USD Input und 0,42 USD Output pro Million Tokens, 200 gleichzeitige Anfragen pro Modell. Laut Anbieter werden API-Eingaben nie auf Datenträgern gespeichert.",
+      catch: "Haken: keine unzensierten und keine Roleplay-Modelle im Katalog.",
+    },
+  },
+  gateways: {
+    title: "Wenn du nur einen Router brauchst",
+    intro:
+      "Gateways routen zu den Anbietern, die du konfigurierst. Keines davon bringt unzensierte Modelle mit.",
+    vercel:
+      "Vercel AI Gateway: gehostet, Token-Preis des Anbieters ohne Aufschlag, gebaut für das AI SDK.",
+    selfHost:
+      "LiteLLM oder Bifrost: Open Source, selbst gehostet, mit eigenen Anbieterschlüsseln, Budgets und Fallbacks.",
+    control:
+      "Portkey, Cloudflare AI Gateway, Helicone: Guardrails, Caching, Anfrage-Logs und Ausgabenkontrolle obendrauf.",
   },
   criteria: {
     title: "Was du vor dem Wechsel vergleichen solltest",
@@ -52,7 +126,7 @@ export const translations: typeof enTranslations = {
     chat: "Chat: dieselben Modelle in einem Web-Chat mit Ordnern, Tools sowie Bild-, Video- und Musikgenerierung. Auch die Nicht-Entwickler im Team kommen an die Modelle.",
     openRouter:
       "OpenRouter inklusive: {{openRouterModels}} unserer Modelle laufen über OpenRouter. Gleiche Modelle, ein Konto mit den unzensierten.",
-    weak: "Wo wir schwächer sind: Der Katalog von OpenRouter ist viel größer, du kannst eigene Anbieter-Schlüssel mitbringen und Anbieter pro Anfrage wählen, und die Preise liegen näher am Listenpreis, weil wir einen Aufschlag nehmen. Wer ein seltenes Modell braucht, findet es wahrscheinlich bei OpenRouter.",
+    weak: "Wo wir schwächer sind: OpenRouter schlägt nichts auf die Inferenz auf, nur 5,5 % Gebühr auf Guthaben-Käufe. Wir schlagen {{markup}} % auf unseren Einkaufspreis auf. Bei OpenRouter bringst du eigene Anbieterschlüssel mit, routest nur an Endpunkte ohne Datenspeicherung und wählst Anbieter pro Anfrage. Das alles haben wir nicht. Und die abliterierten Router oben unterbieten uns bei jedem Modell, das wir gemeinsam führen.",
     codeLabel:
       "Einen OpenAI-SDK-Client umziehen: Base-URL und Schlüssel ändern",
     docsLink: "API-Doku: Endpunkte, Authentifizierung und Limits",
@@ -72,7 +146,7 @@ export const translations: typeof enTranslations = {
       "Preis einer Referenznachricht inklusive unseres Aufschlags von {{markup}} %. Unter jedem Namen steht, wie ein Modell entstanden ist.",
   },
   list: {
-    title: "Die {{count}} Alternativen im Einzelnen",
+    title: "Apps mit unzensierter API im Einzelnen",
     intro:
       "Laut ihren eigenen Seiten, geprüft am {{date}}. Was jede ist, wie ihre API funktioniert, welche Modelle sie hat und was sie kostet.",
     heading: "{{number}}. {{name}}: {{kind}}",
@@ -97,15 +171,15 @@ export const translations: typeof enTranslations = {
     title: "FAQ",
     best: {
       q: "Was ist die beste OpenRouter-Alternative?",
-      a: "Kommt darauf an, was dir bei OpenRouter fehlt. Viele unzensierte Modelle, Bezahlung nach Nutzung: NanoGPT. Nur unzensierte Modelle, Prepaid-Schlüssel ohne Konto: OpenUncensored. Venices eigene Modelle und Privatsphäre: Venice. Lokal und gratis: Ollama. Unzensierte, offene und Mainstream-Modelle plus Team-Chat mit einem Schlüssel: {{appName}}.",
+      a: "Das hängt davon ab, was dir an OpenRouter fehlt. Abliterierte Gewichte zum Anbieterpreis: OpenUncensored, Refuseless oder NEAR AI Cloud. Der größte unzensierte Katalog: UncensoredLLM.ai oder Featherless. Bezahlen pro Nutzung mit Krypto: NanoGPT. Venices eigene Modelle und Datenschutzmodi: Venice. Lokal und gratis: Ollama. Unzensierte, offene und Mainstream-Modelle plus Medien und Team-Chat mit einem Schlüssel: {{appName}}.",
     },
     cheaper: {
       q: "Gibt es eine günstigere OpenRouter-Alternative?",
-      a: "Vergleiche den Preis pro Modell, nicht die Gebühr. Direkte Anbieter-APIs sparen sich jeden Zwischenhändler. Bei Gateways schwanken die Preise je Modell und ändern sich oft. Auf {{appName}} zahlst du unseren Einkaufspreis plus {{markup}} % Aufschlag, und jede Modellseite zeigt den Preis pro Nachricht.",
+      a: "Vergleiche den Preis pro Modell, nicht die Gebühr. OpenRouter schlägt nichts auf die Inferenz auf, OpenUncensored nimmt keine Provision, und Refuseless und NEAR AI Cloud führen die günstigsten abliterierten Builds, die wir gefunden haben. Bei {{appName}} zahlst du unseren Einkaufspreis plus {{markup}} % Aufschlag, und auf jeder Modellseite steht der Preis pro Nachricht.",
     },
     uncensored: {
       q: "Welche OpenRouter-Alternative hat unzensierte Modelle?",
-      a: "NanoGPT, OpenUncensored, Venice, uncensored.ai, Gab AI und {{appName}} bieten unzensierte Modelle per API an. {{appName}} hat gerade {{apiUncensored}} auf seiner API, abliterierte und feinabgestimmte neben {{ownModel}}.",
+      a: "OpenUncensored, Refuseless, NEAR AI Cloud, UncensoredLLM.ai, abliteration.ai, NanoGPT, Venice, uncensored.ai, Gab AI und {{appName}} liefern alle unzensierte Modelle per API. {{appName}} hat gerade {{apiUncensored}} in der API, abliterierte und feinabgestimmte neben {{ownModel}}.",
     },
     sdk: {
       q: "Kann ich meinen OpenAI-SDK-Code behalten?",
@@ -113,14 +187,15 @@ export const translations: typeof enTranslations = {
     },
     anthropic: {
       q: "Funktioniert das mit Anthropic-SDKs und Coding-Agents?",
-      a: "Auf {{appName}} ja: Die Anthropic Messages API läuft neben den OpenAI-Formaten, also verbinden sich Claude Code und andere Agents mit einem Schlüssel, unzensierte Modelle inklusive.",
+      a: "Bei {{appName}} ja: Die Anthropic-Messages-API läuft neben den OpenAI-Formaten, sodass sich Claude Code und andere Agenten mit einem Schlüssel verbinden, unzensierte Modelle inklusive. OpenUncensored, Refuseless, NanoGPT und UncensoredLLM.ai sprechen ebenfalls Anthropic Messages. Venice hat keinen nativen Endpunkt und leitet Claude Code über einen lokalen Proxy.",
     },
     free: {
       q: "Gibt es eine kostenlose OpenRouter-Alternative?",
-      a: "Ollama ist gratis, wenn deine Hardware das Modell stemmt. OpenRouter selbst hat Gratis-Modelle mit Tageslimits. {{appName}} gibt dir jeden Monat Gratis-Credits für den Chat, die API wird mit deinem ersten Kauf freigeschaltet.",
+      a: "Ollama ist gratis, wenn deine Hardware das Modell stemmt. OpenRouter selbst hat 11 Gratis-Modelle mit Tageslimits, und Infermatic bietet einen kostenlosen Web-Tarif. {{appName}} gibt dir jeden Monat Gratis-Credits für den Chat, die API wird mit deinem ersten Kauf freigeschaltet.",
     },
     apiLink: "Unzensierte LLM-API: Modell-IDs, Code und Limits",
     veniceLink: "Venice-AI-Alternativen im Vergleich",
+    nanoGptLink: "NanoGPT-Alternativen im Vergleich",
     keysLink: "Deine API-Schlüssel verwalten",
   },
   cta: {

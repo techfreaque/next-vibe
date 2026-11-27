@@ -24,6 +24,7 @@ import { configScopedTranslation } from "@/env/i18n";
 
 import type { ModelHistoryView } from "../_shared/model-changelog";
 import { ModelHistorySection } from "../_shared/model-changelog-ui";
+import { ModelCompareLinks } from "../_shared/model-compare-links";
 import {
   buildPickerModels,
   type ModelFacts,
@@ -173,6 +174,9 @@ export function TanstackPage(data: ModelPageData): JSX.Element {
               model={data.facts.name}
               content={seo}
             />
+            {data.kind === "chat" && (
+              <ModelCompareLinks locale={data.locale} facts={data.facts} />
+            )}
             <ModelHistorySection
               locale={data.locale}
               model={data.facts.name}

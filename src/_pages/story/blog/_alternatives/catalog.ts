@@ -19,10 +19,17 @@ export interface MarketPlatform {
   media: keyof Labels["media"];
   open: keyof Labels["open"];
   sources: readonly PlatformSource[];
+  /** Set when this entry was re-verified after MARKET_CHECKED_DATE. */
+  checkedDate?: string;
 }
 
 /** Public feature and plan information verified on the linked provider pages. */
 export const MARKET_CHECKED_DATE = "2026-11-24";
+
+/** Day this entry's facts were last verified on its own pages. */
+export function marketCheckedDate(platform: MarketPlatform): string {
+  return platform.checkedDate ?? MARKET_CHECKED_DATE;
+}
 
 export const MARKET_PLATFORMS = {
   noFilter: {
@@ -726,16 +733,31 @@ export const MARKET_PLATFORMS = {
     ],
   },
   together: {
+    // Re-checked 2026-11-27: serverless models, pricing, OpenAI
+    // compatibility docs, privacy and terms.
     name: "Together AI",
     kind: "inference",
     free: "unlisted",
     paid: "usage",
-    filter: "varies",
-    privacy: "hosted",
-    api: "openAi",
-    media: "varies",
+    filter: "policy",
+    privacy: "noTraining",
+    api: "dual",
+    media: "all",
     open: "closed",
-    sources: [{ kind: "docs", url: "https://docs.together.ai/intro" }],
+    checkedDate: "2026-11-27",
+    sources: [
+      {
+        kind: "models",
+        url: "https://docs.together.ai/docs/serverless-models",
+      },
+      { kind: "pricing", url: "https://www.together.ai/pricing" },
+      {
+        kind: "api",
+        url: "https://docs.together.ai/docs/openai-api-compatibility",
+      },
+      { kind: "privacy", url: "https://www.together.ai/privacy" },
+      { kind: "terms", url: "https://www.together.ai/terms-of-service" },
+    ],
   },
   bifrost: {
     name: "Bifrost",
@@ -776,16 +798,27 @@ export const MARKET_PLATFORMS = {
     sources: [{ kind: "docs", url: "https://docs.llmgateway.io/" }],
   },
   deepInfra: {
+    // Re-checked 2026-11-27: pricing, text-generation list, data privacy
+    // and terms.
     name: "DeepInfra",
     kind: "inference",
     free: "unlisted",
     paid: "usage",
     filter: "varies",
-    privacy: "hosted",
+    privacy: "noDisk",
     api: "openAi",
-    media: "varies",
+    media: "image",
     open: "closed",
-    sources: [{ kind: "docs", url: "https://docs.deepinfra.com/" }],
+    checkedDate: "2026-11-27",
+    sources: [
+      { kind: "docs", url: "https://docs.deepinfra.com/" },
+      { kind: "pricing", url: "https://deepinfra.com/pricing" },
+      {
+        kind: "privacy",
+        url: "https://docs.deepinfra.com/account/data-privacy",
+      },
+      { kind: "terms", url: "https://deepinfra.com/terms" },
+    ],
   },
   bedrock: {
     name: "Amazon Bedrock",
@@ -999,8 +1032,8 @@ export const MARKET_PLATFORMS = {
     sources: [{ kind: "home", url: "https://www.sandbase.ai/" }],
   },
   openUncensored: {
-    // Checked 2026-11-26: home, /credits, /privacy, /agents.md and the
-    // public /v1/models list (58 text, 20 image, 3 image-to-video models).
+    // Re-checked 2026-11-27: home, /models (58 text, 20 image, 3 video),
+    // /docs, /privacy, /terms and /methodology.
     name: "OpenUncensored",
     kind: "gateway",
     free: "unlisted",
@@ -1011,11 +1044,13 @@ export const MARKET_PLATFORMS = {
     api: "dual",
     media: "imageVideo",
     open: "client",
+    checkedDate: "2026-11-27",
     sources: [
       { kind: "home", url: "https://openuncensored.com/" },
+      { kind: "models", url: "https://openuncensored.com/models" },
       { kind: "docs", url: "https://openuncensored.com/docs" },
-      { kind: "pricing", url: "https://openuncensored.com/credits" },
       { kind: "privacy", url: "https://openuncensored.com/privacy" },
+      { kind: "terms", url: "https://openuncensored.com/terms" },
     ],
   },
   risuAi: {
@@ -1077,22 +1112,35 @@ export const MARKET_PLATFORMS = {
     sources: [{ kind: "repo", url: "https://github.com/vegu-ai/talemate" }],
   },
   featherless: {
+    // Re-checked 2026-11-27: docs/plans, docs/billing, privacy-and-logging,
+    // terms and the uncensored/abliterated/roleplay model filters.
     name: "Featherless",
     kind: "inference",
     free: "unlisted",
     paid: "both",
     plan: { name: "Chat", price: 25, period: "month" },
     filter: "selected",
-    privacy: "hosted",
+    privacy: "noLogs",
     api: "openAi",
     media: "text",
     open: "closed",
+    checkedDate: "2026-11-27",
     sources: [
-      { kind: "home", url: "https://featherless.ai/" },
-      { kind: "pricing", url: "https://featherless.ai/pricing" },
+      { kind: "pricing", url: "https://featherless.ai/docs/plans" },
+      {
+        kind: "models",
+        url: "https://featherless.ai/models?training=abliterated",
+      },
+      {
+        kind: "privacy",
+        url: "https://featherless.ai/docs/privacy-and-logging",
+      },
+      { kind: "terms", url: "https://featherless.ai/terms" },
     ],
   },
   arliAi: {
+    // Re-checked 2026-11-27: pricing, text model list, privacy and terms.
+    // API compatibility was not re-read, so the API cell stays generic.
     name: "Arli AI",
     kind: "inference",
     free: "unlisted",
@@ -1100,15 +1148,22 @@ export const MARKET_PLATFORMS = {
     plan: { name: "Core", price: 15, period: "month" },
     filter: "permissive",
     privacy: "noLogs",
-    api: "openAi",
+    api: "available",
     media: "image",
     open: "closed",
+    checkedDate: "2026-11-27",
     sources: [
-      { kind: "home", url: "https://www.arliai.com/" },
       { kind: "pricing", url: "https://www.arliai.com/pricing" },
+      {
+        kind: "models",
+        url: "https://www.arliai.com/models/textgen-models?tab=models&lang=en",
+      },
+      { kind: "privacy", url: "https://www.arliai.com/privacy?lang=en" },
+      { kind: "terms", url: "https://www.arliai.com/terms?lang=en" },
     ],
   },
   infermatic: {
+    // Re-checked 2026-11-27: pricing, models, privacy, terms and API docs.
     name: "Infermatic",
     kind: "inference",
     free: "yes",
@@ -1116,15 +1171,20 @@ export const MARKET_PLATFORMS = {
     plan: { name: "Essential", price: 9, period: "month" },
     filter: "selected",
     privacy: "noLogs",
-    api: "available",
+    api: "openAi",
     media: "text",
     open: "closed",
+    checkedDate: "2026-11-27",
     sources: [
       { kind: "pricing", url: "https://infermatic.ai/pricing/" },
+      { kind: "models", url: "https://infermatic.ai/models/" },
       { kind: "privacy", url: "https://infermatic.ai/privacy-policy/" },
+      { kind: "terms", url: "https://infermatic.ai/terms-and-conditions/" },
+      { kind: "api", url: "https://ui.infermatic.ai/docs" },
     ],
   },
   chutes: {
+    // Re-checked 2026-11-27: home, pricing and the public LLM list.
     name: "Chutes",
     kind: "inference",
     free: "unlisted",
@@ -1134,9 +1194,11 @@ export const MARKET_PLATFORMS = {
     api: "openAi",
     media: "all",
     open: "core",
+    checkedDate: "2026-11-27",
     sources: [
       { kind: "home", url: "https://chutes.ai/" },
       { kind: "pricing", url: "https://chutes.ai/pricing" },
+      { kind: "models", url: "https://llm.chutes.ai/v1/models" },
     ],
   },
   kagi: {
@@ -1207,6 +1269,98 @@ export const MARKET_PLATFORMS = {
     sources: [
       { kind: "pricing", url: "https://ourdream.ai/pricing" },
       { kind: "help", url: "https://help.ourdream.ai/" },
+    ],
+  },
+  refuseless: {
+    // Checked 2026-11-27: docs, Messages API docs and the public
+    // /v1/models list. refuseless.com (pricing, privacy, terms) returned 403.
+    name: "Refuseless",
+    kind: "inference",
+    free: "unlisted",
+    paid: "usage",
+    filter: "permissive",
+    privacy: "hosted",
+    api: "dual",
+    media: "text",
+    open: "closed",
+    checkedDate: "2026-11-27",
+    sources: [
+      { kind: "docs", url: "https://docs.refuseless.com" },
+      { kind: "models", url: "https://api.refuseless.com/v1/models" },
+      { kind: "api", url: "https://docs.refuseless.com/api/messages.md" },
+    ],
+  },
+  nearAi: {
+    // Checked 2026-11-27: uncensored LLM API page and the public model list.
+    name: "NEAR AI Cloud",
+    kind: "inference",
+    free: "unlisted",
+    paid: "usage",
+    filter: "permissive",
+    privacy: "enclave",
+    api: "openAi",
+    media: "text",
+    open: "closed",
+    checkedDate: "2026-11-27",
+    sources: [
+      { kind: "home", url: "https://near.ai/uncensored-llm-api" },
+      { kind: "models", url: "https://cloud-api.near.ai/v1/models" },
+    ],
+  },
+  uncensoredLlmAi: {
+    // Checked 2026-11-27: home, pricing and terms. Privacy and KYC not
+    // published on those pages.
+    name: "UncensoredLLM.ai",
+    kind: "gateway",
+    free: "unlisted",
+    paid: "usage",
+    filter: "permissive",
+    privacy: "hosted",
+    api: "dual",
+    media: "imageVideo",
+    open: "closed",
+    checkedDate: "2026-11-27",
+    sources: [
+      { kind: "home", url: "https://uncensoredllm.ai" },
+      { kind: "pricing", url: "https://uncensoredllm.ai/pricing" },
+      { kind: "terms", url: "https://uncensoredllm.ai/terms" },
+    ],
+  },
+  abliterationAi: {
+    // Checked 2026-11-27: home, pricing and data-handling pages.
+    name: "abliteration.ai",
+    kind: "inference",
+    free: "trial",
+    paid: "both",
+    filter: "permissive",
+    privacy: "noLogs",
+    api: "dual",
+    media: "text",
+    open: "closed",
+    checkedDate: "2026-11-27",
+    sources: [
+      { kind: "home", url: "https://www.abliteration.ai/" },
+      { kind: "pricing", url: "https://abliteration.ai/pricing" },
+      { kind: "privacy", url: "https://abliteration.ai/data-handling" },
+    ],
+  },
+  mancer: {
+    // Checked 2026-11-27: home, models, pricing, privacy and terms.
+    name: "Mancer",
+    kind: "inference",
+    free: "yes",
+    paid: "usage",
+    filter: "policy",
+    privacy: "hosted",
+    api: "available",
+    media: "text",
+    open: "closed",
+    checkedDate: "2026-11-27",
+    sources: [
+      { kind: "home", url: "https://mancer.tech" },
+      { kind: "models", url: "https://mancer.tech/models" },
+      { kind: "privacy", url: "https://mancer.tech/privacy" },
+      { kind: "terms", url: "https://mancer.tech/terms" },
     ],
   },
 } satisfies Record<keyof Labels["summaries"], MarketPlatform>;

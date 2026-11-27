@@ -4,23 +4,23 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "API LLM non censurée : modèles abliterated | {{appName}}",
     description:
-      "Modèles abliterated et non censurés via une API compatible OpenAI et Anthropic. Identifiants, contexte, prix par modèle, exemples curl et Python, limites.",
+      "Modèles non censurés et abliterated derrière une seule API compatible OpenAI et Anthropic. Identifiants, prix face aux autres hébergeurs, ce que Vertex, Azure, Bedrock et Together autorisent vraiment, code et limites.",
     category: "Guide développeur",
     imageAlt: "API LLM non censurée avec des endpoints compatibles OpenAI",
     keywords:
-      "API LLM non censurée, API IA sans censure, API modèles abliterated, LLM abliterated API, API compatible OpenAI non censurée, API LLM NSFW, API sans filtre de contenu, modèles abliterated hébergés, alternative à l'API Venice, {{appName}}",
+      "API LLM non censurée, API IA sans censure, API modèles abliterated, LLM abliterated API, API LLM sans filtre de contenu, API compatible OpenAI non censurée, API LLM NSFW, Gemini API safety settings off, Vertex AI non censuré, Together AI non censuré, alternative non censurée à Azure OpenAI, alternative non censurée à Bedrock, modèles abliterated hébergés, alternative à l'API Venice, {{appName}}",
   },
   hero: {
     backToBlog: "Retour au blog",
     category: "Guide développeur",
-    readTime: "8 min de lecture",
+    readTime: "12 min de lecture",
     title: "API LLM non censurée. Votre SDK. Sans réflexe de refus.",
     subtitle:
       "{{count}} modèles non censurés derrière une seule clé compatible OpenAI et Anthropic. Identifiants, contexte et prix lus en direct dans notre registre.",
   },
   intro: {
     lead: "Votre application a besoin d'un modèle qui répond. Pas d'un modèle qui fait la morale, ni d'un modèle qui rejette la moitié de vos prompts de test. Les API grand public filtrent par conception, et faire tourner vous-même des poids abliterated, c'est louer des GPU.",
-    p2: "{{appName}} sert {{count}} modèles non censurés sur les mêmes endpoints /v1 que n'importe quel modèle grand public. Changez la base URL, gardez le SDK OpenAI ou Anthropic, choisissez un identifiant non censuré. Voici la liste, le code, les limites et le revers honnête.",
+    p2: "{{appName}} sert {{count}} modèles non censurés sur les mêmes endpoints /v1 que n'importe quel modèle grand public. Changez la base URL, gardez le SDK OpenAI ou Anthropic, choisissez un identifiant non censuré. Voici la liste, le code, les prix face aux autres hébergeurs, ce que les grands clouds autorisent vraiment, et le revers honnête.",
     access:
       "D'emblée : l'API exige un compte payant. N'importe quel abonnement, à partir de {{subPrice}} par mois, la débloque. Les crédits gratuits et bonus, non.",
     accessLink: "Débloquer l'API",
@@ -89,19 +89,45 @@ export const translations: typeof enTranslations = {
     title: "Ce que deviennent vos prompts",
     intro: "Nous gardons la facture, pas la conversation.",
     noStore:
-      "L'API n'enregistre aucune conversation et ne crée aucun fil. Chez nous, il ne reste que la ligne de facturation : quel modèle, combien de crédits.",
+      "L'API ne crée aucun fil de discussion. Elle n'enregistre que la ligne de facturation : quel modèle, combien de crédits.",
     upstream:
-      "Votre prompt part chez le fournisseur qui sert le modèle. Ses conditions s'appliquent à ce qu'il reçoit.",
+      "Chaque prompt passe par nous jusqu'au fournisseur qui sert le modèle. Ses conditions s'appliquent à ce qu'il reçoit. Notre politique de confidentialité ne promet séparément ni absence de logs ni absence d'entraînement : jugez-nous sur ce qu'elle dit réellement.",
     callout:
       "Si vos prompts ne doivent jamais quitter votre infrastructure, faites tourner des poids abliterated sur votre propre matériel. Pour tout le reste, l'API se déploie plus vite.",
+  },
+  abliterated: {
+    title: "API de modèles abliterated : qui sert quels poids",
+    intro:
+      "Les mêmes poids abliterated tournent chez plusieurs hébergeurs. Voici ce que chacun facture par token, lu aujourd'hui dans leurs listes de modèles publiques.",
+    honest:
+      "Lecture honnête : les routeurs gagnent sur le prix. OpenUncensored et Refuseless vendent GLM 5.3 Flash et DeepSeek V4.1 Flash abliterated à $0.12 en entrée. Notre prix affiché inclut une marge de {{markup}}%. Vous la payez pour une seule clé qui couvre modèles non censurés, ouverts et grand public, les médias, le format Anthropic et un chat que votre équipe peut utiliser.",
+  },
+  noFilter: {
+    title:
+      "API LLM sans filtre de contenu : ce que désactivé veut vraiment dire",
+    intro:
+      "Tous les grands clouds vous laissent abaisser un filtre. Aucun ne retire les refus appris du modèle ni sa politique d'utilisation.",
+    vertex:
+      "Vertex AI et l'API Gemini : les seuils de sécurité passent à OFF, et OFF est la valeur par défaut sur Vertex à partir de gemini-3.5-flash. La protection de l'enfance et les autres préjudices majeurs restent bloqués, et l'alignement de Gemini refuse encore. La Prohibited Use Policy de Google interdit les contenus sexuellement explicites et le contournement des filtres de sécurité, avec des exceptions pour le travail éducatif, documentaire, scientifique ou artistique. Poids personnels : auto-déploiement Model Garden sur des conteneurs vLLM ou TGI.",
+    together:
+      "Together AI : 24 modèles de chat serverless, aucun non censuré. Ses conditions interdisent les contenus obscènes et la pornographie. Vos propres poids tournent sur des endpoints dédiés à partir de $5.49 par heure de H100, et les uploads doivent être des fine-tunes d'une architecture que Together prend déjà en charge.",
+    azure:
+      "Azure OpenAI : filtres actifs par défaut, désactivables seulement après une demande approuvée, et le Code of Conduct interdit de toute façon les chatbots érotiques et romantiques.",
+    bedrock:
+      "AWS Bedrock : aucun filtre sans Guardrail attaché, mais les refus et la politique d'AWS restent. Les poids abliterated passent par Custom Model Import, facturé à la minute de capacité.",
+    azureLink: "Alternatives non censurées à Azure OpenAI, en détail",
+    bedrockLink: "Alternatives non censurées à AWS Bedrock, en détail",
   },
   others: {
     title: "Les autres API non censurées, sans détour",
     intro:
-      "Nous ne sommes pas la seule option. Nous achetons nous-mêmes chez certains d'entre eux. Faits tirés de leur propre documentation et de leurs pages de tarifs.",
+      "Nous ne sommes pas la seule option. Nous achetons nous-mêmes chez certains d'entre eux. Faits tirés de leur propre documentation, de leurs listes de modèles et de leurs pages de tarifs, lus le {{date}}.",
     versusLink: "{{appName}} vs {{name}} : comparaison complète",
     routerLink:
       "Quitter OpenRouter : une clé pour tous les modèles, trois formats d'API",
+    openRouterAlternatives: "Alternatives à OpenRouter, comparées",
+    veniceAlternatives: "Alternatives à Venice AI, comparées",
+    freedomGptAlternatives: "Alternatives à FreedomGPT, comparées",
   },
   faq: {
     title: "FAQ",
@@ -123,7 +149,19 @@ export const translations: typeof enTranslations = {
     },
     logs: {
       q: "{{appName}} enregistre-t-il mes prompts d'API ?",
-      a: "Aucune conversation n'est conservée depuis l'API, seulement la ligne de facturation : modèle et crédits débités. Le fournisseur qui sert le modèle voit le prompt, selon ses propres conditions.",
+      a: "L'API n'écrit aucun fil de discussion, seulement la ligne de facturation : modèle et crédits débités. Chaque prompt passe par nous jusqu'au fournisseur qui sert le modèle, selon ses propres conditions. Notre politique de confidentialité ne promet pas séparément l'absence de logs. Si vous en avez besoin par contrat, hébergez vous-même.",
+    },
+    abliterated: {
+      q: "Quelle API sert des modèles abliterated ?",
+      a: "OpenUncensored, Refuseless, NEAR AI Cloud, NanoGPT, Venice et {{appName}} servent tous des poids abliterated via une API compatible OpenAI. Les routeurs sont les moins chers au token. {{appName}} ajoute des modèles grand public, les médias et un chat web sur la même clé.",
+    },
+    noFilter: {
+      q: "Existe-t-il une API LLM sans filtre de contenu ?",
+      a: "Bedrock sans Guardrail et Gemini avec les réglages de sécurité sur OFF n'ajoutent aucune couche de filtre, mais leurs modèles gardent des refus appris et leurs politiques interdisent le contenu sexuel. Azure exige une demande approuvée pour désactiver les filtres. Pour des modèles qui ne refusent pas, utilisez des poids abliterated ou affinés : hébergés ici ou chez les routeurs ci-dessus, ou sur vos propres GPU.",
+    },
+    vertex: {
+      q: "Puis-je désactiver les filtres de sécurité de Gemini ?",
+      a: "Oui. Sur l'API Gemini, les catégories que vous ne réglez pas sont sur Off par défaut à partir de Gemini 2.5, et sur Vertex OFF est la valeur par défaut à partir de gemini-3.5-flash. Les préjudices majeurs comme la protection de l'enfance restent bloqués, les refus appris de Gemini restent, et la politique de Google interdit les contenus sexuellement explicites et le contournement des filtres de sécurité.",
     },
     local: {
       q: "Vaut-il mieux héberger soi-même des modèles abliterated ?",

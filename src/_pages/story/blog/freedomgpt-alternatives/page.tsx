@@ -6,8 +6,8 @@
  * API, desktop repo activity) were read on its own pages and GitHub on
  * FREEDOMGPT_CHECKED_DATE and live in this post's i18n with the source links
  * below. The alternatives reuse the comparison research data
- * (compare/_shared/platforms.ts + compare i18n), checked on
- * COMPARE_CHECKED_DATE. Our own numbers (credits, plans, model counts, which
+ * (compare/_shared/platforms.ts + compare i18n), each with its own check
+ * date. Our own numbers (credits, plans, model counts, which
  * models we serve through FreedomGPT) are read live via loadUsFacts.
  */
 
@@ -50,8 +50,8 @@ import {
 } from "../../compare/_shared/compare-data";
 import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import {
-  COMPARE_CHECKED_DATE,
   isVersusKey,
+  platformCheckedDate,
   type PlatformKey,
   PLATFORMS,
   versusPath,
@@ -71,14 +71,15 @@ export const revalidate = 3600;
 const SLUG = "freedomgpt-alternatives";
 
 /** Day the FreedomGPT facts in this post were read on its own pages. */
-const FREEDOMGPT_CHECKED_DATE = "2026-11-24";
+const FREEDOMGPT_CHECKED_DATE = "2026-11-27";
 
 /** FreedomGPT's own pages (and repo) the facts in this post come from. */
 const FREEDOMGPT_SOURCES = {
   home: "https://www.freedomgpt.com/",
   pricing: "https://chat.freedomgpt.com/pricing",
   privacy: "https://www.freedomgpt.com/privacy-policy",
-  api: "https://docs.freedomgpt.com/",
+  terms: "https://www.freedomgpt.com/terms-of-service",
+  api: "https://docs.freedomgpt.com/api-reference/endpoint/create.md",
   repo: "https://github.com/ohmplatform/FreedomGPT",
 } as const;
 
@@ -91,7 +92,7 @@ const FREEDOMGPT_PRO = {
   video: 400,
 } as const;
 
-/** Last commit on FreedomGPT's open-source desktop repo (GitHub API). */
+/** Last commit on FreedomGPT's open-source desktop repo (GitHub API, read 2026-11-24). */
 const FREEDOMGPT_DESKTOP_LAST_COMMIT = "2024-06-13";
 
 interface Props {
@@ -165,7 +166,10 @@ export function TanstackPage({
   }).format(FREEDOMGPT_PRO.price);
   const stats = {
     ...us,
-    date: formatCompareDate(COMPARE_CHECKED_DATE, locale),
+    date: formatCompareDate(
+      ALTERNATIVES.map(platformCheckedDate).toSorted().at(-1) ?? "",
+      locale,
+    ),
     fgDate: formatCompareDate(FREEDOMGPT_CHECKED_DATE, locale),
     desktopDate: formatCompareDate(FREEDOMGPT_DESKTOP_LAST_COMMIT, locale),
     count: ALTERNATIVES.length,
@@ -247,6 +251,7 @@ export function TanstackPage({
                 ["home", t("fg.sourceHome")],
                 ["pricing", t("fg.sourcePricing")],
                 ["privacy", t("fg.sourcePrivacy")],
+                ["terms", t("fg.sourceTerms")],
                 ["api", t("fg.sourceApi")],
                 ["repo", t("fg.sourceRepo")],
               ] as const
@@ -473,6 +478,14 @@ export function TanstackPage({
             <CardLink
               href={`/${locale}/story/blog/uncensored-llm-without-gpu`}
               label={t("faq.noGpuLink")}
+            />
+            <CardLink
+              href={`/${locale}/story/blog/uncensored-llm-api`}
+              label={t("faq.apiLink")}
+            />
+            <CardLink
+              href={`/${locale}/story/blog/openrouter-alternatives`}
+              label={t("faq.openRouterLink")}
             />
             <CompareInlineLinks
               locale={locale}

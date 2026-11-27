@@ -5,7 +5,9 @@
  *
  * Competitor facts (what each one is, models, API, pricing, pros and cons)
  * come from the comparison research data (compare/_shared/platforms.ts +
- * compare i18n), checked on COMPARE_CHECKED_DATE. Our numbers (model counts,
+ * compare i18n) and the shared market catalog (_alternatives/catalog.ts),
+ * each with its own check date. The uncensored API write-ups were read on
+ * 2026-11-27 (scratchpad/seo/alt-research/). Our numbers (model counts,
  * models routed through OpenRouter, markup, API unlock price) are read live
  * via loadUsFacts. The model table lists every uncensored model callable on
  * the /v1 API, with its id, from the registry.
@@ -52,16 +54,20 @@ import {
 } from "../../compare/_shared/compare-data";
 import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import {
-  COMPARE_CHECKED_DATE,
   isVersusKey,
+  platformCheckedDate,
   type PlatformKey,
   PLATFORMS,
   versusPath,
 } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
-import { MARKET_CHECKED_DATE } from "../_alternatives/catalog";
 import {
+  MARKET_PLATFORMS,
+  type MarketPlatformKey,
+} from "../_alternatives/catalog";
+import {
+  alternativesCheckedRange,
   AlternativesComparison,
   alternativesFaq,
   AlternativesLinks,
@@ -88,6 +94,32 @@ const ALTERNATIVES: readonly PlatformKey[] = [
   "freedomGpt",
   "ollama",
 ];
+
+/** Uncensored API services, each with its own write-up and links. */
+const UNCENSORED_APIS: readonly {
+  key:
+    | "openUncensored"
+    | "refuseless"
+    | "nearAi"
+    | "uncensoredLlmAi"
+    | "abliterationAi"
+    | "flatRate"
+    | "deepInfra";
+  links: readonly MarketPlatformKey[];
+}[] = [
+  { key: "openUncensored", links: ["openUncensored"] },
+  { key: "refuseless", links: ["refuseless"] },
+  { key: "nearAi", links: ["nearAi"] },
+  { key: "uncensoredLlmAi", links: ["uncensoredLlmAi"] },
+  { key: "abliterationAi", links: ["abliterationAi"] },
+  { key: "flatRate", links: ["featherless", "infermatic", "arliAi"] },
+  { key: "deepInfra", links: ["deepInfra"] },
+];
+
+/** Newest of the given check dates (ISO strings sort by date). */
+function newestDate(dates: readonly string[]): string {
+  return dates.toSorted().at(-1) ?? "";
+}
 
 const FAQ_KEYS: readonly (
   | "best"
@@ -166,11 +198,19 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: compareT } = compareScopedTranslation.scopedT(locale);
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
-  const checked = formatCompareDate(COMPARE_CHECKED_DATE, locale);
+  const checked = formatCompareDate(
+    newestDate(ALTERNATIVES.map(platformCheckedDate)),
+    locale,
+  );
+  const marketRange = alternativesCheckedRange(SLUG);
+  const marketDate = formatCompareDate(marketRange.to, locale);
+  const orDate = formatCompareDate(platformCheckedDate("openRouter"), locale);
   const example = rows[0];
   const stats = {
     ...us,
     date: checked,
+    orDate,
+    marketDate,
     count: ALTERNATIVES.length,
     apiUncensored: rows.length,
     example: example?.id ?? "",
@@ -195,7 +235,10 @@ export function TanstackPage({
         subtitle={t("hero.subtitle", {
           ...stats,
           count: alternativesTotal(SLUG, ALTERNATIVES),
-          date: formatCompareDate(MARKET_CHECKED_DATE, locale),
+          date: formatCompareDate(
+            newestDate([marketRange.to, platformCheckedDate("openRouter")]),
+            locale,
+          ),
         })}
       />
 
@@ -204,6 +247,26 @@ export function TanstackPage({
           <ArticleLead>{t("intro.lead")}</ArticleLead>
           <ArticleP>{t("intro.p2", stats)}</ArticleP>
         </Div>
+
+        <ArticleSection
+          id="openrouter-uncensored"
+          title={t("shelf.title")}
+          intro={t("shelf.intro", stats)}
+        >
+          <ArticleList
+            items={[t("shelf.tunes"), t("shelf.abliterated"), t("shelf.rules")]}
+          />
+          <Callout icon={Scale} tone="neutral">
+            {t("shelf.callout")}
+          </Callout>
+          <CardLink
+            href={`/${locale}${versusPath("openRouter")}`}
+            label={t("list.versusLink", {
+              appName: us.appName,
+              name: PLATFORMS.openRouter.name,
+            })}
+          />
+        </ArticleSection>
 
         <ArticleSection
           id="criteria"
@@ -293,6 +356,37 @@ export function TanstackPage({
             <ArticleP>{t("models.footnote", stats)}</ArticleP>
           </ArticleSection>
         )}
+
+        <ArticleSection
+          id="uncensored-apis"
+          title={t("apis.title")}
+          intro={t("apis.intro", stats)}
+        >
+          {UNCENSORED_APIS.map(({ key, links }) => (
+            <Div key={key} data-market={key} className="flex flex-col gap-3">
+              <ArticleH3>{t(`apis.${key}.heading`)}</ArticleH3>
+              <ArticleP>{t(`apis.${key}.body`)}</ArticleP>
+              <ArticleP>{t(`apis.${key}.catch`)}</ArticleP>
+              <Div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                {links.map((link) => {
+                  const platform = MARKET_PLATFORMS[link];
+                  const home = platform.sources[0];
+                  return home === undefined ? null : (
+                    <ExternalLink
+                      key={link}
+                      href={home.url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className={LINK_CLASS}
+                    >
+                      {t("apis.visit", { name: platform.name })}
+                    </ExternalLink>
+                  );
+                })}
+              </Div>
+            </Div>
+          ))}
+        </ArticleSection>
 
         <ArticleSection
           id="alternatives"
@@ -385,6 +479,20 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleSection
+          id="gateways"
+          title={t("gateways.title")}
+          intro={t("gateways.intro")}
+        >
+          <ArticleList
+            items={[
+              t("gateways.vercel"),
+              t("gateways.selfHost"),
+              t("gateways.control"),
+            ]}
+          />
+        </ArticleSection>
+
+        <ArticleSection
           id="stay"
           title={t("stay.title")}
           intro={t("stay.intro")}
@@ -419,13 +527,17 @@ export function TanstackPage({
               label={t("faq.veniceLink")}
             />
             <CardLink
+              href={`/${locale}/story/blog/nanogpt-alternatives`}
+              label={t("faq.nanoGptLink")}
+            />
+            <CardLink
               href={`/${locale}/${API_KEYS_PAGE_PATH}`}
               label={t("faq.keysLink")}
             />
             <CompareInlineLinks
               locale={locale}
               includeHub={false}
-              versus={["openRouter", "nanoGpt", "venice"]}
+              versus={["openRouter", "nanoGpt", "venice", "uncensoredAi"]}
             />
           </Div>
         </ArticleSection>

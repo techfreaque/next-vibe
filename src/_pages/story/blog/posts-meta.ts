@@ -7,6 +7,8 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
 export const BLOG_POST_DATES = {
+  "azure-openai-alternatives": "2026-11-27",
+  "bedrock-alternatives": "2026-11-27",
   "ai-agent-runs-a-startup": "2026-11-25",
   "ai-ops-agent-tudo-sobre-ia": "2026-11-25",
   "claude-alternatives": "2026-11-25",
@@ -30,7 +32,7 @@ export const BLOG_POST_DATES = {
   "unbiased-ai-chatbot": "2026-11-22",
   "ai-chat-no-sign-up": "2026-11-22",
   "uncensored-llm-without-gpu": "2026-11-21",
-  "uncensored-llm-api": "2026-11-21",
+  "uncensored-llm-api": "2026-11-27",
   "chatgpt-jailbreak-alternative": "2026-11-21",
   "venice-ai-alternatives": "2026-11-21",
   "character-ai-alternatives": "2026-11-19",

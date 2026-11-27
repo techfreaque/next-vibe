@@ -102,6 +102,21 @@ export const translations: typeof enTranslations = {
         'Kein Schalter stellt Claudes Verweigerungen ab, und jedes "unzensierte Claude" ist ein Trick. Claude für die Prosa behalten, den Rest an unzensierte Modelle im selben Thread geben.',
       readTime: "7 Min. Lesezeit",
     },
+    azureOpenAiAlternatives: {
+      title:
+        "Unzensierte Azure-OpenAI-Alternativen. Gleiches SDK, keine Filterschicht.",
+      category: "Entwickler-Guide",
+      excerpt:
+        "Azure filtert jedes Modell standardmäßig, gibt den Ausschalter nur nach genehmigtem Antrag frei und verbietet erotische und romantische Chatbots trotzdem. Was stattdessen funktioniert, samt Code-Umstellung.",
+      readTime: "10 Min. Lesezeit",
+    },
+    bedrockAlternatives: {
+      title: "Unzensierte AWS-Bedrock-Alternativen. Keine Kapazitätsminuten.",
+      category: "Entwickler-Guide",
+      excerpt:
+        "Guardrails sind optional, Verweigerungen und die AWS-Richtlinie nicht. Was Custom Model Import kostet, welche Architekturen passen und wie Claude-auf-Bedrock-Code auf einen Anthropic-kompatiblen Schlüssel umzieht.",
+      readTime: "8 Min. Lesezeit",
+    },
     openrouterAlternatives: {
       title: "OpenRouter-Alternativen. Ein Schlüssel, weniger Verweigerungen.",
       category: "Entwickler-Guide",

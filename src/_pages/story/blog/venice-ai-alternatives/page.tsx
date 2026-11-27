@@ -4,7 +4,7 @@
  *
  * Competitor facts (plans, filter, privacy, models, API, pros and cons,
  * sources) come from the comparison research data (compare/_shared/platforms.ts
- * + compare i18n), checked on COMPARE_CHECKED_DATE. Our own numbers (credits,
+ * + compare i18n), each with its own check date. Our own numbers (credits,
  * plans, model counts, how many models we route through Venice) are read live
  * from config via loadUsFacts.
  */
@@ -47,16 +47,16 @@ import {
 } from "../../compare/_shared/compare-data";
 import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import {
-  COMPARE_CHECKED_DATE,
   isVersusKey,
+  platformCheckedDate,
   type PlatformKey,
   PLATFORMS,
   versusPath,
 } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
-import { MARKET_CHECKED_DATE } from "../_alternatives/catalog";
 import {
+  alternativesCheckedRange,
   AlternativesComparison,
   alternativesFaq,
   AlternativesLinks,
@@ -131,10 +131,14 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: compareT } = compareScopedTranslation.scopedT(locale);
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
-  const checked = formatCompareDate(COMPARE_CHECKED_DATE, locale);
+  const checked = formatCompareDate(
+    ALTERNATIVES.map(platformCheckedDate).toSorted().at(-1) ?? "",
+    locale,
+  );
   const stats = {
     ...us,
     date: checked,
+    veniceDate: formatCompareDate(platformCheckedDate("venice"), locale),
     count: ALTERNATIVES.length,
   };
   const faq = [
@@ -157,7 +161,12 @@ export function TanstackPage({
         subtitle={t("hero.subtitle", {
           ...stats,
           count: alternativesTotal(SLUG, ALTERNATIVES),
-          date: formatCompareDate(MARKET_CHECKED_DATE, locale),
+          date: formatCompareDate(
+            [alternativesCheckedRange(SLUG).to, platformCheckedDate("venice")]
+              .toSorted()
+              .at(-1) ?? "",
+            locale,
+          ),
         })}
       />
 
@@ -205,7 +214,7 @@ export function TanstackPage({
               t("us.api", stats),
             ]}
           />
-          <ArticleP>{t("us.weak")}</ArticleP>
+          <ArticleP>{t("us.weak", stats)}</ArticleP>
           <Div className="flex flex-col">
             <CardLink
               href={`/${locale}/story/abliterated-ai-chat`}
@@ -214,6 +223,32 @@ export function TanstackPage({
             <CardLink
               href={`/${locale}/models/${toModelSlug(OWN_WORLDVIEW_UNCENSORED_MODEL_ID)}`}
               label={t("us.ownLink", stats)}
+            />
+          </Div>
+        </ArticleSection>
+
+        <ArticleSection
+          id="venice-api"
+          title={t("veniceApi.title", stats)}
+          intro={t("veniceApi.intro")}
+        >
+          <ArticleList
+            items={[
+              t("veniceApi.formats"),
+              t("veniceApi.payment"),
+              t("veniceApi.models"),
+              t("veniceApi.terms"),
+            ]}
+          />
+          <ArticleP>{t("veniceApi.us", stats)}</ArticleP>
+          <Div className="flex flex-col">
+            <CardLink
+              href={`/${locale}/story/blog/uncensored-llm-api`}
+              label={t("veniceApi.apiLink")}
+            />
+            <CardLink
+              href={`/${locale}/story/blog/openrouter-alternatives`}
+              label={t("faq.openRouterLink")}
             />
           </Div>
         </ArticleSection>

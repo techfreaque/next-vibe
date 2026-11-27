@@ -2,6 +2,8 @@ export const translations = {
   title: "Platform comparison",
   verify:
     "Additional options checked against the linked official sources on {{date}}. Scroll sideways on mobile to see every column. Limits vary by plan and region.",
+  verifyRange:
+    "Additional options checked against the linked official sources between {{from}} and {{to}}. Scroll sideways on mobile to see every column. Limits vary by plan and region.",
   related: "More alternatives guides",
   kind: {
     chat: "Chat with fewer refusals",
@@ -57,6 +59,7 @@ export const translations = {
     localOption: "On device with a local model",
     upstream: "Depends on upstream provider",
     noLogs: "Provider says it keeps no prompt logs",
+    noDisk: "Provider says it stores no API inputs on disk",
   },
   api: {
     separate: "Separate API product",
@@ -171,7 +174,7 @@ export const translations = {
       "An AI gateway with request traces and spend visibility. Review what gets logged before sending sensitive data.",
     eden: "One API for language models and services such as OCR or translation. Capabilities depend on the provider selected.",
     together:
-      "Serverless inference and dedicated endpoints for open models. Check that it hosts the model you need.",
+      "Serverless and dedicated inference with OpenAI, Responses and Anthropic Messages APIs plus images, video and speech. No uncensored models, and its terms bar pornography.",
     bifrost:
       "Self-host a Go gateway with failover and semantic caching. You configure deployments and provider access.",
     truefoundry:
@@ -179,7 +182,7 @@ export const translations = {
     llmGateway:
       "OpenAI and Anthropic compatibility with a self-hosted option. Billing and retention depend on the deployment.",
     deepInfra:
-      "Hosted open-model inference plus private GPU deployments. You choose from its catalog or set up infrastructure.",
+      "Among the cheapest per token for stock open models, with 200 concurrent requests per model by default. No uncensored or roleplay models in its catalog.",
     bedrock:
       "Managed model catalog with AWS access controls. Available models and features depend on region.",
     kong: "Adds model routing and policies to an API gateway. Check which plugins your edition includes.",
@@ -210,7 +213,7 @@ export const translations = {
     sandbase:
       "Combines model calls, web data and code sandboxes in one API. Free calls have daily limits.",
     openUncensored:
-      "Prepaid API key, no account: 58 abliterated and uncensored text models plus image and video models, ranked by measured refusals. Bills the serving provider's token price, top-ups from $5.",
+      "Prepaid key, no account, no email: 58 text models, almost all abliterated, plus RP fine-tunes, 20 image and 3 video models. Provider price with no commission, top-ups from $5 that never expire. No free tier, no web chat.",
     risuAi:
       "Open-source character chat client with lorebooks, group chats, emotion images and TTS. You bring and pay for the model API.",
     agnai:
@@ -220,19 +223,29 @@ export const translations = {
     talemate:
       "Multi-agent roleplay engine with a narrator, a director and world state tracking. A self-install tool for power users.",
     featherless:
-      "Flat monthly access to thousands of open models, uncensored finetunes included, through one API key. The Chat plan caps context and parallel requests.",
+      "Over 50,000 Hugging Face models behind one key, 1,398 tagged abliterated and 1,605 uncensored. The $25 Chat plan has unlimited tokens but 32K context, low concurrency and personal use only.",
     arliAi:
-      "Unlimited-token plans for open and derestricted models plus images. Cheaper plans allow one request at a time.",
+      "Unlimited tokens on flat plans from $15: about 121 text models, many derestricted or uncensored fine-tunes, plus image generation. Core and Plus run one request at a time.",
     infermatic:
-      "Monthly plans for a small set of uncensored text models with a no-logs claim. The free plan has one model and no API.",
+      "Flat plans from $9 for a curated set of uncensored and roleplay 70B tunes, with a no-logs claim. The free plan is web only, and individual plans may not power apps.",
     chutes:
-      "Decentralized pay-per-token inference for text, images, video and audio. No free tier.",
+      "Decentralized pay-per-token inference, most text models in confidential compute, crypto accepted. No uncensored models and no free tier.",
     kagi: "Multi-model assistant bundled with Kagi search. Threads delete after 24 hours by default, and flagship models need the top plan.",
     huggingChat:
       "Chat with open models through an automatic router. The chat code is open source, and inference bills through Hugging Face credits.",
     zai: "Zhipu's own chat for GLM models, with a separate API. Its privacy policy lists message content for model training.",
     ourDream:
       "Adult companion builder with chat, images and video. Media runs on coins you can only buy with an active plan.",
+    refuseless:
+      "API-only host for abliterated GLM 5.3, DeepSeek V4.1 Flash and Kimi K3.1 Pro with 1M context, on OpenAI, Responses and Anthropic Messages formats. Needs a verified email, no chat app.",
+    nearAi:
+      "Confidential-compute API with two abliterated models and hardware attestation. No application, no identity checks, pay per token.",
+    uncensoredLlmAi:
+      "Prepaid gateway listing 332 abliterated and uncensored chat models, with a daily refusal check. Card or crypto from $3, no resale without written consent.",
+    abliterationAi:
+      "Its own abliterated models on OpenAI and Anthropic formats, an EU region and a policy layer for your own rules. Plans from $20 a month.",
+    mancer:
+      "Roleplay fine-tunes like MythoMax and Magnum with a free MythoLite tier. No abliterated models, and its terms ban obscene or lewd material.",
   },
   articles: {
     "nofiltergpt-alternatives": {
@@ -254,7 +267,7 @@ export const translations = {
     "openrouter-alternatives": {
       question: "Which OpenRouter replacement fits a production app?",
       answer:
-        "Use Vercel for hosted access with no token markup. Try LiteLLM or Bifrost for a gateway you operate with your own provider accounts. Compare Portkey, Cloudflare and Helicone if you need monitoring or policy controls. Check how each option handles fallbacks, data retention and fees.",
+        "For uncensored traffic: OpenUncensored, Refuseless or NEAR AI Cloud for abliterated weights at provider price, {{appName}} if you also need mainstream models, media and a chat on the same key. For routing your own provider accounts: LiteLLM or Bifrost self-hosted, Vercel hosted with no token markup. Check fallbacks, retention and fees before you move traffic.",
     },
     "venice-ai-alternatives": {
       question: "What privacy options go beyond browser-local history?",

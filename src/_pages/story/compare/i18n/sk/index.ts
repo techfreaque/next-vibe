@@ -168,23 +168,23 @@ export const translations: typeof enTranslations = {
   },
   platforms: {
     venice: {
-      what: "Aplikácia AI zameraná na súkromie. Má veľký katalóg vrátane mnohých textových modelov bez cenzúry, tvorbu obrázkov, videa a hudby, API kompatibilné s OpenAI a staking kryptomien VVV a DIEM.",
+      what: "Aplikácia AI s dôrazom na súkromie, veľkým katalógom modelov, vlastnými necenzurovanými fine-tunmi, generovaním obrázkov, videa, hlasu a hudby, API kompatibilným s OpenAI a kryptotokenovou vrstvou (VVV a DIEM).",
       pricingNote:
-        "Zdarma 10 textových a 15 obrazových zadaní denne, len so základnými modelmi. 100 kreditov stojí 1 USD. Za video, hudbu a najvýkonnejšie modely sa účtujú ďalšie kredity.",
+        "Zadarmo: 10 textových a 15 obrazových zadaní denne, len základné modely. 100 kreditov = 1 USD. Pro Plus a Max zahŕňajú výdavky na API. Za video, hudbu a najvýkonnejšie modely sa účtujú ďalšie kredity. USDC funguje na kredity, krypto na dlhšie obdobia Pro.",
       models:
-        "Katalóg API uvádza 303 modelov vrátane 143 textových. V textovom katalógu je 17 označených ako modely bez cenzúry. V ponuke sú aj Claude, GPT, Gemini a Grok.",
+        "Jeho katalóg API uvádza 145 textových, 52 obrazových, 160 video, 11 hlasových a 19 hudobných modelov. Bez cenzúry: vlastné fine-tuny Venice Uncensored 1.2 a Venice Role Play Uncensored plus abliterované verzie GLM, DeepSeek, Gemma a Qwen.",
       filterShort:
         "Filter obsahu pre dospelých je predvolene zapnutý. Pro ho môže vypnúť.",
       filter:
         "Filter obsahu pre dospelých (Mature Filter) je predvolene zapnutý. Používatelia s plánom Pro ho môžu vypnúť v nastaveniach. Podľa podmienok potrebujú používatelia vo veku od 13 do 17 rokov súhlas rodiča a filter musia nechať zapnutý.",
       privacyShort: "História predvolene zostáva v tvojom zariadení",
       privacy:
-        "Venice predvolene uchováva históriu četu v tvojom zariadení. Platené plány poskytujú šifrované zálohovanie a obnovu. V režime Anonymous podľa Venice počítaj s tým, že poskytovateľ modelu uchováva tvoj obsah. Pro pri vybraných modeloch ponúka aj hardvérovo izolované spracovanie a koncové šifrovanie.",
+        "Venice štandardne drží históriu četu na tvojom zariadení. Svoj režim Private označuje za postavený na dôvere a v režime Anonymized ti radí predpokladať, že poskytovateľ modelu tvoj obsah ukladá. Vybrané modely bežia v hardvérových enklávach (cez NEAR AI Cloud a Phala) alebo s end-to-end šifrovaním.",
       apiShort: "",
-      api: "API kompatibilné s OpenAI sa účtuje za token v kreditoch v USD. Vložený DIEM prináša kredit API vo výške 1 USD denne. Bez účtu môžeš platiť za jednotlivé požiadavky v USDC cez x402.",
+      api: "API kompatibilné s OpenAI s endpointom Responses, účtované za token v kreditoch v USD. Žiadne natívne API Anthropic Messages: jeho návod pre Claude Code používa lokálny prekladový proxy. Cez x402 platíš za požiadavku z peňaženky USDC bez účtu.",
       forWho:
         "Pre používateľov, ktorí dbajú na súkromie a chcú čet bez cenzúry aj médiá v jednej aplikácii. Aj pre vývojárov a držiteľov kryptomien.",
-      pro1: "Veľký katalóg textových modelov bez cenzúry a nízke ceny týchto modelov cez API.",
+      pro1: "Vlastné necenzurované fine-tuny a abliterované verzie s nízkymi cenami API za token.",
       pro2: "História predvolene zostáva v tvojom zariadení.",
       con1: "Bezplatný plán má limit 10 textových zadaní denne so základnými modelmi.",
       con2: "Na vypnutie filtra obsahu pre dospelých potrebuješ Pro. Video, hudba aj prémiové modely sa účtujú v kreditoch.",
@@ -192,38 +192,39 @@ export const translations: typeof enTranslations = {
     uncensoredAi: {
       what: "Aplikácia na čet bez cenzúry s jedným modelom, komunitným fórom a archívom dokumentov. Web, iOS aj Android.",
       pricingNote:
-        "Zdarma 3 odpovede denne. Ceny plánu Pro sú fixné doživotne. Platby kartou, cez Cash App, Apple Pay alebo Bitcoin. Kredity API sa predávajú samostatne za 0,05 USD za volanie.",
+        "Zadarmo: denný limit, štandardne 3 odpovede. Ceny plánu Pro sú fixné doživotne. Karty, Cash App, Apple Pay a Bitcoin. Kredity API sa predávajú samostatne: 0,05 USD za požiadavku, nákup od 5 USD.",
       models:
         "Jeden model, UncensoredAI v1.2, s kontextom 32 000 tokenov. Trénoval na knihách a dokumentoch vylúčených z hlavného prúdu internetu. Jeho politické názory sa od hlavného prúdu líšia.",
       filterShort: "Filter sa neuvádza, podmienky vyžadujú vek aspoň 18 rokov",
       filter:
         "Platforma sa označuje za AI bez obmedzení. Podmienky vyžadujú vek aspoň 18 rokov a zakazujú obsah určený na ublíženie, obťažovanie či ohrozovanie iných.",
-      privacyShort: "Podľa zásad sa údaje nepoužívajú na tréning",
+      privacyShort:
+        "Nikdy sa nepredávajú, modelu ide len text, podľa jeho stránok",
       privacy:
-        "Podľa zásad sa tvoje údaje nepoužívajú na tréning ani zlepšovanie modelov AI. Správy spracúva Parasail AI. Plán Pro uchováva históriu četu a umožňuje v nej vyhľadávať alebo ju exportovať.",
+        "Jeho stránky tvrdia, že tvoje údaje sa nikdy nepredávajú, neprenajímajú ani nevymieňajú a že požiadavky na AI nesú len tvoj text, nikdy meno ani e-mail. Správy medzi používateľmi sú end-to-end šifrované. Doba uchovávania nie je zverejnená.",
       apiShort: "",
-      api: "API kompatibilné s OpenAI je priamo zameniteľné. Spracovanie jednej požiadavky stojí 0,05 USD.",
+      api: "Telo požiadavky v štýle OpenAI na vlastnom endpointe, účtované za požiadavku po 0,05 USD. Streaming, nástroje a formát Anthropic nie sú zdokumentované.",
       forWho:
         "Pre ľudí, ktorí nedôverujú výkladu hlavného prúdu a chcú priame odpovede na sporné témy.",
       pro1: "Najlacnejší platený plán v tomto zozname, cena je fixná doživotne.",
-      pro2: "Podľa zásad ochrany osobných údajov sa údaje nepoužívajú na tréning.",
+      pro2: "Údaje sa nikdy nepredávajú, neprenajímajú ani nevymieňajú, tvrdí.",
       con1: "Jeden model s kontextom 32 000 tokenov. Bez tvorby obrázkov, videa alebo hudby.",
       con2: "Zdarma 3 odpovede denne. Hlas, priečinky a archívy vyžadujú Pro.",
     },
     nanoGpt: {
       what: "Webová aplikácia a API pre textové, obrazové, video a zvukové modely s platbou podľa spotreby. Predplatné netreba. Pre otvorené modely je k dispozícii voliteľný plán.",
       pricingNote:
-        "Prvý vklad je 0,10 USD v kryptomene alebo 1 USD pri platbe kartou. Ďalšie vklady kartou sú od 5 USD. Na dobitie zostatku sa treba prihlásiť. Web ponúka jeden bezplatný model. PRO (do mája 2026 stál 8 USD) zahŕňa 60 miliónov vstupných tokenov týždenne na vybraných otvorených textových modeloch a 100 obrázkov denne na osobné použitie. Claude, GPT, Gemini a Grok čerpajú zo zostatku.",
+        "Prvý vklad: 0,10 USD v kryptomene (Bitcoin, Monero a ďalšie) alebo 1 USD kartou, potom 5 USD pri vkladoch kartou. Web má jeden bezplatný model. PRO (do mája 2026 stál 8 USD) pokrýva 60M vstupných tokenov týždenne, s bezplatným výstupom pri zahrnutých otvorených textových modeloch. Claude, GPT, Gemini a Grok čerpajú z tvojho zostatku.",
       models:
-        "Verejné API textových modelov vrátilo 596 položiek. V 38 ID sa nachádzalo uncensored, abliterated alebo Dolphin. Patria sem napríklad Venice Uncensored, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored a upravený variant Kimi K3.1 Pro.",
+        "Verejné API modelov vrátilo 610 položiek, z nich 54 abliterated, uncensored, Heretic, derestricted alebo podobných fine-tunov. Medzi príklady patria GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Qwen 3.8 27B Uncensored a abliterované verzie Kimi K3.1 Pro. Žiadny vlastný model.",
       filterShort: "Bez plošného zákazu obsahu NSFW, vek aspoň 18 rokov",
       filter:
         "Musíš mať aspoň 18 rokov a spĺňať vekovú hranicu na uzatváranie zmlúv vo svojej krajine. Podmienky zakazujú materiál zobrazujúci sexuálne zneužívanie detí aj intímny alebo sexuálne explicitný obsah identifikovateľných osôb bez ich súhlasu vrátane deepfake obsahu. Poskytovatelia môžu uplatňovať vlastné obmedzenia.",
       privacyShort: "História predvolene zostáva v prehliadači",
       privacy:
-        "História predvolene zostáva v prehliadači. Synchronizácia do cloudu je voliteľná. NanoGPT tvrdí, že pri bežnom spracovaní nezaznamenáva zadania ani odpovede. Zaznamenávanie obsahu API aj pamäť četu sú voliteľné. Niektoré trasy poskytovateľov môžu zadania uchovávať alebo používať na tréning. V novembri 2026 NanoGPT oznámil, že u niekoľkých poskytovateľov došlo k sprístupneniu zadaní, a príslušné trasy vyradil.",
+        "História štandardne zostáva v tvojom prehliadači. NanoGPT tvrdí, že pri bežnej inferencii prompty ani odpovede nezaznamenáva ani neuchováva. Logovanie API je voliteľné, na 1 až 30 dní. Private Mode posiela požiadavky do šifrovanej enklávy za 5 % navyše. V novembri 2026 NanoGPT priznalo úniky promptov u viacerých upstream poskytovateľov a tieto trasy zrušilo.",
       apiShort: "",
-      api: "API kompatibilné s OpenAI podporuje Anthropic Messages aj platby bez účtu cez x402. Niektoré odpovede neuvádzajú cenu alebo zobrazujú odhad, kým sa platba nezaúčtuje.",
+      api: "OpenAI chat completions, Responses a Anthropic Messages na jednom kľúči, plus obrázky a video. Platba za požiadavku bez účtu cez Lightning (L402). Platby x402 boli odstránené 2026-11-20.",
       forWho:
         "Pre používateľov a vývojárov, ktorí chcú široký výber modelov, platby v kryptomene a účtovanie podľa spotreby bez predplatného.",
       pro1: "Obrovský výber modelov prevažne za cenníkové ceny, vstup od 0,10 USD.",
@@ -234,51 +235,49 @@ export const translations: typeof enTranslations = {
     openRouter: {
       what: "Vývojárske API sprístupňuje jedným kľúčom stovky modelov od mnohých poskytovateľov. Tokeny sa účtujú z predplatených kreditov.",
       pricingNote:
-        "Bez predplatného. Cenníkové ceny poskytovateľov a poplatok 5,5 % za nákup kreditov. Pri bezplatných modeloch máš 50 požiadaviek denne, po nákupe kreditov za 10 USD až 1 000.",
+        "Bez predplatného a bez prirážky na inferenciu: ceny poskytovateľov plus poplatok 5,5 % pri nákupe kreditov kartou, 5 % pri krypte. Vlastné kľúče poskytovateľov zadarmo do 25 000 USD mesačne. Bezplatné modely: 50 požiadaviek denne, po nákupe kreditov za 10 USD 1 000.",
       models:
-        "474 modelov, z toho 15 bezplatných. Modelov bez cenzúry je málo. Patria sem Venice Uncensored (Dolphin Mistral 24B od Venice) a modely doladené na hranie rolí, napríklad Hermes 4 a Magnum. Ako moderovaných je označených 142 modelov.",
-      filterShort:
-        "Platia pravidlá poskytovateľov. Mnohé trasy majú moderovanie.",
+        "477 modelov, 11 bezplatných. Necenzurovaných možností je málo: 17 sa názvom alebo popisom hlási k roleplayu alebo necenzúre, napríklad Venice Uncensored (Dolphin Mistral 24B), Hermes 4 405B, Magnum a Euryale. Ani jedno ID modelu neobsahuje abliterated alebo uncensored.",
+      filterShort: "Platia pravidlá poskytovateľa pre každý model",
       filter:
-        "Podmienky vyžadujú vek aspoň 18 rokov. OpenRouter kontroluje vstupy na prítomnosť známeho materiálu zobrazujúceho sexuálne zneužívanie detí. Každý poskytovateľ riadi svoj model a na moderovaných trasách sa požiadavky odmietajú podľa jeho pravidiel.",
-      privacyShort: "Zadania sa ukladajú len s tvojím súhlasom",
+        "Podmienky vyžadujú vek 18+. OpenRouter kontroluje vstupy na známy CSAM a malvér. Samostatné pravidlo pre sexuálny obsah neexistuje: platia podmienky každého modelu, takže odmietnutia závisia od modelu a jeho poskytovateľa.",
+      privacyShort: "Prompty sa štandardne nelogujú, smerovanie ZDR",
       privacy:
-        "OpenRouter uvádza, že zadania ani odpovede neukladá, kým na to nedáš súhlas. Metadáta ukladá vždy. Pravidlá zaznamenávania sa medzi poskytovateľmi líšia.",
+        "OpenRouter tvrdí, že prompty ani odpovede nezaznamenáva, kým si to sám nezapneš, a zapnuté logovanie dáva zľavu 1 %. Môžeš blokovať poskytovateľov, ktorí trénujú na tvojich dátach, a smerovať len na endpointy s nulovým uchovávaním dát, na úrovni účtu alebo jednotlivej požiadavky.",
       apiShort: "",
-      api: "Hlavným produktom je API kompatibilné s OpenAI.",
+      api: "OpenAI chat completions a Responses API so streamingom a nástrojmi. Toto je jeho produkt.",
       forWho:
         "Pre vývojárov, ktorí chcú jeden kľúč k mnohým modelom a záložného poskytovateľa.",
-      pro1: "Veľký katalóg za cenníkové ceny bez predplatného.",
-      pro2: "Zaznamenávanie a tréning len s výslovným súhlasom.",
-      con1: "Málo modelov bez cenzúry.",
+      pro1: "Obrovský katalóg za ceny poskytovateľov, bez prirážky na inferenciu.",
+      pro2: "Smerovanie s nulovým uchovávaním dát a vlastné kľúče zadarmo.",
+      con1: "Málo modelov bez cenzúry, žiadny abliterovaný.",
       con2: "Služba sa nezameriava na bežné četovanie. Rozhranie si zabezpečíš sám.",
     },
     freedomGpt: {
-      what: "Aplikácia AI s bežnými modelmi aj vlastným modelom Liberty bez cenzúry. Vytvára obrázky aj videá. K dispozícii je aj staršia otvorená počítačová aplikácia pre modely bez internetu.",
+      what: "Aplikácia AI všetko v jednom na webe, iPhone a Androide: bežné modely popri možnostiach bez cenzúry, s generovaním obrázkov a videa. Má aj API a staršiu open source desktopovú aplikáciu na offline modely.",
       pricingNote:
-        "Začni bez karty a účtu. Pro zahŕňa 2 200 mesačných kreditov a ponúka ich jednorazové dokúpenie. FreedomGPT odhaduje 10 kreditov za prémiovú odpoveď, 25 za obrázok a 400 za päťsekundové video.",
+        "Začneš bez karty a bez účtu. Pro zahŕňa 2 200 kreditov mesačne. FreedomGPT odhaduje 10 kreditov na prémiovú odpoveď, 25 na obrázok a 400 na 5-sekundové video. Noví používatelia, ktorí sa zaregistrujú cez Google, Apple alebo X, dostanú 100 bonusových kreditov.",
       models:
-        "ChatGPT, Claude, Gemini, Grok, DeepSeek, Qwen, Llama, Mistral a ďalšie. V tom istom zozname sú Liberty aj iné modely bez cenzúry. Celkový počet nezverejňujú.",
-      filterShort:
-        "Modely bez cenzúry, zákony USA a pravidlá etického používania",
+        "Sľubuje viac než 400 modelov v jednom predplatnom: ChatGPT, Claude, Gemini, Grok, Kimi, GLM, DeepSeek, Qwen, Llama a ďalšie. Necenzurované možnosti sľubuje, ale žiadnu nemenuje. Jeho API štandardne používa model Liberty.",
+      filterShort: "Len zákonné a etické použitie",
       filter:
-        "FreedomGPT uvádza, že všetci používatelia aj všetky hostované modely musia dodržiavať zákony USA. Používanie modelov na neetické účely nepovoľuje. Označenie bez cenzúry nezaručuje odpoveď na každé zadanie.",
-      privacyShort: "Správy dostávajú poskytovatelia AI",
+        "Jeho podmienky dovoľujú používanie len na zákonné a etické účely a nič konkrétnejšie neuvádzajú. Minimálny vek nie je uvedený.",
+      privacyShort: "Podľa jeho zásad žiadne očakávanie súkromia",
       privacy:
-        "FreedomGPT posiela správy a prílohy poskytovateľovi, ktorý má pripraviť odpoveď. Podľa zásad pre mobilnú aplikáciu môžu poskytovatelia dostať správy, nahrávky a obrázky len na vytvorenie odpovede a nesmú ich používať na vlastné účely. Pevná lehota uchovávania sa neuvádza.",
+        "Domovská stránka radí nepredpokladať anonymitu ani nulové uchovávanie. Zásady ochrany súkromia hovoria, že FreedomGPT môže zbierať a ukladať akékoľvek informácie, ktoré mu poskytneš, že používatelia nemajú nárok na očakávanie súkromia a že správy idú poskytovateľom AI výlučne na generovanie odpovedí. Doba uchovávania nie je zverejnená.",
       apiShort: "",
-      api: "API na chat.freedomgpt.com/api/v1 s kľúčom z ovládacieho panela. Ceny nie sú zdokumentované.",
+      api: "API na chat.freedomgpt.com/api/v1 s endpointmi pre čet, obrázky, telefonické hovory a video. Odpovede prichádzajú vo vlastnom formáte FreedomGPT, nie v schéme OpenAI. Ceny za token nie sú zverejnené.",
       forWho:
-        "Pre používateľov, ktorí chcú jedno predplatné s množstvom modelov vrátane modelov bez cenzúry.",
+        "Používatelia, ktorí chcú jedno predplatné na veľa modelov s možnosťami bez cenzúry.",
       pro1: "Začiatok zdarma bez účtu a karty.",
       pro2: "Obrázky aj video v jednej aplikácii.",
-      con1: "Stále platia zákony USA a zákaz neetického používania.",
+      con1: "Jeho necenzurované modely zostávajú bez mena a podmienky pridávajú etické pravidlo nad rámec zákona.",
       con2: "Počítačová aplikácia s otvoreným kódom nemala aktualizáciu od júna 2024.",
     },
     gabAi: {
       what: "Platforma od Gab s 214 modelmi, vlastným modelom Arya, režimom agenta, tvorbou obrázkov, videa a hudby aj počítačovými aplikáciami. Otvorene sa hlási k pravicovým a kresťanským hodnotám.",
       pricingNote:
-        "Po overení e-mailu je 250 kreditov zdarma. Jednorazové balíky od 10 USD za 700 kreditov, bez obmedzenia platnosti.",
+        "Zadarmo: 250 kreditov po overení e-mailu. Balíky kreditov idú od 10 USD za 700 kreditov po 250 USD za 31 250 a nikdy nevypršia. Business miesta stoja 20 alebo 99 USD. Pokladňa beží cez Whop.",
       models:
         "214 modelov na jeden účet: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi a ďalšie. Vlastný model Arya je založený na kresťanských hodnotách a konzervatívnych zásadách.",
       filterShort: "Voľný prejav, zákaz sexuálneho obsahu",
@@ -286,9 +285,9 @@ export const translations: typeof enTranslations = {
         "Podmienky vyžadujú vek aspoň 18 rokov a zakazujú obscénny, sexuálne explicitný aj pornografický obsah. Súlad môžu kontrolovať automatizované systémy. Politické témy majú voľnosť, obsah pre dospelých je obmedzený.",
       privacyShort: "Čety sa ukladajú a používajú na zlepšovanie modelov",
       privacy:
-        "Gab uchováva zadania, odpovede a históriu na serveroch a medzi účelmi uvádza zlepšovanie modelov. Požiadavky posiela poskytovateľom modelov cez vlastné účty. Podľa jeho zásad tým požiadavka nezískava anonymitu.",
+        "Gab uchováva tvoje prompty, odpovede a históriu tak dlho, ako uzná za potrebné, a medzi účelmi uvádza zlepšovanie svojich modelov. Požiadavky sa k poskytovateľom modelov dostávajú cez vlastné účty Gab; jeho zásady hovoria, že to požiadavku nerobí anonymnou.",
       apiShort: "",
-      api: "API kompatibilné s OpenAI a Anthropic. Vyžaduje plán Plus.",
+      api: "Chat completions cez SDK OpenAI na gab.ai/v1, s príkladmi formátov Responses a Anthropic Messages a bránou pre Claude Code. Vyžaduje plán Plus.",
       forWho:
         "Pre konzervatívnych a kresťanských používateľov, ktorí chcú AI mimo veľkých technologických firiem.",
       pro1: "Veľký katalóg, režim agenta aj počítačové aplikácie.",
@@ -516,7 +515,7 @@ export const translations: typeof enTranslations = {
       },
       developers: {
         title: "API pre modely bez cenzúry: NanoGPT, Venice alebo OpenRouter",
-        body: "NanoGPT a Venice ponúkajú veľa modelov bez cenzúry s nízkou cenou za token. OpenRouter má najširší katalóg a len málo modelov bez cenzúry.",
+        body: "NanoGPT a Venice majú veľa modelov bez cenzúry za nízke ceny za token. OpenRouter má najširší katalóg, ale žiadne abliterované modely.",
       },
       local: {
         title: "Úplné súkromie a nulová cena za správu: Ollama alebo LM Studio",
@@ -600,6 +599,7 @@ export const translations: typeof enTranslations = {
         "Pozrieť celý katalóg modelov ({{modelCount}}) s aktuálnymi cenami",
       pricingLink: "Predplatné a bezplatné kredity",
       guideLink: "Príručka ku všetkým modelom bez cenzúry a ich využitiu",
+      apiLink: "API LLM bez cenzúry: všetky možnosti v porovnaní",
     },
     versus: {
       title: "Priame porovnania",
@@ -659,7 +659,7 @@ export const translations: typeof enTranslations = {
       },
       openRouter: {
         q: "Má OpenRouter modely bez cenzúry?",
-        a: "Niekoľko, napríklad Venice Uncensored a modely na hranie rolí Hermes 4 a Magnum. Zo 474 modelov má 142 označenie moderované. Oveľa väčší výber modelov bez cenzúry v jednom API ponúkajú NanoGPT, Venice a {{appName}}.",
+        a: "Niekoľko: 17 z jeho 477 modelov sa hlási k roleplayu alebo necenzúre, napríklad Venice Uncensored, Hermes 4 405B a Magnum, a žiadny nie je abliterovaný. Na väčší výber bez cenzúry v jednom API ich majú oveľa viac NanoGPT, Venice a {{appName}}.",
       },
       local: {
         q: "Môžem spustiť AI bez cenzúry na svojom počítači?",
@@ -702,14 +702,14 @@ export const translations: typeof enTranslations = {
       verdict:
         "Vyber si Venice, ak chceš celý jej katalóg, lokálnu históriu a najnižšiu cenu za token pri jej vlastných modeloch a vyhovuje ti platiť za Pro na vypnutie filtra pre dospelých. Vyber si {{appName}}, ak chceš modely Venice bez cenzúry, Claude, GPT, model od uncensored.ai a upravené modely GLM a DeepSeek od iných poskytovateľov v jednom čete. Stačí jednorazové potvrdenie veku aspoň 18 rokov.",
       themPros: {
-        a: "V katalógu API je 303 modelov vrátane videa, hudby a hlasu.",
+        a: "Jeho katalóg API uvádza 145 textových, 52 obrazových, 160 video, 11 hlasových a 19 hudobných modelov.",
         b: "História predvolene zostáva v zariadení. Silná ochrana súkromia.",
-        c: "Najlacnejší spôsob volania vlastných modelov Venice. Bez prirážky sprostredkovateľa a so stakingom DIEM pre denné kredity API.",
+        c: "Najlacnejší spôsob, ako volať vlastné modely Venice: bez prirážky sprostredkovateľa a cez x402 platíš za požiadavku z peňaženky USDC bez účtu.",
       },
       themCons: {
         a: "Bezplatný plán má 10 textových zadaní denne len so základnými modelmi.",
         b: "Filter obsahu pre dospelých je predvolene zapnutý. Na vypnutie potrebuješ Pro.",
-        c: "Len ponuka Venice. Bez modelu od uncensored.ai alebo poskytovateľov, ktorých Venice nehostuje.",
+        c: "Žiadne natívne API Anthropic Messages: jeho návod pre Claude Code používa lokálny prekladový proxy.",
       },
       usPros: {
         a: "Modely bez cenzúry od Venice, NanoGPT, uncensored.ai, FreedomGPT a Gab AI v jednom výbere.",
@@ -723,7 +723,7 @@ export const translations: typeof enTranslations = {
       },
       chooseThem: {
         a: "Chceš najväčší katalóg bez cenzúry od jedného poskytovateľa.",
-        b: "Držíš VVV alebo ho chceš vložiť do stakingu kvôli kreditom API.",
+        b: "Držíš VVV alebo DIEM, alebo chceš platiť za požiadavku z peňaženky USDC.",
         c: "Voláš modely Venice cez API a záleží ti na každom cente.",
       },
       chooseUs: {
@@ -743,7 +743,7 @@ export const translations: typeof enTranslations = {
         },
         q2: {
           q: "Je Venice AI zadarmo?",
-          a: "Bezplatný účet má 10 textových a 15 obrazových zadaní denne na základných modeloch. Pro zahŕňa neobmedzené textové zadania, až 1 000 obrázkov denne na modeloch Pro a pre dospelých možnosť vypnúť filter Mature Filter.",
+          a: "Bezplatné účty dostanú 10 textových a 15 obrazových zadaní denne so základnými modelmi. Pro je vstupný plán a dospelým dovoľuje vypnúť Mature Filter. Pro Plus a Max pridávajú kredity na video, hudbu a volania API.",
         },
         q3: {
           q: "Je Venice lacnejšia ako {{appName}}?",
@@ -777,7 +777,7 @@ export const translations: typeof enTranslations = {
       relation:
         "S Character.AI nemáme obchodný vzťah. Postavu môžeš preniesť aj tak. Vlož odkaz z Character.AI a {{appName}} ju importuje ako zručnosť.",
       verdict:
-        "Character.AI si vyber na zábavu bez obsahu pre dospelých s miliónmi pripravených postáv, zdarma a bez limitu, alebo na čítanie pre ľudí mladších ako 18 rokov. {{appName}} si vyber, ak filter prerušuje príbeh. Po jednorazovom potvrdení veku aspoň 18 rokov môžeš hrať roly bez cenzúry, zvoliť model pri každej správe a tvoje čety neslúžia na tréning modelov.",
+        "Character.AI vyber na nezávadnú zábavu s miliónmi hotových postáv, zadarmo a bez limitu, alebo ak máš menej než 18 rokov. {{appName}} vyber, ak ti filter stále kazí príbeh: necenzurované roleplayové modely po jednorazovom potvrdení veku 18+, model podľa výberu pre každú správu a žiadne reklamné pixely ani trackery tretích strán.",
       themPros: {
         a: "Milióny komunitných postáv pripravených na čet.",
         b: "Neobmedzené správy zdarma a lacné platené plány.",
@@ -791,7 +791,7 @@ export const translations: typeof enTranslations = {
       usPros: {
         a: "Počet modelov bez cenzúry: {{uncensored}}. Viaceré sú určené na hranie rolí a umožnia pokračovať v scéne podľa príbehu.",
         b: "Vyber si model pri každej správe. Model bez cenzúry na scénu, špičkový model na plánovanie.",
-        c: "Čety inkognito zostávajú v prehliadači. Na tvojich četoch modely netrénujeme.",
+        c: "Anonymné čety zostávajú v tvojom prehliadači. Žiadne reklamné pixely ani trackery tretích strán.",
       },
       usCons: {
         a: "Oveľa menej pripravených postáv. Vlastné môžeš importovať alebo vytvoriť.",
@@ -806,7 +806,7 @@ export const translations: typeof enTranslations = {
       chooseUs: {
         a: "Filter ti opakovane prerušuje hranie rolí.",
         b: "Chceš si zvoliť model sám.",
-        c: "Chceš, aby sa tvoje čety nepoužívali na tréning ani zacielenie reklám.",
+        c: "Chceš čet bez reklamných pixelov a trackerov tretích strán.",
       },
       both: "Mnohí si nechajú Character.AI na jednoduché rozhovory a príbehy, ktoré potrebujú model pre dospelých, presunú sem. Postavu môžu importovať.",
       switch: {
@@ -931,15 +931,15 @@ export const translations: typeof enTranslations = {
       relation:
         "Sme zákazníkom NanoGPT. Počet našich modelov cez jeho API: {{nanoGptModels}}, z toho bez cenzúry {{nanoGptUncensored}}. Patria sem {{nanoGptExamples}}.",
       verdict:
-        "NanoGPT si vyber pre široký katalóg a platbu podľa spotreby vrátane volania API bez účtu cez x402. {{appName}} si vyber pre vyskúšaný výber modelov od viacerých poskytovateľov, bezplatné mesačné kredity, zručnosti, pamäť a otvorený čet na vlastný server.",
+        "NanoGPT vyber pre široký katalóg a prístup podľa spotreby, vrátane volaní API bez účtu platených cez Lightning. {{appName}} vyber pre odskúšaný výber od viacerých poskytovateľov, mesačné kredity zadarmo, skilly, pamäť a open source čet, ktorý si môžeš prevádzkovať sám.",
       themPros: {
-        a: "596 položiek textových modelov. V 38 ID sa nachádza uncensored, abliterated alebo Dolphin.",
-        b: "Bez predplatného. Prvý vklad po prihlásení od 0,10 USD v kryptomene.",
+        a: "610 položiek modelov, z nich 54 abliterated, uncensored alebo podobných fine-tunov.",
+        b: "Netreba predplatné. Prvé dobitie od 0,10 USD v krypte, vrátane Monera.",
         c: "Cenníkové ceny pri automatickom smerovaní, nižšie ako u sprostredkovateľov.",
       },
       themCons: {
         a: "Bezplatná ponuka na webe zahŕňa jeden model.",
-        b: "Súkromie závisí od trasy poskytovateľa. Niektoré trasy umožňujú tréning.",
+        b: "Súkromie závisí od trasy poskytovateľa. Jeho šifrovaný Private Mode stojí 5 % navyše.",
         c: "V takom veľkom katalógu si modely musíš vyskúšať sám.",
       },
       usPros: {
@@ -953,7 +953,7 @@ export const translations: typeof enTranslations = {
         c: "Najprv predplatné. Balíky kreditov dopĺňajú aktívny plán.",
       },
       chooseThem: {
-        a: "Chceš platiť podľa spotreby bez predplatného alebo volať API cez x402 bez účtu.",
+        a: "Chceš platiť podľa spotreby bez predplatného alebo volať API bez účtu s platbou cez Lightning.",
         b: "Potrebuješ menej známy model dostupný len vo veľkom katalógu.",
         c: "Staviaš na API a chceš cenníkové ceny.",
       },
@@ -974,11 +974,11 @@ export const translations: typeof enTranslations = {
         },
         q2: {
           q: "Potrebujem na NanoGPT účet?",
-          a: "Bezplatný webový model funguje bez účtu. Na dobitie zostatku na webe sa musíš prihlásiť. API podporuje platbu bez účtu cez x402.",
+          a: "Bezplatný webový model funguje bez účtu a zostatok hosťa funguje s prihlasovacím tokenom. Na predplatné sa treba prihlásiť. API prijíma platby cez Lightning (L402) bez účtu; x402 bolo odstránené 2026-11-20.",
         },
         q3: {
           q: "Majú obe služby API?",
-          a: "Áno. API NanoGPT je kompatibilné s OpenAI a Anthropic a podporuje platby bez účtu. Naše API je tiež kompatibilné s OpenAI a Anthropic a sprístupní ho predplatné alebo nákup kreditov.",
+          a: "Áno. API NanoGPT hovorí OpenAI chat completions, Responses aj Anthropic Messages a prijíma platby cez Lightning bez účtu. Naše hovorí tými istými tromi formátmi a odomkne sa po kúpe plánu alebo kreditov.",
         },
         q4: {
           q: "Ktorá služba má viac modelov bez cenzúry?",
@@ -991,14 +991,14 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternatíva k FreedomGPT | {{appName}} a FreedomGPT (2026)",
         description:
-          "{{appName}} a FreedomGPT vedľa seba. Liberty, modely bez cenzúry, pravidlá obsahu, súkromie, kredity, API a otvorený kód. Údaje pre obe služby so zdrojmi.",
+          "{{appName}} oproti FreedomGPT: Liberty a možnosti bez cenzúry, pravidlá obsahu, súkromie, kredity, API a open source. Fakty so zdrojmi, z oboch strán.",
         keywords:
           "alternatíva k FreedomGPT, porovnanie FreedomGPT, recenzia FreedomGPT, ceny FreedomGPT, FreedomGPT Pro, model Liberty, FreedomGPT bez cenzúry, AI bez cenzúry, alternatíva k ChatGPT bez cenzúry, {{appName}} a FreedomGPT",
       },
       hero: {
         title: "{{appName}} a FreedomGPT",
         subtitle:
-          "Dve aplikácie s modelmi bez cenzúry vedľa ChatGPT, Claude a Gemini. Pravidlá, súkromie, kredity a otvorený kód.",
+          "Dve aplikácie, ktoré dávajú možnosti bez cenzúry popri ChatGPT, Claude a Gemini. Pravidlá, súkromie, kredity, open source.",
         readTime: "Čítanie na 6 minút",
       },
       intro: {
@@ -1008,15 +1008,15 @@ export const translations: typeof enTranslations = {
       relation:
         "Sme zákazníkom FreedomGPT. {{freedomGptExamples}} beží na {{appName}} cez vlastné API FreedomGPT.",
       verdict:
-        "FreedomGPT si vyber, ak chceš jeden plán za 20 USD na čet, obrázky a video, s bezplatným začiatkom bez účtu. {{appName}} si vyber, ak chceš viac modelov bez cenzúry od viacerých poskytovateľov, pravidlá bez nadstavby o neetickom používaní, zverejnené ceny jednotlivých modelov a aktívne vyvíjanú platformu s otvoreným kódom.",
+        "FreedomGPT vyber pre jediný plán za 20 USD, ktorý pokrýva čet, obrázky a video, so štartom zadarmo a bez účtu. {{appName}} vyber, ak chceš pomenované modely bez cenzúry od viacerých poskytovateľov, žiadnu etickú klauzulu nad rámec zákona, zverejnené ceny za model a open source platformu, ktorá sa aktívne vyvíja.",
       themPros: {
         a: "Zdarma bez karty a účtu.",
-        b: "Liberty a ďalšie modely bez cenzúry vedľa ChatGPT, Claude a Gemini.",
+        b: "Možnosti bez cenzúry a jeho model Liberty popri ChatGPT, Claude a Gemini.",
         c: "Tvorba obrázkov a videa v jednom pláne.",
       },
       themCons: {
-        a: "Podľa pravidiel musia modely rešpektovať zákony USA a nesmú sa používať na neetické účely.",
-        b: "Správy, hlas a obrázky dostávajú poskytovatelia tretích strán. Lehota uchovávania sa neuvádza.",
+        a: "Jeho podmienky dovoľujú len zákonné a etické použitie a jeho necenzurované modely zostávajú bez mena.",
+        b: "Jeho zásady hovoria, že používatelia nemajú nárok na očakávanie súkromia, a dobu uchovávania neuvádzajú.",
         c: "Počítačová aplikácia s otvoreným kódom nemala aktualizáciu od júna 2024.",
       },
       usPros: {
@@ -1047,7 +1047,7 @@ export const translations: typeof enTranslations = {
       faq: {
         q1: {
           q: "Je FreedomGPT naozaj bez cenzúry?",
-          a: "Jeho modely bez cenzúry vynechávajú väčšinu odmietnutí. FreedomGPT však uvádza, že všetky hostované modely musia rešpektovať zákony USA a nesmú sa používať na neetické účely. Označenie bez cenzúry nezaručuje odpoveď na každé zadanie.",
+          a: "FreedomGPT propaguje možnosti bez cenzúry, ale žiadny model nemenuje a jeho podmienky dovoľujú len zákonné a etické použitie. Na {{appName}} má každý necenzurovaný model meno, vlastnú stránku a odomkne sa po jednorazovom potvrdení veku 18+.",
         },
         q2: {
           q: "Koľko stojí FreedomGPT?",
@@ -1157,7 +1157,7 @@ export const translations: typeof enTranslations = {
       },
       intro: {
         lead: "uncensored.ai vytvoril výrazne odlišný model bez cenzúry: {{ownModel}}. Trénoval na knihách a dokumentoch vylúčených z hlavného prúdu internetu a jeho politické názory sa od hlavného prúdu líšia. Sprístupňujeme ho cez vlastné API uncensored.ai. Kedy sa ho teda oplatí používať priamo cez uncensored.ai a kedy tu?",
-        p2: "Údaje o uncensored.ai pochádzajú z cenníka, stránky API, stránky o službe a zásad ochrany osobných údajov. Overené {{date}}. Naše údaje sa načítavajú priamo z konfigurácie.",
+        p2: "Fakty o uncensored.ai z jeho stránok s cenníkom, API a o nás, overené {{date}}. Jeho zásady ochrany súkromia a podmienky sa nám ten deň nenačítali. Naše údaje čítame naživo z našej konfigurácie.",
       },
       relation:
         "Sme zákazníkom uncensored.ai. {{uncensoredAiExamples}} beží na {{appName}} cez API uncensored.ai. Model je rovnaký, čet a účtovanie sú naše.",
@@ -1166,10 +1166,10 @@ export const translations: typeof enTranslations = {
       themPros: {
         a: "Pevná cena Pro je 9,99 USD mesačne alebo 99,99 USD ročne. Cena sa nemení, kým zostávaš predplatiteľom.",
         b: "Za túto cenu máš neobmedzené čety s modelom, hlasový režim, priečinky a archívy.",
-        c: "Podľa zásad ochrany osobných údajov sa tvoje údaje nepoužívajú na tréning ani zlepšovanie modelov AI.",
+        c: "Jeho stránky tvrdia, že tvoje údaje sa nikdy nepredávajú, neprenajímajú ani nevymieňajú a model dostane len tvoj text.",
       },
       themCons: {
-        a: "Zdarma 3 odpovede denne.",
+        a: "Bezplatný plán má denný limit, štandardne 3 odpovede.",
         b: "Jeden model s kontextom 32 768 tokenov. Bez tvorby obrázkov, videa a hudby.",
         c: "Volanie API stojí 0,05 USD a kupuje sa oddelene od Pro.",
       },
@@ -1205,7 +1205,7 @@ export const translations: typeof enTranslations = {
         },
         q2: {
           q: "Je uncensored.ai zadarmo?",
-          a: "Bezplatný plán má tri odpovede denne. Pro stojí 9,99 USD mesačne alebo 99,99 USD ročne a limit odstraňuje. Na {{appName}} máš mesačne {{guestCredits}} kr. zdarma aj bez účtu.",
+          a: "Má bezplatný plán s denným limitom, štandardne 3 odpovede. Pro stojí 9,99 USD mesačne alebo 99,99 USD ročne a limit odstráni. Na {{appName}} funguje bez účtu {{guestCredits}} kreditov zadarmo mesačne.",
         },
         q3: {
           q: "Čím sa líši model od uncensored.ai?",
@@ -1213,7 +1213,7 @@ export const translations: typeof enTranslations = {
         },
         q4: {
           q: "Má uncensored.ai API?",
-          a: "Áno. API kompatibilné s OpenAI stojí 0,05 USD za spracovanie požiadavky a kredity sa kupujú samostatne. Na {{appName}} môžeš rovnaký model volať cez API kompatibilné s OpenAI aj Anthropic po aktivácii predplatného alebo kúpe kreditov.",
+          a: "Áno: API na vlastnom endpointe s telom požiadavky v štýle OpenAI, 0,05 USD za požiadavku, kredity sa kupujú samostatne od 5 USD. Na {{appName}} sa ten istý model volá cez naše API kompatibilné s OpenAI aj Anthropic po kúpe ľubovoľného plánu alebo kreditov.",
         },
       },
       cta: { title: "Porovnaj jeho názory s ostatnými modelmi" },
@@ -1229,25 +1229,25 @@ export const translations: typeof enTranslations = {
       hero: {
         title: "{{appName}} a OpenRouter",
         subtitle:
-          "Smerovač pre vývojárov so 474 modelmi a čet s modelmi bez cenzúry. Poplatky, filtre, súkromie a API.",
+          "Vývojársky router so 477 modelmi oproti četovej aplikácii s vstavanými modelmi bez cenzúry. Poplatky, filtre, súkromie a API.",
         readTime: "Čítanie na 6 minút",
       },
       intro: {
         lead: "OpenRouter je bežná voľba, ak chceš jeden kľúč API a stovky modelov. Používame ho aj my. Je to však smerovač pre vývojárov a modelov bez cenzúry má málo. Ak hľadáš alternatívu na četovanie, tu nájdeš priame porovnanie.",
-        p2: "Údaje o OpenRouter pochádzajú z cenníka, príručky o zbere údajov, podmienok a zoznamu modelov. Overené {{date}}. Naše údaje sa načítavajú priamo z konfigurácie.",
+        p2: "Fakty o OpenRouter z jeho FAQ, návodu na logovanie poskytovateľov, podmienok, dokumentácie API a verejného zoznamu modelov, overené {{date}}. Naše údaje čítame naživo z našej konfigurácie.",
       },
       relation:
         "Sme zákazníkom OpenRouter. Počet našich modelov cez jeho API: {{openRouterModels}}. Patria sem napríklad {{openRouterExamples}}. Pridávame čet, médiá a poskytovateľov modelov bez cenzúry, ktorých OpenRouter nemá.",
       verdict:
-        "OpenRouter si vyber, ak chceš jeden kľúč pre 474 modelov za ceny poskytovateľov so záložným smerovaním a máš vlastné rozhranie. {{appName}} si vyber, ak chceš hotový čet s modelmi bez cenzúry ({{uncensored}}), vrátane {{ownModel}} a upravených modelov, ktoré OpenRouter nemá. Získaš aj obrázky, video, hudbu a API, keď ho potrebuješ.",
+        "OpenRouter vyber, ak si vývojár a chceš jeden kľúč na 477 modelov za ceny poskytovateľov, s fallbackom, vlastnými kľúčmi a smerovaním s nulovým uchovávaním dát, a vlastné rozhranie si prinášaš. {{appName}} vyber, ak chceš hotový čet s {{uncensored}} modelmi bez cenzúry, vrátane {{ownModel}} a abliterovaných verzií, ktoré OpenRouter neuvádza, plus obrázky, video a hudbu a API, keď ho potrebuješ.",
       themPros: {
-        a: "474 modelov vo verejnom zozname za ceny poskytovateľov.",
+        a: "477 modelov vo verejnom zozname, bez prirážky na inferenciu.",
         b: "Bez predplatného. Na bezplatných modeloch 50 požiadaviek denne, po nákupe kreditov za 10 USD až 1 000.",
-        c: "Zaznamenávanie zadaní aj používanie tvojich údajov vyžaduje tvoj súhlas.",
+        c: "Prompty sa štandardne nelogujú, smerovanie s nulovým uchovávaním dát a vlastné kľúče zadarmo do 25 000 USD mesačne.",
       },
       themCons: {
-        a: "Pri štandardnom pláne poplatok 5,5 % za nákup kreditov.",
-        b: "Málo modelov bez cenzúry. Venice Uncensored a modely na hranie rolí ako Hermes 4 a Magnum. Zo 474 modelov má 142 označenie moderované.",
+        a: "Poplatok 5,5 % pri nákupe kreditov kartou, 5 % pri krypte.",
+        b: "Málo modelov bez cenzúry: 17 roleplayových alebo necenzurovaných tunov ako Venice Uncensored, Hermes 4 a Magnum a žiadne abliterované verzie.",
         c: "Nezameriava sa na bežné četovanie. Rozhranie si dodáš sám.",
       },
       usPros: {
@@ -1256,8 +1256,8 @@ export const translations: typeof enTranslations = {
         c: "API kompatibilné s OpenAI a Anthropic na čet, obrázky, video a reč s jedným zostatkom.",
       },
       usCons: {
-        a: "Menší katalóg. Máme {{modelCount}} četovacích modelov, OpenRouter má 474.",
-        b: "Naša prirážka {{markup}} % k nákladom poskytovateľov je vyššia než poplatok OpenRouter vo výške 5,5 %.",
+        a: "Menší katalóg: {{modelCount}} četových modelov oproti 477 na OpenRouter.",
+        b: "Naša prirážka {{markup}} % na náklady poskytovateľov je vyššia než poplatok 5,5 % na OpenRouter a nemáme vlastné kľúče ani smerovanie s nulovým uchovávaním dát.",
         c: "Ide predovšetkým o čet. Ponúka menej možností smerovania než špecializovaný smerovač.",
       },
       chooseThem: {
@@ -1278,15 +1278,15 @@ export const translations: typeof enTranslations = {
       faq: {
         q1: {
           q: "Existuje alternatíva k OpenRouter s modelmi bez cenzúry?",
-          a: "Áno. {{appName}} ponúka modely bez cenzúry ({{uncensored}}) od Venice, NanoGPT, uncensored.ai, FreedomGPT a Gab AI v jednom čete a cez jedno API. Modely bez cenzúry cez API ponúkajú aj NanoGPT a Venice. OpenRouter uvádza len niekoľko.",
+          a: "Áno. {{appName}} má {{uncensored}} modelov bez cenzúry od Venice, NanoGPT, uncensored.ai, FreedomGPT a Gab AI v jednom čete a jednom API. Medzi možnosťami len cez API pre abliterované váhy sú OpenUncensored, Refuseless a NEAR AI Cloud. Samotný OpenRouter abliterované modely neuvádza.",
         },
         q2: {
           q: "Povoľuje OpenRouter obsah NSFW?",
-          a: "Podmienky vyžadujú vek aspoň 18 rokov a služba kontroluje vstupy na prítomnosť známeho materiálu zobrazujúceho sexuálne zneužívanie detí. Každý poskytovateľ má vlastné pravidlá. Zo 474 modelov má 142 označenie moderované, takže prijatie požiadavky závisí od modelu a poskytovateľa.",
+          a: "Jeho podmienky vyžadujú vek 18+ a vstupy kontroluje na známy CSAM. Samostatné pravidlo pre sexuálny obsah neexistuje: platia podmienky každého modelu, takže či požiadavka prejde, závisí od modelu a poskytovateľa.",
         },
         q3: {
           q: "Koľko stojí OpenRouter?",
-          a: "Účtujú sa cenníkové ceny poskytovateľov za token a pri štandardnom pláne poplatok 5,5 % za nákup kreditov. Predplatné nie je potrebné. Bezplatné modely umožňujú 50 požiadaviek denne, po kúpe kreditov za 10 USD až 1 000.",
+          a: "Bez prirážky na inferenciu: ceny poskytovateľov za token plus poplatok 5,5 % pri nákupe kreditov kartou, 5 % pri krypte. Predplatné neexistuje. Bezplatné modely dovoľujú 50 požiadaviek denne, 1 000 po nákupe kreditov za 10 USD.",
         },
         q4: {
           q: "Môžem použiť kód pre OpenRouter s {{appName}}?",

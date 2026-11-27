@@ -23,8 +23,8 @@ import { scopedTranslation as compareTranslation } from "../../compare/i18n";
 import { guideCards } from "../guide-links";
 import { BLOG_POST_SLUGS } from "../posts-cards";
 import {
-  MARKET_CHECKED_DATE,
   MARKET_PLATFORMS,
+  marketCheckedDate,
   type MarketPlatform,
   type MarketPlatformKey,
 } from "./catalog";
@@ -72,6 +72,18 @@ function marketRow(
       open: t(`open.${platform.open}`),
     },
   };
+}
+
+/** Oldest and newest check date of a guide's extra (market) rows. */
+export function alternativesCheckedRange(slug: AlternativesSlug): {
+  from: string;
+  to: string;
+} {
+  const dates = ALTERNATIVE_GUIDES[slug].market
+    .map((key) => marketCheckedDate(MARKET_PLATFORMS[key]))
+    .toSorted();
+  const from = dates[0] ?? "";
+  return { from, to: dates.at(-1) ?? from };
 }
 
 export function alternativesTotal(
@@ -135,6 +147,7 @@ export function AlternativesComparison({
       ? [...marketRows, ...existingRows]
       : [...existingRows, ...marketRows];
   const reference = guide.subject;
+  const checked = alternativesCheckedRange(slug);
   const subject =
     "market" in reference
       ? marketRow(reference.market, locale, t, compareT)
@@ -144,7 +157,12 @@ export function AlternativesComparison({
   return (
     <ArticleSection id="table" title={title ?? t("title")}>
       <ArticleP>
-        {t("verify", { date: formatCompareDate(MARKET_CHECKED_DATE, locale) })}
+        {checked.from === checked.to
+          ? t("verify", { date: formatCompareDate(checked.to, locale) })
+          : t("verifyRange", {
+              from: formatCompareDate(checked.from, locale),
+              to: formatCompareDate(checked.to, locale),
+            })}
       </ArticleP>
       <CompareTable
         locale={locale}

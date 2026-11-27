@@ -17,7 +17,7 @@ export const translations = {
       "{{count}} alternatives and {{appName}}, compared on what their own pricing, privacy and filter pages say.",
   },
   intro: {
-    lead: "FreedomGPT pitches one subscription for hundreds of models, censor-free ones included. Good idea. The catches sit in its own FAQ, its privacy policy and a desktop app nobody has updated in years.",
+    lead: "FreedomGPT pitches one subscription for hundreds of models, uncensored ones included. Good idea. The catches: it never names those uncensored models, its privacy policy promises no privacy, and its desktop app has not been updated in years.",
     p2: "Below: what FreedomGPT actually promises, what its credits buy, and {{count}} alternatives checked on their own pages. FreedomGPT facts as of {{fgDate}}, the others as of {{date}}. We say where they beat us.",
     relation:
       "Full disclosure: we are a FreedomGPT customer. {{freedomGptExamples}} runs on {{appName}} through FreedomGPT's own API.",
@@ -25,22 +25,23 @@ export const translations = {
   fg: {
     title: "What FreedomGPT gives you",
     intro:
-      "From its home page, pricing page, privacy policy, API docs and GitHub, read on {{fgDate}}.",
+      "From its home page, pricing page, terms, privacy policy and API docs, read on {{fgDate}}.",
     models:
-      "Models: the home page claims 400+ models on one subscription and names ChatGPT, Claude, Gemini, Grok, Kimi, GLM, DeepSeek, Qwen, Llama, Mistral and more, next to uncensored options for writing, roleplay and research.",
+      "Models: the home page claims 400+ models on one subscription and names ChatGPT, Claude, Gemini, Grok, Kimi, GLM, DeepSeek, Qwen, Llama and more. It promises uncensored options but names no uncensored model. Its API defaults to a model called Liberty and does not say what it is.",
     filter:
-      "Filter: its own FAQ says a censor-free label does not guarantee that every request gets answered, and that model and service rules still apply.",
+      "Filter: its terms allow use only for lawful and ethical purposes and list nothing more specific. No minimum age is stated.",
     price:
       "Price: free to try with no card and no account. Pro costs {{proPrice}} a month for {{proCredits}} credits. Its own estimates: about {{replyCost}} credits per premium reply, {{imageCost}} per image, {{videoCost}} per five-second video.",
     bonus:
       "Signup bonus: 100 credits, but only for eligible new Google, Apple or X accounts. Email and password signups get none.",
     privacy:
-      "Privacy: the home page tells you not to assume anonymity or zero retention. The privacy policy says messages, voice recordings and images go to third-party AI providers, and it states no retention period.",
-    apps: "Apps and API: web, iPhone, iPad and Android. An API key comes from the dashboard; the docs list no prices. The open-source desktop app's last commit is from {{desktopDate}}.",
+      "Privacy: the home page tells you not to assume anonymity or zero retention. The privacy policy says FreedomGPT may collect and store any information you provide, that users have no expectation of privacy, and that messages go to AI providers to generate replies. It states no retention period.",
+    apps: "Apps and API: web, iPhone and Android. The API has chat, image, phone-call and video endpoints, but replies come back in FreedomGPT's own format, not the OpenAI schema, and the docs list no per-token prices. The open-source desktop app's last commit is from {{desktopDate}}.",
     why: "Why people look elsewhere: they want to know what a month really buys, want an offline app that is still maintained, or want a privacy policy that keeps chats off a server.",
     sourceHome: "FreedomGPT home page",
     sourcePricing: "FreedomGPT pricing",
     sourcePrivacy: "FreedomGPT privacy policy",
+    sourceTerms: "FreedomGPT terms of service",
     sourceApi: "FreedomGPT API docs",
     sourceRepo: "FreedomGPT desktop repo",
   },
@@ -111,7 +112,7 @@ export const translations = {
   privacy: {
     title: "Privacy: read the policy, not the slogan",
     intro: "What each side actually writes down.",
-    fg: "FreedomGPT: messages, voice recordings and images are shared with third-party AI providers. No retention period stated. Its own home page says not to assume anonymity.",
+    fg: "FreedomGPT: its policy says users have no expectation of privacy and that it may store anything you provide. Messages go to AI providers. No retention period stated. Its own home page says not to assume anonymity.",
     us: "{{appName}} incognito: chats live in your browser's local storage, not on our servers. Clear your browser data and they are gone.",
     local:
       "LM Studio and Ollama: the model runs on your machine and the prompt never leaves it. The price is your own hardware.",
@@ -143,11 +144,13 @@ export const translations = {
     },
     api: {
       q: "Which alternative has an uncensored API?",
-      a: "Venice, NanoGPT, uncensored.ai, Gab AI and {{appName}} all offer OpenAI-compatible APIs. FreedomGPT has one too, with no prices in its docs. On {{appName}} any plan from {{apiSubPrice}} a month unlocks the API.",
+      a: "Venice, NanoGPT, uncensored.ai, Gab AI and {{appName}} all offer OpenAI-compatible APIs. FreedomGPT has one too, in its own response format and with no prices in its docs. For abliterated weights by API only, OpenUncensored, Refuseless and NEAR AI Cloud sell them at provider price. On {{appName}} any plan from {{apiSubPrice}} a month unlocks the API.",
     },
     gabLink: "Gab AI alternatives, compared",
     nofilterLink: "NoFilterGPT alternatives, compared",
     noGpuLink: "Run uncensored models without a GPU",
+    openRouterLink: "Uncensored OpenRouter alternatives, compared",
+    apiLink: "Uncensored LLM API: model ids, code and limits",
   },
   cta: {
     title: "Know what you pay for. Then ask anything.",

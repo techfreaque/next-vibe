@@ -166,22 +166,22 @@ export const translations = {
   },
   platforms: {
     venice: {
-      what: "Privacy-first AI app with a large model catalog, many uncensored text models, image, video and music generation, an OpenAI-compatible API and a crypto staking layer (VVV and DIEM).",
+      what: "Privacy-first AI app with a large model catalog, its own uncensored fine-tunes, image, video, voice and music generation, an OpenAI-compatible API and a crypto token layer (VVV and DIEM).",
       pricingNote:
-        "Free: 10 text and 15 image prompts a day, base models only. 100 credits = $1. Video, music and frontier models cost credits on top.",
+        "Free: 10 text and 15 image prompts a day, base models only. 100 credits = $1. Pro Plus and Max include API spend. Video, music and frontier models cost credits on top. USDC works for credits, crypto for longer Pro terms.",
       models:
-        "Its API catalog lists 303 models, including 143 text models. The text catalog labels 17 uncensored. It also lists Claude, GPT, Gemini and Grok.",
+        "Its API catalog lists 145 text, 52 image, 160 video, 11 voice and 19 music models. Uncensored: its own Venice Uncensored 1.2 and Venice Role Play Uncensored fine-tunes, plus abliterated GLM, DeepSeek, Gemma and Qwen builds.",
       filterShort: "Mature filter on by default, Pro can turn it off",
       filter:
         "The Mature Filter is on by default. Pro users can switch it off in preferences. The terms require parental consent for ages 13 to 17 and require those users to keep the filter on.",
       privacyShort: "History stays on your device by default",
       privacy:
-        "Venice keeps chat history on your device by default. Its paid plans offer encrypted backup and restore. In Anonymous mode, Venice tells you to assume the model provider stores your content. Pro also offers hardware-isolated and end-to-end encrypted inference on selected models.",
+        "Venice keeps chat history on your device by default. It calls its Private mode trust-based, and in Anonymized mode it tells you to assume the model provider stores your content. Selected models run in hardware enclaves (through NEAR AI Cloud and Phala) or end-to-end encrypted.",
       apiShort: "",
-      api: "OpenAI-compatible API, billed per token in USD credits. Staked DIEM gives $1 of API credit a day. Accountless pay-per-request with USDC via x402.",
+      api: "OpenAI-compatible API with a Responses endpoint, billed per token in USD credits. No native Anthropic Messages API: its Claude Code guide runs a local translation proxy. x402 lets you pay per request from a USDC wallet with no account.",
       forWho:
         "Privacy-minded users who want uncensored chat and media in one app, plus developers and crypto holders.",
-      pro1: "Big catalog with many uncensored text models and cheap uncensored API prices.",
+      pro1: "Own uncensored fine-tunes plus abliterated builds at low per-token API prices.",
       pro2: "History stays on your device by default.",
       con1: "Free tier is tight: 10 text prompts a day on base models.",
       con2: "Disabling the adult filter requires Pro. Video, music and premium models use credits.",
@@ -189,38 +189,38 @@ export const translations = {
     uncensoredAi: {
       what: "Single-model uncensored chat app with a community forum and document archives. Web, iOS and Android.",
       pricingNote:
-        "Free: 3 responses a day. Pro prices are locked for life. Cards, Cash App, Apple Pay and Bitcoin. API credits sell separately at $0.05 per call.",
+        "Free: a daily cap, 3 responses by default. Pro prices are locked for life. Cards, Cash App, Apple Pay and Bitcoin. API credits sell separately: $0.05 per request, bought from $5.",
       models:
         "One model: UncensoredAI v1.2, 32K context, trained on books and documents banned from the mainstream internet. Its political opinions run against the mainstream.",
       filterShort: "No filter described, 18+ in terms",
       filter:
         "Calls itself an unrestricted AI platform. Terms require users to be 18 or older and ban content meant to harm, harass or endanger others.",
-      privacyShort: "Not used for training, per its policy",
+      privacyShort: "Never sold, text only to the model, per its pages",
       privacy:
-        "Its policy says your data is not used to train or improve AI models. Messages go to Parasail AI for processing. Pro keeps chat history with search and export.",
+        "Its pages say your data is never sold, rented or traded, and that AI requests carry your text only, never your name or email. Messages between users are end-to-end encrypted. No retention period is published.",
       apiShort: "",
-      api: "Drop-in OpenAI-compatible API at $0.05 per inference.",
+      api: "OpenAI-style request body on its own endpoint, billed per request at $0.05. Streaming, tools and the Anthropic format are not documented.",
       forWho:
         "People who distrust mainstream narratives and want blunt answers on contested topics.",
       pro1: "Cheapest paid plan in this list, price locked for life.",
-      pro2: "Not used for training, says its privacy policy.",
+      pro2: "Data never sold, rented or traded, it says.",
       con1: "One model, 32K context, no image, video or music generation.",
       con2: "Free tier is 3 responses a day; voice, folders and archives need Pro.",
     },
     nanoGpt: {
       what: "Pay-as-you-go web app and API for text, image, video and audio models. No subscription needed, optional plan for open models.",
       pricingNote:
-        "First deposit: $0.10 in crypto or $1 by card, then $5 for card deposits. Sign in to add balance. The web has one free model. PRO (it was $8 until May 2026) covers 60M input tokens a week on selected open-source text models plus 100 images a day, for personal use. Claude, GPT, Gemini and Grok draw from your balance.",
+        "First deposit: $0.10 in crypto (Bitcoin, Monero and others) or $1 by card, then $5 for card deposits. The web has one free model. PRO (it was $8 until May 2026) covers 60M input tokens a week, with free output on the included open-source text models. Claude, GPT, Gemini and Grok draw from your balance.",
       models:
-        "The public text-model API returned 596 entries, 38 with IDs containing uncensored, abliterated or Dolphin. Examples include Venice Uncensored, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored and a Kimi K3.1 Pro abliterated variant.",
+        "The public model API returned 610 entries, 54 of them abliterated, uncensored, Heretic, derestricted or similar fine-tunes. Examples include GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Qwen 3.8 27B Uncensored and abliterated Kimi K3.1 Pro builds. No model of its own.",
       filterShort: "No blanket NSFW ban, 18+",
       filter:
         "You must be at least 18 and old enough to enter a contract where you live. The terms ban child sexual abuse material and non-consensual intimate or sexually explicit content depicting identifiable people, including deepfakes. Providers may apply their own restrictions.",
       privacyShort: "History stays in your browser by default",
       privacy:
-        "History stays in your browser by default, with optional cloud sync. NanoGPT says it does not log prompts and responses during normal inference. API content logging and chat memory are optional. Certain provider routes may retain prompts or use them for training. In November 2026 NanoGPT disclosed prompt exposures at several upstream providers and dropped those routes.",
+        "History stays in your browser by default. NanoGPT says it does not log or retain prompts and responses during normal inference. API logging is optional, for 1 to 30 days. Private Mode sends requests to an encrypted enclave for 5% extra. In November 2026 NanoGPT disclosed prompt exposures at several upstream providers and dropped those routes.",
       apiShort: "",
-      api: "OpenAI-compatible API with Anthropic Messages support and accountless x402 payments. Some responses omit the cost or show an estimate while billing is pending.",
+      api: "OpenAI chat completions, Responses and Anthropic Messages on one key, plus images and video. Accountless pay-per-request over Lightning (L402). x402 payments were removed on 2026-11-20.",
       forWho:
         "Pay-per-use users and developers who want every model, crypto payments and no subscription.",
       pro1: "Huge model list, mostly at list price, entry from ten cents.",
@@ -231,49 +231,49 @@ export const translations = {
     openRouter: {
       what: "Developer API that routes one key to hundreds of models from many providers, billed per token from prepaid credits.",
       pricingNote:
-        "No subscription. Provider list prices plus a 5.5% fee on credit purchases. Free models: 50 requests a day, 1,000 after you buy $10 of credits.",
+        "No subscription and no markup on inference: provider prices plus a 5.5% fee on card credit purchases, 5% for crypto. Bring your own provider keys free up to $25,000 a month. Free models: 50 requests a day, 1,000 after you buy $10 of credits.",
       models:
-        "474 models, 15 free. Uncensored options are thin: Venice Uncensored (Dolphin Mistral 24B, hosted by Venice) and roleplay fine-tunes like Hermes 4 and Magnum. 142 models are flagged as moderated.",
-      filterShort: "Provider rules apply, many routes moderated",
+        "477 models, 11 free. Uncensored options are thin: 17 match roleplay or uncensored by name or description, such as Venice Uncensored (Dolphin Mistral 24B), Hermes 4 405B, Magnum and Euryale. Not one model ID says abliterated or uncensored.",
+      filterShort: "Provider rules apply per model",
       filter:
-        "Terms require 18+. OpenRouter screens inputs for known CSAM. Each provider keeps control of its own model, and moderated routes decline per the vendor's policy.",
-      privacyShort: "No prompt storage unless you opt in",
+        "Terms require 18+. OpenRouter screens inputs for known CSAM and malware. There is no separate sexual-content rule: you follow each model's own terms, so refusals depend on the model and its provider.",
+      privacyShort: "No prompt logging by default, ZDR routing",
       privacy:
-        "OpenRouter says it does not store prompts or responses unless you opt in. Metadata is always stored. Provider logging policies vary.",
+        "OpenRouter says it does not log prompts or completions unless you opt in, and opt-in logging earns a 1% discount. You can block providers that train on your data and route only to zero-data-retention endpoints, per account or per request.",
       apiShort: "",
-      api: "OpenAI-compatible API. This is the product.",
+      api: "OpenAI chat completions and Responses API with streaming and tools. This is the product.",
       forWho:
         "Developers who want one API key for many models with provider fallback.",
-      pro1: "Huge catalog at list prices, no subscription.",
-      pro2: "Logging and training are opt-in.",
-      con1: "Few uncensored models.",
+      pro1: "Huge catalog at provider prices, no markup on inference.",
+      pro2: "Zero-data-retention routing and free bring-your-own-key.",
+      con1: "Few uncensored models, no abliterated ones.",
       con2: "No consumer chat app focus: you bring the interface.",
     },
     freedomGpt: {
-      what: "All-in-one AI app: mainstream models next to its own censor-free model Liberty, with image and video generation. Also an older open-source desktop app for offline models.",
+      what: "All-in-one AI app on web, iPhone and Android: mainstream models next to uncensored options, with image and video generation. Also an API and an older open-source desktop app for offline models.",
       pricingNote:
-        "Start without a card or account. Pro includes 2,200 monthly credits and offers one-time top-ups. FreedomGPT estimates 10 credits for a premium reply, 25 for an image and 400 for a 5-second video.",
+        "Start without a card or account. Pro includes 2,200 monthly credits. FreedomGPT estimates 10 credits for a premium reply, 25 for an image and 400 for a 5-second video. New Google, Apple or X signups get 100 bonus credits.",
       models:
-        "ChatGPT, Claude, Gemini, Grok, DeepSeek, Qwen, Llama, Mistral and more, plus Liberty and other censor-free models in the same list. No total count published.",
-      filterShort: "Censor-free models, US law and ethics rules",
+        "Claims 400+ models on one subscription: ChatGPT, Claude, Gemini, Grok, Kimi, GLM, DeepSeek, Qwen, Llama and more. It promises uncensored options but names none. Its API defaults to a model called Liberty.",
+      filterShort: "Lawful and ethical use only",
       filter:
-        "FreedomGPT says everyone and every model it hosts must follow US law, and it does not allow its models to be used for unethical purposes. A censor-free label does not promise every request gets answered.",
-      privacyShort: "Messages shared with AI providers",
+        "Its terms allow use only for lawful and ethical purposes and list nothing more specific. No minimum age is stated.",
+      privacyShort: "No expectation of privacy, per its policy",
       privacy:
-        "FreedomGPT sends messages and attachments to the provider needed for the response. Its mobile privacy policy says providers may receive messages, recordings and images only to generate replies, and may not use them for their own purposes. It gives no fixed retention period for them.",
+        "The home page says not to assume anonymity or zero retention. The privacy policy says FreedomGPT may collect and store any information you provide, that users have no expectation of privacy, and that messages go to AI providers solely to generate responses. No retention period is published.",
       apiShort: "",
-      api: "API at chat.freedomgpt.com/api/v1 with a key from the dashboard. Pricing is not documented.",
+      api: "API at chat.freedomgpt.com/api/v1 with chat, image, phone-call and video endpoints. Replies come back in FreedomGPT's own format, not the OpenAI schema. No per-token prices published.",
       forWho:
-        "Users who want one subscription for many models with censor-free options.",
+        "Users who want one subscription for many models with uncensored options.",
       pro1: "Free start with no account or card.",
       pro2: "Images and video in the same app.",
-      con1: "Still bound by US law and an unethical-use rule.",
+      con1: "Its uncensored models go unnamed, and the terms add an ethics rule on top of the law.",
       con2: "The open-source desktop app has not been updated since June 2024.",
     },
     gabAi: {
       what: "Multi-model AI platform from Gab with 214 models, its own model Arya, an agent mode, image, video and music generation and desktop apps. Openly right-wing Christian positioning.",
       pricingNote:
-        "Free: 250 credits after email verification. One-time credit packs from $10 for 700 credits, never expire.",
+        "Free: 250 credits after email verification. Credit packs run from $10 for 700 credits to $250 for 31,250 and never expire. Business seats cost $20 or $99. Checkout runs through Whop.",
       models:
         "214 models on one account: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi and more. Arya is Gab's own model, built around Christian values and conservative principles.",
       filterShort: "Uncensored on speech, bans sexual content",
@@ -281,9 +281,9 @@ export const translations = {
         "Terms require 18+ and ban obscene, sexually explicit or pornographic content. Automated systems may scan content for compliance. Free on politics, not on adult content.",
       privacyShort: "Chats stored, used to improve models",
       privacy:
-        "Gab keeps your prompts, answers and history on its servers and lists improving its models as a purpose. Requests reach model providers through Gab's own accounts; its policy says this does not make a request anonymous.",
+        "Gab keeps your prompts, answers and history for as long as it deems necessary and lists improving its models as a purpose. Requests reach model providers through Gab's own accounts; its policy says this does not make a request anonymous.",
       apiShort: "",
-      api: "OpenAI and Anthropic compatible API. Requires a Plus plan.",
+      api: "OpenAI SDK chat completions at gab.ai/v1, with Responses and Anthropic Messages format examples and a Claude Code gateway. Requires a Plus plan.",
       forWho:
         "Conservative and Christian users who want AI built outside Big Tech.",
       pro1: "Large catalog, agent mode and desktop apps.",
@@ -508,7 +508,7 @@ export const translations = {
       },
       developers: {
         title: "API for uncensored models: NanoGPT, Venice or OpenRouter",
-        body: "NanoGPT and Venice carry many uncensored models at low per-token prices. OpenRouter has the widest catalog but few uncensored options.",
+        body: "NanoGPT and Venice carry many uncensored models at low per-token prices. OpenRouter has the widest catalog but no abliterated models.",
       },
       local: {
         title: "Total privacy, zero cost per message: Ollama or LM Studio",
@@ -590,6 +590,7 @@ export const translations = {
       modelsLink: "See all {{modelCount}} models with live prices",
       pricingLink: "Plans and free credits",
       guideLink: "Guide: every uncensored model and what it is good at",
+      apiLink: "Uncensored LLM API: every option, compared",
     },
     versus: {
       title: "Head-to-head comparisons",
@@ -649,7 +650,7 @@ export const translations = {
       },
       openRouter: {
         q: "Does OpenRouter have uncensored models?",
-        a: "A few: Venice Uncensored and roleplay fine-tunes like Hermes 4 and Magnum, and 142 of its 474 models are flagged as moderated. For more uncensored choice in one API, NanoGPT, Venice and {{appName}} carry far more.",
+        a: "A few: 17 of its 477 models match roleplay or uncensored, such as Venice Uncensored, Hermes 4 405B and Magnum, and none is abliterated. For more uncensored choice in one API, NanoGPT, Venice and {{appName}} carry far more.",
       },
       local: {
         q: "Can I run an uncensored AI on my own computer?",
@@ -692,14 +693,14 @@ export const translations = {
       verdict:
         "Pick Venice if you want its full catalog, local-only history and the cheapest per-token price on its own models, and you are fine paying for Pro to drop the mature filter. Pick {{appName}} if you want Venice's uncensored models next to Claude, GPT, uncensored.ai's model and abliterated GLM and DeepSeek builds from other providers, in one chat, with no filter to unlock beyond a one-time 18+ confirmation.",
       themPros: {
-        a: "303 models in its API catalog, including video, music and voice.",
+        a: "Its API catalog lists 145 text, 52 image, 160 video, 11 voice and 19 music models.",
         b: "History stays on your device by default. Strong privacy story.",
-        c: "Cheapest way to call Venice's own models: no middleman markup, plus DIEM staking for daily API credit.",
+        c: "Cheapest way to call Venice's own models: no middleman markup, and x402 pay-per-request from a USDC wallet with no account.",
       },
       themCons: {
         a: "Free tier: 10 text prompts a day, base models only.",
         b: "The mature filter is on by default. Turning it off needs Pro.",
-        c: "Only Venice's lineup: no uncensored.ai model, no models from providers Venice does not host.",
+        c: "No native Anthropic Messages API: its Claude Code guide runs a local translation proxy.",
       },
       usPros: {
         a: "Venice's uncensored models plus uncensored models from NanoGPT, uncensored.ai, FreedomGPT and Gab AI in one model picker.",
@@ -713,7 +714,7 @@ export const translations = {
       },
       chooseThem: {
         a: "You want the largest uncensored catalog from a single provider.",
-        b: "You hold or want to stake VVV for API credit.",
+        b: "You hold VVV or DIEM, or want to pay per request from a USDC wallet.",
         c: "You call Venice's models via API and every cent per token matters.",
       },
       chooseUs: {
@@ -733,7 +734,7 @@ export const translations = {
         },
         q2: {
           q: "Is Venice AI free?",
-          a: "Free accounts get 10 text and 15 image prompts a day on base models. Pro includes unlimited text, up to 1,000 images a day on Pro models, and the option to turn off the Mature Filter for adults.",
+          a: "Free accounts get 10 text and 15 image prompts a day on base models. Pro is the entry plan and lets adults turn off the Mature Filter. Pro Plus and Max add credits for video, music and API calls.",
         },
         q3: {
           q: "Is Venice cheaper than {{appName}}?",
@@ -767,7 +768,7 @@ export const translations = {
       relation:
         "No business relationship with Character.AI. You can bring a character over: paste its Character.AI link and {{appName}} imports it as a skill.",
       verdict:
-        "Pick Character.AI for safe-for-work fun with millions of ready-made characters, free and unlimited, or for anyone under 18. Pick {{appName}} if the filter keeps breaking your story: uncensored roleplay models after a one-time 18+ confirmation, model choice per message, and chats that are not used to train anyone's models.",
+        "Pick Character.AI for safe-for-work fun with millions of ready-made characters, free and unlimited, or for anyone under 18. Pick {{appName}} if the filter keeps breaking your story: uncensored roleplay models after a one-time 18+ confirmation, model choice per message, and no ad pixels or third-party trackers.",
       themPros: {
         a: "Millions of community characters, ready to chat.",
         b: "Unlimited free messages, cheap paid tiers.",
@@ -781,7 +782,7 @@ export const translations = {
       usPros: {
         a: "{{uncensored}} uncensored models, several built for roleplay. Scenes go where the story goes.",
         b: "Pick the model per message: an uncensored roleplay model for the scene, a frontier model for planning.",
-        c: "Incognito chats stay in your browser. We do not train models on your chats.",
+        c: "Incognito chats stay in your browser. No ad pixels or third-party trackers.",
       },
       usCons: {
         a: "Far fewer ready-made characters. You import or write your own.",
@@ -796,7 +797,7 @@ export const translations = {
       chooseUs: {
         a: "The filter keeps breaking your roleplay.",
         b: "You want to pick the model, not get one assigned.",
-        c: "You want your chats kept out of training and ad targeting.",
+        c: "You want a chat without ad pixels or third-party trackers.",
       },
       both: "Many people keep Character.AI for light chat and move the stories that need an adult model here, using the import to bring the character along.",
       switch: {
@@ -921,15 +922,15 @@ export const translations = {
       relation:
         "We are a NanoGPT customer: {{nanoGptModels}} of our models run through NanoGPT's API ({{nanoGptUncensored}} of them uncensored), including {{nanoGptExamples}}.",
       verdict:
-        "Pick NanoGPT for a broad catalog and pay-as-you-go access, including accountless API calls with x402. Pick {{appName}} for a tested selection across providers, free monthly credits, skills, memory and an open-source chat you can host yourself.",
+        "Pick NanoGPT for a broad catalog and pay-as-you-go access, including accountless API calls paid over Lightning. Pick {{appName}} for a tested selection across providers, free monthly credits, skills, memory and an open-source chat you can host yourself.",
       themPros: {
-        a: "596 text model entries. 38 IDs contain uncensored, abliterated or Dolphin.",
-        b: "No subscription needed. First top-up from $0.10 in crypto after signing in.",
+        a: "610 model entries, 54 of them abliterated, uncensored or similar fine-tunes.",
+        b: "No subscription needed. First top-up from $0.10 in crypto, Monero included.",
         c: "List prices on auto-routed models, cheaper than any middleman.",
       },
       themCons: {
         a: "Free tier is one model on the web.",
-        b: "Privacy depends on the provider route; some routes allow training.",
+        b: "Privacy depends on the provider route. Its encrypted Private Mode costs 5% extra.",
         c: "A catalog that big means you do the testing yourself.",
       },
       usPros: {
@@ -943,7 +944,7 @@ export const translations = {
         c: "Plans first: credit packs top up an active plan.",
       },
       chooseThem: {
-        a: "You want pay-as-you-go without a subscription, or accountless API calls via x402.",
+        a: "You want pay-as-you-go without a subscription, or accountless API calls paid over Lightning.",
         b: "You need an obscure model only a huge catalog carries.",
         c: "You build on the API and want list prices.",
       },
@@ -964,11 +965,11 @@ export const translations = {
         },
         q2: {
           q: "Does NanoGPT need an account?",
-          a: "The free web model works without an account. You must sign in to add balance on the website. The API supports accountless x402 payments.",
+          a: "The free web model works without an account, and a guest balance works with a sign-in token. Subscribing needs a sign-in. The API takes accountless Lightning (L402) payments; x402 was removed on 2026-11-20.",
         },
         q3: {
           q: "Do both have an API?",
-          a: "Yes. NanoGPT's API is OpenAI and Anthropic compatible with accountless payments. Ours is OpenAI and Anthropic compatible and unlocks after a plan or credit purchase.",
+          a: "Yes. NanoGPT's API speaks OpenAI chat completions, Responses and Anthropic Messages, with accountless Lightning payments. Ours speaks the same three formats and unlocks after a plan or credit purchase.",
         },
         q4: {
           q: "Which has more uncensored models?",
@@ -981,14 +982,14 @@ export const translations = {
       meta: {
         title: "FreedomGPT Alternative: {{appName}} vs FreedomGPT (2026)",
         description:
-          "{{appName}} vs FreedomGPT: Liberty and censor-free models, content rules, privacy, credits, API and open source. Facts with sources, both sides.",
+          "{{appName}} vs FreedomGPT: Liberty and uncensored options, content rules, privacy, credits, API and open source. Facts with sources, both sides.",
         keywords:
           "FreedomGPT alternative, FreedomGPT vs, FreedomGPT review, FreedomGPT pricing, FreedomGPT Pro, Liberty model, FreedomGPT uncensored, censor-free AI, uncensored ChatGPT alternative, {{appName}} vs FreedomGPT",
       },
       hero: {
         title: "{{appName}} vs FreedomGPT",
         subtitle:
-          "Two apps that put censor-free models next to ChatGPT, Claude and Gemini. Rules, privacy, credits, open source.",
+          "Two apps that put uncensored options next to ChatGPT, Claude and Gemini. Rules, privacy, credits, open source.",
         readTime: "6 min read",
       },
       intro: {
@@ -998,15 +999,15 @@ export const translations = {
       relation:
         "We are a FreedomGPT customer: {{freedomGptExamples}} runs on {{appName}} through FreedomGPT's own API.",
       verdict:
-        "Pick FreedomGPT for one $20 plan covering chat, images and video with a free start and no account. Pick {{appName}} if you want more uncensored models from several providers, no unethical-use clause on top of the law, published per-model prices and an open-source platform that is actively developed.",
+        "Pick FreedomGPT for one $20 plan covering chat, images and video with a free start and no account. Pick {{appName}} if you want named uncensored models from several providers, no ethics clause on top of the law, published per-model prices and an open-source platform that is actively developed.",
       themPros: {
         a: "Free with no card or account.",
-        b: "Liberty and other censor-free models next to ChatGPT, Claude and Gemini.",
+        b: "Uncensored options and its Liberty model next to ChatGPT, Claude and Gemini.",
         c: "Image and video generation in the same plan.",
       },
       themCons: {
-        a: "Models must follow US law and may not be used for unethical purposes, by its rules.",
-        b: "Messages, voice and images go to third-party providers; no retention period stated.",
+        a: "Its terms allow only lawful and ethical use, and its uncensored models go unnamed.",
+        b: "Its policy says users have no expectation of privacy, and it states no retention period.",
         c: "The open-source desktop app has not been updated since June 2024.",
       },
       usPros: {
@@ -1037,7 +1038,7 @@ export const translations = {
       faq: {
         q1: {
           q: "Is FreedomGPT really uncensored?",
-          a: "Its censor-free models drop most refusals, but FreedomGPT says every model it hosts must follow US law and may not be used for unethical purposes, and a censor-free label does not guarantee every request is answered.",
+          a: "FreedomGPT advertises uncensored options but names no model, and its terms allow only lawful and ethical use. On {{appName}} every uncensored model is named, has its own page and unlocks after a one-time 18+ confirmation.",
         },
         q2: {
           q: "How much does FreedomGPT cost?",
@@ -1147,7 +1148,7 @@ export const translations = {
       },
       intro: {
         lead: "uncensored.ai makes the most different uncensored model we know: {{ownModel}}, trained on books and documents banned from the mainstream internet, with political opinions that run against the mainstream. We run it through uncensored.ai's own API. So this page answers one question: should you use it on uncensored.ai, or here?",
-        p2: "uncensored.ai facts from its pricing page, API page, about page and privacy policy, checked {{date}}. Ours read live from our config.",
+        p2: "uncensored.ai facts from its pricing, API and about pages, checked {{date}}. Its privacy policy and terms did not load for us that day. Ours read live from our config.",
       },
       relation:
         "We are an uncensored.ai customer: {{uncensoredAiExamples}} runs on {{appName}} through uncensored.ai's API. Same model, our chat, our billing.",
@@ -1156,10 +1157,10 @@ export const translations = {
       themPros: {
         a: "Flat price: Pro is $9.99 a month or $99.99 a year, locked for life while you stay subscribed.",
         b: "Unlimited chats with the model for that price, plus voice mode, folders and archives.",
-        c: "Its privacy policy says your data is not used to train or improve AI models.",
+        c: "Its pages say your data is never sold, rented or traded, and the model gets your text only.",
       },
       themCons: {
-        a: "Free is 3 responses a day.",
+        a: "Free is a daily cap, 3 responses by default.",
         b: "One model, 32,768 tokens of context, no image, video or music generation.",
         c: "API calls cost $0.05 each and are bought separately from Pro.",
       },
@@ -1195,7 +1196,7 @@ export const translations = {
         },
         q2: {
           q: "Is uncensored.ai free?",
-          a: "It has a free tier with 3 responses a day. Pro costs $9.99 a month or $99.99 a year and removes the limit. On {{appName}}, {{guestCredits}} free credits a month work without an account.",
+          a: "It has a free tier with a daily cap, 3 responses by default. Pro costs $9.99 a month or $99.99 a year and removes the limit. On {{appName}}, {{guestCredits}} free credits a month work without an account.",
         },
         q3: {
           q: "What makes uncensored.ai's model different?",
@@ -1203,7 +1204,7 @@ export const translations = {
         },
         q4: {
           q: "Does uncensored.ai have an API?",
-          a: "Yes: an OpenAI-compatible API at $0.05 per inference, with credits bought separately. On {{appName}} the same model is callable through our OpenAI and Anthropic compatible API after any plan or credit purchase.",
+          a: "Yes: an API on its own endpoint with an OpenAI-style request body, $0.05 per request, credits bought separately from $5. On {{appName}} the same model is callable through our OpenAI and Anthropic compatible API after any plan or credit purchase.",
         },
       },
       cta: { title: "Put its takes next to every other model" },
@@ -1219,25 +1220,25 @@ export const translations = {
       hero: {
         title: "{{appName}} vs OpenRouter",
         subtitle:
-          "A developer router with 474 models against a chat app with uncensored models built in. Fees, filters, privacy and API.",
+          "A developer router with 477 models against a chat app with uncensored models built in. Fees, filters, privacy and API.",
         readTime: "6 min read",
       },
       intro: {
         lead: "OpenRouter is the default answer for one API key and hundreds of models. We use it ourselves. But it is a router for developers, not a chat app, and its uncensored shelf is thin. If you came looking for an OpenRouter alternative to chat with, this is the honest comparison.",
-        p2: "OpenRouter facts from its pricing page, data collection guide, terms and public model list, checked {{date}}. Ours read live from our config.",
+        p2: "OpenRouter facts from its FAQ, provider-logging guide, terms, API docs and public model list, checked {{date}}. Ours read live from our config.",
       },
       relation:
         "We are an OpenRouter customer: {{openRouterModels}} of our models run through OpenRouter's API, including {{openRouterExamples}}. We add the chat, the media and the uncensored providers it does not carry.",
       verdict:
-        "Pick OpenRouter if you are a developer who wants one key for 474 models at provider prices with fallback routing, and you bring your own interface. Pick {{appName}} if you want a finished chat with {{uncensored}} uncensored models, including {{ownModel}} and abliterated builds OpenRouter does not list, plus images, video and music, and an API when you need one.",
+        "Pick OpenRouter if you are a developer who wants one key for 477 models at provider prices, with fallback, bring-your-own-key and zero-data-retention routing, and you bring your own interface. Pick {{appName}} if you want a finished chat with {{uncensored}} uncensored models, including {{ownModel}} and abliterated builds OpenRouter does not list, plus images, video and music, and an API when you need one.",
       themPros: {
-        a: "474 models in its public model list, at provider prices.",
+        a: "477 models in its public model list, with no markup on inference.",
         b: "No subscription. Free models with 50 requests a day, 1,000 after you buy $10 of credits.",
-        c: "Prompt logging and use of your data are both opt-in.",
+        c: "No prompt logging by default, zero-data-retention routing and free bring-your-own-key up to $25,000 a month.",
       },
       themCons: {
-        a: "A 5.5% fee on credit purchases on the standard plan.",
-        b: "Few uncensored models: Venice Uncensored plus roleplay fine-tunes like Hermes 4 and Magnum. 142 of its 474 models are flagged as moderated.",
+        a: "A 5.5% fee on card credit purchases, 5% for crypto.",
+        b: "Few uncensored models: 17 roleplay or uncensored tunes such as Venice Uncensored, Hermes 4 and Magnum, and no abliterated builds.",
         c: "No consumer chat focus: you bring the interface.",
       },
       usPros: {
@@ -1246,8 +1247,8 @@ export const translations = {
         c: "OpenAI and Anthropic compatible API for chat, images, video and speech on the same balance.",
       },
       usCons: {
-        a: "Smaller catalog: {{modelCount}} chat models against OpenRouter's 474.",
-        b: "Our {{markup}}% markup on provider costs is above OpenRouter's 5.5% fee.",
+        a: "Smaller catalog: {{modelCount}} chat models against OpenRouter's 477.",
+        b: "Our {{markup}}% markup on provider costs is above OpenRouter's 5.5% fee, and we have no bring-your-own-key or zero-data-retention routing.",
         c: "Built as a chat first: fewer routing controls than a dedicated router.",
       },
       chooseThem: {
@@ -1268,15 +1269,15 @@ export const translations = {
       faq: {
         q1: {
           q: "Is there an OpenRouter alternative with uncensored models?",
-          a: "Yes. {{appName}} carries {{uncensored}} uncensored models from Venice, NanoGPT, uncensored.ai, FreedomGPT and Gab AI in one chat and one API. NanoGPT and Venice also sell uncensored models by API. OpenRouter itself lists only a few.",
+          a: "Yes. {{appName}} carries {{uncensored}} uncensored models from Venice, NanoGPT, uncensored.ai, FreedomGPT and Gab AI in one chat and one API. API-only options for abliterated weights include OpenUncensored, Refuseless and NEAR AI Cloud. OpenRouter itself lists no abliterated models.",
         },
         q2: {
           q: "Does OpenRouter allow NSFW content?",
-          a: "Its terms require 18+ and it screens inputs for known CSAM. Each provider keeps its own rules, and 142 of the 474 models in its list are flagged as moderated, so whether a request passes depends on the model and the provider.",
+          a: "Its terms require 18+ and it screens inputs for known CSAM. There is no separate sexual-content rule: each model's own terms apply, so whether a request passes depends on the model and the provider.",
         },
         q3: {
           q: "How much does OpenRouter charge?",
-          a: "Provider list prices per token, plus a 5.5% fee on credit purchases on the standard plan. There is no subscription. Free models allow 50 requests a day, 1,000 once you have bought $10 of credits.",
+          a: "No markup on inference: provider prices per token, plus a 5.5% fee on card credit purchases, 5% for crypto. There is no subscription. Free models allow 50 requests a day, 1,000 once you have bought $10 of credits.",
         },
         q4: {
           q: "Can I use my OpenRouter code with {{appName}}?",

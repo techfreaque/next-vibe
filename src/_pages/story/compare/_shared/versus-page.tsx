@@ -39,6 +39,7 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
+import { guideCards } from "../../blog/guide-links";
 import { scopedTranslation } from "../i18n";
 import {
   allPlansText,
@@ -54,6 +55,7 @@ import {
   COMPARE_HUB_PATH,
   platformCheckedDate,
   PLATFORMS,
+  VERSUS_GUIDES,
   VERSUS_PUBLISHED_DATES,
   type VersusKey,
   versusPath,
@@ -360,6 +362,15 @@ export function VersusPage(data: VersusPageData): JSX.Element {
         </ArticleSection>
 
         <ArticleSection id="more" title={t("common.versus.moreTitle")}>
+          <Div className="flex flex-col">
+            {guideCards(locale, VERSUS_GUIDES[versus]).map((guide) => (
+              <CardLink
+                key={guide.slug}
+                href={`/${locale}${guide.path}`}
+                label={guide.title}
+              />
+            ))}
+          </Div>
           <CompareLinks locale={locale} exclude={versus} />
         </ArticleSection>
 

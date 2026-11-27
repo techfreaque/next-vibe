@@ -4,6 +4,8 @@ export const translations: typeof enTranslations = {
   title: "Comparativa de plataformas",
   verify:
     "Verificamos las demás opciones el {{date}} en las fuentes oficiales enlazadas. En el móvil, desplaza la tabla hacia los lados para ver todas las columnas. Los límites dependen del plan y del país.",
+  verifyRange:
+    "Opciones adicionales comprobadas en las fuentes oficiales enlazadas entre el {{from}} y el {{to}}. En el móvil, desliza hacia los lados para ver todas las columnas. Los límites varían según el plan y la región.",
   related: "Más guías de alternativas",
   kind: {
     chat: "Chat con menos rechazos",
@@ -60,6 +62,8 @@ export const translations: typeof enTranslations = {
     localOption: "En el dispositivo con un modelo local",
     upstream: "Depende del proveedor del modelo",
     noLogs: "El proveedor afirma que no guarda registros de prompts",
+    noDisk:
+      "El proveedor dice que no guarda en disco ninguna entrada de la API",
   },
   api: {
     separate: "API como producto aparte",
@@ -174,7 +178,7 @@ export const translations: typeof enTranslations = {
       "Pasarela de IA con trazas de solicitudes y seguimiento del gasto. Revisa qué se registra antes de enviar datos sensibles.",
     eden: "Una API para modelos de lenguaje, OCR o traducción. Las funciones dependen del proveedor elegido.",
     together:
-      "Inferencia sin servidor y puntos de acceso dedicados para modelos abiertos. Comprueba que aloje el modelo que necesitas.",
+      "Inferencia serverless y dedicada con las API de OpenAI, Responses y Anthropic Messages, además de imágenes, video y voz. Sin modelos sin censura, y sus términos prohíben la pornografía.",
     bifrost:
       "Aloja una pasarela en Go con conmutación por error y caché semántica. Tú configuras el despliegue y el acceso a proveedores.",
     truefoundry:
@@ -182,7 +186,7 @@ export const translations: typeof enTranslations = {
     llmGateway:
       "Compatible con OpenAI y Anthropic, con opción de alojamiento propio. La facturación y retención dependen del despliegue.",
     deepInfra:
-      "Inferencia alojada para modelos abiertos y despliegues de GPU privados. Elige del catálogo o configura la infraestructura.",
+      "De los más baratos por token en modelos abiertos estándar, con 200 solicitudes simultáneas por modelo por defecto. Su catálogo no incluye modelos sin censura ni de rol.",
     bedrock:
       "Catálogo gestionado con controles de acceso de AWS. Los modelos y funciones dependen de la región.",
     kong: "Añade enrutamiento de modelos y políticas a una pasarela de API. Consulta qué complementos incluye tu edición.",
@@ -213,7 +217,7 @@ export const translations: typeof enTranslations = {
     sandbase:
       "Combina llamadas a modelos, datos web y entornos aislados de código en una API. Las llamadas gratuitas tienen un límite diario.",
     openUncensored:
-      "Clave prepago, sin cuenta: 58 modelos de texto abliterated y sin censura, más modelos de imagen y vídeo, ordenados por rechazos medidos. Se cobra el precio por token del proveedor que responde, recargas desde 5 $.",
+      "Clave prepago, sin cuenta ni correo: 58 modelos de texto, casi todos abliterados, más fine-tunes de rol, 20 modelos de imagen y 3 de video. Precio del proveedor sin comisión, recargas desde 5 USD que nunca caducan. Sin plan gratis ni chat web.",
     risuAi:
       "Cliente de chat con personajes de código abierto, con libros de ambientación, chats de grupo, imágenes de emociones y TTS. La API del modelo la aportas y la pagas tú.",
     agnai:
@@ -223,19 +227,29 @@ export const translations: typeof enTranslations = {
     talemate:
       "Motor de rol multiagente con narrador, director y seguimiento del estado del mundo. Una herramienta de instalación propia para usuarios avanzados.",
     featherless:
-      "Acceso mensual de tarifa plana a miles de modelos abiertos, finetunes sin censura incluidos, con una sola clave API. El plan Chat limita el contexto y las solicitudes en paralelo.",
+      "Más de 50.000 modelos de Hugging Face con una sola clave, 1.398 etiquetados como abliterated y 1.605 como uncensored. El plan Chat de 25 USD ofrece tokens ilimitados, pero con 32K de contexto, poca concurrencia y solo para uso personal.",
     arliAi:
-      "Planes con tokens ilimitados para modelos abiertos y sin restricciones, más imágenes. Los planes más baratos permiten una solicitud a la vez.",
+      "Tokens ilimitados con planes de tarifa plana desde 15 USD: unos 121 modelos de texto, muchos fine-tunes derestricted o sin censura, y generación de imágenes. Core y Plus procesan una solicitud a la vez.",
     infermatic:
-      "Planes mensuales para un pequeño grupo de modelos de texto sin censura, con la promesa de no guardar registros. El plan gratis tiene un modelo y no incluye API.",
+      "Planes de tarifa plana desde 9 USD con una selección curada de tunes de 70B sin censura y de rol, y promesa de no guardar logs. El plan gratis es solo web y los planes individuales no pueden alimentar apps.",
     chutes:
-      "Inferencia descentralizada de pago por token para texto, imágenes, video y audio. Sin plan gratis.",
+      "Inferencia descentralizada de pago por token, con la mayoría de los modelos de texto en computación confidencial y pagos en cripto. Sin modelos sin censura y sin plan gratis.",
     kagi: "Asistente multimodelo incluido con la búsqueda de Kagi. Los hilos se borran a las 24 horas por defecto, y los modelos punteros exigen el plan más alto.",
     huggingChat:
       "Chat con modelos abiertos a través de un enrutador automático. El código del chat es abierto, y la inferencia se cobra con créditos de Hugging Face.",
     zai: "El chat propio de Zhipu para los modelos GLM, con una API aparte. Su política de privacidad incluye el contenido de los mensajes para entrenar modelos.",
     ourDream:
       "Creador de compañeros para adultos con chat, imágenes y video. Los medios funcionan con monedas que solo puedes comprar con un plan activo.",
+    refuseless:
+      "Host solo de API para GLM 5.3, DeepSeek V4.1 Flash y Kimi K3.1 Pro abliterados con contexto de 1M, en formatos OpenAI, Responses y Anthropic Messages. Pide un correo verificado y no tiene app de chat.",
+    nearAi:
+      "API de computación confidencial con dos modelos abliterados y atestación por hardware. Sin solicitud de acceso ni verificación de identidad, y se paga por token.",
+    uncensoredLlmAi:
+      "Pasarela prepago con 332 modelos de chat abliterados y sin censura, y una revisión diaria de rechazos. Tarjeta o cripto desde 3 USD, y la reventa está prohibida sin consentimiento por escrito.",
+    abliterationAi:
+      "Modelos abliterados propios en formatos OpenAI y Anthropic, una región de la UE y una capa de políticas para tus propias reglas. Planes desde 20 USD al mes.",
+    mancer:
+      "Fine-tunes de rol como MythoMax y Magnum con un plan gratis, MythoLite. Sin modelos abliterados, y sus términos prohíben el material obsceno o lascivo.",
   },
   articles: {
     "nofiltergpt-alternatives": {
@@ -259,7 +273,7 @@ export const translations: typeof enTranslations = {
       question:
         "¿Qué alternativa a OpenRouter encaja en una aplicación en producción?",
       answer:
-        "Vercel ofrece acceso alojado sin recargo por token. Con LiteLLM o Bifrost operas tu propia pasarela con tus cuentas de proveedores. Para monitorización o control de políticas, compara Portkey, Cloudflare y Helicone. Revisa las rutas de respaldo, la retención de datos y las comisiones.",
+        "Para tráfico sin censura: OpenUncensored, Refuseless o NEAR AI Cloud para pesos abliterados a precio del proveedor, y {{appName}} si además necesitas modelos convencionales, medios y un chat con la misma clave. Para enrutar tus propias cuentas de proveedor: LiteLLM o Bifrost autoalojados, Vercel alojado y sin margen sobre los tokens. Revisa fallbacks, retención y comisiones antes de mover tu tráfico.",
     },
     "venice-ai-alternatives": {
       question:

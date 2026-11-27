@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatívy k Venice AI na súkromný čet (2026)",
     description:
-      "Venice AI oproti {{appName}}, Maple, Proton Lumo, Duck.ai, NanoGPT a lokálnym aplikáciám. Kde sa spracúvajú zadania, aké majú filtre a ceny.",
+      "Venice AI oproti {{appName}}, OpenUncensored, NEAR AI Cloud, Maple, Proton Lumo, NanoGPT a lokálnym aplikáciám. Kde sa spracúvajú zadania, ktoré modely odmietajú menej, ktoré formáty API fungujú a čo stojí navyše.",
     category: "Porovnanie",
     imageAlt: "Porovnanie alternatív k Venice AI",
     keywords:
@@ -13,13 +13,13 @@ export const translations: typeof enTranslations = {
   hero: {
     backToBlog: "Späť na blog",
     category: "Porovnanie",
-    readTime: "9 min čítania",
+    readTime: "10 min čítania",
     title: "Alternatívy k Venice AI na súkromný čet",
     subtitle:
       "{{appName}} a ďalšie alternatívy ({{count}}) podľa ich cenníkov, filtrov a zásad súkromia. Údaje overené {{date}}.",
   },
   intro: {
-    lead: "Venice si vybudovalo meno na dvoch sľuboch: súkromie a čet bez cenzúry. Veľa z toho dodržiava. Bezplatný plán má však tesné limity, vypnutie filtra pre dospelých vyžaduje Pro a nie každý chce popri čete riešiť staking kryptomien.",
+    lead: "Venice si vybudovalo meno na dvoch sľuboch: súkromie a čet bez cenzúry. Veľa z toho dodržiava. Bezplatný plán však dáva 10 textových zadaní denne, filter pre dospelých vyžaduje Pro a jeho API nemá natívny endpoint Anthropic.",
     p2: "Alternatívy sme porovnali podľa cien, zásad súkromia a filtrov, ktoré zverejňovali k {{date}}. S Venice spolupracujeme ako zákazník. {{appName}} cez Venice sprístupňuje {{veniceModels}} modelov, z toho {{veniceUncensored}} bez cenzúry. Uvádzame aj to, kde má Venice navrch.",
   },
   criteria: {
@@ -51,9 +51,23 @@ export const translations: typeof enTranslations = {
     price:
       "Cena: Mesačne dostaneš {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s účtom. Plány začínajú na {{subPrice}} mesačne. K aktívnemu plánu si môžeš dokúpiť kredity, ktoré nevypršia.",
     api: "API: Rovnaké modely sú dostupné cez rozhrania kompatibilné s OpenAI aj Anthropicom. Prístup získaš s ktorýmkoľvek plánom od {{apiSubPrice}} mesačne.",
-    weak: "Kde má Venice navrch: Má väčší katalóg a za token vlastných modelov si účtuje menej, lebo my k jeho cene pripočítavame maržu. Kryptomenový staking ako VVV alebo DIEM neponúkame.",
+    weak: "Kde sme slabší: katalóg Venice je väčší a na vlastných modeloch je Venice lacnejšie za token, lebo k cene, ktorú platíme my, pripočítavame prirážku {{markup}} %. Nemáme platbu za požiadavku cez x402 ani tokenovú vrstvu ako VVV či DIEM: naše API vyžaduje účet a nákup.",
     directoryLink: "Všetky abliterované modely, ich kontext a ceny",
     ownLink: "Pozrieť si {{ownModel}}",
+  },
+  veniceApi: {
+    title: "API Venice, overené {{veniceDate}}",
+    intro: "Čo dostanú vývojári, než sa poobzerajú inde.",
+    formats:
+      "Formáty: čet kompatibilný s OpenAI s endpointom Responses. Žiadne natívne API Anthropic Messages: jeho vlastný návod pre Claude Code používa lokálny prekladový proxy.",
+    payment:
+      "Platba: kľúč API vyžaduje účet, alebo cez x402 platíš za každú požiadavku z peňaženky USDC, úplne bez účtu.",
+    models:
+      "Vlastné modely: Venice Uncensored 1.2 a Venice Role Play Uncensored, jeho vlastné fine-tuny, popri abliterovaných verziách GLM, DeepSeek, Gemma a Qwen.",
+    terms:
+      "Podmienky: zákaz prepredaja prístupu a zákaz použitia API v rizikových oblastiach.",
+    us: "Na {{appName}} hovorí jeden kľúč formátmi OpenAI chat completions, Responses aj Anthropic Messages. Claude Code sa pripojí priamo, vrátane modelov Venice.",
+    apiLink: "API LLM bez cenzúry: ID modelov, kód a limity",
   },
   list: {
     title: "Alternatívy: {{count}} možností podrobne",
@@ -85,7 +99,7 @@ export const translations: typeof enTranslations = {
     title: "Kedy sa ešte oplatí vybrať Venice",
     intro: "Niekedy sa viac oplatí zostať pri pôvodnej službe.",
     crypto:
-      "Vlastníš VVV alebo DIEM, prípadne chceš platiť za volania API bez účtu. Ostatné služby v zozname túto možnosť neposkytujú rovnakým spôsobom.",
+      "Držíš VVV alebo DIEM, alebo chceš platiť za každú požiadavku API z peňaženky USDC bez účtu. Nikto iný v tomto zozname to nerobí rovnako.",
     versusLink: "{{appName}} a Venice: úplné porovnanie",
   },
   faq: {
@@ -96,7 +110,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k Venice AI?",
-      a: "Áno. FreedomGPT sa dá vyskúšať bezplatne a bez účtu. LM Studio je zadarmo na vlastnom zariadení. {{appName}} poskytuje {{guestCredits}} kred. mesačne bez účtu alebo {{freeCredits}} s účtom. Modely bez cenzúry sprístupní po jednorazovom potvrdení veku 18+.",
+      a: "Áno. Bezplatný plán Venice dáva 10 textových a 15 obrazových zadaní denne. FreedomGPT začína zadarmo a bez účtu. LM Studio je zadarmo na tvojom hardvéri. {{appName}} dáva mesačne {{guestCredits}} kreditov zadarmo bez účtu a {{freeCredits}} s účtom, vrátane modelov bez cenzúry po jednorazovom potvrdení veku 18+.",
     },
     private: {
       q: "Ktorá alternatíva k Venice poskytuje najviac súkromia?",
@@ -104,11 +118,11 @@ export const translations: typeof enTranslations = {
     },
     api: {
       q: "Ktorá alternatíva ponúka API bez cenzúry?",
-      a: "NanoGPT, uncensored.ai, Gab AI, OpenRouter aj {{appName}} ponúkajú API kompatibilné s OpenAI. Ponuka modelov bez cenzúry sa výrazne líši. OpenRouter ich má málo, NanoGPT veľa. Na {{appName}} získaš prístup k API s plánom od {{apiSubPrice}} mesačne.",
+      a: "NanoGPT, uncensored.ai, Gab AI, OpenRouter aj {{appName}} ponúkajú API kompatibilné s OpenAI. Na abliterované váhy len cez API ich za cenu poskytovateľa predávajú OpenUncensored a NEAR AI Cloud. Pokrytie sa veľmi líši: OpenRouter nemá abliterované modely, NanoGPT ich má desiatky. Na {{appName}} odomkne API ktorýkoľvek plán od {{apiSubPrice}} mesačne.",
     },
     same: {
       q: "Môžem modely od Venice používať aj inde?",
-      a: "Niektoré áno. {{appName}} sprístupňuje cez Venice {{veniceModels}} modelov vrátane {{veniceExamples}} v tom istom čete ako Claude, GPT a ďalšie. OpenRouter aj NanoGPT ponúkajú tiež Venice Uncensored.",
+      a: "Niektoré. {{appName}} smeruje {{veniceModels}} modelov cez Venice, vrátane {{veniceExamples}}, v tom istom čete ako Claude, GPT a ostatné. Venice Uncensored uvádzajú aj OpenRouter, NanoGPT a OpenUncensored.",
     },
     account: {
       q: "Potrebujem účet, aby som si to vyskúšal?",
@@ -116,6 +130,7 @@ export const translations: typeof enTranslations = {
     },
     noGpuLink: "Spustiť LLM bez cenzúry online aj bez grafickej karty",
     apiLink: "API pre LLM bez cenzúry: identifikátory modelov, kód a limity",
+    openRouterLink: "Alternatívy k OpenRouter bez cenzúry v porovnaní",
   },
   cta: {
     title: "Súkromný čet aj modely bez cenzúry podľa potreby",

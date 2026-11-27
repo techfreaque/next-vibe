@@ -11,6 +11,7 @@
 
 import { ApiProvider } from "next-vibe/agent/models/models";
 
+import type { BlogPostSlug } from "../../blog/posts-meta";
 import type { UpstreamProvider } from "./us-facts";
 
 /** Original verification date, used until a platform's full re-check. */
@@ -18,7 +19,7 @@ export const COMPARE_CHECKED_DATE = "2026-11-17";
 /** Day the comparison pages first shipped. */
 export const COMPARE_PUBLISHED_DATE = "2026-11-17";
 /** Latest re-check of any single platform (newest `checkedDate` below). */
-export const COMPARE_LATEST_CHECK_DATE = "2026-11-25";
+export const COMPARE_LATEST_CHECK_DATE = "2026-11-27";
 
 export const COMPARE_BASE_PATH = "/story/compare";
 export const COMPARE_HUB_PATH = `${COMPARE_BASE_PATH}/uncensored-ai-platforms`;
@@ -131,17 +132,22 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "yes", video: "yes", voice: "yes" },
     upstream: ApiProvider.VENICE_AI,
-    checkedDate: "2026-11-24",
+    // Re-checked 2026-11-27: pricing, API model catalog (145 text, 52 image,
+    // 160 video, 11 TTS, 19 music), pricing docs, about page (x402), Claude
+    // Code guide (local proxy, no native Messages API), privacy, terms, FAQ.
+    checkedDate: "2026-11-27",
     sources: [
       { kind: "pricing", url: "https://venice.ai/pricing" },
       { kind: "privacy", url: "https://venice.ai/privacy" },
       { kind: "terms", url: "https://venice.ai/legal/tos" },
-      { kind: "models", url: "https://docs.venice.ai/models/overview" },
-      { kind: "models", url: "https://docs.venice.ai/models/text" },
+      { kind: "models", url: "https://api.venice.ai/api/v1/models" },
+      { kind: "pricing", url: "https://docs.venice.ai/overview/pricing" },
+      { kind: "api", url: "https://docs.venice.ai/overview/about-venice" },
       {
-        kind: "api",
-        url: "https://docs.venice.ai/guides/integrations/x402-venice-api",
+        kind: "docs",
+        url: "https://docs.venice.ai/guides/integrations/claude-code",
       },
+      { kind: "help", url: "https://venice.ai/faqs/all" },
       { kind: "docs", url: "https://docs.venice.ai/overview/vvv-diem" },
       {
         kind: "help",
@@ -165,11 +171,13 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "no", video: "no", voice: "yes" },
     upstream: ApiProvider.UNCENSORED_AI,
-    // Re-checked 2026-11-24: pricing (3 free responses a day, Pro $9.99/month
-    // or $99.99/year locked for life), API page ($0.05 per inference,
-    // UncensoredAI v1.2, 32,768 context), privacy policy (not used for
-    // training, Parasail AI processes messages).
-    checkedDate: "2026-11-24",
+    // Re-checked 2026-11-27 from the site's own JS bundles: pricing (daily
+    // free response cap, default 3; Pro $9.99/month or $99.99/year locked
+    // for life), API page (`uncensored-lm`, 32,768 context, $0.05 per
+    // request, credits from $5), privacy wording ("never sold, rented or
+    // traded", text only to the model). The JS-rendered privacy policy and
+    // terms were unreachable that day.
+    checkedDate: "2026-11-27",
     sources: [
       { kind: "pricing", url: "https://uncensored.ai/pricing" },
       { kind: "api", url: "https://uncensored.ai/api" },
@@ -191,13 +199,19 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "yes", video: "yes", voice: "yes" },
     upstream: ApiProvider.NANO_GPT,
-    checkedDate: "2026-11-25",
+    // Re-checked 2026-11-27: pricing, privacy, terms, docs intro (x402
+    // removed 2026-11-20, Lightning L402 instead) and the detailed models
+    // API (610 models, 54 abliterated/uncensored/fine-tune ids).
+    checkedDate: "2026-11-27",
     sources: [
       { kind: "pricing", url: "https://nano-gpt.com/pricing" },
       { kind: "privacy", url: "https://nano-gpt.com/privacy" },
-      { kind: "terms", url: "https://nano-gpt.com/legal/terms-of-service" },
-      { kind: "api", url: "https://nano-gpt.com/api" },
-      { kind: "models", url: "https://api.nano-gpt.com/api/v1/models" },
+      { kind: "terms", url: "https://nano-gpt.com/terms" },
+      { kind: "api", url: "https://docs.nano-gpt.com/introduction" },
+      {
+        kind: "models",
+        url: "https://nano-gpt.com/api/v1/models?detailed=true",
+      },
       { kind: "docs", url: "https://nano-gpt.com/llms-full.txt" },
       {
         kind: "blog",
@@ -218,17 +232,23 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "partial", video: "partial", voice: "partial" },
     upstream: ApiProvider.OPENROUTER,
-    // Re-checked 2026-11-24: pricing page (5.5% fee, 50/1,000 free requests
-    // a day), data-collection guide, terms (18+, CSAM screening) and the
-    // public models API (474 models, 15 free, 142 moderated).
-    checkedDate: "2026-11-24",
+    // Re-checked 2026-11-27: FAQ (no inference markup, 5.5% fee on card
+    // credits, 5% crypto, BYOK free to $25k a month, 50/1,000 free requests
+    // a day), provider-logging guide (ZDR routing), terms (18+, CSAM
+    // screening), API overview and the public models API (477 models, 11
+    // free, 17 RP or uncensored by name or description, 0 abliterated ids).
+    checkedDate: "2026-11-27",
     sources: [
-      { kind: "pricing", url: "https://openrouter.ai/pricing" },
+      { kind: "docs", url: "https://openrouter.ai/docs/faq" },
       {
         kind: "privacy",
-        url: "https://openrouter.ai/docs/guides/privacy/data-collection",
+        url: "https://openrouter.ai/docs/guides/privacy/provider-logging",
       },
       { kind: "terms", url: "https://openrouter.ai/terms" },
+      {
+        kind: "api",
+        url: "https://openrouter.ai/docs/api/reference/overview",
+      },
       { kind: "models", url: "https://openrouter.ai/api/v1/models" },
     ],
   },
@@ -245,19 +265,18 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: true,
     media: { image: "yes", video: "yes", voice: "partial" },
     upstream: ApiProvider.FREEDOMGPT,
-    checkedDate: "2026-11-24",
+    // Re-checked 2026-11-27: home, pricing, privacy policy, terms and the
+    // API reference (default model id `liberty`, non-standard response
+    // schema). The desktop repo date is from the 2026-11-24 check.
+    checkedDate: "2026-11-27",
     sources: [
       { kind: "home", url: "https://www.freedomgpt.com/" },
       { kind: "pricing", url: "https://chat.freedomgpt.com/pricing" },
-      {
-        kind: "blog",
-        url: "https://www.freedomgpt.com/blog/what-is-uncensored-ai",
-      },
       { kind: "privacy", url: "https://www.freedomgpt.com/privacy-policy" },
       { kind: "terms", url: "https://www.freedomgpt.com/terms-of-service" },
       {
         kind: "api",
-        url: "https://docs.freedomgpt.com/api-reference/introduction",
+        url: "https://docs.freedomgpt.com/api-reference/endpoint/create.md",
       },
       { kind: "repo", url: "https://github.com/ohmplatform/FreedomGPT" },
     ],
@@ -279,17 +298,21 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "yes", video: "yes", voice: "yes" },
     upstream: ApiProvider.GAB_AI,
-    // Re-checked 2026-11-24: home page ("214 models. One account."),
+    // Re-checked 2026-11-27: home, pricing (also Business seats and packs up
+    // to 31,250 credits for $250, checkout via Whop), API docs (OpenAI,
+    // Responses and Messages formats, Claude Code gateway, Plus required),
+    // terms and privacy policy.
+    // Earlier check 2026-11-24: home page ("214 models. One account."),
     // pricing (Plus $20/month or $200/year, Plus Premium $999/year, packs
     // from $10 for 700 credits, 250 signup credits), API page (Plus or Plus
     // Premium required), terms (18+, no sexually explicit content, automated
     // scanning) and privacy policy (last updated 2026-11-09: content used to
     // improve models, provider requests "not anonymous").
-    checkedDate: "2026-11-24",
+    checkedDate: "2026-11-27",
     sources: [
       { kind: "home", url: "https://gab.ai/" },
       { kind: "pricing", url: "https://gab.ai/pricing" },
-      { kind: "api", url: "https://gab.ai/api" },
+      { kind: "api", url: "https://gab.ai/docs/api" },
       { kind: "privacy", url: "https://gab.ai/privacy-policy" },
       { kind: "terms", url: "https://gab.ai/terms-of-service" },
     ],
@@ -610,6 +633,18 @@ export const VERSUS_SLUGS: Record<VersusKey, string> = {
   gabAi: "unbottled-vs-gab-ai",
   uncensoredAi: "unbottled-vs-uncensored-ai",
   openRouter: "unbottled-vs-openrouter",
+};
+
+/** Blog guides that answer the same question as each versus page. */
+export const VERSUS_GUIDES: Record<VersusKey, readonly BlogPostSlug[]> = {
+  venice: ["venice-ai-alternatives", "uncensored-llm-api"],
+  characterAi: ["character-ai-alternatives", "ai-roleplay-without-filter"],
+  janitorAi: ["janitor-ai-alternatives", "character-ai-alternatives"],
+  nanoGpt: ["nanogpt-alternatives", "uncensored-llm-api"],
+  freedomGpt: ["freedomgpt-alternatives", "venice-ai-alternatives"],
+  gabAi: ["gab-ai-alternatives", "unbiased-ai-chatbot"],
+  uncensoredAi: ["uncensored-llm-api", "unbiased-ai-chatbot"],
+  openRouter: ["openrouter-alternatives", "uncensored-llm-api"],
 };
 
 /** Day each versus page first shipped (Article datePublished). */

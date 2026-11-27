@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternative a Venice AI: private e senza censura (2026)",
     description:
-      "Venice AI a confronto con {{appName}}, Maple, Proton Lumo, Duck.ai, NanoGPT e app locali. Dove finiscono le richieste, chi rifiuta meno e cosa costa extra.",
+      "Venice AI a confronto con {{appName}}, OpenUncensored, NEAR AI Cloud, Maple, Proton Lumo, NanoGPT e app locali. Dove vengono elaborate le richieste, quali modelli rifiutano meno, quali formati API funzionano e cosa costa extra.",
     category: "Confronto",
     imageAlt: "Le alternative a Venice AI a confronto",
     keywords:
@@ -13,13 +13,13 @@ export const translations: typeof enTranslations = {
   hero: {
     backToBlog: "Torna al blog",
     category: "Confronto",
-    readTime: "9 min di lettura",
+    readTime: "10 min di lettura",
     title: "Alternative a Venice AI per chat riservate",
     subtitle:
       "{{count}} alternative e {{appName}}, confrontate su quello che dicono le loro pagine di prezzi, privacy e filtri. Verificato il {{date}}.",
   },
   intro: {
-    lead: "Venice si è fatta un nome con due promesse: privata e senza censura. Ne mantiene buona parte. Ma il piano gratuito è stretto, il filtro per adulti richiede Pro, e non tutti vogliono uno strato di staking crypto accanto alla chat.",
+    lead: "Venice si è fatta un nome con due promesse: privata e senza censura. Ne mantiene buona parte. Ma il piano gratuito offre 10 richieste di testo al giorno, il filtro per adulti richiede Pro e la sua API non ha un endpoint Anthropic nativo.",
     p2: "Ecco quindi le alternative, verificate il {{date}} sulle loro pagine di prezzi, privacy e filtri. Per trasparenza: compriamo da Venice. {{appName}} oggi passa da Venice per {{veniceModels}} modelli, di cui {{veniceUncensored}} senza censura. Diciamo anche dove vince Venice.",
   },
   criteria: {
@@ -51,9 +51,23 @@ export const translations: typeof enTranslations = {
     price:
       "Prezzo: {{guestCredits}} crediti gratuiti al mese senza account, {{freeCredits}} con un account. Piani da {{subPrice}} al mese. I pacchetti di crediti ricaricano un piano attivo e non scadono mai.",
     api: "API: gli stessi modelli tramite endpoint compatibili OpenAI e Anthropic. Qualsiasi piano da {{apiSubPrice}} al mese la sblocca.",
-    weak: "Dove siamo più deboli: il catalogo di Venice è più grande, e sui suoi modelli Venice costa meno a token, perché sul nostro prezzo d'acquisto aggiungiamo un ricarico. Nessuno strato di staking come VVV o DIEM.",
+    weak: "Dove siamo più deboli: il catalogo di Venice è più grande, e sui suoi modelli Venice costa meno a token, perché sul prezzo che paghiamo aggiungiamo un ricarico del {{markup}}%. Niente pagamento a richiesta con x402 e nessuno strato di token come VVV o DIEM: la nostra API richiede un account e un acquisto.",
     directoryLink: "Tutti i modelli abliterated, con contesto e prezzo",
     ownLink: "Guarda {{ownModel}}",
+  },
+  veniceApi: {
+    title: "L'API di Venice, verificata il {{veniceDate}}",
+    intro: "Cosa ottengono gli sviluppatori prima di guardare altrove.",
+    formats:
+      "Formati: chat compatibile con OpenAI con un endpoint Responses. Nessuna Anthropic Messages API nativa: la sua guida per Claude Code usa un proxy di traduzione locale.",
+    payment:
+      "Pagamento: una chiave API richiede un account, oppure con x402 paghi ogni richiesta da un wallet USDC, senza alcun account.",
+    models:
+      "Modelli propri: Venice Uncensored 1.2 e Venice Role Play Uncensored, fine-tune suoi, accanto a versioni abliterated di GLM, DeepSeek, Gemma e Qwen.",
+    terms:
+      "Termini: vietata la rivendita dell'accesso e l'uso dell'API in contesti ad alto rischio.",
+    us: "Su {{appName}} una sola chiave parla OpenAI chat completions, Responses e Anthropic Messages. Claude Code si collega direttamente, modelli di Venice inclusi.",
+    apiLink: "API LLM senza censura: ID dei modelli, codice e limiti",
   },
   list: {
     title: "Le {{count}} alternative, una per una",
@@ -85,7 +99,7 @@ export const translations: typeof enTranslations = {
     title: "Quando Venice resta la scelta giusta",
     intro: "A volte l'originale è l'affare migliore.",
     crypto:
-      "Hai VVV o DIEM, oppure vuoi pagare le chiamate API senza account. Nessun altro in questa lista lo fa allo stesso modo.",
+      "Possiedi VVV o DIEM, oppure vuoi pagare ogni richiesta API da un wallet USDC senza account. Nessun altro in questa lista lo fa allo stesso modo.",
     versusLink: "{{appName}} vs Venice: il confronto completo",
   },
   faq: {
@@ -96,7 +110,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Esiste un'alternativa gratuita a Venice AI?",
-      a: "Sì. FreedomGPT parte gratis senza account. LM Studio è gratuito sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account, modelli senza censura inclusi dopo una conferma 18+ una tantum.",
+      a: "Sì. Il piano gratuito di Venice offre 10 richieste di testo e 15 di immagini al giorno. FreedomGPT parte gratis e senza account. LM Studio è gratis sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account, modelli senza censura inclusi dopo un'unica conferma dei 18 anni.",
     },
     private: {
       q: "Quale alternativa a Venice è la più privata?",
@@ -104,11 +118,11 @@ export const translations: typeof enTranslations = {
     },
     api: {
       q: "Quale alternativa ha un'API senza censura?",
-      a: "NanoGPT, uncensored.ai, Gab AI, OpenRouter e {{appName}} offrono tutte API compatibili OpenAI. L'offerta di modelli senza censura cambia molto: OpenRouter ne ha pochi, NanoGPT molti. Su {{appName}} qualsiasi piano da {{apiSubPrice}} al mese sblocca l'API.",
+      a: "NanoGPT, uncensored.ai, Gab AI, OpenRouter e {{appName}} offrono tutti API compatibili con OpenAI. Per pesi abliterated solo via API, OpenUncensored e NEAR AI Cloud li vendono a prezzo del provider. La copertura cambia molto: OpenRouter non ha modelli abliterated, NanoGPT ne ha decine. Su {{appName}} qualsiasi piano da {{apiSubPrice}} al mese sblocca l'API.",
     },
     same: {
       q: "Posso usare i modelli di Venice altrove?",
-      a: "Alcuni. {{appName}} fa girare {{veniceModels}} modelli tramite Venice, tra cui {{veniceExamples}}, nella stessa chat di Claude, GPT e gli altri. Anche OpenRouter e NanoGPT hanno Venice Uncensored.",
+      a: "Alcuni sì. {{appName}} usa {{veniceModels}} modelli tramite Venice, tra cui {{veniceExamples}}, nella stessa chat di Claude, GPT e gli altri. Anche OpenRouter, NanoGPT e OpenUncensored elencano Venice Uncensored.",
     },
     account: {
       q: "Serve un account per provarlo?",
@@ -116,6 +130,7 @@ export const translations: typeof enTranslations = {
     },
     noGpuLink: "Un LLM senza censura online, senza GPU",
     apiLink: "API LLM senza censura: ID, codice e limiti",
+    openRouterLink: "Alternative a OpenRouter senza censura, a confronto",
   },
   cta: {
     title: "Privato quando vuoi. Senza censura quando serve.",

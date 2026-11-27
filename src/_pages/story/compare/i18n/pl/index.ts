@@ -168,22 +168,22 @@ export const translations: typeof enTranslations = {
   },
   platforms: {
     venice: {
-      what: "Aplikacja AI stawiająca na prywatność: duży katalog modeli, wiele modeli tekstowych bez cenzury, generowanie obrazów, wideo i muzyki, API zgodne z OpenAI oraz warstwa stakingu krypto (VVV i DIEM).",
+      what: "Aplikacja AI stawiająca na prywatność, z dużym katalogiem modeli, własnymi fine-tunami bez cenzury, generowaniem obrazów, wideo, głosu i muzyki, API zgodnym z OpenAI oraz warstwą tokenów krypto (VVV i DIEM).",
       pricingNote:
-        "Za darmo: 10 promptów tekstowych i 15 obrazowych dziennie, tylko modele bazowe. 100 kredytów = 1 USD. Wideo, muzyka i modele frontier kosztują dodatkowe kredyty.",
+        "Za darmo: 10 promptów tekstowych i 15 obrazowych dziennie, tylko modele bazowe. 100 kredytów = 1 USD. Pro Plus i Max zawierają wydatki na API. Wideo, muzyka i modele frontier kosztują dodatkowe kredyty. USDC działa przy kredytach, krypto przy dłuższych okresach Pro.",
       models:
-        "API wymienia 303 modele, w tym 143 tekstowe. 17 modeli tekstowych oznaczono jako niecenzurowane. Są też Claude, GPT, Gemini i Grok.",
+        "Katalog API ma 145 modeli tekstowych, 52 obrazowe, 160 wideo, 11 głosowych i 19 muzycznych. Bez cenzury są własne fine-tuny Venice Uncensored 1.2 i Venice Role Play Uncensored oraz abliterowane wersje GLM, DeepSeek, Gemma i Qwen.",
       filterShort: "Mature Filter domyślnie włączony, Pro może go wyłączyć",
       filter:
         "Filtr treści dla dorosłych jest domyślnie włączony. Użytkownicy Pro mogą go wyłączyć w ustawieniach. Regulamin wymaga zgody rodzica dla osób w wieku od 13 do 17 lat. Te osoby muszą zostawić filtr włączony.",
       privacyShort: "Historia domyślnie zostaje na urządzeniu",
       privacy:
-        "Venice domyślnie zapisuje historię na urządzeniu. Płatne plany oferują szyfrowaną kopię zapasową i przywracanie. W trybie Anonymous według Venice należy założyć, że dostawca modelu przechowuje treść. Pro daje też dostęp do przetwarzania w izolowanym sprzętowo środowisku i szyfrowania end-to-end dla wybranych modeli.",
+        "Venice domyślnie trzyma historię czatu na Twoim urządzeniu. Tryb Private nazywa opartym na zaufaniu, a w trybie Anonymized każe zakładać, że dostawca modelu przechowuje Twoje treści. Wybrane modele działają w enklawach sprzętowych (przez NEAR AI Cloud i Phala) lub z szyfrowaniem end-to-end.",
       apiShort: "",
-      api: "API zgodne z OpenAI, rozliczane za tokeny w kredytach USD. Stakowany DIEM daje 1 USD kredytu API dziennie. Płatność za zapytanie bez konta w USDC przez x402.",
+      api: "API zgodne z OpenAI z endpointem Responses, rozliczane za token w kredytach USD. Brak natywnego API Anthropic Messages: własny poradnik Claude Code uruchamia lokalne proxy tłumaczące. Przez x402 płacisz za zapytanie z portfela USDC, bez konta.",
       forWho:
         "Dla dbających o prywatność, którzy chcą czatu i mediów bez cenzury w jednej aplikacji, oraz dla deweloperów i posiadaczy krypto.",
-      pro1: "Duży katalog z wieloma modelami tekstowymi bez cenzury i tanie API bez cenzury.",
+      pro1: "Własne fine-tuny bez cenzury i abliterowane wersje przy niskich cenach API za token.",
       pro2: "Historia domyślnie zostaje na Twoim urządzeniu.",
       con1: "Ciasny darmowy plan: 10 promptów tekstowych dziennie na modelach bazowych.",
       con2: "Wyłączenie filtra dla dorosłych wymaga Pro. Wideo, muzyka i modele premium zużywają kredyty.",
@@ -191,38 +191,39 @@ export const translations: typeof enTranslations = {
     uncensoredAi: {
       what: "Czat bez cenzury z jednym modelem, forum społeczności i archiwami dokumentów. Web, iOS i Android.",
       pricingNote:
-        "Za darmo: 3 odpowiedzi dziennie. Ceny Pro zablokowane dożywotnio. Karty, Cash App, Apple Pay i Bitcoin. Kredyty API sprzedawane osobno po 0,05 USD za wywołanie.",
+        "Za darmo: dzienny limit, domyślnie 3 odpowiedzi. Ceny Pro są zablokowane na całe życie. Karty, Cash App, Apple Pay i Bitcoin. Kredyty API sprzedawane osobno: 0,05 USD za zapytanie, kupowane od 5 USD.",
       models:
         "Jeden model: UncensoredAI v1.2, kontekst 32K, trenowany na książkach i dokumentach usuniętych z mainstreamowego internetu. Jego poglądy polityczne idą pod prąd mainstreamu.",
       filterShort: "Brak opisanego filtra, 18+ w regulaminie",
       filter:
         "Nazywa się platformą AI bez ograniczeń. Regulamin wymaga ukończonych 18 lat i zakazuje treści mających krzywdzić, nękać lub narażać innych.",
-      privacyShort: "Według polityki nie służy do treningu",
+      privacyShort:
+        "Według jego stron nigdy nie sprzedaje danych, do modelu trafia sam tekst",
       privacy:
-        "Polityka mówi, że Twoje dane nie służą do trenowania ani ulepszania modeli AI. Wiadomości przetwarza Parasail AI. Pro zachowuje historię czatów z wyszukiwaniem i eksportem.",
+        "Według jego stron Twoje dane nigdy nie są sprzedawane, wynajmowane ani wymieniane, a zapytania AI niosą tylko Twój tekst, nigdy imię ani mail. Wiadomości między użytkownikami są szyfrowane end-to-end. Okresu przechowywania nie podano.",
       apiShort: "",
-      api: "API zgodne z OpenAI, gotowe do podmiany, 0,05 USD za inferencję.",
+      api: "Treść zapytania w stylu OpenAI na własnym endpoincie, rozliczana za zapytanie po 0,05 USD. Streaming, narzędzia i format Anthropic nie są udokumentowane.",
       forWho:
         "Dla tych, którzy nie ufają mainstreamowym narracjom i chcą dosadnych odpowiedzi na sporne tematy.",
       pro1: "Najtańszy płatny plan na tej liście, cena zablokowana dożywotnio.",
-      pro2: "Według polityki prywatności dane nie służą do treningu.",
+      pro2: "Dane nigdy nie są sprzedawane, wynajmowane ani wymieniane, jak twierdzi dostawca.",
       con1: "Jeden model, kontekst 32K, bez generowania obrazów, wideo i muzyki.",
       con2: "Darmowy plan to 3 odpowiedzi dziennie; głos, foldery i archiwa wymagają Pro.",
     },
     nanoGpt: {
       what: "Aplikacja webowa i API w modelu płatności za użycie: modele tekstowe, obrazowe, wideo i audio. Subskrypcja niepotrzebna, opcjonalny plan na modele open.",
       pricingNote:
-        "Pierwsza wpłata od 0,10 USD w krypto lub 1 USD kartą. Następne wpłaty kartą od 5 USD. Doładujesz saldo po zalogowaniu. W przeglądarce jest jeden darmowy model. PRO (do maja 2026 kosztował 8 USD) obejmuje 60 mln tokenów wejściowych tygodniowo na wybranych otwartych modelach tekstowych oraz 100 obrazów dziennie, do użytku osobistego. Claude, GPT, Gemini i Grok zużywają saldo.",
+        "Pierwsza wpłata od 0,10 USD w krypto (Bitcoin, Monero i inne) lub 1 USD kartą, kolejne kartą od 5 USD. W przeglądarce jest jeden darmowy model. PRO (do maja 2026 kosztował 8 USD) obejmuje 60 mln tokenów wejściowych tygodniowo, z darmowym wyjściem na wliczonych modelach tekstowych open source. Claude, GPT, Gemini i Grok pobierają z Twojego salda.",
       models:
-        "Publiczne API modeli tekstowych zwróciło 596 wpisów. 38 identyfikatorów zawiera słowa uncensored, abliterated lub Dolphin. Przykłady to Venice Uncensored, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored i wariant Kimi K3.1 Pro z usuniętą blokadą odmów.",
+        "Publiczne API modeli zwróciło 610 wpisów, w tym 54 fine-tuny abliterowane, bez cenzury, Heretic, derestricted i podobne. Przykłady: GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Qwen 3.8 27B Uncensored i abliterowane wersje Kimi K3.1 Pro. Brak własnego modelu.",
       filterShort: "Brak ogólnego zakazu NSFW, 18+",
       filter:
         "Musisz mieć co najmniej 18 lat i móc zawrzeć umowę zgodnie z lokalnym prawem. Regulamin zabrania materiałów przedstawiających wykorzystywanie seksualne dzieci oraz intymnych lub seksualnych treści z rozpoznawalnymi osobami bez ich zgody, w tym deepfake’ów. Dostawcy mogą stosować własne ograniczenia.",
       privacyShort: "Historia domyślnie zostaje w przeglądarce",
       privacy:
-        "Historia domyślnie zostaje w przeglądarce, z opcjonalną synchronizacją z chmurą. Według NanoGPT standardowe przetwarzanie nie zapisuje treści wiadomości ani odpowiedzi. Dzienniki API i pamięć czatu są opcjonalne. Niektórzy dostawcy mogą przechowywać wiadomości lub użyć ich do treningu. W listopadzie 2026 NanoGPT ujawnił wycieki promptów u kilku dostawców i wyłączył te ścieżki.",
+        "Historia domyślnie zostaje w Twojej przeglądarce. NanoGPT twierdzi, że przy zwykłej inferencji nie loguje ani nie przechowuje promptów i odpowiedzi. Logowanie API jest opcjonalne, na 1 do 30 dni. Private Mode wysyła zapytania do szyfrowanej enklawy za 5 % dopłaty. W listopadzie 2026 NanoGPT ujawnił, że prompty były widoczne u kilku dostawców upstream, i usunął te trasy.",
       apiShort: "",
-      api: "API zgodne z OpenAI i formatem Anthropic Messages. x402 umożliwia płatności bez konta. Niektóre odpowiedzi nie podają ceny lub pokazują szacunek do czasu rozliczenia.",
+      api: "OpenAI chat completions, Responses i Anthropic Messages na jednym kluczu, plus obrazy i wideo. Płatność za zapytanie bez konta przez Lightning (L402). Płatności x402 usunięto 2026-11-20.",
       forWho:
         "Dla płacących za użycie i deweloperów, którzy chcą każdego modelu, płatności krypto i zero subskrypcji.",
       pro1: "Ogromna lista modeli, w większości po cenach katalogowych, start od dziesięciu centów.",
@@ -233,49 +234,49 @@ export const translations: typeof enTranslations = {
     openRouter: {
       what: "API dla deweloperów: jeden klucz do setek modeli od wielu dostawców, rozliczane za tokeny z przedpłaconych kredytów.",
       pricingNote:
-        "Bez subskrypcji. Ceny katalogowe dostawców plus 5,5% opłaty od zakupu kredytów. Darmowe modele: 50 zapytań dziennie, 1000 po zakupie kredytów za 10 USD.",
+        "Bez subskrypcji i bez narzutu na inferencję: ceny dostawców plus 5,5 % opłaty przy zakupie kredytów kartą, 5 % przy krypto. Własne klucze dostawców za darmo do 25 000 USD miesięcznie. Darmowe modele: 50 zapytań dziennie, 1000 po zakupie kredytów za 10 USD.",
       models:
-        "474 modele, 15 darmowych. Opcji bez cenzury jest mało: Venice Uncensored (Dolphin Mistral 24B, hostowany przez Venice) i fine-tuny do roleplayu jak Hermes 4 i Magnum. 142 modele mają flagę moderacji.",
-      filterShort: "Obowiązują zasady dostawców, wiele ścieżek moderowanych",
+        "477 modeli, 11 darmowych. Opcji bez cenzury jest mało: 17 pasuje nazwą lub opisem do roleplayu albo braku cenzury, np. Venice Uncensored (Dolphin Mistral 24B), Hermes 4 405B, Magnum i Euryale. Żadne ID modelu nie zawiera słów abliterated ani uncensored.",
+      filterShort: "Zasady dostawcy obowiązują per model",
       filter:
-        "Regulamin wymaga 18+. OpenRouter skanuje wejście pod kątem znanych materiałów CSAM. Każdy dostawca kontroluje swój model, a moderowane ścieżki odmawiają zgodnie z polityką producenta.",
-      privacyShort: "Nie zapisuje promptów, chyba że się zgodzisz",
+        "Regulamin wymaga 18+. OpenRouter filtruje wejścia pod kątem znanych CSAM i malware. Nie ma osobnej reguły dla treści seksualnych: obowiązuje regulamin każdego modelu, więc to, czy zapytanie przejdzie, zależy od modelu i dostawcy.",
+      privacyShort: "Domyślnie bez logowania promptów, routing ZDR",
       privacy:
-        "OpenRouter deklaruje, że nie przechowuje promptów ani odpowiedzi bez Twojej zgody. Metadane zapisuje zawsze. Zasady logowania u dostawców się różnią.",
+        "OpenRouter twierdzi, że nie loguje promptów ani odpowiedzi bez Twojej zgody, a zgoda daje 1 % zniżki. Możesz blokować dostawców trenujących na Twoich danych i kierować ruch tylko do endpointów bez retencji danych (zero data retention), per konto lub per zapytanie.",
       apiShort: "",
-      api: "API zgodne z OpenAI. To jest cały produkt.",
+      api: "OpenAI chat completions i Responses API ze streamingiem i narzędziami. To jest cały produkt.",
       forWho:
         "Dla deweloperów, którzy chcą jednego klucza API do wielu modeli z przełączaniem dostawców.",
-      pro1: "Ogromny katalog po cenach katalogowych, bez subskrypcji.",
-      pro2: "Logowanie i trening tylko za Twoją zgodą.",
-      con1: "Mało modeli bez cenzury.",
+      pro1: "Ogromny katalog w cenach dostawców, bez narzutu na inferencję.",
+      pro2: "Routing bez retencji danych i darmowe własne klucze.",
+      con1: "Mało modeli bez cenzury, żadnych abliterowanych.",
       con2: "Nie celuje w czat dla zwykłych użytkowników: interfejs dostarczasz sam.",
     },
     freedomGpt: {
-      what: "Aplikacja AI wszystko w jednym: modele mainstream obok własnego modelu bez cenzury Liberty, z generowaniem obrazów i wideo. Do tego starsza aplikacja desktopowa open source do modeli offline.",
+      what: "Aplikacja AI wszystko w jednym na przeglądarkę, iPhone'a i Androida: modele mainstream obok opcji bez cenzury, z generowaniem obrazów i wideo. Do tego API i starsza aplikacja desktopowa open source dla modeli offline.",
       pricingNote:
-        "Zacznij bez karty i konta. Pro obejmuje 2200 kredytów miesięcznie i pozwala dokupić dodatkowe. FreedomGPT szacuje około 10 kredytów za odpowiedź premium, 25 za obraz i 400 za 5-sekundowy film.",
+        "Start bez karty i bez konta. Pro zawiera 2200 kredytów miesięcznie. FreedomGPT szacuje 10 kredytów na odpowiedź premium, 25 na obraz i 400 na 5-sekundowe wideo. Nowe rejestracje przez Google, Apple lub X dostają 100 kredytów bonusu.",
       models:
-        "ChatGPT, Claude, Gemini, Grok, DeepSeek, Qwen, Llama, Mistral i inne, plus Liberty i inne modele bez cenzury na tej samej liście. Łącznej liczby nie podaje.",
-      filterShort: "Modele bez cenzury, zasady prawa USA i etyki",
+        "Chwali się ponad 400 modelami w jednej subskrypcji: ChatGPT, Claude, Gemini, Grok, Kimi, GLM, DeepSeek, Qwen, Llama i inne. Obiecuje opcje bez cenzury, ale nie podaje żadnej. API domyślnie używa modelu o nazwie Liberty.",
+      filterShort: "Tylko zgodne z prawem i etyczne użycie",
       filter:
-        "FreedomGPT deklaruje, że każdy użytkownik i każdy hostowany model musi przestrzegać prawa USA, i nie pozwala używać swoich modeli do celów nieetycznych. Etykieta „censor-free” nie gwarantuje odpowiedzi na każde zapytanie.",
-      privacyShort: "Wiadomości trafiają do dostawców AI",
+        "Regulamin dopuszcza użycie tylko w celach zgodnych z prawem i etycznych i nie podaje niczego bardziej konkretnego. Nie podano minimalnego wieku.",
+      privacyShort: "Według polityki brak oczekiwania prywatności",
       privacy:
-        "FreedomGPT wysyła wiadomości i załączniki do dostawcy potrzebnego do udzielenia odpowiedzi. Polityka aplikacji mówi, że dostawcy mogą używać wiadomości, nagrań i obrazów wyłącznie do generowania odpowiedzi. Nie podaje dla nich stałego czasu przechowywania.",
+        "Strona główna radzi nie zakładać anonimowości ani zerowej retencji. Polityka prywatności mówi, że FreedomGPT może zbierać i przechowywać wszystko, co podasz, że użytkownicy nie mogą oczekiwać prywatności, a wiadomości trafiają do dostawców AI wyłącznie po to, by wygenerować odpowiedzi. Okresu przechowywania nie podano.",
       apiShort: "",
-      api: "API pod chat.freedomgpt.com/api/v1 z kluczem z panelu. Cennik nie jest udokumentowany.",
+      api: "API pod chat.freedomgpt.com/api/v1 z endpointami czatu, obrazu, połączeń telefonicznych i wideo. Odpowiedzi przychodzą we własnym formacie FreedomGPT, nie w schemacie OpenAI. Cen za token nie opublikowano.",
       forWho:
-        "Dla tych, którzy chcą jednej subskrypcji na wiele modeli z opcjami bez cenzury.",
+        "Dla tych, którzy chcą jednej subskrypcji na wiele modeli, także bez cenzury.",
       pro1: "Darmowy start bez konta i karty.",
       pro2: "Obrazy i wideo w tej samej aplikacji.",
-      con1: "Nadal obowiązuje prawo USA i zakaz nieetycznego użycia.",
+      con1: "Jego modele bez cenzury pozostają bez nazwy, a regulamin dokłada regułę etyczną ponad prawo.",
       con2: "Aplikacja desktopowa open source nie była aktualizowana od czerwca 2024.",
     },
     gabAi: {
       what: "Platforma AI z wieloma modelami od Gab: 214 modeli, własny model Arya, tryb agenta, generowanie obrazów, wideo i muzyki oraz aplikacje desktopowe. Otwarcie prawicowe, chrześcijańskie pozycjonowanie.",
       pricingNote:
-        "Za darmo: 250 kredytów po weryfikacji e-maila. Jednorazowe pakiety kredytów od 10 USD za 700 kredytów, nigdy nie wygasają.",
+        "Za darmo: 250 kredytów po potwierdzeniu maila. Pakiety kredytów od 10 USD za 700 kredytów do 250 USD za 31 250, nigdy nie wygasają. Miejsca biznesowe kosztują 20 lub 99 USD. Płatność przez Whop.",
       models:
         "214 modeli na jednym koncie: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi i inne. Arya to własny model Gab, zbudowany wokół wartości chrześcijańskich i zasad konserwatywnych.",
       filterShort: "Bez cenzury w poglądach, zakaz treści seksualnych",
@@ -283,9 +284,9 @@ export const translations: typeof enTranslations = {
         "Regulamin wymaga 18+ i zakazuje treści obscenicznych, seksualnie dosłownych i pornograficznych. Automatyczne systemy mogą skanować treści pod kątem zgodności. Swoboda w polityce, nie w treściach dla dorosłych.",
       privacyShort: "Czaty zapisywane, służą do ulepszania modeli",
       privacy:
-        "Gab trzyma Twoje prompty, odpowiedzi i historię na swoich serwerach, a jako jeden z celów podaje ulepszanie swoich modeli. Zapytania trafiają do dostawców modeli przez własne konta Gab; według polityki nie czyni to zapytania anonimowym.",
+        "Gab przechowuje Twoje prompty, odpowiedzi i historię tak długo, jak uzna za potrzebne, i wymienia ulepszanie swoich modeli jako cel. Zapytania trafiają do dostawców modeli przez własne konta Gaba; jego polityka mówi, że to nie czyni zapytania anonimowym.",
       apiShort: "",
-      api: "API zgodne z OpenAI i Anthropic. Wymaga planu Plus.",
+      api: "Chat completions w stylu OpenAI SDK pod gab.ai/v1, z przykładami formatów Responses i Anthropic Messages oraz bramą dla Claude Code. Wymaga planu Plus.",
       forWho:
         "Dla konserwatywnych i chrześcijańskich użytkowników, którzy chcą AI zbudowanego poza Big Tech.",
       pro1: "Duży katalog, tryb agenta i aplikacje desktopowe.",
@@ -512,7 +513,7 @@ export const translations: typeof enTranslations = {
       },
       developers: {
         title: "API do modeli bez cenzury: NanoGPT, Venice lub OpenRouter",
-        body: "NanoGPT i Venice mają wiele modeli bez cenzury w niskich cenach za token. OpenRouter ma najszerszy katalog, ale mało opcji bez cenzury.",
+        body: "NanoGPT i Venice mają wiele modeli bez cenzury w niskich cenach za token. OpenRouter ma najszerszy katalog, ale żadnych modeli abliterowanych.",
       },
       local: {
         title:
@@ -595,6 +596,7 @@ export const translations: typeof enTranslations = {
       modelsLink: "Zobacz wszystkie {{modelCount}} modele z cenami na żywo",
       pricingLink: "Plany i darmowe kredyty",
       guideLink: "Poradnik: każdy model bez cenzury i do czego się nadaje",
+      apiLink: "API LLM bez cenzury: wszystkie opcje, porównane",
     },
     versus: {
       title: "Porównania jeden na jeden",
@@ -654,7 +656,7 @@ export const translations: typeof enTranslations = {
       },
       openRouter: {
         q: "Czy OpenRouter ma modele bez cenzury?",
-        a: "Kilka: Venice Uncensored i fine-tuny do roleplayu jak Hermes 4 i Magnum, a 142 z jego 474 modeli mają flagę moderacji. Jeśli chcesz większego wyboru bez cenzury w jednym API, NanoGPT, Venice i {{appName}} mają ich dużo więcej.",
+        a: "Kilka: 17 z jego 477 modeli pasuje do roleplayu lub braku cenzury, np. Venice Uncensored, Hermes 4 405B i Magnum, i żaden nie jest abliterowany. Jeśli chcesz większego wyboru modeli bez cenzury w jednym API, NanoGPT, Venice i {{appName}} mają ich znacznie więcej.",
       },
       local: {
         q: "Czy mogę uruchomić AI bez cenzury na własnym komputerze?",
@@ -697,14 +699,14 @@ export const translations: typeof enTranslations = {
       verdict:
         "Wybierz Venice, jeśli chcesz jej pełnego katalogu, historii tylko na urządzeniu i najniższej ceny za token na jej własnych modelach, a zapłata za Pro, żeby zdjąć Mature Filter, Ci nie przeszkadza. Wybierz {{appName}}, jeśli chcesz modeli bez cenzury od Venice obok Claude, GPT, modelu od uncensored.ai oraz abliterowanych wersji GLM i DeepSeek od innych dostawców, w jednym czacie, bez filtra do odblokowania poza jednorazowym potwierdzeniem 18+.",
       themPros: {
-        a: "303 modele w katalogu API, w tym do wideo, muzyki i głosu.",
+        a: "Katalog API ma 145 modeli tekstowych, 52 obrazowe, 160 wideo, 11 głosowych i 19 muzycznych.",
         b: "Historia domyślnie zostaje na Twoim urządzeniu. Mocna historia prywatności.",
-        c: "Najtańszy dostęp do własnych modeli Venice: bez marży pośrednika, plus staking DIEM za dzienny kredyt API.",
+        c: "Najtańszy sposób na własne modele Venice: bez narzutu pośrednika i z x402 za zapytanie z portfela USDC, bez konta.",
       },
       themCons: {
         a: "Darmowy plan: 10 promptów tekstowych dziennie, tylko modele bazowe.",
         b: "Mature Filter jest domyślnie włączony. Wyłączenie wymaga Pro.",
-        c: "Tylko oferta Venice: bez modelu od uncensored.ai, bez modeli od dostawców, których Venice nie hostuje.",
+        c: "Brak natywnego API Anthropic Messages: własny poradnik Claude Code uruchamia lokalne proxy tłumaczące.",
       },
       usPros: {
         a: "Modele bez cenzury od Venice plus modele bez cenzury od NanoGPT, uncensored.ai, FreedomGPT i Gab AI w jednym wyborze modeli.",
@@ -718,7 +720,7 @@ export const translations: typeof enTranslations = {
       },
       chooseThem: {
         a: "Chcesz największego katalogu bez cenzury od jednego dostawcy.",
-        b: "Masz VVV albo chcesz go stakować za kredyt API.",
+        b: "Masz VVV lub DIEM albo chcesz płacić za zapytanie z portfela USDC.",
         c: "Wywołujesz modele Venice przez API i liczy się każdy cent za token.",
       },
       chooseUs: {
@@ -738,7 +740,7 @@ export const translations: typeof enTranslations = {
         },
         q2: {
           q: "Czy Venice AI jest darmowe?",
-          a: "Konto bezpłatne daje 10 zapytań tekstowych i 15 próśb o obraz dziennie w modelach podstawowych. Pro obejmuje tekst bez limitu, do 1000 obrazów dziennie w modelach Pro i możliwość wyłączenia filtra przez dorosłych.",
+          a: "Darmowe konta dostają 10 promptów tekstowych i 15 obrazowych dziennie na modelach bazowych. Pro to plan wejściowy, w którym dorośli mogą wyłączyć Mature Filter. Pro Plus i Max dodają kredyty na wideo, muzykę i wywołania API.",
         },
         q3: {
           q: "Czy Venice jest tańsze niż {{appName}}?",
@@ -772,7 +774,7 @@ export const translations: typeof enTranslations = {
       relation:
         "Nie łączą nas żadne relacje biznesowe z Character.AI. Możesz przenieść postać: wklej jej link z Character.AI, a {{appName}} zaimportuje ją jako skill.",
       verdict:
-        "Wybierz Character.AI do zabawy bez treści dla dorosłych z milionami gotowych postaci, za darmo i bez limitu, albo dla każdego poniżej 18 lat. Wybierz {{appName}}, jeśli filtr ciągle psuje Ci historię: modele do roleplayu bez cenzury po jednorazowym potwierdzeniu 18+, wybór modelu przy każdej wiadomości i czaty, na których nikt nie trenuje modeli.",
+        "Wybierz Character.AI do niewinnej zabawy z milionami gotowych postaci, za darmo i bez limitów, albo jeśli masz mniej niż 18 lat. Wybierz {{appName}}, jeśli filtr ciągle psuje Ci historię: modele do roleplayu bez cenzury po jednorazowym potwierdzeniu 18+, wybór modelu per wiadomość i zero pikseli reklamowych oraz trackerów firm trzecich.",
       themPros: {
         a: "Miliony postaci społeczności, gotowych do rozmowy.",
         b: "Nielimitowane darmowe wiadomości, tanie płatne plany.",
@@ -786,7 +788,7 @@ export const translations: typeof enTranslations = {
       usPros: {
         a: "{{uncensored}} modeli bez cenzury, kilka stworzonych do roleplayu. Scena idzie tam, dokąd prowadzi historia.",
         b: "Model wybierasz przy każdej wiadomości: model do roleplayu bez cenzury na scenę, model frontier do planowania.",
-        c: "Czaty incognito zostają w Twojej przeglądarce. Nie trenujemy modeli na Twoich czatach.",
+        c: "Czaty incognito zostają w Twojej przeglądarce. Bez pikseli reklamowych i trackerów firm trzecich.",
       },
       usCons: {
         a: "Dużo mniej gotowych postaci. Importujesz albo piszesz własne.",
@@ -801,7 +803,7 @@ export const translations: typeof enTranslations = {
       chooseUs: {
         a: "Filtr ciągle psuje Ci roleplay.",
         b: "Chcesz wybierać model, a nie dostać przydzielony.",
-        c: "Chcesz, żeby Twoje czaty nie trafiały do treningu ani targetowania reklam.",
+        c: "Chcesz czatu bez pikseli reklamowych i trackerów firm trzecich.",
       },
       both: "Wielu trzyma Character.AI do lekkich rozmów, a historie, które potrzebują modelu dla dorosłych, przenosi tutaj, razem z postacią przez import.",
       switch: {
@@ -928,15 +930,15 @@ export const translations: typeof enTranslations = {
       relation:
         "Jesteśmy klientem NanoGPT: {{nanoGptModels}} naszych modeli działa przez API NanoGPT (w tym {{nanoGptUncensored}} bez cenzury), m.in. {{nanoGptExamples}}.",
       verdict:
-        "Wybierz NanoGPT, jeśli chcesz szeroki katalog i płatność za zużycie, z API bez konta przez x402. Wybierz {{appName}}, jeśli chcesz sprawdzony wybór modeli od różnych dostawców, darmowe kredyty co miesiąc, umiejętności, pamięć i otwarty czat na własnym serwerze.",
+        "Wybierz NanoGPT dla szerokiego katalogu i płacenia za użycie, w tym wywołań API bez konta opłacanych przez Lightning. Wybierz {{appName}} dla przetestowanego wyboru u wielu dostawców, darmowych kredytów co miesiąc, skilli, pamięci i czatu open source, który możesz hostować sam.",
       themPros: {
-        a: "596 wpisów modeli tekstowych. 38 identyfikatorów zawiera uncensored, abliterated lub Dolphin.",
-        b: "Bez abonamentu. Po zalogowaniu pierwsza wpłata w krypto od 0,10 USD.",
+        a: "610 wpisów modeli, w tym 54 fine-tuny abliterowane, bez cenzury lub podobne.",
+        b: "Subskrypcja niepotrzebna. Pierwsza wpłata od 0,10 USD w krypto, także Monero.",
         c: "Ceny katalogowe na automatycznie routowanych modelach, taniej niż u każdego pośrednika.",
       },
       themCons: {
         a: "Darmowy plan to jeden model w przeglądarce.",
-        b: "Prywatność zależy od ścieżki dostawcy; niektóre pozwalają na trening.",
+        b: "Prywatność zależy od trasy u dostawcy. Szyfrowany Private Mode kosztuje 5 % extra.",
         c: "Przy tak dużym katalogu testujesz wszystko sam.",
       },
       usPros: {
@@ -950,7 +952,7 @@ export const translations: typeof enTranslations = {
         c: "Najpierw plan: pakiety kredytów doładowują aktywny plan.",
       },
       chooseThem: {
-        a: "Chcesz płacić za zużycie lub korzystać z API bez konta przez x402.",
+        a: "Chcesz płacić za użycie bez subskrypcji albo wywoływać API bez konta, płacąc przez Lightning.",
         b: "Potrzebujesz niszowego modelu, który ma tylko ogromny katalog.",
         c: "Budujesz na API i chcesz cen katalogowych.",
       },
@@ -971,11 +973,11 @@ export const translations: typeof enTranslations = {
         },
         q2: {
           q: "Czy NanoGPT wymaga konta?",
-          a: "Darmowy model w przeglądarce działa bez konta. Doładowanie salda na stronie wymaga logowania. API obsługuje płatności x402 bez konta.",
+          a: "Darmowy model w przeglądarce działa bez konta, a saldo gościa działa z tokenem logowania. Subskrypcja wymaga logowania. API przyjmuje płatności Lightning bez konta (L402); x402 usunięto 2026-11-20.",
         },
         q3: {
           q: "Czy oba mają API?",
-          a: "Tak. API NanoGPT jest zgodne z OpenAI i Anthropic, z płatnościami bez konta. Nasze jest zgodne z OpenAI i Anthropic i odblokowuje się po planie albo zakupie kredytów.",
+          a: "Tak. API NanoGPT obsługuje OpenAI chat completions, Responses i Anthropic Messages, z płatnościami Lightning bez konta. Nasze obsługuje te same trzy formaty i odblokowuje się po zakupie planu lub kredytów.",
         },
         q4: {
           q: "Kto ma więcej modeli bez cenzury?",
@@ -988,14 +990,14 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "FreedomGPT alternatywa: {{appName}} vs FreedomGPT (2026)",
         description:
-          "{{appName}} vs FreedomGPT: Liberty i modele bez cenzury, zasady treści, prywatność, kredyty, API i open source. Fakty ze źródłami, z obu stron.",
+          "{{appName}} vs FreedomGPT: Liberty i opcje bez cenzury, zasady treści, prywatność, kredyty, API i open source. Fakty ze źródłami, obie strony.",
         keywords:
           "FreedomGPT alternatywa, FreedomGPT opinie, FreedomGPT cena, FreedomGPT bez cenzury, model Liberty, ChatGPT bez cenzury, alternatywa dla ChatGPT bez cenzury, AI bez cenzury, AI bez filtrów, FreedomGPT alternative, FreedomGPT vs, FreedomGPT review, FreedomGPT pricing, FreedomGPT Pro, Liberty model, censor-free AI, uncensored ChatGPT alternative, {{appName}} vs FreedomGPT",
       },
       hero: {
         title: "{{appName}} vs FreedomGPT",
         subtitle:
-          "Dwie aplikacje, które stawiają modele bez cenzury obok ChatGPT, Claude i Gemini. Zasady, prywatność, kredyty, open source.",
+          "Dwie aplikacje, które stawiają opcje bez cenzury obok ChatGPT, Claude i Gemini. Zasady, prywatność, kredyty, open source.",
         readTime: "6 min czytania",
       },
       intro: {
@@ -1005,15 +1007,15 @@ export const translations: typeof enTranslations = {
       relation:
         "Jesteśmy klientem FreedomGPT: {{freedomGptExamples}} działa w {{appName}} przez własne API FreedomGPT.",
       verdict:
-        "Wybierz FreedomGPT dla jednego planu za 20 USD na czat, obrazy i wideo, z darmowym startem bez konta. Wybierz {{appName}}, jeśli chcesz więcej modeli bez cenzury od kilku dostawców, żadnej klauzuli o nieetycznym użyciu ponad prawo, jawnych cen każdego modelu i platformy open source, która jest aktywnie rozwijana.",
+        "Wybierz FreedomGPT dla jednego planu za 20 USD obejmującego czat, obrazy i wideo, z darmowym startem i bez konta. Wybierz {{appName}}, jeśli chcesz nazwanych modeli bez cenzury od wielu dostawców, braku klauzuli etycznej ponad prawem, opublikowanych cen za model i aktywnie rozwijanej platformy open source.",
       themPros: {
         a: "Za darmo, bez karty i konta.",
-        b: "Liberty i inne modele bez cenzury obok ChatGPT, Claude i Gemini.",
+        b: "Opcje bez cenzury i własny model Liberty obok ChatGPT, Claude i Gemini.",
         c: "Generowanie obrazów i wideo w tym samym planie.",
       },
       themCons: {
-        a: "Według jego zasad modele muszą przestrzegać prawa USA i nie mogą służyć do celów nieetycznych.",
-        b: "Wiadomości, głos i obrazy trafiają do zewnętrznych dostawców; okres przechowywania nie jest podany.",
+        a: "Regulamin dopuszcza tylko zgodne z prawem i etyczne użycie, a jego modele bez cenzury pozostają bez nazwy.",
+        b: "Jego polityka mówi, że użytkownicy nie mogą oczekiwać prywatności, i nie podaje okresu przechowywania.",
         c: "Aplikacja desktopowa open source nie była aktualizowana od czerwca 2024.",
       },
       usPros: {
@@ -1044,7 +1046,7 @@ export const translations: typeof enTranslations = {
       faq: {
         q1: {
           q: "Czy FreedomGPT jest naprawdę bez cenzury?",
-          a: "Jego modele bez cenzury pomijają większość odmów, ale FreedomGPT deklaruje, że każdy hostowany model musi przestrzegać prawa USA i nie może służyć do celów nieetycznych, a etykieta „censor-free” nie gwarantuje odpowiedzi na każde zapytanie.",
+          a: "FreedomGPT reklamuje opcje bez cenzury, ale nie podaje żadnego modelu, a jego regulamin dopuszcza tylko zgodne z prawem i etyczne użycie. W {{appName}} każdy model bez cenzury ma nazwę, własną stronę i odblokowuje się po jednorazowym potwierdzeniu 18+.",
         },
         q2: {
           q: "Ile kosztuje FreedomGPT?",
@@ -1156,7 +1158,7 @@ export const translations: typeof enTranslations = {
       },
       intro: {
         lead: "uncensored.ai robi najbardziej odmienny model bez cenzury, jaki znamy: {{ownModel}}, trenowany na książkach i dokumentach usuniętych z mainstreamowego internetu, z poglądami politycznymi pod prąd mainstreamu. Mamy go przez własne API uncensored.ai. Ta strona odpowiada więc na jedno pytanie: korzystać z niego na uncensored.ai czy tutaj?",
-        p2: "Dane o uncensored.ai z cennika, strony API, strony o firmie i polityki prywatności, sprawdzone {{date}}. Nasze czytane na żywo z naszej konfiguracji.",
+        p2: "Fakty o uncensored.ai ze stron z cennikiem, API i informacjami o firmie, sprawdzone {{date}}. Jego polityka prywatności i regulamin nie załadowały się nam tego dnia. Nasze dane czytamy na żywo z naszej konfiguracji.",
       },
       relation:
         "Jesteśmy klientem uncensored.ai: {{uncensoredAiExamples}} działa w {{appName}} przez API uncensored.ai. Ten sam model, nasz czat, nasze rozliczenia.",
@@ -1165,10 +1167,10 @@ export const translations: typeof enTranslations = {
       themPros: {
         a: "Stała cena: Pro kosztuje 9,99 USD miesięcznie albo 99,99 USD rocznie, zablokowana dożywotnio, dopóki trwa subskrypcja.",
         b: "Nielimitowane czaty z modelem w tej cenie, do tego tryb głosowy, foldery i archiwa.",
-        c: "Polityka prywatności mówi, że Twoje dane nie służą do trenowania ani ulepszania modeli AI.",
+        c: "Według jego stron Twoje dane nigdy nie są sprzedawane, wynajmowane ani wymieniane, a model dostaje sam tekst.",
       },
       themCons: {
-        a: "Darmowy plan to 3 odpowiedzi dziennie.",
+        a: "Darmowy plan to dzienny limit, domyślnie 3 odpowiedzi.",
         b: "Jeden model, 32 768 tokenów kontekstu, bez generowania obrazów, wideo i muzyki.",
         c: "Wywołania API kosztują 0,05 USD za sztukę i kupuje się je osobno od Pro.",
       },
@@ -1204,7 +1206,7 @@ export const translations: typeof enTranslations = {
         },
         q2: {
           q: "Czy uncensored.ai jest darmowe?",
-          a: "Ma darmowy plan z 3 odpowiedziami dziennie. Pro kosztuje 9,99 USD miesięcznie albo 99,99 USD rocznie i znosi limit. W {{appName}} {{guestCredits}} darmowych kredytów miesięcznie działa bez konta.",
+          a: "Ma darmowy plan z dziennym limitem, domyślnie 3 odpowiedzi. Pro kosztuje 9,99 USD miesięcznie lub 99,99 USD rocznie i znosi limit. W {{appName}} {{guestCredits}} darmowych kredytów miesięcznie działa bez konta.",
         },
         q3: {
           q: "Czym wyróżnia się model uncensored.ai?",
@@ -1212,7 +1214,7 @@ export const translations: typeof enTranslations = {
         },
         q4: {
           q: "Czy uncensored.ai ma API?",
-          a: "Tak: API zgodne z OpenAI za 0,05 USD za inferencję, z kredytami kupowanymi osobno. W {{appName}} ten sam model wywołasz przez nasze API zgodne z OpenAI i Anthropic po dowolnym planie albo zakupie kredytów.",
+          a: "Tak: API na własnym endpoincie z treścią zapytania w stylu OpenAI, 0,05 USD za zapytanie, kredyty kupowane osobno od 5 USD. W {{appName}} ten sam model wywołasz przez nasze API zgodne z OpenAI i Anthropic po zakupie dowolnego planu lub kredytów.",
         },
       },
       cta: { title: "Postaw jego zdanie obok każdego innego modelu" },
@@ -1228,25 +1230,25 @@ export const translations: typeof enTranslations = {
       hero: {
         title: "{{appName}} vs OpenRouter",
         subtitle:
-          "Router dla deweloperów z 474 modelami kontra aplikacja czatu z wbudowanymi modelami bez cenzury. Opłaty, filtry, prywatność i API.",
+          "Router dla programistów z 477 modelami kontra aplikacja czatu z wbudowanymi modelami bez cenzury. Opłaty, filtry, prywatność i API.",
         readTime: "6 min czytania",
       },
       intro: {
         lead: "OpenRouter to domyślna odpowiedź na jeden klucz API i setki modeli. Sami z niego korzystamy. Ale to router dla deweloperów, nie aplikacja czatu, a jego półka z modelami bez cenzury jest skromna. Jeśli szukasz alternatywy dla OpenRouter do czatowania, oto uczciwe porównanie.",
-        p2: "Dane o OpenRouter z cennika, przewodnika o zbieraniu danych, regulaminu i publicznej listy modeli, sprawdzone {{date}}. Nasze czytane na żywo z naszej konfiguracji.",
+        p2: "Fakty o OpenRouter z jego FAQ, poradnika o logowaniu u dostawców, regulaminu, dokumentacji API i publicznej listy modeli, sprawdzone {{date}}. Nasze dane czytamy na żywo z naszej konfiguracji.",
       },
       relation:
         "Jesteśmy klientem OpenRouter: {{openRouterModels}} naszych modeli działa przez API OpenRouter, m.in. {{openRouterExamples}}. Dokładamy czat, media i dostawców bez cenzury, których OpenRouter nie ma.",
       verdict:
-        "Wybierz OpenRouter, jeśli jesteś deweloperem i chcesz jednego klucza do 474 modeli po cenach dostawców z przełączaniem awaryjnym, a interfejs masz własny. Wybierz {{appName}}, jeśli chcesz gotowego czatu z {{uncensored}} modelami bez cenzury, w tym {{ownModel}} i wersjami abliterowanymi, których OpenRouter nie ma, do tego obrazów, wideo i muzyki oraz API, gdy go potrzebujesz.",
+        "Wybierz OpenRouter, jeśli jesteś programistą i chcesz jednego klucza do 477 modeli w cenach dostawców, z fallbackiem, własnymi kluczami i routingiem bez retencji danych, a interfejs przynosisz własny. Wybierz {{appName}}, jeśli chcesz gotowego czatu z {{uncensored}} modelami bez cenzury, w tym {{ownModel}} i abliterowanymi wersjami, których OpenRouter nie ma, plus obrazy, wideo i muzykę, a API wtedy, gdy go potrzebujesz.",
       themPros: {
-        a: "474 modele na publicznej liście, po cenach dostawców.",
+        a: "477 modeli na publicznej liście, bez narzutu na inferencję.",
         b: "Bez subskrypcji. Darmowe modele: 50 zapytań dziennie, 1000 po zakupie kredytów za 10 USD.",
-        c: "Logowanie promptów i wykorzystanie Twoich danych tylko za Twoją zgodą.",
+        c: "Domyślnie bez logowania promptów, routing bez retencji danych i darmowe własne klucze do 25 000 USD miesięcznie.",
       },
       themCons: {
-        a: "5,5% opłaty od zakupu kredytów w standardowym planie.",
-        b: "Mało modeli bez cenzury: Venice Uncensored plus fine-tuny do roleplayu jak Hermes 4 i Magnum. 142 z jego 474 modeli mają flagę moderacji.",
+        a: "5,5 % opłaty przy zakupie kredytów kartą, 5 % przy krypto.",
+        b: "Mało modeli bez cenzury: 17 tunów do roleplayu lub bez cenzury, jak Venice Uncensored, Hermes 4 i Magnum, i żadnych wersji abliterowanych.",
         c: "Nie celuje w czat dla zwykłych użytkowników: interfejs dostarczasz sam.",
       },
       usPros: {
@@ -1255,8 +1257,8 @@ export const translations: typeof enTranslations = {
         c: "API zgodne z OpenAI i Anthropic: czat, obrazy, wideo i mowa na tym samym saldzie.",
       },
       usCons: {
-        a: "Mniejszy katalog: {{modelCount}} modeli czatu wobec 474 w OpenRouter.",
-        b: "Nasze {{markup}}% marży od kosztów dostawcy to więcej niż 5,5% opłaty w OpenRouter.",
+        a: "Mniejszy katalog: {{modelCount}} modeli czatu wobec 477 w OpenRouter.",
+        b: "Nasz narzut {{markup}} % na koszty dostawców jest wyższy niż opłata 5,5 % w OpenRouter, a my nie mamy własnych kluczy ani routingu bez retencji danych.",
         c: "Zbudowany najpierw jako czat: mniej opcji routingu niż w dedykowanym routerze.",
       },
       chooseThem: {
@@ -1277,15 +1279,15 @@ export const translations: typeof enTranslations = {
       faq: {
         q1: {
           q: "Czy jest alternatywa dla OpenRouter z modelami bez cenzury?",
-          a: "Tak. {{appName}} ma {{uncensored}} modeli bez cenzury od Venice, NanoGPT, uncensored.ai, FreedomGPT i Gab AI w jednym czacie i jednym API. NanoGPT i Venice też sprzedają modele bez cenzury przez API. Sam OpenRouter ma ich tylko kilka.",
+          a: "Tak. {{appName}} ma {{uncensored}} modeli bez cenzury od Venice, NanoGPT, uncensored.ai, FreedomGPT i Gab AI w jednym czacie i jednym API. Opcje tylko z API dla abliterowanych wag to OpenUncensored, Refuseless i NEAR AI Cloud. Sam OpenRouter nie ma modeli abliterowanych.",
         },
         q2: {
           q: "Czy OpenRouter pozwala na treści NSFW?",
-          a: "Regulamin wymaga 18+, a wejście jest skanowane pod kątem znanych materiałów CSAM. Każdy dostawca ma własne zasady, a 142 z 474 modeli na liście mają flagę moderacji, więc to, czy zapytanie przejdzie, zależy od modelu i dostawcy.",
+          a: "Regulamin wymaga 18+, a wejścia są filtrowane pod kątem znanych CSAM. Nie ma osobnej reguły dla treści seksualnych: obowiązuje regulamin każdego modelu, więc to, czy zapytanie przejdzie, zależy od modelu i dostawcy.",
         },
         q3: {
           q: "Ile pobiera OpenRouter?",
-          a: "Ceny katalogowe dostawców za token plus 5,5% opłaty od zakupu kredytów w standardowym planie. Subskrypcji nie ma. Darmowe modele pozwalają na 50 zapytań dziennie, 1000 po zakupie kredytów za 10 USD.",
+          a: "Bez narzutu na inferencję: ceny dostawców za token plus 5,5 % opłaty przy zakupie kredytów kartą, 5 % przy krypto. Nie ma subskrypcji. Darmowe modele pozwalają na 50 zapytań dziennie, 1000 po zakupie kredytów za 10 USD.",
         },
         q4: {
           q: "Czy mogę użyć mojego kodu pod OpenRouter z {{appName}}?",

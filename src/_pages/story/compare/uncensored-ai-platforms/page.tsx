@@ -423,6 +423,10 @@ export function TanstackPage({
               href={`/${locale}/story/blog/uncensored-models-what-each-is-good-at`}
               label={t("hub.us.guideLink")}
             />
+            <CardLink
+              href={`/${locale}/story/blog/uncensored-llm-api`}
+              label={t("hub.us.apiLink")}
+            />
           </Div>
         </ArticleSection>
 

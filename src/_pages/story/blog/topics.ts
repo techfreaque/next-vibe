@@ -22,6 +22,8 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
+  "azure-openai-alternatives": "developers",
+  "bedrock-alternatives": "developers",
   "ai-agent-runs-a-startup": "updates",
   "ai-ops-agent-tudo-sobre-ia": "updates",
   "claude-alternatives": "uncensored",
@@ -113,6 +115,8 @@ export const HUB_GUIDES: Record<TopicHub, readonly BlogPostSlug[]> = {
     "ai-chat-no-sign-up",
     "uncensored-llm-without-gpu",
     "uncensored-llm-api",
+    "azure-openai-alternatives",
+    "bedrock-alternatives",
     "uncensored-ai-image-generator",
     "model-refresh-uncensored-providers",
   ],
@@ -135,6 +139,22 @@ interface RelatedGuideSet {
 
 /** Curated hub + siblings. Posts not listed fall back to their topic. */
 const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
+  "azure-openai-alternatives": {
+    hub: "uncensored",
+    related: [
+      "bedrock-alternatives",
+      "uncensored-llm-api",
+      "openrouter-alternatives",
+    ],
+  },
+  "bedrock-alternatives": {
+    hub: "uncensored",
+    related: [
+      "azure-openai-alternatives",
+      "uncensored-llm-api",
+      "openai-anthropic-compatible-api",
+    ],
+  },
   "ai-agent-runs-a-startup": {
     hub: null,
     related: [

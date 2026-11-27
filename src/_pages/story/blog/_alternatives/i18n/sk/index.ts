@@ -4,6 +4,8 @@ export const translations: typeof enTranslations = {
   title: "Porovnanie platforiem",
   verify:
     "Ďalšie možnosti sme overili podľa uvedených oficiálnych zdrojov {{date}}. Na mobile posuň tabuľku do strany a zobrazia sa všetky stĺpce. Limity sa líšia podľa plánu a regiónu.",
+  verifyRange:
+    "Ďalšie možnosti overené podľa prepojených oficiálnych zdrojov medzi {{from}} a {{to}}. Na mobile posúvaj tabuľku do strán, aby si videl všetky stĺpce. Limity sa líšia podľa plánu a regiónu.",
   related: "Ďalšie porovnania alternatív",
   kind: {
     chat: "Čet s menším počtom odmietnutí",
@@ -61,6 +63,7 @@ export const translations: typeof enTranslations = {
     localOption: "Spracovanie v zariadení s lokálnym modelom",
     upstream: "Závisí od poskytovateľa modelu",
     noLogs: "Poskytovateľ uvádza, že neuchováva záznamy o zadaniach",
+    noDisk: "Poskytovateľ tvrdí, že žiadne vstupy API neukladá na disk",
   },
   api: {
     separate: "Samostatný produkt API",
@@ -175,7 +178,7 @@ export const translations: typeof enTranslations = {
       "Brána AI so záznamami priebehu požiadaviek a prehľadom výdavkov. Pred odoslaním citlivých údajov si over, čo zaznamenáva.",
     eden: "Jedno API pre jazykové modely a služby ako OCR či preklad. Možnosti závisia od zvoleného poskytovateľa.",
     together:
-      "Spracovanie bez vlastného servera a vyhradené koncové body pre otvorené modely. Over si, či ponúka model, ktorý potrebuješ.",
+      "Serverless aj dedikovaná inferencia s rozhraniami OpenAI, Responses a Anthropic Messages, plus obrázky, video a hlas. Žiadne modely bez cenzúry a jej podmienky zakazujú pornografiu.",
     bifrost:
       "Spusti vlastnú bránu v jazyku Go so záložným smerovaním a sémantickou vyrovnávacou pamäťou. Nasadenie a prístup k poskytovateľom nastavuješ ty.",
     truefoundry:
@@ -183,7 +186,7 @@ export const translations: typeof enTranslations = {
     llmGateway:
       "Kompatibilita s OpenAI a Anthropic a možnosť vlastnej prevádzky. Účtovanie a uchovávanie údajov závisia od nasadenia.",
     deepInfra:
-      "Hostované spracovanie otvorenými modelmi aj súkromné nasadenie na GPU. Vyber si z katalógu alebo nastav infraštruktúru.",
+      "Za token patrí medzi najlacnejšie pri bežných otvorených modeloch, štandardne s 200 súbežnými požiadavkami na model. V katalógu nemá modely bez cenzúry ani na roleplay.",
     bedrock:
       "Spravovaný katalóg modelov s riadením prístupu cez AWS. Dostupné modely a funkcie závisia od regiónu.",
     kong: "Pridáva smerovanie modelov a pravidlá do brány API. Over si, ktoré doplnky obsahuje tvoja edícia.",
@@ -214,7 +217,7 @@ export const translations: typeof enTranslations = {
     sandbase:
       "Jedno API spája volanie modelov, údaje z webu a izolované prostredia na spúšťanie kódu. Bezplatné volania majú denný limit.",
     openUncensored:
-      "Predplatený kľúč namiesto účtu: 58 abliterovaných a necenzurovaných textových modelov plus modely na obrázky a video, zoradené podľa nameraných odmietnutí. Platíte cenu za tokeny poskytovateľa, ktorý požiadavku vybaví, dobitie od 5 $.",
+      "Predplatený kľúč bez účtu a bez e-mailu: 58 textových modelov, takmer všetky abliterované, plus roleplayové fine-tuny, 20 obrazových a 3 video modely. Cena poskytovateľa bez provízie, dobitie od 5 USD s neobmedzenou platnosťou. Bez bezplatného plánu a bez webového četu.",
     risuAi:
       "Klient na čet s postavami s otvoreným kódom. Má príručky k svetom postáv, skupinové čety, obrázky emócií a prevod textu na reč. API modelu si zabezpečíš a platíš sám.",
     agnai:
@@ -224,19 +227,29 @@ export const translations: typeof enTranslations = {
     talemate:
       "Systém na hranie rolí s viacerými agentmi, rozprávačom, režisérom a sledovaním stavu sveta. Nástroj na vlastnú inštaláciu pre pokročilých používateľov.",
     featherless:
-      "Tisíce otvorených modelov vrátane doladených modelov bez cenzúry za pevný mesačný poplatok a cez jeden kľúč API. Plán Chat obmedzuje kontext aj súbežné požiadavky.",
+      "Viac než 50 000 modelov z Hugging Face na jeden kľúč, 1 398 označených ako abliterated a 1 605 ako uncensored. Plán Chat za 25 USD má neobmedzené tokeny, ale kontext 32K, nízku súbežnosť a len osobné použitie.",
     arliAi:
-      "Plány bez limitu tokenov pre otvorené modely aj modely s oslabenými obmedzeniami. Zahŕňajú aj obrázky. Lacnejšie plány spracujú jednu požiadavku naraz.",
+      "Neobmedzené tokeny s paušálnymi plánmi od 15 USD: okolo 121 textových modelov, veľa derestricted alebo necenzurovaných fine-tunov, plus generovanie obrázkov. Core a Plus spracujú jednu požiadavku naraz.",
     infermatic:
-      "Mesačné plány pre menší výber textových modelov bez cenzúry. Služba tvrdí, že neuchováva záznamy. Bezplatný plán má jeden model a nemá API.",
+      "Paušálne plány od 9 USD s vybranými necenzurovanými a roleplayovými tunmi 70B a sľubom, že neukladá logy. Bezplatný plán je len webový a individuálne plány nesmú poháňať aplikácie.",
     chutes:
-      "Decentralizované spracovanie textu, obrázkov, videa a zvuku s platbou za token. Bez bezplatného plánu.",
+      "Decentralizovaná inferencia s platbou za token, väčšina textových modelov beží v dôvernom výpočte a berie platby v kryptomenách. Bez modelov bez cenzúry a bez bezplatného plánu.",
     kagi: "Asistent s viacerými modelmi v balíku s vyhľadávačom Kagi. Čety sa predvolene vymažú po 24 hodinách a špičkové modely vyžadujú najvyšší plán.",
     huggingChat:
       "Čet s otvorenými modelmi cez automatické smerovanie. Kód četu je otvorený a spracovanie sa účtuje v kreditoch Hugging Face.",
     zai: "Vlastný čet od Zhipu pre modely GLM so samostatným API. Podľa zásad ochrany osobných údajov sa obsah správ používa na tréning.",
     ourDream:
       "Tvorba spoločníkov pre dospelých s četom, obrázkami a videom. Médiá sa platia mincami, ktoré kúpiš len s aktívnym plánom.",
+    refuseless:
+      "Hostiteľ len pre API: abliterované GLM 5.3, DeepSeek V4.1 Flash a Kimi K3.1 Pro s kontextom 1M vo formátoch OpenAI, Responses a Anthropic Messages. Vyžaduje overený e-mail a nemá aplikáciu na čet.",
+    nearAi:
+      "API v dôvernom výpočte s dvoma abliterovanými modelmi a hardvérovou atestáciou. Bez žiadosti o prístup, bez overovania identity, platí sa za token.",
+    uncensoredLlmAi:
+      "Predplatená brána s 332 abliterovanými a necenzurovanými četovými modelmi a každodennou kontrolou odmietnutí. Karta alebo krypto od 3 USD, prepredaj bez písomného súhlasu je zakázaný.",
+    abliterationAi:
+      "Vlastné abliterované modely vo formátoch OpenAI a Anthropic, región EÚ a vrstva pravidiel pre tvoje vlastné zásady. Plány od 20 USD mesačne.",
+    mancer:
+      "Roleplayové fine-tuny ako MythoMax a Magnum s bezplatným plánom MythoLite. Žiadne abliterované modely a jeho podmienky zakazujú obscénny alebo oplzlý obsah.",
   },
   articles: {
     "nofiltergpt-alternatives": {
@@ -258,7 +271,7 @@ export const translations: typeof enTranslations = {
     "openrouter-alternatives": {
       question: "Ktorá náhrada OpenRouter sa hodí pre produkčnú aplikáciu?",
       answer:
-        "Hostovaný prístup bez prirážky za tokeny ponúka Vercel. Na vlastnú bránu s vlastnými účtami poskytovateľov skús LiteLLM alebo Bifrost. Pri monitorovaní alebo riadení pravidiel porovnaj Portkey, Cloudflare a Helicone. Over si záložné smerovanie, uchovávanie údajov a poplatky.",
+        "Na necenzurovanú prevádzku: OpenUncensored, Refuseless alebo NEAR AI Cloud pre abliterované váhy za cenu poskytovateľa, {{appName}}, ak popri tom potrebuješ bežné modely, médiá a čet na jednom kľúči. Na smerovanie vlastných účtov poskytovateľov: LiteLLM alebo Bifrost vo vlastnej réžii, Vercel hostovaný bez prirážky na tokeny. Skontroluj fallbacky, uchovávanie dát a poplatky skôr, než presunieš prevádzku.",
     },
     "venice-ai-alternatives": {
       question: "Ako chrániť viac než históriu v prehliadači?",
