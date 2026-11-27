@@ -1,6 +1,8 @@
 /**
  * /story/self-host - run unbottled.ai on your own machine.
  *
+ * One install is the whole suite (AI, agents, accounting/ERP, CRM, payments,
+ * framework); the suite section links /story/business and /story/framework.
  * Primary path: connect the instance to an unbottled.ai account (every
  * model, no provider keys). Setup is git clone, bun i, vibe dev; the
  * first-run wizard at /setup does the rest (admin login, Connect AI,
@@ -19,25 +21,25 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Details } from "next-vibe/ui/components/details";
 import { Div } from "next-vibe/ui/components/div";
-import { Activity } from "next-vibe/ui/components/icons/Activity";
 import { ArrowDown } from "next-vibe/ui/components/icons/ArrowDown";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
-import { Brain } from "next-vibe/ui/components/icons/Brain";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { Cloud } from "next-vibe/ui/components/icons/Cloud";
-import { Coins } from "next-vibe/ui/components/icons/Coins";
-import { Cpu } from "next-vibe/ui/components/icons/Cpu";
+import { Code as CodeIcon } from "next-vibe/ui/components/icons/Code";
+import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Github } from "next-vibe/ui/components/icons/Github";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Link2 } from "next-vibe/ui/components/icons/Link2";
+import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { Monitor } from "next-vibe/ui/components/icons/Monitor";
 import { Rocket } from "next-vibe/ui/components/icons/Rocket";
-import { Search } from "next-vibe/ui/components/icons/Search";
 import { Server } from "next-vibe/ui/components/icons/Server";
 import { Sliders } from "next-vibe/ui/components/icons/Sliders";
 import { Terminal } from "next-vibe/ui/components/icons/Terminal";
+import { Users } from "next-vibe/ui/components/icons/Users";
 import { Span } from "next-vibe/ui/components/span";
 import { Summary } from "next-vibe/ui/components/summary";
 import { H3, P } from "next-vibe/ui/components/typography";
@@ -125,19 +127,20 @@ const SERVER_COMMANDS = [
 ] as const;
 
 const INSTANCE_POINTS = ["chats", "files", "tools", "admin"] as const;
-const ACCOUNT_SIDE_POINTS = ["models", "credits", "keys", "unlock"] as const;
+const ACCOUNT_SIDE_POINTS = ["models", "keys"] as const;
 const BROWSER_STEPS = ["open", "admin", "ai", "extras"] as const;
 const LOCAL_FACTS = ["docker", "postgres", "config"] as const;
 const ACCOUNT_POINTS = ["models", "local", "sync", "paid"] as const;
 const KEY_PROVIDERS = ["openrouter", "venice", "nanogpt"] as const;
 
-const INCLUDES = [
-  { key: "models", icon: Cpu },
-  { key: "memory", icon: Brain },
-  { key: "search", icon: Search },
-  { key: "thea", icon: Bot },
-  { key: "admin", icon: Activity },
-  { key: "tools", icon: Terminal },
+/** What one install brings; the business modules link deeper below the grid. */
+const SUITE = [
+  { key: "ai", icon: MessageSquare },
+  { key: "agents", icon: Bot },
+  { key: "books", icon: BookOpen },
+  { key: "customers", icon: Users },
+  { key: "payments", icon: CreditCard },
+  { key: "build", icon: CodeIcon },
 ] as const;
 
 /** Small uppercase label above a card title. */
@@ -369,6 +372,34 @@ export function TanstackPage({
       </PageHero>
 
       <PageSection
+        id="suite"
+        label={t("suite.eyebrow")}
+        title={t("suite.title")}
+        intro={t("suite.intro")}
+      >
+        <FeatureGrid columns={3}>
+          {SUITE.map(({ key, icon }) => (
+            <FeatureCard
+              key={key}
+              icon={icon}
+              title={t(`suite.cards.${key}.title`)}
+              className={cn(
+                key === "books" && "border-primary/40 ring-1 ring-primary/15",
+              )}
+            >
+              {t(`suite.cards.${key}.body`, vars)}
+            </FeatureCard>
+          ))}
+        </FeatureGrid>
+        <Div className="mt-4">
+          <CardLink
+            href={`/${locale}/story/business`}
+            label={t("suite.link")}
+          />
+        </Div>
+      </PageSection>
+
+      <PageSection
         id="start"
         tone="muted"
         label={t("start.eyebrow")}
@@ -588,32 +619,13 @@ export function TanstackPage({
           <FeatureCard icon={Sliders} title={t("own.cards.filter.title")}>
             {t("own.cards.filter.body")}
           </FeatureCard>
-          <FeatureCard icon={Coins} title={t("own.cards.bill.title")}>
-            {t("own.cards.bill.body", vars)}
+          <FeatureCard icon={Terminal} title={t("own.cards.api.title")}>
+            {t("own.cards.api.body")}
           </FeatureCard>
           <FeatureCard icon={Github} title={t("own.cards.code.title")}>
             {t("own.cards.code.body", vars)}
           </FeatureCard>
         </FeatureGrid>
-
-        <Div className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-xs md:mt-8 md:p-8">
-          <H3 className="text-xl font-semibold tracking-tight">
-            {t("includes.title")}
-          </H3>
-          <P className="mt-1 text-sm leading-relaxed text-muted-foreground md:text-base">
-            {t("includes.intro", vars)}
-          </P>
-          <Div className="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2">
-            {INCLUDES.map(({ key, icon: Icon }) => (
-              <Div key={key} className="flex items-start gap-3">
-                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <P className="text-sm leading-relaxed text-foreground/90">
-                  {t(`includes.items.${key}`, vars)}
-                </P>
-              </Div>
-            ))}
-          </Div>
-        </Div>
       </PageSection>
 
       <PageSection
@@ -651,6 +663,12 @@ export function TanstackPage({
               <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <P className="text-sm leading-relaxed text-foreground/90 md:text-base">
                 {t("server.points.connect", vars)}
+              </P>
+            </Div>
+            <Div className="flex gap-3">
+              <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <P className="text-sm leading-relaxed text-foreground/90 md:text-base">
+                {t("server.points.db")}
               </P>
             </Div>
           </Div>

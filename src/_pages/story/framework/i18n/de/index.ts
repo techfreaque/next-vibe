@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Entwickler: next-vibe-Framework, unzensierte KI-API, MCP",
     description:
-      "Einen Endpoint schreiben, Web-UI, CLI-Befehl, MCP-Tool und KI-Tool bekommen. Open Source. Klonen, installieren, starten. Dazu eine OpenAI- und Anthropic-kompatible API für Mainstream- und unzensierte Modelle.",
+      "Einen Endpoint schreiben, Web-UI, CLI-Befehl, MCP-Tool und KI-Tool bekommen. Open Source. Klonen, installieren, starten. Dazu eine OpenAI- und Anthropic-kompatible API für Mainstream- und unzensierte Modelle. Mit Modulen für Buchhaltung, Rechnungen, CRM und Kasse.",
     category: "Entwickler",
     imageAlt: "unbottled.ai für Entwickler: API, MCP und Self-Hosting",
     keywords:
@@ -15,13 +15,13 @@ export const translations: typeof enTranslations = {
     title: "Eine definition.ts.",
     titleAccent: "Jede Oberfläche.",
     subtitle:
-      "next-vibe ist das Open-Source-Framework in TypeScript hinter {{appName}}. Du schreibst einen Endpoint und bekommst Web-UI, CLI-Befehl, MCP-Tool, KI-Tool und mehr. Gleiche Validierung, gleiche Typen, kein Glue-Code.",
+      "next-vibe ist das Open-Source-Framework in TypeScript hinter {{appName}}. KI-Chat, Buchhaltung, Kasse, Lager und CRM laufen darauf. Ein Endpoint wird zu Web-UI, CLI-Befehl, MCP-Tool und KI-Tool. Kein Glue-Code.",
     ctaFramework: "Code ansehen",
     ctaKeys: "API nutzen",
     stats: {
       endpoints: "typisierte Endpoints im Repo",
       surfaces: "Oberflächen aus einer Definition",
-      languages: "Sprachen, jeder Text übersetzt",
+      languages: "Sprachen eingebaut",
       models: "Chat-Modelle, ein API-Schlüssel",
     },
   },
@@ -35,7 +35,7 @@ export const translations: typeof enTranslations = {
     selfHost: {
       label: "Selbst hosten",
       title: "Die ganze Plattform betreiben",
-      body: "Open Source. Klonen, installieren, starten. Den Rest erledigt der Browser.",
+      body: "Chat, Buchhaltung, Kasse, Lager, CRM. Klonen, installieren, starten.",
       link: "Installieren",
     },
     framework: {
@@ -43,6 +43,26 @@ export const translations: typeof enTranslations = {
       title: "Eine Definition, jede Oberfläche",
       body: "Einen Endpoint einmal schreiben. Daraus werden Web-UI, CLI-Befehl, MCP-Tool, KI-Tool und mehr.",
       link: "Code ansehen",
+    },
+  },
+  modules: {
+    eyebrow: "Im Repo",
+    title: "Ganze Produkte, gleiches Muster.",
+    intro:
+      "Buchhaltung, Rechnungen, CRM und Nachrichten folgen demselben Muster wie das Kontaktformular oben. Jeder Endpoint ist CLI-Befehl, MCP-Tool und KI-Tool, außer seine Definition schaltet das ab. Öffne einen beliebigen Ordner: definition, repository, route.",
+    endpoints: "{{count}} Endpoints",
+    business: "Führ deine Firma damit",
+    source: "Module auf GitHub ansehen",
+    tryLine: "Gleiches Muster, echte Befehle",
+    items: {
+      accounting: "Doppelte Buchführung",
+      documents: "Rechnungen, Eingangsrechnungen, Angebote",
+      purchasing: "Einkauf",
+      pos: "Kasse",
+      inventory: "Lager",
+      crm: "CRM und Leads",
+      newsletter: "Newsletter",
+      messaging: "Posteingang und Nachrichten",
     },
   },
   quickstart: {
@@ -98,7 +118,7 @@ export const translations: typeof enTranslations = {
       "Brauchst du mehr? Abonnenten laden mit Credit-Paketen ab {{packPrice}} nach. Paket-Credits verfallen nie.",
     facts: {
       credit: "1 Credit = 1 US-Cent",
-      rate: "{{rate}} Anfragen pro Minute je Schlüssel",
+      rate: "Kein festes Ratenlimit (Abrechnung pro Anfrage)",
       keys: "Bis zu {{maxKeys}} Schlüssel pro Konto",
       preflight: "Zu wenig Credits: 402, bevor etwas läuft",
     },
@@ -156,7 +176,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Das Framework",
     title: "Ein Endpoint, einmal komplett.",
     intro:
-      "Das Kontaktformular aus diesem Repo, gekürzt, aber echt. Aus einer Definition werden Web-UI, CLI-Befehl, MCP-Tool, nativer Screen, KI-Tool und Cron-Job. Das echte Formular steht unten auf dieser Seite.",
+      "Das Kontaktformular aus diesem Repo, gekürzt, aber echt. Aus einer Definition werden Web-UI, CLI-Befehl, MCP-Tool, nativer Screen, KI-Tool und Cron-Job.",
     tabAdd: "Eigenes Feature",
     call: {
       title: "So rufst du es auf",
@@ -168,7 +188,7 @@ export const translations: typeof enTranslations = {
     becomes: "Aus dem Kontaktformular wird",
     more: "Dazu {{count}} weitere Oberflächen",
     source: "Kompletter Quellcode auf GitHub",
-    live: "Unten live ausprobieren",
+    live: "Live am Ende der Seite",
     docs: "Doku zu den Mustern auf GitHub",
     deleteLine:
       "Ein Feature ist ein Ordner. Löschen, `vibe gen` ausführen, und es verschwindet auf einen Schlag von jeder Oberfläche.",
@@ -229,10 +249,6 @@ export const translations: typeof enTranslations = {
       q: "Welche SDKs und Tools funktionieren?",
       a: "Die offiziellen OpenAI- und Anthropic-SDKs, jede OpenAI-kompatible Bibliothek und Coding-Agenten wie Claude Code, Codex CLI, OpenCode, Aider, Cline und Continue. Base-URL und Schlüssel tauschen, fertig.",
     },
-    price: {
-      q: "Wie wird ein Aufruf berechnet?",
-      a: "In Credits. Ein Credit ist ein US-Cent. Jedes Modell hat einen Credit-Satz pro Million Ein- und Ausgabetokens, gelistet in `GET /v1/models`. Jede Antwort meldet `usage.credits_charged` (Streams mit `stream_options.include_usage`), du weißt also immer, was ein Aufruf gekostet hat.",
-    },
     uncensored: {
       q: "Kann ich unzensierte Modelle über die API aufrufen?",
       a: "Ja. Einmal auf der Seite für API-Schlüssel bestätigen, dass du mindestens 18 bist, dann wie jedes andere Modell aufrufen. Abliterierte Modelle und UncensoredLM nutzen dieselben Endpoints.",
@@ -243,15 +259,11 @@ export const translations: typeof enTranslations = {
     },
     limits: {
       q: "Welche Rate-Limits gelten?",
-      a: "Standardmäßig {{rate}} Anfragen pro Minute je Schlüssel. Darüber gibt es HTTP 429 mit `Retry-After`-Header. Mehr Durchsatz nötig? Nutze das Kontaktformular unten.",
+      a: "Kein festes Ratenlimit. Die Nutzung wird pro Anfrage aus deinem Guthaben abgerechnet; es gilt ein großzügiger Missbrauchsschutz (hohe Burst- und Stream-Obergrenzen). HTTP 429 von Modellanbietern wird mit `Retry-After`-Header durchgereicht. Sehr hohes Volumen geplant? Nutze das Kontaktformular unten.",
     },
     selfHost: {
       q: "Ist Selbsthosten kostenlos?",
       a: "Ja. Der Code ist Open Source: MIT für die App, GPL v3 für das Framework. Eigene Anbieterschlüssel mitbringen, oder die Installation mit deinem {{appName}}-Konto verbinden und nach Verbrauch zahlen.",
-    },
-    docker: {
-      q: "Brauche ich Docker oder einen Datenbankserver?",
-      a: "Nein. Standard ist eingebettetes Postgres (PGlite). Später auf volles Postgres wechseln, indem du `DATABASE_URL` änderst.",
     },
   },
   contact: {

@@ -79,6 +79,7 @@ describe("client-locale-loader", () => {
   });
 
   it.each([
+    ["src/_pages/story/business/i18n/index.ts", "de"],
     ["src/_pages/story/framework/i18n/index.ts", "de"],
     ["src/_pages/story/self-host/i18n/index.ts", "de"],
     ["src/user/public/signup/i18n/index.ts", "de"],

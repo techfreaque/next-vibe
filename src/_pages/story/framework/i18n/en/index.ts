@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Developers: next-vibe Framework, Uncensored AI API, MCP",
     description:
-      "Write one endpoint, get a web UI, CLI command, MCP tool, AI tool and more. Open source. Clone, install, run. Plus one OpenAI and Anthropic compatible API for mainstream and uncensored models.",
+      "Write one endpoint, get a web UI, CLI command, MCP tool, AI tool and more. Open source. Clone, install, run. Plus one OpenAI and Anthropic compatible API for mainstream and uncensored models. Includes accounting, invoicing, CRM and point-of-sale modules.",
     category: "Developers",
     imageAlt: "unbottled.ai for developers: API, MCP and self-hosting",
     keywords:
@@ -13,13 +13,13 @@ export const translations = {
     title: "One definition.ts.",
     titleAccent: "Every surface.",
     subtitle:
-      "next-vibe is the open-source TypeScript framework behind {{appName}}. Write one endpoint, get a web UI, CLI command, MCP tool, AI tool and more. Same validation, same types, no glue code.",
+      "next-vibe is the open-source TypeScript framework behind {{appName}}. AI chat, accounting, POS, inventory and CRM run on it. One endpoint becomes a web UI, CLI command, MCP tool and AI tool. No glue code.",
     ctaFramework: "See the pattern",
     ctaKeys: "Use the API",
     stats: {
       endpoints: "typed endpoints in the repo",
       surfaces: "surfaces from one definition",
-      languages: "languages, every string translated",
+      languages: "languages built in",
       models: "chat models, one API key",
     },
   },
@@ -33,7 +33,7 @@ export const translations = {
     selfHost: {
       label: "Self-host",
       title: "Run the whole platform",
-      body: "Open source. Clone, install, run. The browser handles the rest.",
+      body: "Chat, accounting, POS, inventory, CRM. Clone, install, run.",
       link: "Install it",
     },
     framework: {
@@ -41,6 +41,26 @@ export const translations = {
       title: "One definition, every surface",
       body: "Write an endpoint once. Get a web UI, CLI command, MCP tool, AI tool and more.",
       link: "See the pattern",
+    },
+  },
+  modules: {
+    eyebrow: "In the repo",
+    title: "Whole products, same pattern.",
+    intro:
+      "Accounting, invoicing, CRM and messaging follow the same pattern as the contact form above. Each endpoint is a CLI command, MCP tool and AI tool unless its definition opts out. Open any folder: definition, repository, route.",
+    endpoints: "{{count}} endpoints",
+    business: "Run your company on it",
+    source: "Browse the modules on GitHub",
+    tryLine: "Same pattern, real commands",
+    items: {
+      accounting: "Double-entry accounting",
+      documents: "Invoices, bills, quotes",
+      purchasing: "Purchasing",
+      pos: "Point of sale",
+      inventory: "Inventory",
+      crm: "CRM and leads",
+      newsletter: "Newsletter",
+      messaging: "Inbox and messaging",
     },
   },
   quickstart: {
@@ -96,7 +116,7 @@ export const translations = {
       "Need more? Subscribers top up with credit packs from {{packPrice}}. Pack credits never expire.",
     facts: {
       credit: "1 credit = 1 US cent",
-      rate: "{{rate}} requests per minute per key",
+      rate: "No fixed rate limit (billed per request)",
       keys: "Up to {{maxKeys}} keys per account",
       preflight: "Short on credits: 402 before anything runs",
     },
@@ -154,7 +174,7 @@ export const translations = {
     eyebrow: "The framework",
     title: "Follow one endpoint.",
     intro:
-      "The contact form from this repo, trimmed but real. One definition becomes a web UI, CLI command, MCP tool, native screen, AI tool and cron job. The live form sits at the bottom of this page.",
+      "The contact form from this repo, trimmed but real. One definition becomes a web UI, CLI command, MCP tool, native screen, AI tool and cron job.",
     tabAdd: "Add yours",
     call: {
       title: "Call it",
@@ -166,7 +186,7 @@ export const translations = {
     becomes: "The contact form becomes",
     more: "Plus {{count}} more surfaces",
     source: "Full source on GitHub",
-    live: "Try it live below",
+    live: "Live at the end of the page",
     docs: "Pattern docs on GitHub",
     deleteLine:
       "A feature is a folder. Delete it, run `vibe gen`, and it disappears from every surface at once.",
@@ -227,10 +247,6 @@ export const translations = {
       q: "Which SDKs and tools work?",
       a: "The official OpenAI and Anthropic SDKs, any OpenAI-compatible library, and coding agents like Claude Code, Codex CLI, OpenCode, Aider, Cline and Continue. Change the base URL and the key.",
     },
-    price: {
-      q: "How is a call priced?",
-      a: "In credits. One credit is one US cent. Each model has a credit rate per million input and output tokens, listed in `GET /v1/models`. Every response reports `usage.credits_charged` (streams with `stream_options.include_usage`), so you always know what a call cost.",
-    },
     uncensored: {
       q: "Can I call uncensored models over the API?",
       a: "Yes. Confirm once on the API keys page that you are 18 or older, then call them like any other model. Abliterated models and UncensoredLM use the same endpoints.",
@@ -241,15 +257,11 @@ export const translations = {
     },
     limits: {
       q: "What are the rate limits?",
-      a: "{{rate}} requests per minute per key by default. Over the limit you get HTTP 429 with a `Retry-After` header. Need more throughput? Use the contact form below.",
+      a: "No fixed rate limit. Usage is billed per request from your credits, and generous abuse protection applies (high burst and concurrent stream guards). Upstream provider 429s pass through with a `Retry-After` header. Planning very high volume? Use the contact form below.",
     },
     selfHost: {
       q: "Is self-hosting free?",
       a: "Yes. The code is open source: MIT for the app, GPL v3 for the framework. Bring your own provider keys, or connect the install to your {{appName}} account and pay for what you use.",
-    },
-    docker: {
-      q: "Do I need Docker or a database server?",
-      a: "No. The default database is embedded Postgres (PGlite). Switch to full Postgres later by changing `DATABASE_URL`.",
     },
   },
   contact: {

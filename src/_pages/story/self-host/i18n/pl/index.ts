@@ -2,20 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "{{appName}} na własnym serwerze: twój serwer, każdy model",
+    title: "{{appName}} na własnym serwerze: AI, księgowość i CRM",
     description:
-      "Uruchom {{appName}} na swoim komputerze. git clone, bun i, vibe dev. Zaloguj się kontem {{appName}} i masz dostęp do wszystkich {{modelCount}} modeli. Bez kluczy dostawców.",
+      "{{appName}} na twoim komputerze. git clone, bun i, vibe dev. Wszystkie {{modelCount}} modele AI przez konto {{appName}}, do tego księgowość, CRM i newslettery. Twoje dane zostają w twojej bazie.",
     category: "Self-Host",
     imageAlt: "{{appName}} na własnym komputerze",
     keywords:
-      "self-host, własny serwer, czat AI na własnym serwerze, next-vibe, {{appName}}, open source, prywatna AI, lokalna AI, AI bez cenzury",
+      "self-host, własny serwer, czat AI na własnym serwerze, next-vibe, {{appName}}, open source, prywatna AI, lokalna AI, AI bez cenzury, księgowość na własnym serwerze, ERP open source, CRM na własnym serwerze",
   },
   hero: {
     badge: "Darmowe i open source",
     title: "Twój serwer.",
-    titleHighlight: "Każdy model.",
+    titleHighlight: "Twoje AI. Twoje księgi.",
     subtitle:
-      "Uruchom {{appName}} na swoim komputerze. Zaloguj się kontem {{appName}} i masz wszystkie {{modelCount}} modeli. Zero kluczy dostawców. Twoje czaty nie opuszczają twojej bazy.",
+      "Uruchom {{appName}} na swoim komputerze. Zaloguj się kontem {{appName}} i działają wszystkie {{modelCount}} modele. Bez kluczy dostawców. Księgowość, CRM, newslettery i agenci są w tej samej aplikacji.",
     ctaStart: "Uruchom to",
     ctaGithub: "Zobacz na GitHubie",
   },
@@ -25,20 +25,51 @@ export const translations: typeof enTranslations = {
       label: "Działa u ciebie",
       title: "Twoja instancja",
       points: {
-        chats: "Czaty, wspomnienia i dokumenty w twoim własnym Postgresie",
+        chats: "Czaty, księgi i klienci w twoim własnym Postgresie",
         files: "Pliki i wygenerowane media na twoim dysku",
         tools: "Thea, zadania cron i każde narzędzie AI",
-        admin: "Twój login admina. Twoje zasady.",
+        admin: "Twój panel, twoje zasady.",
       },
     },
     account: {
       label: "Działa na {{appName}}",
       title: "Twoje konto",
       points: {
-        models: "{{modelCount}} modeli, od mainstreamu po bez cenzury",
-        credits: "Rozliczenie z twoich kredytów {{appName}}",
-        keys: "Zero kluczy dostawców do pilnowania",
-        unlock: "Odblokowuje to dowolny plan lub pakiet kredytów",
+        models: "{{modelCount}} modeli, rozliczane z twoich kredytów",
+        keys: "Zero kluczy dostawców",
+      },
+    },
+  },
+  suite: {
+    eyebrow: "Co instalujesz",
+    title: "Dużo więcej niż czat.",
+    intro:
+      "Jeden kod. Jedna baza danych. Jeden panel. Każdy moduł jest w tej samej instalacji.",
+    link: "Zobacz cały pakiet dla firm",
+    cards: {
+      ai: {
+        title: "Czat AI",
+        body: "{{modelCount}} modeli, pamięć, wyszukiwanie w sieci i czaty incognito. Do tego obrazy, wideo, muzyka i mowa.",
+      },
+      agents: {
+        title: "Agent, który pracuje",
+        body: "Thea, wbudowany agent, wykonuje zadania według harmonogramu i używa SSH, przeglądarki i twojej poczty jako narzędzi.",
+      },
+      books: {
+        title: "Księgowość i ERP",
+        body: "Księga główna z podwójnym zapisem, faktury sprzedaży i zakupu, zamówienia, magazyn i kasa.",
+      },
+      customers: {
+        title: "Klienci",
+        body: "CRM z importem CSV, newslettery z podwójną zgodą, jedna skrzynka na e-mail, SMS, Telegram i WhatsApp.",
+      },
+      payments: {
+        title: "Płatności",
+        body: "Płatności przez Stripe i kryptowaluty za plany subskrypcyjne, z webhookami i zwrotami.",
+      },
+      build: {
+        title: "Własne funkcje",
+        body: "Jeden plik definicji staje się stroną, poleceniem CLI, narzędziem MCP i narzędziem AI.",
       },
     },
   },
@@ -95,7 +126,7 @@ export const translations: typeof enTranslations = {
         },
         ai: {
           title: "Połącz konto {{appName}}",
-          body: "Wpisz e-mail i hasło do {{appName}}. Z dowolnym planem lub pakietem kredytów odblokowujesz każdy model. Bez kluczy.",
+          body: "Wpisz e-mail i hasło do {{appName}}. Gotowe.",
         },
         extras: {
           title: "Dodatki, gdy będą potrzebne",
@@ -119,8 +150,8 @@ export const translations: typeof enTranslations = {
           body: "Mainstreamowe, otwarte i bez cenzury. Ten sam wybór co na {{appName}}.",
         },
         local: {
-          title: "Czaty zostają u ciebie",
-          body: "Wątki leżą w twojej bazie. Synchronizują się tylko, jeśli to włączysz.",
+          title: "Historia zostaje u ciebie",
+          body: "Wątki są zapisane w twojej bazie. Przez {{appName}} idą tylko wywołania modeli. Synchronizacja jest wyłączona, dopóki jej nie włączysz.",
         },
         sync: {
           title: "Twoje ustawienia idą z tobą",
@@ -155,9 +186,9 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Twój Postgres, twoje pliki, twoje logi. Ty wybierasz modele i to, ile filtrów stoi między tobą a nimi.",
     cards: {
-      bill: {
-        title: "Twój rachunek, twój wybór",
-        body: "Koszty modeli idą z twoich kredytów {{appName}} albo prosto do twojego dostawcy. Ty decydujesz.",
+      api: {
+        title: "Twoje API w gratisie",
+        body: "Każdy moduł to polecenie CLI i narzędzie MCP na twojej instancji. Napisz skrypt albo podepnij swojego agenta.",
       },
       filter: {
         title: "Twój poziom filtrowania",
@@ -169,24 +200,11 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-  includes: {
-    title: "Wszystko, co ma chmura.",
-    intro: "Ten sam kod co {{appName}}. Nic nie schowane.",
-    items: {
-      models: "{{modelCount}} modeli czatu, plus obraz, wideo, muzyka i mowa",
-      memory: "Trwała pamięć i czaty incognito",
-      search: "Wyszukiwanie w sieci i pobieranie stron",
-      thea: "Thea, twoja adminka AI: wykonuje zadania, buduje narzędzia na prośbę",
-      admin: "Panel admina i zadania cron",
-      tools:
-        "SSH, automatyzacja przeglądarki i klient poczty jako narzędzia AI",
-    },
-  },
   server: {
     eyebrow: "Na produkcję",
     title: "Wrzuć to na serwer.",
     intro:
-      "To samo repo, te same trzy komendy. Potem build produkcyjny zamiast serwera deweloperskiego.",
+      "To samo klonowanie i instalacja. Potem build produkcyjny zamiast serwera deweloperskiego.",
     terminalTitle: "Na twoim serwerze",
     rows: {
       start: "Pierwszy start: build produkcyjny",
@@ -197,11 +215,12 @@ export const translations: typeof enTranslations = {
       env: "Przy pierwszej wizycie ten sam kreator. Wolisz zmienne środowiskowe? Ustaw je we wdrożeniu i zrestartuj.",
       connect:
         "Konto {{appName}} łączysz na serwerze dokładnie tak jak na laptopie.",
+      db: "Domyślnie wbudowany Postgres (PGlite). Na produkcji ustaw DATABASE_URL na własnego Postgresa.",
     },
   },
   developers: {
     title: "Chcesz na tym budować?",
-    body: "Każda funkcja to jeden plik definicji, który staje się stroną, komendą CLI, narzędziem MCP i narzędziem AI.",
+    body: "Każdy moduł to zwykły TypeScript w repozytorium. Zrób fork, rozbuduj go albo napisz własny.",
     cta: "Zobacz, jak działa next-vibe",
   },
   help: {

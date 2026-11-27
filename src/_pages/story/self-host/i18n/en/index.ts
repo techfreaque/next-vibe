@@ -1,19 +1,19 @@
 export const translations = {
   meta: {
-    title: "Self-Host {{appName}}: Your Server, Every Model",
+    title: "Self-Host {{appName}}: AI, Accounting and CRM on Your Server",
     description:
-      "Run {{appName}} on your own machine. git clone, bun i, vibe dev. Sign in with your {{appName}} account and all {{modelCount}} models work. No provider keys.",
+      "Run {{appName}} on your own machine. git clone, bun i, vibe dev. All {{modelCount}} AI models through your {{appName}} account, plus accounting, CRM and newsletters. Your data stays in your database.",
     category: "Self-Host",
     imageAlt: "Self-host {{appName}} on your own machine",
     keywords:
-      "self-host, self-hosted AI chat, next-vibe, {{appName}}, open source, private AI, local AI, uncensored AI",
+      "self-host, self-hosted AI chat, next-vibe, {{appName}}, open source, private AI, local AI, uncensored AI, self-hosted accounting, open source ERP, self-hosted CRM",
   },
   hero: {
     badge: "Free and open source",
     title: "Your server.",
-    titleHighlight: "Every model.",
+    titleHighlight: "Your AI. Your business.",
     subtitle:
-      "Run {{appName}} on your own machine. Sign in with your {{appName}} account and all {{modelCount}} models work. No provider keys. Your chats never leave your database.",
+      "Run {{appName}} on your own machine. Sign in with your {{appName}} account and all {{modelCount}} models work. No provider keys. Accounting, CRM, newsletters and agents ship in the same app.",
     ctaStart: "Get it running",
     ctaGithub: "View on GitHub",
   },
@@ -23,20 +23,51 @@ export const translations = {
       label: "Runs on your machine",
       title: "Your instance",
       points: {
-        chats: "Chats, memories and documents in your own Postgres",
+        chats: "Chats, books and customers in your own Postgres",
         files: "Uploads and generated media on your disk",
         tools: "Thea, cron jobs and every AI tool",
-        admin: "Your admin login. Your rules.",
+        admin: "Your admin, your rules.",
       },
     },
     account: {
       label: "Runs on {{appName}}",
       title: "Your account",
       points: {
-        models: "{{modelCount}} models, mainstream to uncensored",
-        credits: "Usage billed to your {{appName}} credits",
-        keys: "Zero provider keys to manage",
-        unlock: "Unlocks with any plan or credit pack",
+        models: "{{modelCount}} models, billed to your credits",
+        keys: "Zero provider keys",
+      },
+    },
+  },
+  suite: {
+    eyebrow: "What you install",
+    title: "Far more than a chat app.",
+    intro:
+      "One codebase. One database. One admin. Every module ships in the same install.",
+    link: "See the full business suite",
+    cards: {
+      ai: {
+        title: "AI chat",
+        body: "{{modelCount}} models, memory, web search and incognito chats. Images, video, music and speech.",
+      },
+      agents: {
+        title: "An agent that works",
+        body: "Thea, the built-in agent, runs tasks on a schedule and uses SSH, a browser and your email as tools.",
+      },
+      books: {
+        title: "Accounting and ERP",
+        body: "Double-entry ledger, invoices, bills, purchasing, inventory and point of sale.",
+      },
+      customers: {
+        title: "Customers",
+        body: "CRM with CSV import, newsletters with double opt-in, one inbox for email, SMS, Telegram and WhatsApp.",
+      },
+      payments: {
+        title: "Payments",
+        body: "Stripe and crypto checkout for subscription plans, with webhooks and refunds.",
+      },
+      build: {
+        title: "Your own features",
+        body: "One definition file becomes a web page, a CLI command, an MCP tool and an AI tool.",
       },
     },
   },
@@ -93,7 +124,7 @@ export const translations = {
         },
         ai: {
           title: "Connect your {{appName}} account",
-          body: "Enter your {{appName}} email and password. Every model unlocks with any plan or credit pack. No keys.",
+          body: "Enter your {{appName}} email and password. Done.",
         },
         extras: {
           title: "Extras, when you need them",
@@ -117,8 +148,8 @@ export const translations = {
           body: "Mainstream, open and uncensored. Same lineup as {{appName}}.",
         },
         local: {
-          title: "Chats stay local",
-          body: "Threads live in your database. They never sync unless you turn it on.",
+          title: "History stays local",
+          body: "Threads are stored in your database. Only model calls go through {{appName}}. Thread sync is off unless you turn it on.",
         },
         sync: {
           title: "Your setup follows you",
@@ -153,9 +184,9 @@ export const translations = {
     subtitle:
       "Your Postgres, your files, your logs. You pick the models and how much filtering sits between you and them.",
     cards: {
-      bill: {
-        title: "Your bill, your call",
-        body: "Model spend goes to your {{appName}} credits or straight to your own provider. You pick.",
+      api: {
+        title: "Your API, too",
+        body: "Every module is a CLI command and an MCP tool on your instance. Script it or point your agent at it.",
       },
       filter: {
         title: "Your filtering level",
@@ -167,23 +198,11 @@ export const translations = {
       },
     },
   },
-  includes: {
-    title: "Everything the cloud has.",
-    intro: "Same codebase as {{appName}}. Nothing held back.",
-    items: {
-      models: "{{modelCount}} chat models, plus image, video, music and speech",
-      memory: "Persistent memory and incognito chats",
-      search: "Web search and page fetch",
-      thea: "Thea, your AI admin: runs tasks, builds tools on request",
-      admin: "Admin dashboard and cron jobs",
-      tools: "SSH, browser automation, email client as AI tools",
-    },
-  },
   server: {
     eyebrow: "Going live",
     title: "Put it on a server.",
     intro:
-      "Same repo, same three commands. Then a production build instead of the dev server.",
+      "Same clone and install. Then a production build instead of the dev server.",
     terminalTitle: "On your server",
     rows: {
       start: "First start: production build",
@@ -194,11 +213,12 @@ export const translations = {
       env: "Same setup wizard on first visit. Prefer env vars? Set them in your deployment and restart.",
       connect:
         "Connect your {{appName}} account from the server, exactly like on your laptop.",
+      db: "Embedded Postgres (PGlite) by default. Point DATABASE_URL at your own Postgres for production.",
     },
   },
   developers: {
     title: "Want to build on it?",
-    body: "Every feature is one definition file that becomes a web page, a CLI command, an MCP tool and an AI tool.",
+    body: "Every module is plain TypeScript in the repo. Fork it, extend it, or write your own.",
     cta: "See how next-vibe works",
   },
   help: {

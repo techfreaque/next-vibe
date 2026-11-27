@@ -22,6 +22,7 @@ import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowDown } from "next-vibe/ui/components/icons/ArrowDown";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
@@ -30,20 +31,27 @@ import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Flame } from "next-vibe/ui/components/icons/Flame";
 import { Github } from "next-vibe/ui/components/icons/Github";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
+import { Inbox } from "next-vibe/ui/components/icons/Inbox";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Layers } from "next-vibe/ui/components/icons/Layers";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { Megaphone } from "next-vibe/ui/components/icons/Megaphone";
+import { Package } from "next-vibe/ui/components/icons/Package";
 import { Plug } from "next-vibe/ui/components/icons/Plug";
+import { Receipt } from "next-vibe/ui/components/icons/Receipt";
 import { Server } from "next-vibe/ui/components/icons/Server";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { ShieldOff } from "next-vibe/ui/components/icons/ShieldOff";
+import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
 import { Smartphone } from "next-vibe/ui/components/icons/Smartphone";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Terminal } from "next-vibe/ui/components/icons/Terminal";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { X } from "next-vibe/ui/components/icons/X";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { JsonLd } from "next-vibe/ui/components/json-ld";
-import { Link } from "next-vibe/ui/components/link";
+import { ExternalLink, Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import type { IconComponent } from "next-vibe/ui/lib/helper";
@@ -64,7 +72,6 @@ import {
 } from "@/api-keys/coding-tools";
 import {
   API_DOCS_PATH,
-  API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE,
   API_KEY_MAX_ACTIVE,
   API_KEYS_PAGE_PATH,
 } from "@/api-keys/constants";
@@ -128,7 +135,72 @@ export interface FrameworkPageData {
   abliterated: UncensoredModelChip[];
   /** The model trained on its own (banned-texts) corpus, when live. */
   worldview: (UncensoredModelChip & { name: string }) | null;
+  /** Endpoint count per MODULES entry (same order), from the generated index. */
+  moduleCounts: number[];
   platform: Platform;
+}
+
+/** Business modules built on the same pattern, by endpoint path prefix. */
+const MODULES = [
+  {
+    key: "accounting",
+    icon: BookOpen,
+    folder: "src/chart-of-accounts",
+    prefixes: ["chart-of-accounts"],
+  },
+  {
+    key: "documents",
+    icon: Receipt,
+    folder: "src/payment/invoice",
+    prefixes: [
+      "payment/invoice",
+      "payment/bill",
+      "payment/estimate",
+      "payment/credit-note",
+    ],
+  },
+  {
+    key: "purchasing",
+    icon: ShoppingCart,
+    folder: "src/purchasing",
+    prefixes: ["purchasing"],
+  },
+  { key: "pos", icon: Wallet, folder: "src/pos", prefixes: ["pos"] },
+  {
+    key: "inventory",
+    icon: Package,
+    folder: "src/inventory",
+    prefixes: ["inventory"],
+  },
+  { key: "crm", icon: Users, folder: "src/leads", prefixes: ["leads"] },
+  {
+    key: "newsletter",
+    icon: Megaphone,
+    folder: "src/newsletter",
+    prefixes: ["newsletter"],
+  },
+  {
+    key: "messaging",
+    icon: Inbox,
+    folder: "src/messenger",
+    prefixes: ["messenger"],
+  },
+] as const;
+
+/** Real aliases from the business modules, shown under the grid. */
+const MODULE_COMMANDS = `vibe payment-invoice-list --help
+vibe pos-dashboard`;
+
+function countModuleEndpoints(
+  paths: ReadonlyArray<readonly string[]>,
+  prefixes: readonly string[],
+): number {
+  return paths.filter((path) => {
+    const joined = path.join("/");
+    return prefixes.some(
+      (prefix) => joined === prefix || joined.startsWith(`${prefix}/`),
+    );
+  }).length;
 }
 
 /** The hosted API lives on unbottled.ai, also when this page runs on a self-hosted copy. */
@@ -182,6 +254,12 @@ export async function tanstackLoader({
     abliterated: uncensored
       .filter(({ kind }) => kind !== "ownWorldview")
       .map(({ model }) => ({ id: model.id, slug: model.slug })),
+    moduleCounts: MODULES.map(({ prefixes }) =>
+      countModuleEndpoints(
+        endpointsMeta.map((meta) => meta.path),
+        prefixes,
+      ),
+    ),
     worldview:
       worldview === undefined
         ? null
@@ -248,12 +326,10 @@ const PRICING_FACTS = [
 const FAQ_KEYS = [
   "free",
   "sdks",
-  "price",
   "uncensored",
   "media",
   "limits",
   "selfHost",
-  "docker",
 ] as const;
 
 /** Coding tools named on the page (generic entries left out). */
@@ -325,6 +401,7 @@ export function TanstackPage({
   apiBaseUrl,
   abliterated,
   worldview,
+  moduleCounts,
   platform,
 }: FrameworkPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
@@ -334,7 +411,6 @@ export function TanstackPage({
   const snippets = buildDocsSnippets(apiBaseUrl);
   const toolSnippets = buildCodingToolSnippets({ baseUrl: apiBaseUrl });
   const prices = getApiAccessPrices(locale);
-  const rate = API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE;
   const keysHref = `/${locale}/${API_KEYS_PAGE_PATH}`;
   const docsHref = `/${locale}/${API_DOCS_PATH}`;
   const copy = {
@@ -347,7 +423,7 @@ export function TanstackPage({
 
   const faq = FAQ_KEYS.map((key) => ({
     question: t(`faq.${key}.q`),
-    answer: t(`faq.${key}.a`, { subPrice: prices.subPrice, rate, appName }),
+    answer: t(`faq.${key}.a`, { subPrice: prices.subPrice, appName }),
   }));
   /** Structured data gets plain text: the backticks only mark inline code. */
   const faqStructured = faq.map(({ question, answer }) => ({
@@ -579,6 +655,60 @@ export function TanstackPage({
               </P>
             </Div>
           ))}
+        </Div>
+      </PageSection>
+
+      {/* ── Whole products on the same pattern ── */}
+      <PageSection
+        id="modules"
+        className="pt-0 md:pt-4"
+        label={t("modules.eyebrow")}
+        title={t("modules.title")}
+        intro={t("modules.intro")}
+      >
+        <Div className="grid grid-cols-2 gap-3 lg:grid-cols-4 md:gap-4">
+          {MODULES.map(({ key, icon: Icon, folder }, index) => (
+            <ExternalLink
+              key={key}
+              href={`${GITHUB_REPO_URL}/tree/dev/${folder}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex min-w-0 flex-col rounded-xl border border-border bg-card p-3.5 shadow-xs transition-colors hover:border-primary/40 sm:p-4 md:p-5"
+            >
+              <Div className="flex flex-wrap items-center justify-between gap-2">
+                <Span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                  <Icon className="size-4" />
+                </Span>
+                <Span className="text-xs font-medium tabular-nums text-muted-foreground">
+                  {t("modules.endpoints", { count: moduleCounts[index] ?? 0 })}
+                </Span>
+              </Div>
+              <H3 className="mt-3 text-sm font-semibold leading-snug tracking-tight md:text-base">
+                {t(`modules.items.${key}`)}
+              </H3>
+              <Span className="mt-1 hidden truncate font-mono text-xs text-muted-foreground group-hover:text-primary sm:block">
+                {folder}
+              </Span>
+            </ExternalLink>
+          ))}
+        </Div>
+        <CodeTabs
+          {...copy}
+          className="mt-4"
+          title={t("modules.tryLine")}
+          wrapByDefault={false}
+          tabs={[{ label: "bash", language: "bash", code: MODULE_COMMANDS }]}
+        />
+        <Div className="mt-2 flex flex-wrap gap-x-6">
+          <CardLink
+            href={`/${locale}/story/business`}
+            label={t("modules.business")}
+          />
+          <CardLink
+            href={`${GITHUB_REPO_URL}/tree/dev/src`}
+            label={t("modules.source")}
+            external
+          />
         </Div>
       </PageSection>
 
@@ -843,7 +973,6 @@ export function TanstackPage({
                   <Icon className="mt-0.5 size-4 shrink-0 text-primary" />
                   <Span className="min-w-0">
                     {t(`pricing.facts.${key}`, {
-                      rate,
                       maxKeys: API_KEY_MAX_ACTIVE,
                     })}
                   </Span>

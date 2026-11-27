@@ -19,6 +19,7 @@ const PAGES: readonly string[] = [
   "/story/careers",
   "/story/framework",
   "/story/self-host",
+  "/story/business",
   "/story/build-a-skill",
   "/story/earn",
   "/story/partners",
