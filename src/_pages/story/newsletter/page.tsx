@@ -38,7 +38,7 @@ export async function generateMetadata({
     title,
     category: t("page.eyebrow", { appName }),
     description: t("page.description"),
-    image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL.replace(/\/+$/, "")}/og-image.jpg`,
     imageAlt: title,
     keywords: [t("page.eyebrow", { appName })],
   });

@@ -58,7 +58,7 @@ export async function generateMetadata({
     description: t("meta.description", {
       modelCount: getAvailableChatModelCount(false, await getEnvAvailability()),
     }),
-    image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL.replace(/\/+$/, "")}/og-image.jpg`,
     imageAlt: t("meta.imageAlt"),
     keywords: [t("meta.keywords")],
     // No canonical/hreflang at layout level: a page without its own metadata

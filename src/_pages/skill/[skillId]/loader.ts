@@ -199,7 +199,7 @@ export async function loadSkillPageMetadata({
       : t("meta.titlePlain", { appName, name: displayName }),
     category: t("meta.category"),
     description: metaDescription || t("hero.tryGeneric"),
-    image: `${configT("websiteUrl")}/og-image.jpg`,
+    image: `${configT("websiteUrl").replace(/\/+$/, "")}/og-image.jpg`,
     imageAlt: appName,
     keywords: [t("meta.keywords", { appName, name: displayName })],
     generateAlternates: indexableId !== null && variantId === null,
