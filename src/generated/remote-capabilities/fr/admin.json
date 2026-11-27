@@ -675095,6 +675095,198 @@
           },
           "schemaType": "primitive"
         },
+        "WHOP_ENVIRONMENT": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Whop (card payments). production = api.whop.com with WHOP_API_KEY / WHOP_WEBHOOK_SECRET; sandbox = sandbox-api.whop.com (test cards, no real money) with WHOP_SANDBOX_API_KEY / WHOP_SANDBOX_WEBHOOK_SECRET. Use sandbox on dev machines.",
+          "description": "Whop (card payments). production = api.whop.com with WHOP_API_KEY / WHOP_WEBHOOK_SECRET; sandbox = sandbox-api.whop.com (test cards, no real money) with WHOP_SANDBOX_API_KEY / WHOP_SANDBOX_WEBHOOK_SECRET. Use sandbox on dev machines.",
+          "placeholder": "production",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "WHOP_API_KEY": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Whop production account API key (dashboard, Developer, API keys). Whop shows as card checkout once the key and the webhook secret of the active environment are set.",
+          "description": "Whop production account API key (dashboard, Developer, API keys). Whop shows as card checkout once the key and the webhook secret of the active environment are set.",
+          "placeholder": "your_whop_account_api_key",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "WHOP_WEBHOOK_SECRET": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Signing secret (ws_...) of the production Whop webhook pointing at https://<domain>/api/en-GLOBAL/payment/providers/whop/webhook.",
+          "description": "Signing secret (ws_...) of the production Whop webhook pointing at https://<domain>/api/en-GLOBAL/payment/providers/whop/webhook.",
+          "placeholder": "ws_your_whop_webhook_secret",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "WHOP_COMPANY_ID": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Optional: Whop account id (biz_...) that owns the products. Looked up from the API key when unset.",
+          "description": "Optional: Whop account id (biz_...) that owns the products. Looked up from the API key when unset.",
+          "placeholder": "biz_your_account_id",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "WHOP_SANDBOX_API_KEY": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Whop sandbox account API key (sandbox.whop.com), used when WHOP_ENVIRONMENT=sandbox.",
+          "description": "Whop sandbox account API key (sandbox.whop.com), used when WHOP_ENVIRONMENT=sandbox.",
+          "placeholder": "your_whop_sandbox_api_key",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "WHOP_SANDBOX_WEBHOOK_SECRET": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Signing secret of the sandbox Whop webhook, used when WHOP_ENVIRONMENT=sandbox.",
+          "description": "Signing secret of the sandbox Whop webhook, used when WHOP_ENVIRONMENT=sandbox.",
+          "placeholder": "ws_your_whop_sandbox_webhook_secret",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "WHOP_SANDBOX_COMPANY_ID": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Optional: sandbox account id. Looked up from the sandbox key when unset.",
+          "description": "Optional: sandbox account id. Looked up from the sandbox key when unset.",
+          "placeholder": "biz_your_sandbox_account_id",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "WHOP_CHECKOUT_PAUSED": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Stop offering Whop for new checkouts. Existing Whop memberships keep renewing.",
+          "description": "Stop offering Whop for new checkouts. Existing Whop memberships keep renewing.",
+          "placeholder": "false",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "SMS_PROVIDER": {
           "type": "form_field",
           "fieldType": "select",
@@ -675773,6 +675965,54 @@
           "label": "How long an idle SSH exec session is kept open before being closed.",
           "description": "How long an idle SSH exec session is kept open before being closed.",
           "placeholder": "300000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "SUBSCRIPTION_SWITCH_PROVIDER": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Payment provider card subscribers move to (key of the PaymentProvider enum, never STRIPE). Unset = no switch offer anywhere.",
+          "description": "Payment provider card subscribers move to (key of the PaymentProvider enum, never STRIPE). Unset = no switch offer anywhere.",
+          "placeholder": "WHOP",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "SUBSCRIPTION_SWITCH_ENABLED": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Set to true once the switch provider takes live payments. Gates the switch card on the subscription page and the subscription-provider-switch-notify mail.",
+          "description": "Set to true once the switch provider takes live payments. Gates the switch card on the subscription page and the subscription-provider-switch-notify mail.",
+          "placeholder": "false",
           "columns": 12,
           "schema": {
             "def": {
