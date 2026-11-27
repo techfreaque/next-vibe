@@ -419,7 +419,12 @@ describe("structured data", () => {
       ).toEqual({
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: home, item: root },
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: home,
+            item: `${root}/story`,
+          },
           {
             "@type": "ListItem",
             position: 2,

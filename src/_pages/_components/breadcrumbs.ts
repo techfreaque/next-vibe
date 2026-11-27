@@ -8,11 +8,15 @@ export interface BreadcrumbEntry {
   path: string;
 }
 
-/** Include the locale root so top-level pages have two breadcrumb items. */
+/**
+ * Include the home crumb so top-level pages have two breadcrumb items.
+ * Points at `/story` (the final URL): the bare locale root 307-redirects there,
+ * and a redirecting breadcrumb is a "Page with redirect" entry in Search Console.
+ */
 export function withHomeBreadcrumb(
   locale: CountryLanguage,
   crumbs: readonly BreadcrumbEntry[],
 ): BreadcrumbEntry[] {
   const { t } = scopedTranslation.scopedT(locale);
-  return [{ name: t("breadcrumbs.home"), path: "" }, ...crumbs];
+  return [{ name: t("breadcrumbs.home"), path: "/story" }, ...crumbs];
 }

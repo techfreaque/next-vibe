@@ -55,8 +55,6 @@ export const generateMetadata = async ({
     title: t("meta.title", { appName }),
     category: t("meta.category"),
     description: t("meta.description", { appName }),
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Building_perspective.jpg/1920px-Building_perspective.jpg",
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords", { appName })],
     additionalMetadata: {
