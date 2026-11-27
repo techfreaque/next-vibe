@@ -38,61 +38,6 @@ import { RouteDelegationHandler } from "./route-executor";
 
 export const binaryStartTime = Date.now();
 
-/**
- * Attempt to resolve a file-system path to a canonical tool name.
- *
- * Accepts any of:
- *   src/vibe/agent/models/openrouter/route.ts
- *   src/vibe/agent/models/openrouter/definition.ts
- *   src/vibe/agent/models/openrouter/repository.ts
- *   src/vibe/agent/models/openrouter
- *
- * Returns { canonical, alias } on success, null if not a path or not found.
- * Tries GET, POST, PUT, PATCH in that order.
- */
-function resolveCommandFromPath(
-  input: string,
-): { canonical: string; alias: string } | null {
-  // Only attempt resolution if the input looks like a file path (contains /)
-  if (!input.includes("/")) {
-    return null;
-  }
-
-  // Strip known file suffixes
-  let normalized = input
-    .replace(/\/(route|definition|repository)\.ts$/, "")
-    .replace(/\.ts$/, "");
-
-  // Extract the part after [locale]/ if present
-  const localeMarker = "[locale]/";
-  const localeIdx = normalized.indexOf(localeMarker);
-  if (localeIdx !== -1) {
-    normalized = normalized.slice(localeIdx + localeMarker.length);
-  } else {
-    // Fallback: strip common prefix patterns like src/en/
-    normalized = normalized.replace(/^.*\/api\/[^/]+\//, "");
-  }
-
-  // Convert path separators and dynamic segments to underscores
-  // e.g. "agent/models/openrouter" → "agent_models_openrouter"
-  // e.g. "agent/chat/threads/[threadId]" → "agent_chat_threads_threadId"
-  const base = normalized
-    .split("/")
-    .map((seg) => seg.replaceAll(/\[|\]/g, ""))
-    .join("_");
-
-  const methods = ["GET", "POST", "PUT", "PATCH"] as const;
-  for (const method of methods) {
-    const canonical = `${base}_${method}`;
-    if (canonical in pathToAliasMap) {
-      const alias = pathToAliasMap[canonical as keyof typeof pathToAliasMap];
-      return { canonical, alias };
-    }
-  }
-
-  return null;
-}
-
 const environmentResult: EnvironmentResult = loadEnvironment();
 const cliPlatform = environmentResult.platform;
 export const projectRoot: string | null = environmentResult.projectRoot;
@@ -209,9 +154,11 @@ export function runCli({
           command = defaultEndpoint;
         }
 
-        // If command looks like a file path, resolve it to a canonical tool name
         if (command) {
-          const resolved = resolveCommandFromPath(command);
+          const resolved = CliInputParser.resolveCommandFromPath(
+            command,
+            pathToAliasMap,
+          );
           if (resolved) {
             const hint =
               resolved.alias !== resolved.canonical
@@ -362,8 +309,8 @@ export function runCli({
           const parsedArgs = rawArgs
             ? CliInputParser.parseCliArguments(args || [], rawArgs, logger)
             : CliInputParser.parseCliArgumentsSimple(args || []);
-          const commandIndex = rawArgs
-            ? rawArgs.findIndex((a) => a === command)
+          const commandIndex = rawCommand
+            ? (rawArgs?.indexOf(rawCommand) ?? -1)
             : -1;
           const rawTokens =
             rawArgs && commandIndex >= 0
@@ -476,7 +423,7 @@ export function runCli({
         arg === "mcp" ||
         arg === "h" ||
         arg === "help" ||
-        resolveCommandFromPath(arg) !== null,
+        CliInputParser.resolveCommandFromPath(arg, pathToAliasMap) !== null,
     ),
     { from: "user" },
   );

@@ -7,9 +7,14 @@ import { readFileSync } from "node:fs";
 
 import { z } from "zod";
 
+import { pathSegmentsToToolName } from "../../../core/core-utils/path";
 import { isEmptySchema } from "../../../core/core-utils/validation";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
-import { FieldDataType } from "../../../core/definition/enums";
+import {
+  ALL_METHODS,
+  FieldDataType,
+  Methods,
+} from "../../../core/definition/enums";
 import type { WidgetData } from "../../../core/utils/json";
 import { WidgetDataSchema } from "../../../core/utils/json";
 import { parseError } from "../../../core/utils/parse-error";
@@ -51,6 +56,62 @@ function readZodObject(
 }
 
 export class CliInputParser {
+  static resolveCommandFromPath(
+    input: string,
+    aliases: Readonly<Record<string, string>>,
+  ): { canonical: string; alias: string } | null {
+    if (Object.hasOwn(aliases, input)) {
+      return null;
+    }
+
+    if (!input.includes("/")) {
+      // A bare route path such as "referral" can name a tool only when
+      // exactly one registered method exists. "payment" needs a method.
+      if (!/^[a-z0-9-]+$/.test(input)) {
+        return null;
+      }
+      const matches = ALL_METHODS.map((method) =>
+        pathSegmentsToToolName([input], method),
+      ).filter((canonical) => Object.hasOwn(aliases, canonical));
+      const [canonical] = matches;
+      if (matches.length !== 1 || canonical === undefined) {
+        return null;
+      }
+      const alias = aliases[canonical];
+      return alias === undefined ? null : { canonical, alias };
+    }
+
+    let normalized = input
+      .replace(/\/(route|definition|repository)\.ts$/, "")
+      .replace(/\.ts$/, "");
+    const localeMarker = "[locale]/";
+    const localeIdx = normalized.indexOf(localeMarker);
+    if (localeIdx !== -1) {
+      normalized = normalized.slice(localeIdx + localeMarker.length);
+    } else {
+      normalized = normalized.replace(/^.*\/api\/[^/]+\//, "");
+    }
+
+    const base = normalized
+      .split("/")
+      .map((segment) => segment.replaceAll(/\[|\]/g, ""))
+      .join("_");
+    for (const method of [
+      Methods.GET,
+      Methods.POST,
+      Methods.PUT,
+      Methods.PATCH,
+    ]) {
+      const canonical = `${base}_${method}`;
+      const alias = aliases[canonical];
+      if (alias !== undefined) {
+        return { canonical, alias };
+      }
+    }
+
+    return null;
+  }
+
   static normalizeRemoteFlag(
     args: readonly string[],
     isCommand: (value: string) => boolean,

@@ -6,6 +6,8 @@ import { describe, expect, it } from "bun:test";
 import { Command } from "commander";
 
 import creditsHistory from "@/credits/history/definition";
+import { pathToAliasMap } from "@/generated/endpoints/alias-map-dev";
+import createReferral from "@/referral/definition";
 import referrals from "@/subscription/admin/referrals/definition";
 
 import { ChatModelId } from "../../../agent/ai-stream/models";
@@ -17,7 +19,10 @@ import { createEndpointLogger } from "../../../logger/server";
 import { resolveInputPath } from "./input-path";
 import { CliInputParser } from "./parsing";
 
-function parseRemoteFlag(args: string[]): { remote: string; command?: string } {
+function parseRemoteFlag(
+  args: string[],
+  isCommand = (arg: string): boolean => arg === "user-update",
+): { remote: string; command?: string } {
   const program = new Command()
     .option("--hermes")
     .option("--remote [instanceId]")
@@ -25,7 +30,7 @@ function parseRemoteFlag(args: string[]): { remote: string; command?: string } {
     .argument("[args...]")
     .allowUnknownOption();
   program.parse(
-    CliInputParser.normalizeRemoteFlag(args, (arg) => arg === "user-update"),
+    CliInputParser.normalizeRemoteFlag(args, isCommand),
     { from: "user" },
   );
   return {
@@ -44,6 +49,42 @@ function collect(
     createEndpointLogger(false, defaultLocale),
   );
 }
+
+describe("CliInputParser.resolveCommandFromPath", () => {
+  it("preserves a bare referral command for remote mode and resolves it before request parsing", async () => {
+    const resolve = (command: string): ReturnType<
+      typeof CliInputParser.resolveCommandFromPath
+    > => CliInputParser.resolveCommandFromPath(command, pathToAliasMap);
+    const { remote, command } = parseRemoteFlag(
+      ["--hermes", "--remote", "referral", "--fields-grid.code=FRIEND2024"],
+      (arg) => resolve(arg) !== null,
+    );
+    expect(remote).toBe("thea");
+    expect(command).toBe("referral");
+    expect(resolve(command ?? "")).toEqual({
+      canonical: "referral_POST",
+      alias: "referral_POST",
+    });
+    const { data } = await collect(
+      ["--fields-grid.code=FRIEND2024"],
+      createReferral.POST,
+    );
+    expect(createReferral.POST.requestSchema.safeParse(data).success).toBe(true);
+  });
+
+  it("leaves known commands, ambiguous paths and remote-only names alone", () => {
+    for (const command of [
+      "referral_POST",
+      "credits-balance",
+      "payment",
+      "peer-tool",
+    ]) {
+      expect(
+        CliInputParser.resolveCommandFromPath(command, pathToAliasMap),
+      ).toBeNull();
+    }
+  });
+});
 
 describe("CliInputParser.normalizeRemoteFlag", () => {
   it("preserves the command after bare --remote", () => {
