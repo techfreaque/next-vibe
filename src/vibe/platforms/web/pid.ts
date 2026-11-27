@@ -8,6 +8,8 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  readlinkSync,
+  statSync,
   unlinkSync,
   writeFileSync,
 } from "node:fs";
@@ -51,6 +53,106 @@ function isProcessRunning(pid: number): boolean {
   }
 }
 
+/** Linux USER_HZ: /proc/<pid>/stat start times are in these ticks. */
+const PROC_CLOCK_TICKS_PER_SECOND = 100;
+
+/** Slack between a pid file write and the start of a process it lists. */
+const PID_START_SLACK_MS = 1000;
+
+/** One field of /proc/<pid>/status (`Tgid`, `PPid`), or undefined. */
+function readProcStatusField(pid: number, field: string): number | undefined {
+  try {
+    const status = readFileSync(`/proc/${String(pid)}/status`, "utf-8");
+    const line = status.split("\n").find((l) => l.startsWith(`${field}:`));
+    const value = parseInt(line?.slice(field.length + 1).trim() ?? "", 10);
+    return isNaN(value) ? undefined : value;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Wall-clock start of a process (ms since epoch) from /proc, or undefined. */
+function readProcStartMs(pid: number): number | undefined {
+  try {
+    const stat = readFileSync(`/proc/${String(pid)}/stat`, "utf-8");
+    // Fields after the parenthesised command name; starttime is field 22.
+    const afterComm = stat.slice(stat.lastIndexOf(")") + 2).split(" ");
+    const startTicks = parseInt(afterComm[19] ?? "", 10);
+    const btimeLine = readFileSync("/proc/stat", "utf-8")
+      .split("\n")
+      .find((l) => l.startsWith("btime "));
+    const bootSeconds = parseInt(btimeLine?.slice(6) ?? "", 10);
+    if (isNaN(startTicks) || isNaN(bootSeconds)) {
+      return undefined;
+    }
+    return (
+      bootSeconds * 1000 + (startTicks / PROC_CLOCK_TICKS_PER_SECOND) * 1000
+    );
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Whether `pid` (read from a pid file or found on a port) is a different,
+ * live process that may be killed as a stale instance of ours.
+ *
+ * Never: this process, its parent (the supervisor), its own child, or a
+ * THREAD id. kill(2) with a thread id signals the whole thread group, and in
+ * a restarted container PIDs repeat: prod 2026-11-27 (f1f703a62d) read a
+ * stale pid that was now a thread of the booting server itself and SIGKILLed
+ * itself on every boot. On Linux the process must also run from our cwd and
+ * must have started before the pid file was written (a recycled pid started
+ * later). `pidFileMtimeMs` is undefined for port-discovered pids.
+ */
+export function isForeignStaleCandidate(
+  pid: number,
+  pidFileMtimeMs: number | undefined,
+): boolean {
+  if (!Number.isInteger(pid) || pid <= 0) {
+    return false;
+  }
+  if (pid === process.pid || pid === process.ppid) {
+    return false;
+  }
+  if (!isProcessRunning(pid)) {
+    return false;
+  }
+  if (process.platform !== "linux") {
+    return true;
+  }
+  // A thread id resolves in /proc too; only a thread-group leader is a process.
+  const tgid = readProcStatusField(pid, "Tgid");
+  if (tgid === undefined || tgid !== pid) {
+    return false;
+  }
+  if (readProcStatusField(pid, "PPid") === process.pid) {
+    return false;
+  }
+  if (!isPidFromOurCwd(pid)) {
+    return false;
+  }
+  if (pidFileMtimeMs !== undefined) {
+    const startedAt = readProcStartMs(pid);
+    if (
+      startedAt === undefined ||
+      startedAt > pidFileMtimeMs + PID_START_SLACK_MS
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/** mtime of a file in ms, or undefined. */
+function readMtimeMs(path: string): number | undefined {
+  try {
+    return statSync(path).mtimeMs;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Kill a previous vibe instance if still running.
  * Reads the PID file, checks if the process is alive, sends SIGTERM, waits for exit.
@@ -76,8 +178,7 @@ export function killPreviousInstance(
       const pidOnPort = getPidOnPort(internalPort);
       if (
         pidOnPort !== undefined &&
-        pidOnPort !== process.pid &&
-        isPidFromOurCwd(pidOnPort)
+        isForeignStaleCandidate(pidOnPort, undefined)
       ) {
         logger.debug(
           `Killing orphaned same-cwd process on internal port ${internalPort} (no pid file)`,
@@ -101,6 +202,7 @@ export function killPreviousInstance(
     return;
   }
 
+  const pidFileMtimeMs = readMtimeMs(pidFile);
   const pidStr = readFileSync(pidFile, "utf-8").trim();
   const lines = pidStr.split("\n");
 
@@ -123,8 +225,21 @@ export function killPreviousInstance(
   // All PIDs recorded in the old file are ours - build a set for port ownership checks.
   const oldPidSet = new Set(pids);
 
-  // Filter to only running processes
-  const running = pids.filter(isProcessRunning);
+  // Only live, foreign processes of ours. A pid that is now this process, its
+  // supervisor, its child or one of its threads (PIDs repeat after a
+  // container restart) is a stale entry, never a target.
+  const running = pids.filter((pid) =>
+    isForeignStaleCandidate(pid, pidFileMtimeMs),
+  );
+  const skipped = pids.filter(
+    (pid) => isProcessRunning(pid) && !running.includes(pid),
+  );
+  if (skipped.length > 0) {
+    logger.debug("Ignoring stale pid file entries that are not ours", {
+      pids: skipped,
+      pidFile,
+    });
+  }
   if (running.length > 0) {
     logger.debug("Killing previous vibe instance(s)", {
       pids: running,
@@ -162,7 +277,7 @@ export function killPreviousInstance(
 
     logger.debug("Previous vibe instance(s) stopped", { pids: running });
   } else if (pids.length > 0) {
-    logger.debug("Stale PID file found (no processes running), cleaning up", {
+    logger.debug("Stale PID file found (no previous instance running)", {
       pids,
       pidFile,
     });
@@ -173,11 +288,11 @@ export function killPreviousInstance(
   // select another port. Production callers retain the legacy recovery path.
   if (oldPort !== undefined && !isNaN(oldPort)) {
     const internalPort = oldPort + NEXT_PORT_OFFSET;
-    const allTrackedDead = pids.every((p) => !isProcessRunning(p));
+    const allTrackedDead = running.every((p) => !isProcessRunning(p));
     const pidOnPort = getPidOnPort(internalPort);
     if (
       pidOnPort !== undefined &&
-      pidOnPort !== process.pid &&
+      isForeignStaleCandidate(pidOnPort, undefined) &&
       // On Windows, only kill if explicitly tracked - the allTrackedDead fallback
       // would target unkillable system PIDs (Docker HNS) that happen to show on
       // this port in netstat but don't actually block binding.
@@ -372,11 +487,7 @@ function isPidFromOurCwd(pid: number): boolean {
     return false;
   }
   try {
-    const cwd = execSync(`readlink /proc/${String(pid)}/cwd`, {
-      encoding: "utf-8",
-      stdio: "pipe",
-    }).trim();
-    return cwd === process.cwd();
+    return readlinkSync(`/proc/${String(pid)}/cwd`) === process.cwd();
   } catch {
     return false;
   }

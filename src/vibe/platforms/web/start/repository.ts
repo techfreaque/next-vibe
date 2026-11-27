@@ -1606,6 +1606,13 @@ export class ServerStartRepository {
 
     // Write our PID file with the resolved port.
     writePidFile(VIBE_START_PID_FILE, logger, [], port);
+    // Any exit (also a drained event loop, which runs no signal handler) drops
+    // our pid file, so a restarted container never reads a pid of ours that
+    // the new PID namespace has reused. Owner-checked, so a newer server's
+    // file is left alone.
+    process.on("exit", () => {
+      cleanupPidFile(VIBE_START_PID_FILE);
+    });
 
     // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately.
     // Use stable named functions so process.off() can remove them precisely.

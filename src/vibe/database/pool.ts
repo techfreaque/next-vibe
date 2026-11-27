@@ -174,6 +174,9 @@ export function resolveConnectRetryOptions(
   };
 }
 
+/** Upper bound for the ref'd timer that holds the loop during a detach hop. */
+const DETACH_HOLD_MS = 60_000;
+
 /** The callback overload of Pool.connect (Parameters picks the last overload). */
 type PoolConnectCallback = Parameters<Pool["connect"]>[0];
 
@@ -212,7 +215,14 @@ export function runDetachedFromAsyncContext<T>(
   }
   return new Promise<T>((resolve, reject) => {
     const channel = new MessageChannel();
+    // Bun's MessagePort does not keep the event loop alive. Without a ref'd
+    // handle the process exits 0 before the message lands whenever nothing
+    // else is pending (prod boot f1f703a62d 2026-11-27: the first DB query in
+    // deployDbFunctions never ran and `vibe start` exited mid-boot). The timer
+    // is cleared on delivery, so it never outlives the hop.
+    const holdLoop = setTimeout(() => undefined, DETACH_HOLD_MS);
     channel.port1.addEventListener("message", (): void => {
+      clearTimeout(holdLoop);
       channel.port1.close();
       channel.port2.close();
       void fn().then(resolve).catch(reject);

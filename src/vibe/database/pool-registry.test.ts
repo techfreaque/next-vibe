@@ -6,6 +6,8 @@
  */
 
 import { AsyncLocalStorage } from "node:async_hooks";
+import { spawnSync } from "node:child_process";
+import { join } from "node:path";
 
 import { Pool } from "pg";
 import { afterEach, describe, expect, it } from "vitest";
@@ -85,5 +87,27 @@ describe("runDetachedFromAsyncContext", () => {
     } finally {
       globalThis.__vibeRootAsyncSnapshot = prevSnapshot;
     }
+  });
+
+  it("keeps the process alive until the MessageChannel hop runs (prod boot 2026-11-27)", () => {
+    // Bun's MessagePort holds no event-loop ref: with nothing else pending the
+    // process exited 0 before the detached connect ran (vibe start died
+    // silently in deployDbFunctions). Run it in a bare process to prove the hop
+    // completes on its own.
+    const poolModule = join(import.meta.dirname, "pool.ts");
+    const script = [
+      `const { runDetachedFromAsyncContext } = await import(${JSON.stringify(poolModule)});`,
+      "async function run() {",
+      "  await new Promise((r) => setTimeout(r, 5));",
+      '  const value = await runDetachedFromAsyncContext(async () => "ran");',
+      "  console.log(`DETACHED:${value}`);",
+      "}",
+      "void run();",
+    ].join("\n");
+    const result = spawnSync(process.execPath, ["-e", script], {
+      encoding: "utf-8",
+      timeout: 30_000,
+    });
+    expect(result.stdout).toContain("DETACHED:ran");
   });
 });
