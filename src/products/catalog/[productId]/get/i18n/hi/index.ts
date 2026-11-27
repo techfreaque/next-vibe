@@ -1,0 +1,107 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: {
+    products: "प्रोडक्ट",
+    catalog: "कैटलॉग",
+    get: "पाएँ",
+  },
+  get: {
+    title: "कैटलॉग प्रोडक्ट पाएँ",
+    titleShort: "प्रोडक्ट का ब्योरा",
+    description: "ID से एक कैटलॉग प्रोडक्ट निकालें।",
+    productId: {
+      label: "प्रोडक्ट ID",
+      description: "जिस प्रोडक्ट को निकालना है उसकी ID",
+    },
+    errors: {
+      validation: {
+        title: "वैलिडेशन एरर",
+        description: "प्रोडक्ट ID जाँचें और फिर कोशिश करें",
+      },
+      unauthorized: {
+        title: "साइन इन नहीं है",
+        description: "प्रोडक्ट का ब्योरा देखने के लिए साइन इन करें",
+      },
+      forbidden: {
+        title: "प्रतिबंधित",
+        description: "आपके पास यह प्रोडक्ट देखने की अनुमति नहीं है",
+      },
+      conflict: {
+        title: "टकराव",
+        description: "टकराव हुआ",
+      },
+      server: {
+        title: "सर्वर एरर",
+        description: "हमारी तरफ़ कुछ गड़बड़ हुई। फिर कोशिश करें।",
+      },
+      unknown: {
+        title: "अज्ञात एरर",
+        description: "कुछ अनपेक्षित हुआ",
+      },
+      network: {
+        title: "नेटवर्क एरर",
+        description: "कनेक्शन जाँचें और फिर कोशिश करें",
+      },
+      notFound: {
+        title: "नहीं मिला",
+        description: "प्रोडक्ट नहीं मिला",
+      },
+      unsavedChanges: {
+        title: "बिना सेव बदलाव",
+        description: "आपके बदलाव सेव नहीं हुए हैं",
+      },
+    },
+    success: {
+      title: "प्रोडक्ट मिल गया",
+      description: "प्रोडक्ट का ब्योरा लोड हुआ।",
+    },
+    response: {
+      id: "प्रोडक्ट ID",
+      companyId: "कंपनी",
+      name: "प्रोडक्ट का नाम",
+      description: "विवरण",
+      sku: "SKU",
+      type: "किस्म",
+      unit: "यूनिट",
+      basePrice: "बेस कीमत",
+      currency: "करेंसी",
+      defaultTaxRate: "डिफ़ॉल्ट टैक्स दर",
+      categoryId: "कैटेगरी",
+      imageUrl: "इमेज URL",
+      isActive: "सक्रिय",
+      isSubscription: "सब्सक्रिप्शन",
+      billingInterval: "बिलिंग अंतराल",
+      createdAt: "बनाया गया",
+      updatedAt: "अपडेट किया गया",
+    },
+    widget: {
+      unavailable: "प्रोडक्ट उपलब्ध नहीं",
+      prices: "सक्रिय प्राइस टियर",
+      stock: "इन्वेंटरी",
+      viewStock: "वेयरहाउस स्टॉक देखें",
+      offers: "प्रोसेसर ऑफ़र",
+      noOffers: "इस प्रोडक्ट से कोई सक्रिय प्रोसेसर ऑफ़र नहीं जुड़ा है।",
+      configureOffer: "प्रोसेसर ऑफ़र कॉन्फ़िगर करें",
+      offerNeedsSku: "ऑफ़र कॉन्फ़िगर करने के लिए प्रोडक्ट सक्रिय करें और SKU जोड़ें।",
+      revenueAccount: "राजस्व अकाउंट",
+      liabilityAccount: "स्थगित राजस्व अकाउंट",
+      edit: "एडिट करें",
+      deactivate: "निष्क्रिय करें",
+      activate: "सक्रिय करें",
+      active: "सक्रिय",
+      inactive: "निष्क्रिय",
+      back: "वापस",
+      loading: "प्रोडक्ट लोड हो रहा है...",
+      typeService: "सर्विस",
+      typePhysical: "फ़िज़िकल",
+      typeDigital: "डिजिटल",
+      recurring: "आवर्ती",
+      billingMonthly: "मासिक",
+      billingYearly: "वार्षिक",
+      addToInvoice: "इनवॉइस में जोड़ें",
+      details: "ब्योरा",
+      select: "प्रोडक्ट चुनें",
+    },
+  },
+};
