@@ -45,6 +45,10 @@ export function CodeTabs({
   wrapByDefault?: boolean;
   className?: string;
 }): JSX.Element {
+  const lines = tabs.flatMap(({ code }) => code.split("\n"));
+  const wrapOnPhone =
+    !lines.some((line) => line.trimEnd().endsWith("\\")) &&
+    lines.some((line) => line.length > 60);
   return (
     <CodeTabsFrame
       tabs={tabs.map((tab) => ({
@@ -57,6 +61,7 @@ export function CodeTabs({
       copiedLabel={copiedLabel}
       wrapLabel={wrapLabel}
       wrapByDefault={wrapByDefault}
+      wrapOnPhone={wrapOnPhone}
       className={className}
     />
   );

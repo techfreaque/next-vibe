@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
     addToCollection: "Añadir a tu colección:",
     addAllToFavorites: "Agregar todos los modelos",
     quickAdd: "Añadir",
-    tweakAndAdd: "Tweak &amp; Add",
+    tweakAndAdd: "Ajustar y añadir",
     edit: "Editar",
     copyAndCustomize: "Haz mi propia versión",
     delete: "Eliminar",
@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
     models: {
       brain: "Cerebro",
       eyes: "Ojos",
-      ears: "Orejas &quot; Voz &quot;",
+      ears: "Oídos y voz",
       media: "Medios",
       slots: {
         chat: "Chat",
@@ -192,9 +192,9 @@ export const translations: typeof enTranslations = {
       description: "habilidad recuperada con éxito",
     },
     share: {
-      button: "Compartir &quot; Ganar &quot;",
+      button: "Compartir y Ganar",
       titleNamed: "Compartir {{name}} y ganar",
-      title: "Compartir esta habilidad &quot; ganar",
+      title: "Compartir esta habilidad y ganar",
       description:
         "Comparte esta habilidad con tu enlace de referencia. Ganar un 10% de comisión recurrente de cada usuario que se registra.",
       selectCode: "Seleccione el código de referencia:",

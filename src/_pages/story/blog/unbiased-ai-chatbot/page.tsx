@@ -21,6 +21,7 @@ import { ExternalLink } from "next-vibe/ui/components/link";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { UNBIASED_CHATBOT_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import { OWN_WORLDVIEW_UNCENSORED_MODEL_ID } from "@/_pages/models/_shared/model-facts";
 import { configScopedTranslation } from "@/env/i18n";
 
@@ -68,13 +69,6 @@ const LINEUP: readonly ChatModelId[] = [
   ChatModelId.GLM_5_3_UNCENSORED,
   ChatModelId.UNCENSORED_LM_V1_2,
   ChatModelId.GAB_AI_ARYA,
-];
-
-const PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_2_SOL],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.CLAUDE_SONNET_5_5],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GROK_4_7],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
 ];
 
 /** Skills that argue, question or present several sides. */
@@ -129,7 +123,7 @@ export async function tanstackLoader({
   const [facts, rows, pairs] = await Promise.all([
     loadUsFacts(locale),
     loadModelRowsByIds(LINEUP, locale),
-    loadComparePairs(PAIRS),
+    loadComparePairs(UNBIASED_CHATBOT_PAIRS),
   ]);
   return { locale, us: usParams(facts), rows, pairs };
 }

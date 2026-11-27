@@ -280,7 +280,7 @@ export const translations: typeof enTranslations = {
           },
         },
         engagement: {
-          title: "Créditos &quot; Participación",
+          title: "Créditos y participación",
           description: "Saldo, gastos, ganancias y actividad",
           creditBalance: {
             content: "Saldo de créditos",

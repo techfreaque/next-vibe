@@ -1,6 +1,8 @@
 import { Link as TanstackLink } from "@tanstack/react-router";
 import type { JSX, ReactNode } from "react";
 
+import { crawlLinkRel } from "../../crawl-link-rel";
+
 export interface LinkProps {
   children?: ReactNode;
   href: string;
@@ -31,7 +33,7 @@ export function Link({
       to={href}
       className={className}
       target={target}
-      rel={rel}
+      rel={crawlLinkRel(href, rel)}
       {...(onClick ? { onClick } : {})}
       title={title}
       activeOptions={

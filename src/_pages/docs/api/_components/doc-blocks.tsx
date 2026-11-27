@@ -121,7 +121,7 @@ export function DocSection({
   return (
     <Section
       id={id}
-      className="scroll-mt-36 border-b border-border py-10 first:pt-2 last:border-b-0 lg:scroll-mt-24 md:py-14"
+      className="scroll-mt-36 border-b border-border py-10 first:pt-2 last:border-b-0 lg:scroll-mt-24 md:py-14 [content-visibility:auto] [contain-intrinsic-size:auto_50rem]"
     >
       {group !== undefined && (
         <Span className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-primary">

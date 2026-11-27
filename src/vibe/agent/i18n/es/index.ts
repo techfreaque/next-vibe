@@ -863,11 +863,11 @@ export const translations: typeof enTranslations = {
         noProviderAvailable:
           "Falta configurar un proveedor de IA. Agrega OPENROUTER_API_KEY o habilita Claude Code (CLAUDE_CODE_ENABLED=true) para continuar.",
         coding: {
-          label: "Coding &quot; Tech",
+          label: "Programación y tecnología",
           hint: "Vibe Coder, Coder",
         },
         research: {
-          label: "Research &quot; Analysis",
+          label: "Investigación y análisis",
           hint: "Researcher, Data Analyst",
         },
         writing: {
@@ -875,11 +875,11 @@ export const translations: typeof enTranslations = {
           hint: "Escritor, Editor",
         },
         business: {
-          label: "Estrategia de Negocios &quot;",
+          label: "Negocios y estrategia",
           hint: "Business Advisor, Product Manager",
         },
         learning: {
-          label: "Aprender &quot; estudiar &quot;",
+          label: "Aprender y estudiar",
           hint: "Tutor, Interlocutor Socrático",
         },
         creative: {
@@ -895,7 +895,7 @@ export const translations: typeof enTranslations = {
           hint: "Sin censura, Filosofía",
         },
         roleplay: {
-          label: "Roleplay &quot; Personajes",
+          label: "Roleplay y Personajes",
           hint: "Roleplay, Creador de Personaje",
         },
       },
@@ -1054,7 +1054,7 @@ export const translations: typeof enTranslations = {
       },
       welcomeTour: {
         authDialog: {
-          title: "Desbloquear carpetas privadas &quot; compartidas",
+          title: "Desbloquear carpetas privadas y compartidas",
           description:
             "Regístrese o inicie sesión para acceder a carpetas privadas y compartidas. Tus chats se sincronizarán entre dispositivos.",
           continueTour: "Viaje continuo",
@@ -1351,7 +1351,7 @@ export const translations: typeof enTranslations = {
       copyContent: "Copiado para el portapapeles",
     },
     dialogs: {
-      searchAndCreate: "Buscar &quot; Crear &quot;",
+      searchAndCreate: "Buscar y Crear",
       deleteChat: 'Eliminar el chat " {{title}} "?',
       deleteFolderConfirm:
         'Eliminar la carpeta " {{name}}" y mover {{count}} chat(s) a General?',

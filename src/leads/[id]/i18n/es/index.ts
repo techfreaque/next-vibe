@@ -154,7 +154,7 @@ export const translations: typeof enTranslations = {
         content: "Actualizado en",
       },
       identity: {
-        title: "Dispositivo &quot; identidad &quot;",
+        title: "Dispositivo y identidad",
         description:
           "Seguimiento de la identidad y la información del dispositivo",
       },
@@ -769,7 +769,7 @@ export const translations: typeof enTranslations = {
     activeSubscriberSince: "Suscriptor activo desde",
     viewUserProfile: "Ver perfil de usuario",
     viewUserDetail: "Ver detalle de usuario",
-    notesAndMetadata: "Notas &quot; Metadatos &quot;",
+    notesAndMetadata: "Notas y Metadatos",
     notes: "Notas",
     metadata: "Metadatos",
     created: "Creado",
@@ -795,7 +795,7 @@ export const translations: typeof enTranslations = {
     tabBasic: "Básica",
     tabCampaign: "Campaña",
     tabAdvanced: "Avances",
-    deviceIdentity: "Dispositivo &quot; identidad &quot;",
+    deviceIdentity: "Dispositivo y identidad",
     ipAddress: "Dirección de IP",
     userAgent: "Agente de usuario",
     deviceType: "Tipo de dispositivo",

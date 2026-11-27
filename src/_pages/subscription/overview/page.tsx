@@ -33,7 +33,6 @@ export interface OverviewPageData {
   locale: CountryLanguage;
   user: Awaited<ReturnType<typeof subscriptionLoader>>["user"];
   initialCredits: CreditsGetResponseOutput | null;
-  platform: Awaited<ReturnType<typeof subscriptionLoader>>["platform"];
   /** Service and Offer JSON-LD for the public pricing page. */
   structuredData: JsonLdNode;
 }
@@ -69,7 +68,6 @@ export function TanstackPage({
   locale,
   user,
   initialCredits,
-  platform,
   structuredData,
 }: OverviewPageData): JSX.Element {
   return (
@@ -79,7 +77,6 @@ export function TanstackPage({
         locale={locale}
         user={user}
         initialCredits={initialCredits}
-        platform={platform}
       />
     </>
   );

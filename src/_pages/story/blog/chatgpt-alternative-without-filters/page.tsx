@@ -30,6 +30,7 @@ import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { CHATGPT_ALTERNATIVE_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import {
   canonicalComparisonPath,
   listModelFacts,
@@ -150,19 +151,6 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
   },
 ];
 
-/**
- * Side-by-side pairs worth a look: the own-worldview uncensored model against
- * ChatGPT's model, the roleplay pick and an uncensored flagship, plus other
- * mainstream and alternative pairs.
- */
-const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_2_SOL],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
-  [ChatModelId.CLAUDE_SONNET_5_5, ChatModelId.GLM_5_3_UNCENSORED],
-  [ChatModelId.GPT_6_2_SOL, ChatModelId.KIMI_K3_1_PRO],
-];
-
 const FAQ_KEYS: readonly (
   | "filters"
   | "free"
@@ -210,7 +198,7 @@ export async function tanstackLoader({
         .map((id) => availableModels.get(id))
         .filter((model) => model !== undefined),
     })).filter(({ models }) => models.length > 0),
-    comparisons: COMPARE_PAIRS.flatMap(([a, b]) => {
+    comparisons: CHATGPT_ALTERNATIVE_PAIRS.flatMap(([a, b]) => {
       const left = availableModels.get(a);
       const right = availableModels.get(b);
       return left === undefined || right === undefined

@@ -57,7 +57,8 @@ export async function tanstackLoader({
   // The hero carries the title - drop the markdown's own H1.
   const investContent = fs
     .readFileSync(investPath, "utf-8")
-    .replace(/^# .*\n+/, "");
+    .replace(/^# .*\n+/, "")
+    .replaceAll("](https://unbottled.ai)", `](/${locale}/story)`);
   return { locale, investContent };
 }
 

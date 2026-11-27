@@ -71,7 +71,7 @@ export function UserMenu({
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild className="cursor-pointer">
-          <Link href={`/${locale}/threads`}>
+          <Link href={`/${locale}/threads/private/new`}>
             <MessageSquare className="mr-2 h-4 w-4" />
             <Span>{t("nav.goToApp")}</Span>
           </Link>

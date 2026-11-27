@@ -48,10 +48,12 @@ import {
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { ROLEPLAY_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import {
   canonicalComparisonPath,
   formatTokenCount,
   getModelFacts,
+  isIndexableComparison,
 } from "@/_pages/models/_shared/model-facts";
 import { formatNumber, tierName } from "@/_pages/models/_shared/model-format";
 import { configScopedTranslation } from "@/env/i18n";
@@ -126,16 +128,6 @@ const PICKS: readonly { key: PickGroup; models: readonly ModelKey[] }[] = [
   { key: "long", models: ["deepseekFlash", "artemis", "veniceRoleplay"] },
   { key: "cheap", models: ["minimaxFlash", "glmFlash", "venice"] },
   { key: "filtered", models: ["kimi", "sonnet"] },
-];
-
-/** Featured pairs (same URL order as the sitemap). */
-const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.DRUMMER_ARTEMIS_31B],
-  [
-    ChatModelId.UNCENSORED_LM_V1_2,
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-  ],
 ];
 
 const SETUP_STEPS: readonly (
@@ -257,10 +249,14 @@ export async function tanstackLoader({
       },
     ];
   });
-  const compares = COMPARE_PAIRS.flatMap(([a, b]) => {
+  const compares = ROLEPLAY_PAIRS.flatMap(([a, b]) => {
     const factsA = getModelFacts(a, availability);
     const factsB = getModelFacts(b, availability);
-    if (factsA === null || factsB === null) {
+    if (
+      factsA === null ||
+      factsB === null ||
+      !isIndexableComparison(factsA, factsB)
+    ) {
       return [];
     }
     return [

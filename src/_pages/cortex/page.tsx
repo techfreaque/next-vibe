@@ -6,6 +6,7 @@
 export const dynamic = "force-dynamic";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { NOINDEX_FOLLOW_ROBOTS } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -17,6 +18,10 @@ import { CortexPageClient } from "./page-client";
 
 interface CortexPageProps {
   params: Promise<{ locale: CountryLanguage }>;
+}
+
+export function generateMetadata(): { robots: typeof NOINDEX_FOLLOW_ROBOTS } {
+  return { robots: NOINDEX_FOLLOW_ROBOTS };
 }
 
 export interface CortexPageData {

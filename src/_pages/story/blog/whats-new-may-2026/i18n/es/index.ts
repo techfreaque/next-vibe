@@ -44,10 +44,10 @@ export const translations: typeof enTranslations = {
   media: {
     title: "Genera imágenes, vídeo, música. De cualquier conversación.",
     lead: "Describe lo que quieras, o sube una imagen y transformála. Sube un PDF y habla con él. Su AI. Thea o Hermes,  puede hacer todo esto. Pregúntale.",
-    imageLabel: "Imagen &amp; Vídeo",
+    imageLabel: "Imagen y Vídeo",
     image:
       "Genera imágenes de descripciones de texto. Transformar las imágenes existentes. Cree cortos de vídeo. Todo desde el interior del chat. sin conmutación de herramientas.",
-    musicLabel: "Música &amp; Audio",
+    musicLabel: "Música y Audio",
     music:
       "Describir un estado de ánimo, un género, un sentimiento. Regresa una pista. Es temprano, pero funciona, y es una de esas características que te hace sonreír la primera vez.",
     note: "El gen de los medios está en beta. Espere bordes ásperos y la iteración activa.",

@@ -43,6 +43,14 @@ interface GenerateMetadataOptions {
   parent?: Metadata;
 }
 
+export function canonicalPageUrl(
+  locale: CountryLanguage,
+  path: string,
+): string {
+  const { t } = configScopedTranslation.scopedT(locale);
+  return `${t("websiteUrl").replace(/\/+$/, "")}/${canonicalSeoLocale(locale)}${path ? `/${path}` : ""}`;
+}
+
 export function metadataGenerator(
   locale: CountryLanguage,
   options: GenerateMetadataOptions,
@@ -66,7 +74,7 @@ export function metadataGenerator(
   // Mixed locales (de-US, en-PL, ...) are served but not indexed: their
   // canonical is the language's indexable locale, so search engines see one
   // URL per language/market (same set as the sitemap).
-  const canonicalUrl = `${baseUrl}/${canonicalSeoLocale(locale)}${path ? `/${path}` : ""}`;
+  const canonicalUrl = canonicalPageUrl(locale, path);
 
   const languageAlternates: Record<string, string> = generateAlternates
     ? seoLanguageAlternates(baseUrl, path)

@@ -12,7 +12,7 @@ import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data
 import { buildBreadcrumbList } from "@/_pages/_components/structured-data";
 import {
   canonicalComparisonPath,
-  isUncensoredVariantOf,
+  findAbliteratedBase,
   listModelFacts,
   type ModelRef,
 } from "@/_pages/models/_shared/model-facts";
@@ -65,11 +65,7 @@ export async function tanstackLoader({ params }: Props): Promise<PageData> {
         a.name.localeCompare(b.name),
     )
     .map((model) => {
-      const base = available.find(
-        (candidate) =>
-          candidate.outputs.join() === model.outputs.join() &&
-          isUncensoredVariantOf(model, candidate),
-      );
+      const base = findAbliteratedBase(model, available);
       return {
         id: model.id,
         slug: model.slug,

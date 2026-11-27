@@ -16,7 +16,8 @@ import { repairMangledStorageUrl } from "../../../agent/chat/storage/storage-url
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { parseError } from "../../../core/utils/parse-error";
-import { Environment } from "../../../env/env-util";
+import { Environment, VibeMode } from "../../../env/env-util";
+import { SetupStatusRepository } from "../../../env/settings/setup-status";
 import { GUEST_LEAD_DB_BUDGET_MS } from "../../../identity/lead/database-deadline";
 import {
   checkLeadId,
@@ -176,8 +177,14 @@ export async function middleware(
   // One redirect, query string kept (?ref= track links survive).
   const localeRedirect = detectLocale(request, options);
   if (localeRedirect) {
+    const destination = buildLocaleRedirectPath(path, localeRedirect);
+    const directStory =
+      path === "/" &&
+      coreEnv.NEXT_PUBLIC_VIBE_MODE !== VibeMode.AGENT &&
+      !request.cookies.has(AUTH_TOKEN_COOKIE_NAME) &&
+      !SetupStatusRepository.isPending();
     const redirectUrl = new URL(
-      buildLocaleRedirectPath(path, localeRedirect),
+      directStory ? `${destination}/story` : destination,
       publicOrigin,
     );
     redirectUrl.search = request.nextUrl.search;
@@ -187,6 +194,19 @@ export async function middleware(
   // Step 2: Extract locale from path for leadId middleware
   const locale =
     (extractLocaleFromPath(path) as CountryLanguage) || options.defaultLocale;
+
+  if (
+    path === `/${locale}/story/compare` ||
+    path === `/${locale}/story/compare/`
+  ) {
+    return NextResponseClass.redirect(
+      new URL(
+        `/${locale}/story/compare/uncensored-ai-platforms${request.nextUrl.search}`,
+        publicOrigin,
+      ),
+      308,
+    );
+  }
 
   // Step 3: Frame routes - redeem exchange token (?et=) before any lead check.
   // The embed script called the config API (credentials: include), which minted

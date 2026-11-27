@@ -3,6 +3,8 @@
 import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { Div } from "next-vibe/ui/components/div";
 import { Calendar } from "next-vibe/ui/components/icons/Calendar";
@@ -16,7 +18,7 @@ import {
   useWidgetLocale,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 
 import { ModelCatalog } from "@/_pages/models/_shared/model-catalog";
 import {
@@ -42,13 +44,30 @@ import { CreditsTabHeader } from "./credits-tab-header";
 
 export function CreditsBalanceContainer(): JSX.Element {
   const locale = useWidgetLocale();
-  const widgetUser = useWidgetUser();
+  const user = useWidgetUser();
+  return (
+    <CreditsOverview
+      locale={locale}
+      user={user}
+      header={<CreditsTabHeader activeTab="overview" />}
+    />
+  );
+}
+
+export function CreditsOverview({
+  locale,
+  user,
+  header,
+}: {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  header: ReactNode;
+}): JSX.Element {
   const availability = useProviderAvailability();
   const { locale: currentLocale } = useTranslation();
   const { t: tSub } = subscriptionT.scopedT(currentLocale);
 
-  const isAdmin =
-    !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
   const totalModelCount = getAvailableChatModelCount(isAdmin, availability);
 
   const products = productsRepository.getProducts(locale);
@@ -125,7 +144,7 @@ export function CreditsBalanceContainer(): JSX.Element {
 
   return (
     <WidgetShell className="gap-6">
-      <CreditsTabHeader activeTab="overview" />
+      {header}
 
       {/* How credits work */}
       <Div className="flex flex-col gap-3">

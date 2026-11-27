@@ -143,7 +143,23 @@ export function chatModelMeta(
     };
   }
   const uncensored = facts.content === ContentLevel.UNCENSORED;
-  const hasTokenPrice = facts.tokenPrice !== null;
+  const flatDescription = t(
+    uncensored
+      ? "meta.model.descriptionUncensoredFlat"
+      : "meta.model.descriptionFlat",
+    vars,
+  );
+  const description = facts.tokenPrice
+    ? fitDescription(
+        t(
+          uncensored
+            ? "meta.model.descriptionUncensored"
+            : "meta.model.description",
+          vars,
+        ),
+        flatDescription,
+      )
+    : flatDescription;
   return {
     title: uncensored
       ? fitTitle(
@@ -156,13 +172,7 @@ export function chatModelMeta(
           t("meta.model.titleShort", vars),
           t("meta.model.titleMin", vars),
         ),
-    description: uncensored
-      ? hasTokenPrice
-        ? t("meta.model.descriptionUncensored", vars)
-        : t("meta.model.descriptionUncensoredFlat", vars)
-      : hasTokenPrice
-        ? t("meta.model.description", vars)
-        : t("meta.model.descriptionFlat", vars),
+    description,
   };
 }
 

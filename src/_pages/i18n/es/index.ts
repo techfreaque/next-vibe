@@ -525,7 +525,7 @@ export const translations: typeof enTranslations = {
       categories: {
         all: "Todos",
         general: "General",
-        ai: "AI &amp; Tech",
+        ai: "IA y tecnología",
         education: "Educación",
         communication: "Comunicación",
         science: "Ciencia",

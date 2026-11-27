@@ -462,7 +462,7 @@ function UnbottledContent({
           asChild
           onClick={(e) => e.stopPropagation()}
         >
-          <Link href={`/${locale}/threads`}>
+          <Link href={`/${locale}/threads/incognito/new`}>
             <MessageSquare className="mr-2 h-4 w-4" />
             {t("home.splitHero.unbottled.cta")}
           </Link>

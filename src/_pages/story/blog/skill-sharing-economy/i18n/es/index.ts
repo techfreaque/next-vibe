@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
   },
   shareLink: {
     title: "El mecánico de enlaces de acciones: cómo usted realmente ganar",
-    p1: "Cuando usted golpeó Compartir &quot; Ganar en cualquier habilidad, usted consigue un URL que hace dos cosas a la vez:",
+    p1: "Cuando usted golpeó Compartir y Ganar en cualquier habilidad, usted consigue un URL que hace dos cosas a la vez:",
     bullet1:
       "Muestra a los visitantes la habilidad, lo que hace, cómo se configura, qué tipo de AI es",
     bullet2:
@@ -101,10 +101,10 @@ export const translations: typeof enTranslations = {
       "Construya uno desde cero en la página de habilidad, pida a Thea o Hermes que le ayuden a redactarlo, o encuentre una habilidad integrada que valga la pena compartir.",
     step2Title: "Abre la habilidad.",
     step2Body:
-      "Haga clic en la habilidad para ver su página de detalles. Aquí es donde encontrarás el botón Compartir &gt; Ganar.",
+      "Haga clic en la habilidad para ver su página de detalles. Aquí es donde encontrarás el botón Compartir y ganar.",
     step3Title: "Genera tu enlace de compartir",
     step3Body:
-      "Haga clic en Compartir &gt; Ganar. Si tiene un código de referencia, seleccionelo. Si no, cree uno en tres segundos. Su enlace lleva su código de referencia y la habilidad ID: atribución se rastrea automáticamente.",
+      "Haga clic en Compartir y ganar. Si tiene un código de referencia, seleccionelo. Si no, cree uno en tres segundos. Su enlace lleva su código de referencia y la habilidad ID: atribución se rastrea automáticamente.",
     step4Title: "Compartir donde importa",
     step4Body:
       "Post it in communities where people would actually use the skill: Discord servers, subreddits, forum threads, blog posts, Slack channels. Golpes específicos anchos.",

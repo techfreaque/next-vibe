@@ -13,6 +13,7 @@ const localeIndexPath = /^\/[a-z]{2}-[A-Z]+\/?$/;
 const publicPages = new Set([
   "docs/api",
   "models",
+  "models/compare",
   "story",
   "story/abliterated-ai-chat",
   "story/about-us",

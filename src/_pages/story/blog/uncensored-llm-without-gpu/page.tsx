@@ -11,7 +11,6 @@
  */
 
 import type { Metadata } from "next";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { Div } from "next-vibe/ui/components/div";
@@ -25,6 +24,7 @@ import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { HOSTED_MODEL_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import { formatNumber } from "@/_pages/models/_shared/model-format";
 import { configScopedTranslation } from "@/env/i18n";
 
@@ -65,16 +65,6 @@ interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-/** Base model next to its uncensored build: what changes when you go hosted. */
-const PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.GLM_5_3_FLASH, ChatModelId.GLM_5_3_FLASH_UNCENSORED],
-  [ChatModelId.GLM_5_3, ChatModelId.GLM_5_3_UNCENSORED],
-  [
-    ChatModelId.DEEPSEEK_V4_1_FLASH,
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-  ],
-];
-
 const STEPS: readonly ("open" | "pick" | "confirm" | "ask")[] = [
   "open",
   "pick",
@@ -107,7 +97,7 @@ export async function tanstackLoader({
   const [facts, rows, pairs] = await Promise.all([
     loadUsFacts(locale),
     loadUncensoredRows(locale),
-    loadComparePairs(PAIRS),
+    loadComparePairs(HOSTED_MODEL_PAIRS),
   ]);
   return { locale, us: usParams(facts), rows, pairs };
 }

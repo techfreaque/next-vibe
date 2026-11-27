@@ -9,6 +9,7 @@ import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
+import { Link } from "next-vibe/ui/components/link";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
@@ -81,6 +82,7 @@ export async function tanstackLoader({
 }
 
 export function TanstackPage(data: ModelsIndexPageData): JSX.Element {
+  const { t } = scopedTranslation.scopedT(data.locale);
   return (
     <>
       <JsonLd id="models-structured-data" data={data.structuredData} />
@@ -91,6 +93,12 @@ export function TanstackPage(data: ModelsIndexPageData): JSX.Element {
         directorySection={
           <>
             <ModelDirectory locale={data.locale} groups={data.directory} />
+            <Link
+              href={`/${data.locale}/models/compare`}
+              className="text-primary underline"
+            >
+              {t("compareHub.title")}
+            </Link>
             <CompareSection locale={data.locale} />
           </>
         }

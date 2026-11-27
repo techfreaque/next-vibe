@@ -75,7 +75,7 @@ export const translations: typeof enTranslations = {
       placeholder: "https://example.com",
     },
     locationPreferences: {
-      title: "Lugar &quot; Preferencias",
+      title: "Ubicación y preferencias",
       description: "Preferencias geográficas y lingüísticas",
     },
     country: {

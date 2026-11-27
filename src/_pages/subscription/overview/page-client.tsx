@@ -1,9 +1,7 @@
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { Platform } from "next-vibe/platforms/platforms";
 import {
   Alert,
   AlertDescription,
@@ -16,14 +14,12 @@ import { Link } from "next-vibe/ui/components/link";
 import { H1 } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
-import type { UseNavigationStackReturn } from "next-vibe/unified-ui/hooks/use-navigation-stack";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
+import { CreditsTabHeaderContent } from "@/credits/credits-tab-header";
 import type { CreditsGetResponseOutput } from "@/credits/definition";
-import creditsDefinition from "@/credits/definition";
-import { CreditsBalanceContainer } from "@/credits/widget";
+import { CreditsOverview } from "@/credits/widget";
 
 import { scopedTranslation } from "../i18n";
 
@@ -31,14 +27,7 @@ interface Props {
   locale: CountryLanguage;
   user: JwtPayloadType;
   initialCredits: CreditsGetResponseOutput | null;
-  platform: Platform;
 }
-
-const PATH_TO_TAB: Record<string, string> = {
-  "subscription/create": "buy",
-  "credits/history": "history",
-  "remote-connection/list": "remote",
-};
 
 function PaymentResultBanner({
   locale,
@@ -103,49 +92,28 @@ export function OverviewPageClient({
   locale,
   user,
   initialCredits,
-  platform,
 }: Props): JSX.Element {
   const logger = useLogger();
   const router = useRouter();
   const { t } = scopedTranslation.scopedT(locale);
 
-  const navigationOverride = useMemo(
-    () => ({
-      push: <TEndpoint extends CreateApiEndpointAny>(
-        endpoint: TEndpoint,
-        options?: Parameters<UseNavigationStackReturn["push"]>[1],
-        nativePush?: UseNavigationStackReturn["push"],
-      ): void => {
-        const tab = PATH_TO_TAB[endpoint.path.slice(0, 2).join("/")];
-        if (tab) {
-          router.push(`/${locale}/subscription/${tab}`);
-        } else if (nativePush) {
-          nativePush(endpoint, options);
-        }
-      },
-      canGoBack: false,
-    }),
-    [locale, router],
-  );
-
   return (
     <Container className="max-w-6xl px-0 py-4 sm:px-2 sm:py-8 lg:px-2">
       <H1 className="mx-4 mb-4 text-2xl font-semibold">{t("meta.category")}</H1>
       <PaymentResultBanner locale={locale} />
-      <EndpointsPage
-        logger={logger}
-        endpoint={creditsDefinition}
-        widget={<CreditsBalanceContainer />}
+      <CreditsOverview
         user={user}
         locale={locale}
-        platform={platform}
-        endpointOptions={{
-          read: {
-            initialData: initialCredits ?? undefined,
-            queryOptions: { staleTime: 0, refetchOnWindowFocus: true },
-          },
-        }}
-        navigationOverride={navigationOverride}
+        header={
+          <CreditsTabHeaderContent
+            activeTab="overview"
+            initialBalance={initialCredits ?? undefined}
+            user={user}
+            locale={locale}
+            logger={logger}
+            onTabChange={(tab) => router.push(`/${locale}/subscription/${tab}`)}
+          />
+        }
       />
     </Container>
   );

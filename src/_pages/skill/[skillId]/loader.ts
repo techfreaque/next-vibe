@@ -183,13 +183,22 @@ export async function loadSkillPageMetadata({
   const displayName = name ?? "";
 
   const summary = asSentence(description || tagline || displayName);
+  const taglineSentence = asSentence(tagline ?? "");
+  const combined = `${summary} ${taglineSentence}`.trim();
+  const metaDescription =
+    summary.length < 120 &&
+    taglineSentence &&
+    !summary.toLowerCase().includes(taglineSentence.toLowerCase()) &&
+    combined.length <= 160
+      ? combined
+      : summary;
   return metadataGenerator(locale, {
     path: `skill/${encodeURIComponent(indexableId ?? baseSkillId)}`,
     title: tagline
       ? t("meta.title", { appName, name: displayName, tagline })
       : t("meta.titlePlain", { appName, name: displayName }),
     category: t("meta.category"),
-    description: summary || t("hero.tryGeneric"),
+    description: metaDescription || t("hero.tryGeneric"),
     image: `${configT("websiteUrl")}/og-image.jpg`,
     imageAlt: appName,
     keywords: [t("meta.keywords", { appName, name: displayName })],

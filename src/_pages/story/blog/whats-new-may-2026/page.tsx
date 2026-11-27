@@ -236,7 +236,7 @@ export function TanstackPage({ locale }: WhatsNewMay2026PageData): JSX.Element {
           actions={
             <>
               <Cta
-                href={`/${locale}/threads`}
+                href={`/${locale}/threads/incognito/new`}
                 label={t("close.cta", { appName })}
               />
               <Cta

@@ -9,12 +9,14 @@ export const dynamic = "force-dynamic";
 import { scopedTranslation as shareLinksScopedTranslation } from "next-vibe/agent/chat/threads/[threadId]/share-links/i18n";
 import { ShareLinksRepository } from "next-vibe/agent/chat/threads/[threadId]/share-links/repository";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Div } from "next-vibe/ui/components/div";
 import { P } from "next-vibe/ui/components/typography";
+import { notFound } from "next-vibe/ui/lib/not-found";
 import { redirect } from "next-vibe/ui/lib/redirect";
 import type { JSX } from "react";
 
@@ -72,6 +74,13 @@ export async function tanstackLoader({
     shareLinksT,
     logger,
   );
+
+  if (
+    !shareLinkResponse.success &&
+    shareLinkResponse.errorType === ErrorResponseTypes.NOT_FOUND
+  ) {
+    notFound();
+  }
 
   if (!shareLinkResponse.success || !shareLinkResponse.data) {
     return {

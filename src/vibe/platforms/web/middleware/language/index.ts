@@ -10,6 +10,7 @@ import { LOCALE_COOKIE_NAME } from "@/env/constants";
 
 import { languageConfig } from "../../../../core/i18n";
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import { canonicalSeoLocale } from "../../../../core/i18n/core/seo-locales";
 
 export interface LanguageMiddlewareOptions {
   /**
@@ -289,6 +290,19 @@ export function detectLocale(
     const isLanguageOnly =
       /^[a-z]{2}$/i.test(localeSegment) &&
       supportedLanguages.has(localeSegment.toLowerCase());
+    if (isLanguageOnly && !isApiRoute) {
+      const fallback = languageFallbackLocale(
+        supportedLocales,
+        languageOf(localeSegment),
+      );
+      if (fallback) {
+        const canonical = canonicalSeoLocale(fallback);
+        return {
+          locale: findLocale(supportedLocales, canonical) ?? fallback,
+          replaceSegment: true,
+        };
+      }
+    }
     if (isLanguageOnly || LOCALE_SHAPED_SEGMENT_REGEX.test(localeSegment)) {
       const language = languageOf(localeSegment);
       return {

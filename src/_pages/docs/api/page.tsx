@@ -282,6 +282,7 @@ export function TanstackPage({
               url: pageUrl(locale, "/docs/api"),
               mainEntityOfPage: pageUrl(locale, "/docs/api"),
               inLanguage: hreflangFor(locale),
+              dateModified: "2026-11-27",
               image: defaultImage(locale),
               author: organizationNode(locale),
               publisher: organizationNode(locale),

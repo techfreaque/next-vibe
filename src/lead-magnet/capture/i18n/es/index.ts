@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   submit: {
     tag: "lead-magnet-capture",
-    title: "Suscribirse &quot; Obtener acceso &quot;",
+    title: "Suscríbete y consigue acceso",
     titleShort: "Suscribirme",
     description:
       "Presenta tus datos para unirte a la lista del creador y obtener acceso a esta habilidad",
@@ -79,6 +79,7 @@ export const translations: typeof enTranslations = {
     },
   },
   form: {
+    signUp: "Crear una cuenta",
     headline: "Quédate en el bucle.",
     namePlaceholder: "Tu nombre de pila",
     emailPlaceholder: "Su correo electrónico",

@@ -29,7 +29,9 @@ import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
+import { UNCENSORED_USE_CASE_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import { toModelSlug } from "@/_pages/models/_shared/model-facts";
+import { isAvailableComparison } from "@/_pages/models/_shared/model-facts";
 import { compareHref } from "@/_pages/models/_shared/model-format";
 import { configScopedTranslation } from "@/env/i18n";
 
@@ -161,19 +163,6 @@ const GROUPS: readonly {
   { key: "fast", cards: ["glm53Flash", "gemma", "mimo"] },
 ];
 
-/** Own-worldview vs refusal-stripped, then vs ChatGPT's model. */
-const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED],
-  [
-    ChatModelId.UNCENSORED_LM_V1_2,
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-  ],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.QWEN_3_6_PLUS_UNCENSORED],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
-];
-
 function modelName(id: ChatModelId): string {
   return chatModelDefinitions[id].name;
 }
@@ -181,6 +170,7 @@ function modelName(id: ChatModelId): string {
 export interface UncensoredGuidePageData {
   locale: CountryLanguage;
   counts: ModelCountsByContentLevel;
+  comparisons: typeof UNCENSORED_USE_CASE_PAIRS;
 }
 
 export async function tanstackLoader({
@@ -191,6 +181,9 @@ export async function tanstackLoader({
   return {
     locale,
     counts: getAvailableChatModelCountsByContentLevel(false, availability),
+    comparisons: UNCENSORED_USE_CASE_PAIRS.filter((pair) =>
+      isAvailableComparison(pair, availability),
+    ),
   };
 }
 
@@ -254,8 +247,10 @@ function ModelCard({
 function TopPick({
   pick,
   locale,
+  comparisons,
 }: {
   pick: TopPickSpec;
+  comparisons: typeof UNCENSORED_USE_CASE_PAIRS;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
@@ -282,13 +277,15 @@ function TopPick({
           href={`/${locale}/models/${toModelSlug(id)}`}
           label={t("cards.pageLink", { model: name })}
         />
-        <CardLink
-          href={compareHref(locale, id, otherId)}
-          label={t("howToPick.compareLink", {
-            a: name,
-            b: modelName(otherId),
-          })}
-        />
+        {comparisons.some(([a, b]) => a === id && b === otherId) && (
+          <CardLink
+            href={compareHref(locale, id, otherId)}
+            label={t("howToPick.compareLink", {
+              a: name,
+              b: modelName(otherId),
+            })}
+          />
+        )}
       </Div>
     </Div>
   );
@@ -297,6 +294,7 @@ function TopPick({
 export function TanstackPage({
   locale,
   counts,
+  comparisons,
 }: UncensoredGuidePageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
@@ -335,7 +333,11 @@ export function TanstackPage({
             intro={t(`groups.${group.key}.intro`)}
           >
             {group.topPick !== undefined && (
-              <TopPick pick={group.topPick} locale={locale} />
+              <TopPick
+                pick={group.topPick}
+                locale={locale}
+                comparisons={comparisons}
+              />
             )}
             {group.topPick !== undefined && (
               <Span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -362,7 +364,7 @@ export function TanstackPage({
           <ArticleP>{t("howToPick.p1")}</ArticleP>
           <ArticleP>{t("howToPick.p2")}</ArticleP>
           <Div className="flex flex-col">
-            {COMPARE_PAIRS.map(([a, b]) => (
+            {comparisons.map(([a, b]) => (
               <CardLink
                 key={`${a}-${b}`}
                 href={compareHref(locale, a, b)}
@@ -387,7 +389,7 @@ export function TanstackPage({
           actions={
             <>
               <Cta
-                href={`/${locale}/threads`}
+                href={`/${locale}/threads/incognito/new`}
                 label={t("cta.chat")}
                 icon={MessageSquare}
               />

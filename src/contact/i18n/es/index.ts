@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
     contactForm: "Formulario de contacto",
     contactUs: "Contáctanos",
     contactSubmission: "Comunicación de contacto",
-    helpSupport: "Ayuda &quot; Apoyo",
+    helpSupport: "Ayuda y soporte",
   },
 
   form: {
@@ -73,7 +73,7 @@ export const translations: typeof enTranslations = {
   },
 
   subject: {
-    helpSupport: "Ayuda &quot; Apoyo",
+    helpSupport: "Ayuda y soporte",
     generalInquiry: "Investigación general",
     technicalSupport: "Technical Support",
     accountQuestion: "Cuestión de la cuenta",

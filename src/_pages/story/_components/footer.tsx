@@ -35,6 +35,7 @@ import { NewsletterSubscribeInline } from "@/newsletter/_components/newsletter-s
 import type { StatusGetResponseOutput } from "@/newsletter/status/definition";
 
 import { Logo } from "../../_components/logo";
+import { scopedTranslation as investTranslation } from "../invest/i18n";
 import { FeaturedOn } from "./featured-on";
 import { scopedTranslation } from "./i18n";
 
@@ -67,6 +68,7 @@ const Footer: React.FC<FooterProps> = ({
 }) => {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
+  const { t: investT } = investTranslation.scopedT(locale);
   const currentYear = getCurrentYear();
 
   return (
@@ -219,7 +221,7 @@ const Footer: React.FC<FooterProps> = ({
                   href={
                     isPublic
                       ? `/${locale}/story#privacy`
-                      : `/${locale}/threads/private`
+                      : `/${locale}/threads/private/new`
                   }
                   className="hover:text-foreground transition-colors flex items-center gap-2"
                 >
@@ -229,7 +231,7 @@ const Footer: React.FC<FooterProps> = ({
               </Li>
               <Li>
                 <Link
-                  href={`/${locale}/threads/incognito`}
+                  href={`/${locale}/threads/incognito/new`}
                   className="hover:text-foreground transition-colors flex items-center gap-2"
                 >
                   <Shield className="h-4 w-4" />
@@ -241,7 +243,7 @@ const Footer: React.FC<FooterProps> = ({
                   href={
                     isPublic
                       ? `/${locale}/story#privacy`
-                      : `/${locale}/threads/shared`
+                      : `/${locale}/threads/shared/new`
                   }
                   className="hover:text-foreground transition-colors flex items-center gap-2"
                 >
@@ -274,6 +276,14 @@ const Footer: React.FC<FooterProps> = ({
                 >
                   <Info className="h-4 w-4" />
                   {t("footer.company.aboutUs")}
+                </Link>
+              </Li>
+              <Li>
+                <Link
+                  href={`/${locale}/story/invest`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {investT("title", { appName: configT("appName") })}
                 </Link>
               </Li>
               <Li>

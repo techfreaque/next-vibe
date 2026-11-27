@@ -143,7 +143,7 @@ export const translations: typeof enTranslations = {
         description: "Filtrar y navegar suscripciones",
       },
       searchFilters: {
-        title: "Búsqueda &quot; Filtros",
+        title: "Búsqueda y Filtros",
         description: "Suscripciones de filtros",
       },
       search: {
@@ -270,7 +270,7 @@ export const translations: typeof enTranslations = {
         description: "Ver las compras de paquetes de crédito",
       },
       searchFilters: {
-        title: "Búsqueda &quot; Filtros",
+        title: "Búsqueda y Filtros",
         description: "Compras de filtros",
       },
       search: {
@@ -388,7 +388,7 @@ export const translations: typeof enTranslations = {
         description: "Gestionar el programa de remisión",
       },
       searchFilters: {
-        title: "Búsqueda &quot; Filtros",
+        title: "Búsqueda y Filtros",
         description: "Datos de referencia del filtro",
       },
       search: {

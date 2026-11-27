@@ -10,7 +10,6 @@
  * which only render for pairs whose two models are both live. Credits and
  * plans come from loadUsFacts.
  */
-
 import type { Metadata } from "next";
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -24,6 +23,10 @@ import { JsonLd } from "next-vibe/ui/components/json-ld";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import {
+  CLAUDE_COMPARISON_ANCHORS,
+  CLAUDE_COMPARISON_PARTNERS,
+} from "@/_pages/models/_shared/editorial-comparison-pairs";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -60,16 +63,6 @@ const SLUG = "claude-without-filters";
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
-
-/** Claude models, newest and strongest first. The first live one leads. */
-const CLAUDE_IDS: readonly ChatModelId[] = [
-  ChatModelId.CLAUDE_OPUS_5_5,
-  ChatModelId.CLAUDE_SONNET_5_5,
-  ChatModelId.CLAUDE_FABLE_5_2,
-  ChatModelId.CLAUDE_HAIKU_5_5,
-  ChatModelId.CLAUDE_OPUS_5,
-  ChatModelId.CLAUDE_SONNET_5,
-];
 
 /** How many Claude rows the table shows. */
 const CLAUDE_ROWS = 2;
@@ -117,19 +110,21 @@ export async function tanstackLoader({
     await import("../../compare/_shared/us-facts");
   const [facts, claudeRows, pickRows] = await Promise.all([
     loadUsFacts(locale),
-    loadModelRowsByIds(CLAUDE_IDS, locale),
+    loadModelRowsByIds(CLAUDE_COMPARISON_ANCHORS, locale),
     loadModelRowsByIds(
       PICKS.map(([, id]) => id),
       locale,
     ),
   ]);
-  const lead = CLAUDE_IDS.find((id) => claudeRows.some((row) => row.id === id));
+  const lead = CLAUDE_COMPARISON_ANCHORS.find((id) =>
+    claudeRows.some((row) => row.id === id),
+  );
   const pairs =
     lead === undefined
       ? []
       : await loadComparePairs(
-          PICKS.slice(0, 3).map(
-            ([, id]): readonly [ChatModelId, ChatModelId] => [lead, id],
+          CLAUDE_COMPARISON_PARTNERS.map(
+            (id): readonly [ChatModelId, ChatModelId] => [lead, id],
           ),
         );
   return {

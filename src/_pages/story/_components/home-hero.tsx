@@ -85,7 +85,7 @@ export function HomeHero({
 
             <Div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
               <Button size="lg" className="h-12 gap-2 px-6 text-base" asChild>
-                <Link href={`/${locale}/threads`}>
+                <Link href={`/${locale}/threads/incognito/new`}>
                   <MessageSquare className="h-4 w-4" />
                   {t("home.splitHero.unbottled.cta")}
                   <ArrowRight className="h-4 w-4" />

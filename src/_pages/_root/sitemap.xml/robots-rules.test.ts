@@ -185,12 +185,15 @@ describe("robots.txt rules", () => {
     ).toEqual([]);
   });
 
-  test("chat pages carry noindex, follow", () => {
-    const metadata = threadsMetadata({
+  test("chat pages carry noindex, follow and the canonical composer URL", async () => {
+    const metadata = await threadsMetadata({
       params: Promise.resolve({ locale: "en-US", path: ["incognito", "new"] }),
       searchParams: Promise.resolve({}),
     });
     expect(metadata.robots).toEqual(NOINDEX_FOLLOW_ROBOTS);
+    expect(metadata.alternates?.canonical).toMatch(
+      /\/en-US\/threads\/incognito\/new$/,
+    );
   });
 
   test("compare pages index current pairs and legacy->successor upgrades, and noindex unrelated legacy pairs", async () => {

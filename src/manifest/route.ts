@@ -17,7 +17,7 @@ import { configScopedTranslation } from "@/env/i18n";
 const MANIFEST_CONSTANTS = {
   DISPLAY: "standalone" as const,
   BACKGROUND_COLOR: "#d1dff5",
-  THEME_COLOR: "#4f46e5",
+  THEME_COLOR: "#0EA5E9",
   ORIENTATION: "portrait-primary" as const,
   CATEGORIES: ["social", "productivity", "business"] as const,
   ICON_SIZES: {

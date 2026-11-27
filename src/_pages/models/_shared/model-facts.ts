@@ -599,6 +599,28 @@ export function isUncensoredVariantOf(
   );
 }
 
+/** Find the same catalogued base model that the abliterated landing links to. */
+export function findAbliteratedBase(
+  model: ModelFacts,
+  models: readonly ModelFacts[],
+): ModelFacts | undefined {
+  return models.find(
+    (candidate) =>
+      !candidate.isLegacy &&
+      candidate.outputs.join() === model.outputs.join() &&
+      isUncensoredVariantOf(model, candidate),
+  );
+}
+
+export function isAvailableComparison(
+  [a, b]: readonly [ChatModelId, ChatModelId],
+  availability: AgentEnvAvailability,
+): boolean {
+  const left = getModelFacts(a, availability);
+  const right = getModelFacts(b, availability);
+  return left !== null && right !== null && isIndexableComparison(left, right);
+}
+
 /**
  * Comparison suggestions for a model page: its successor first (legacy), then
  * the featured pairs (always shown, may exceed `limit`), then known
@@ -610,10 +632,10 @@ export function suggestComparisons(
   availability: AgentEnvAvailability,
   limit = 3,
 ): ModelRef[] {
-  const picks: ModelRef[] = [];
-  if (facts.successor !== null) {
-    picks.push(facts.successor);
+  if (facts.isLegacy) {
+    return facts.successor === null ? [] : [facts.successor];
   }
+  const picks: ModelRef[] = [];
   for (const featured of featuredComparisons(facts, availability)) {
     if (!picks.some((pick) => pick.id === featured.id)) {
       picks.push(featured);

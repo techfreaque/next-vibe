@@ -277,7 +277,10 @@ export function TanstackPage({
           subtitle={`${t("close.p1")} ${t("close.p2")}`}
           actions={
             <>
-              <Cta href={`/${locale}/threads`} label={t("close.createSkill")} />
+              <Cta
+                href={`/${locale}/threads/incognito/new`}
+                label={t("close.createSkill")}
+              />
               <Cta
                 href={`/${locale}/user/referral`}
                 label={t("close.referralPage")}

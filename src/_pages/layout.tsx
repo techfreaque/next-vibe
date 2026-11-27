@@ -20,7 +20,6 @@ import { Head } from "next-vibe/ui/components/head";
 import { Html } from "next-vibe/ui/components/html";
 import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
 import { LinkTag } from "next-vibe/ui/components/link-tag";
-import { Meta } from "next-vibe/ui/components/meta";
 import { Outlet } from "next-vibe/ui/components/outlet";
 import { Script } from "next-vibe/ui/components/script";
 import { Scripts } from "next-vibe/ui/components/scripts";
@@ -67,6 +66,15 @@ export async function generateMetadata({
     // it. Every indexable page sets its own via metadataGenerator.
     additionalMetadata: {
       alternates: null,
+      robots: null,
+      icons: {
+        icon: {
+          url: "/images/apple-icon.png",
+          type: "image/png",
+          sizes: "180x180",
+        },
+        apple: "/images/apple-icon.png",
+      },
       // Search Console / Bing Webmaster tokens, rendered on every page.
       // Read inline: the client build strips generateMetadata, but a helper
       // function would keep the server-only env import in the client bundle.
@@ -143,7 +151,6 @@ export function TanstackPage({
       suppressHydrationWarning
     >
       <Head>
-        <Meta name="viewport" content="width=device-width, initial-scale=1" />
         <LinkTag rel="manifest" href={`/api/${locale}/manifest`} />
         {/* Sync cookie → localStorage before next-themes reads it, preventing theme flash */}
         <Script

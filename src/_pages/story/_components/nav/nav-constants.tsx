@@ -31,7 +31,7 @@ export type NavPaths =
   | "/create"
   | "/help"
   | "/admin"
-  | "/threads"
+  | "/threads/incognito/new"
   | "/user/settings"
   | "/user/referral"
   | "/user/api-keys"

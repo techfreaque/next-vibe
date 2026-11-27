@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  compareHub: {
+    title: "KI-Modelle vergleichen",
+    description:
+      "Vergleiche verfügbare KI-Modelle direkt nach Preis, Kontextfenster, Funktionen und Inhaltsfiltern.",
+  },
   meta: {
     category: "KI-Modelle",
     index: {

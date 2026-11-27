@@ -40,9 +40,9 @@ declare global {
 const FLUSH_INTERVAL_MS = 5_000;
 const FLUSH_BATCH_THRESHOLD = 50;
 
-function unrefTimer(timer: number | { unref?: () => void }): void {
+function allowProcessExit(timer: number | NodeJS.Timeout): void {
   if (typeof timer !== "number") {
-    timer.unref?.();
+    timer.unref();
   }
 }
 
@@ -96,7 +96,7 @@ export function recordVerifiedCrawlerVisit(
       state.timer = null;
       void flushCrawlerVisits(logger);
     }, FLUSH_INTERVAL_MS);
-    unrefTimer(state.timer);
+    allowProcessExit(state.timer);
   }
 }
 

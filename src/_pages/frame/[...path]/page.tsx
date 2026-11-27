@@ -13,18 +13,26 @@
 export const dynamic = "force-dynamic";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { NOINDEX_FOLLOW_ROBOTS } from "next-vibe/core/i18n/core/metadata";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
+import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { VibeFramePageClient } from "./page-client";
 
 interface FramePageProps {
   params: Promise<{ locale: CountryLanguage; path: string[] }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export function generateMetadata(): { robots: typeof NOINDEX_FOLLOW_ROBOTS } {
+  return { robots: NOINDEX_FOLLOW_ROBOTS };
 }
 
 export interface VibeFramePageData {
@@ -50,6 +58,9 @@ export async function tanstackLoader({
   // e.g. /frame/contact_POST -> "contact_POST"
   // e.g. /frame/agent/chat/threads_GET -> "agent_chat_threads_GET"
   const endpointId = path.join("_");
+  if ((await getEndpoint(endpointId)) === null) {
+    notFound();
+  }
 
   const frameId =
     (typeof search.frameId === "string" ? search.frameId : "") || "";

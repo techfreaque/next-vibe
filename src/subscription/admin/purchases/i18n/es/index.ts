@@ -13,7 +13,7 @@ export const translations: typeof enTranslations = {
       description: "Ver las compras de paquetes de crédito",
     },
     searchFilters: {
-      title: "Búsqueda &quot; Filtros",
+      title: "Búsqueda y Filtros",
       description: "Compras de filtros",
     },
     search: {

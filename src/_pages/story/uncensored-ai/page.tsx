@@ -16,6 +16,7 @@ import { buildBreadcrumbList } from "@/_pages/_components/structured-data";
 import {
   canonicalComparisonPath,
   FEATURED_COMPARISON_PAIRS,
+  isIndexableComparison,
   listModelFacts,
   type ModelRef,
 } from "@/_pages/models/_shared/model-facts";
@@ -74,7 +75,11 @@ export async function tanstackLoader({ params }: Props): Promise<PageData> {
   const comparisons = FEATURED_COMPARISON_PAIRS.flatMap(([leftId, rightId]) => {
     const left = live.find((model) => model.id === leftId);
     const right = live.find((model) => model.id === rightId);
-    if (left === undefined || right === undefined) {
+    if (
+      left === undefined ||
+      right === undefined ||
+      !isIndexableComparison(left, right)
+    ) {
       return [];
     }
     const path = canonicalComparisonPath(left, right);

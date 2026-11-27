@@ -4,6 +4,8 @@ import type { Route } from "next";
 import NextLink from "next/link";
 import * as React from "react";
 
+import { crawlLinkRel } from "../../crawl-link-rel";
+
 export interface LinkProps<RouteType extends string> {
   children?: React.ReactNode;
   href: Route<RouteType>;
@@ -36,7 +38,7 @@ export function Link<RouteType extends string>({
       className={className}
       href={href}
       target={target}
-      rel={rel}
+      rel={crawlLinkRel(href, rel)}
       {...(onClick ? { onClick } : {})}
       download={download}
       title={title}

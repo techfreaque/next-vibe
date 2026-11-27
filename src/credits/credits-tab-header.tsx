@@ -2,7 +2,10 @@
 import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { useRemoteConnections } from "next-vibe/remote-connection/list/hooks";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -29,7 +32,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
-import { useContext } from "react";
+import { lazy, Suspense, useContext } from "react";
 
 import { scopedTranslation as subscriptionScopedT } from "@/_pages/subscription/i18n";
 import {
@@ -42,16 +45,24 @@ import {
   ProductIds,
   productsRepository,
 } from "@/products/repository-client";
-import { CreditOffers } from "@/subscription/create/credit-offers";
 import { useSubscription } from "@/subscription/hooks";
 import { getPlanOfferState } from "@/subscription/plan-offers";
 import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
 import { InitialCreditBalanceContext } from "./balance-context";
-import creditsDefinition from "./definition";
+import creditsDefinition, { type CreditsGetResponseOutput } from "./definition";
 import { FreeCreditsStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { SubscriptionStatusCard } from "./subscription-status-card";
+const DeferredCreditOffers = lazy(() =>
+  import("@/subscription/create/credit-offers").then(({ CreditOffers }) => ({
+    default: CreditOffers,
+  })),
+);
+const DeferredSubscriptionStatusCard = lazy(() =>
+  import("./subscription-status-card").then(({ SubscriptionStatusCard }) => ({
+    default: SubscriptionStatusCard,
+  })),
+);
 
 type TabId = "overview" | "buy" | "history" | "remote";
 
@@ -70,14 +81,62 @@ function formatCredits(amount: number): string {
 export function CreditsTabHeader({
   activeTab,
 }: CreditsTabHeaderProps): JSX.Element {
-  const { locale: currentLocale } = useTranslation();
-  const { t } = scopedTranslation.scopedT(currentLocale);
-  const { t: tSub } = subscriptionScopedT.scopedT(currentLocale);
   const locale = useWidgetLocale();
   const widgetUser = useWidgetUser();
   const navigation = useWidgetNavigation();
   const logger = useWidgetLogger();
   const initialBalance = useContext(InitialCreditBalanceContext);
+
+  const handleTabClick = (tab: TabId): void => {
+    void (async (): Promise<void> => {
+      if (tab === "overview") {
+        navigation.pop();
+      } else if (tab === "buy") {
+        const def = await import("@/subscription/create/definition");
+        navigation.push(def.default.POST, {});
+      } else if (tab === "history") {
+        const def = await import("@/credits/history/definition");
+        // GET validates a nested paginationInfo; an empty push answered 400.
+        navigation.push(def.default.GET, {
+          data: { paginationInfo: { page: 1, limit: 20 } },
+        });
+      } else if (tab === "remote") {
+        const def = await import("next-vibe/remote-connection/list/definition");
+        navigation.push(def.default.GET, {});
+      }
+    })();
+  };
+
+  return (
+    <CreditsTabHeaderContent
+      activeTab={activeTab}
+      locale={locale}
+      user={widgetUser}
+      logger={logger}
+      initialBalance={initialBalance}
+      onTabChange={handleTabClick}
+    />
+  );
+}
+
+export function CreditsTabHeaderContent({
+  activeTab,
+  locale,
+  user: widgetUser,
+  logger,
+  initialBalance,
+  onTabChange,
+}: {
+  activeTab: TabId;
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
+  initialBalance: CreditsGetResponseOutput | undefined;
+  onTabChange: (tab: TabId) => void;
+}): JSX.Element {
+  const { locale: currentLocale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(currentLocale);
+  const { t: tSub } = subscriptionScopedT.scopedT(currentLocale);
 
   const isAdmin =
     !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
@@ -184,29 +243,6 @@ export function CreditsTabHeader({
         ]
       : []),
   ];
-
-  const handleTabClick = (tab: TabId): void => {
-    if (tab === activeTab) {
-      return;
-    }
-    void (async (): Promise<void> => {
-      if (tab === "overview") {
-        navigation.pop();
-      } else if (tab === "buy") {
-        const def = await import("@/subscription/create/definition");
-        navigation.push(def.default.POST, {});
-      } else if (tab === "history") {
-        const def = await import("@/credits/history/definition");
-        // GET validates a nested paginationInfo; an empty push answered 400.
-        navigation.push(def.default.GET, {
-          data: { paginationInfo: { page: 1, limit: 20 } },
-        });
-      } else if (tab === "remote") {
-        const def = await import("next-vibe/remote-connection/list/definition");
-        navigation.push(def.default.GET, {});
-      }
-    })();
-  };
 
   return (
     <Div className="overflow-hidden rounded-xl border bg-card shadow-sm">
@@ -323,7 +359,9 @@ export function CreditsTabHeader({
             </Div>
             {/* One tap to card checkout; the buy tab below already has it all. */}
             {activeTab !== "buy" && (
-              <CreditOffers locale={locale} className="mt-3" />
+              <Suspense fallback={null}>
+                <DeferredCreditOffers locale={locale} className="mt-3" />
+              </Suspense>
             )}
           </Div>
         </Div>
@@ -354,7 +392,7 @@ export function CreditsTabHeader({
                 <Button
                   type="button"
                   className="h-11 shrink-0 sm:h-10"
-                  onClick={() => handleTabClick("buy")}
+                  onClick={() => onTabChange("buy")}
                 >
                   {t("get.balance.subscribe")}
                 </Button>
@@ -427,12 +465,14 @@ export function CreditsTabHeader({
       {/* Subscription status card */}
       {currentSubscription?.hasSubscription && (
         <Div className="px-5 pb-5 sm:px-6">
-          <SubscriptionStatusCard
-            locale={locale}
-            initialSubscription={currentSubscription}
-            user={widgetUser}
-            logger={logger}
-          />
+          <Suspense fallback={null}>
+            <DeferredSubscriptionStatusCard
+              locale={locale}
+              initialSubscription={currentSubscription}
+              user={widgetUser}
+              logger={logger}
+            />
+          </Suspense>
         </Div>
       )}
 
@@ -453,7 +493,11 @@ export function CreditsTabHeader({
                 key={tab.id}
                 type="button"
                 variant="ghost"
-                onClick={() => handleTabClick(tab.id)}
+                onClick={(): void => {
+                  if (!isActive) {
+                    onTabChange(tab.id);
+                  }
+                }}
                 role="tab"
                 className={cn(
                   "h-auto min-h-11 min-w-0 gap-1.5 whitespace-normal rounded-lg px-2.5 py-2 text-center text-sm font-medium leading-tight transition-colors",

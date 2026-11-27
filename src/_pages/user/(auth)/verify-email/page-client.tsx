@@ -28,7 +28,9 @@ export function VerifyEmailPageClient({
       locale={locale}
       user={user}
       platform={platform}
-      endpointOptions={{ create: { autoPrefillData: { token } } }}
+      endpointOptions={
+        token ? { create: { autoPrefillData: { token } } } : undefined
+      }
     />
   );
 }

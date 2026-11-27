@@ -23,6 +23,7 @@ import { JsonLd } from "next-vibe/ui/components/json-ld";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { DEEPSEEK_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -67,23 +68,6 @@ const STOCK_IDS: readonly ChatModelId[] = [
   ChatModelId.DEEPSEEK_V4_PRO,
 ];
 
-/** Stock against each build, the two builds, then a non-DeepSeek rival. */
-const PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [
-    ChatModelId.DEEPSEEK_V4_1_FLASH,
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-  ],
-  [ChatModelId.DEEPSEEK_V4_1_FLASH, ChatModelId.DEEPSEEK_V4_1_FLASH_CSF],
-  [
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-    ChatModelId.DEEPSEEK_V4_1_FLASH_CSF,
-  ],
-  [
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-    ChatModelId.GLM_5_3_UNCENSORED,
-  ],
-];
-
 /** Copy key per uncensored build (what makes each one different). */
 const BUILD_KEYS: ReadonlyMap<string, "venice" | "csf"> = new Map<
   string,
@@ -118,7 +102,7 @@ export async function tanstackLoader({
   const [facts, rows, pairs] = await Promise.all([
     loadUsFacts(locale),
     loadModelRowsByIds([...UNCENSORED_IDS, ...STOCK_IDS], locale),
-    loadComparePairs(PAIRS),
+    loadComparePairs(DEEPSEEK_PAIRS),
   ]);
   return { locale, us: usParams(facts), rows, pairs };
 }

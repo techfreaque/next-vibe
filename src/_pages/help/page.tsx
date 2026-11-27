@@ -141,7 +141,7 @@ export function TanstackPage({
       <Div className="container max-w-6xl mx-auto pt-8 px-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <BreadcrumbTrail items={buildBreadcrumbTrail(locale, crumbs)} />
         <Link
-          href={`/${locale}/threads`}
+          href={`/${locale}/threads/incognito/new`}
           className="inline-flex min-h-11 items-center text-sm text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />

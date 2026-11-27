@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   title: "Comparte tu enlace. Ganar {{directPct}} de cada pago. Para siempre.",
   description:
     "Cualquier persona que se inscriba a través de su enlace le paga {{directPct}} de cada pago que hacen. Sin expiación, sin gorra. Publish a habilidad y ganar {{skillBonusPct}} en los usuarios que otros traen a ella.",
-  tagline: "Referencias &quot; Habilidades &quot;",
+  tagline: "Referidos y habilidades",
 
   hero: {
     directEarning: "Te ganas.",

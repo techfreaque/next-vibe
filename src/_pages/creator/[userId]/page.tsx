@@ -8,11 +8,14 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
+import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
@@ -25,8 +28,16 @@ interface Props {
   params: Promise<{ locale: CountryLanguage; userId: string }>;
 }
 
-/** Resolve userId param for metadata - accepts UUID or creatorSlug. */
-async function resolveUserName(param: string): Promise<string | null> {
+interface CreatorIdentity {
+  id: string;
+  publicName: string;
+  creatorSlug: string | null;
+}
+
+/** Resolve the published slug and title for profile metadata. */
+async function resolveCreatorIdentity(
+  param: string,
+): Promise<CreatorIdentity | null> {
   const uuidPattern =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!uuidPattern.test(param)) {
@@ -34,7 +45,11 @@ async function resolveUserName(param: string): Promise<string | null> {
     const { db } = await import("next-vibe/database");
     const { users } = await import("next-vibe/identity/user/db");
     const result = await db
-      .select({ publicName: users.publicName })
+      .select({
+        id: users.id,
+        publicName: users.publicName,
+        creatorSlug: users.creatorSlug,
+      })
       .from(users)
       .where(
         or(
@@ -43,17 +58,21 @@ async function resolveUserName(param: string): Promise<string | null> {
         ),
       )
       .limit(1);
-    return result[0]?.publicName ?? null;
+    return result[0] ?? null;
   }
   const { eq } = await import("drizzle-orm");
   const { db } = await import("next-vibe/database");
   const { users } = await import("next-vibe/identity/user/db");
   const result = await db
-    .select({ publicName: users.publicName })
+    .select({
+      id: users.id,
+      publicName: users.publicName,
+      creatorSlug: users.creatorSlug,
+    })
     .from(users)
     .where(eq(users.id, param))
     .limit(1);
-  return result[0]?.publicName ?? null;
+  return result[0] ?? null;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -61,16 +80,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const { t } = scopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const publicName = await resolveUserName(rawParam);
+  const creator = await resolveCreatorIdentity(rawParam);
 
-  if (!publicName) {
-    return { title: t("meta.notFound", { appName }) };
+  if (!creator) {
+    notFound();
   }
 
-  return {
+  const { id, publicName, creatorSlug } = creator;
+  return metadataGenerator(locale, {
+    path: `creator/${encodeURIComponent(creatorSlug ?? id)}`,
     title: t("meta.title", { publicName }),
     description: t("meta.description", { publicName, appName }),
-  };
+    category: t("category"),
+    imageAlt: t("category"),
+    keywords: [t("category")],
+  });
 }
 
 export async function tanstackLoader({
@@ -92,6 +116,13 @@ export async function tanstackLoader({
     t,
     viewer,
   );
+
+  if (
+    !response.success &&
+    response.errorType === ErrorResponseTypes.NOT_FOUND
+  ) {
+    notFound();
+  }
 
   return {
     locale,

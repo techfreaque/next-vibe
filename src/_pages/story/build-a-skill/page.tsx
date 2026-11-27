@@ -101,7 +101,7 @@ export function TanstackPage({ locale }: BuildASkillPageData): JSX.Element {
       body: t("ways.way2Body"),
       detail: t("ways.way2Detail"),
       cta: t("ways.way2Cta"),
-      href: `/${locale}/threads`,
+      href: `/${locale}/threads/incognito/new`,
     },
   ];
 
@@ -122,7 +122,7 @@ export function TanstackPage({ locale }: BuildASkillPageData): JSX.Element {
           <>
             <Cta href={`/${locale}/skills`} label={t("hero.ctaPrimary")} />
             <Cta
-              href={`/${locale}/threads`}
+              href={`/${locale}/threads/incognito/new`}
               label={t("hero.ctaSecondary")}
               icon={MessageSquare}
               variant="secondary"
@@ -254,7 +254,7 @@ export function TanstackPage({ locale }: BuildASkillPageData): JSX.Element {
           <>
             <Cta href={`/${locale}/skills`} label={t("cta.primary")} />
             <Cta
-              href={`/${locale}/threads`}
+              href={`/${locale}/threads/incognito/new`}
               label={t("cta.secondary")}
               icon={MessageSquare}
               variant="secondary"

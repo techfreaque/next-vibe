@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
     // ── Behavior section ───────────────────────────────────────────────────
     behaviorSection: "Comportamiento",
     // ── Sync section ───────────────────────────────────────────────────────
-    syncSection: "Sync &amp; Access",
+    syncSection: "Sincronización y acceso",
     syncScope: {
       memories: "Memorias",
       documents: "Documentos",
@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
     cortexDescription:
       "Consulte el sistema de archivos compartido para esta conexión.",
     cortexLink: "Open Cortex",
-    sshSection: "SSH &amp; Terminal",
+    sshSection: "SSH y terminal",
     sshDescription:
       "Configuraciones SSH y sesiones terminales a través de esta conexión.",
     sshLink: "Open SSH connections",

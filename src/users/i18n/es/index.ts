@@ -349,7 +349,7 @@ export const translations: typeof enTranslations = {
       },
       // Search & Filters section
       searchFilters: {
-        title: "Búsqueda &quot; Filtros",
+        title: "Búsqueda y Filtros",
         description: "Buscar y filtrar usuarios por criterios",
       },
       search: {

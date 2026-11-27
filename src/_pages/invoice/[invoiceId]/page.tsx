@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { canonicalPageUrl } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -25,10 +26,19 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale, invoiceId } = await params;
   const { t } = scopedTranslation.scopedT(locale);
   // Invoices are private documents — never indexed
-  return { title: t("get.title"), robots: { index: false, follow: false } };
+  return {
+    title: t("get.title"),
+    alternates: {
+      canonical: canonicalPageUrl(
+        locale,
+        `invoice/${encodeURIComponent(invoiceId)}`,
+      ),
+    },
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function tanstackLoader({

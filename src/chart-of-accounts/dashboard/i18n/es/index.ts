@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
       journalEntries: "Journal Entries",
       periods: "Períodos",
       balanceSheet: "Hoja de equilibrio",
-      profitLoss: "Profit &quot; Loss &quot;",
+      profitLoss: "Pérdidas y ganancias",
       trialBalance: "Saldo de juicio",
       taxReport: "Informe fiscal",
       companies: "Empresas",

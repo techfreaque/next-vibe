@@ -38,7 +38,7 @@ export async function tanstackLoader({
   );
   const user = userResponse.success ? userResponse.data : undefined;
   const folder = user?.isPublic ? "incognito" : "private";
-  redirect(`/${locale}/threads/${folder}`);
+  redirect(`/${locale}/threads/${folder}/new`);
 }
 
 export function TanstackPage(): JSX.Element {

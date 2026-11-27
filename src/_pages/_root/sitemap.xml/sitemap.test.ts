@@ -7,14 +7,20 @@ import {
   SEO_LOCALES,
 } from "next-vibe/core/i18n/core/seo-locales";
 
+import { moreComparisons } from "../../models/_shared/model-compare";
 import {
   canonicalComparisonPath,
   isIndexableComparison,
   listModelFacts,
+  suggestComparisons,
 } from "../../models/_shared/model-facts";
 import { listMediaFacts } from "../../models/_shared/model-media-facts";
 import { BLOG_POST_DATES } from "../../story/blog/posts-meta";
-import { buildSitemapXml, SITEMAP_STATIC_PATHS } from "./build-sitemap";
+import {
+  buildSitemapXml,
+  collectSitemapEntries,
+  SITEMAP_STATIC_PATHS,
+} from "./build-sitemap";
 import * as rootRoute from "./root-route";
 
 /** Every provider key configured. */
@@ -85,6 +91,7 @@ describe("sitemap.xml", () => {
     const modelPages = pathsUnder(urls, "/models/").filter(
       (url) =>
         !url.includes("/models/compare/") &&
+        !url.endsWith("/models/compare") &&
         !url.endsWith("/models/changelog"),
     );
     expect(modelPages.length).toBe((chat.length + media.length) * n);
@@ -121,9 +128,15 @@ describe("sitemap.xml", () => {
   test("omits redirecting paths and skill IDs that do not resolve as landing pages", () => {
     const xml = buildSitemapXml(
       ALL,
-      ["community-skill", "community-skill", "science-bot", "thea__brilliant", "default", ".", "oops/"].map(
-        (id) => ({ id, updatedAt: null }),
-      ),
+      [
+        "community-skill",
+        "community-skill",
+        "science-bot",
+        "thea__brilliant",
+        "default",
+        ".",
+        "oops/",
+      ].map((id) => ({ id, updatedAt: null })),
       BASE,
     );
     const urls = locs(xml);
@@ -138,6 +151,25 @@ describe("sitemap.xml", () => {
     expect(urls.some((url) => url.endsWith("/"))).toBe(false);
   });
 
+  test("includes the comparison targets linked from model detail and comparison pages", () => {
+    const paths = new Set(collectSitemapEntries(ALL).map(({ path }) => path));
+    const models = listModelFacts(ALL);
+    const byId = new Map(models.map((facts) => [facts.id, facts]));
+    for (const facts of models) {
+      const suggestions = suggestComparisons(facts, ALL);
+      for (const other of suggestions) {
+        expect(paths.has(canonicalComparisonPath(facts, other))).toBe(true);
+      }
+      const first = suggestions[0];
+      const exclude = first && byId.get(first.id);
+      if (exclude) {
+        for (const link of moreComparisons(facts, exclude, ALL)) {
+          expect(paths.has(link.path)).toBe(true);
+        }
+      }
+    }
+  });
+
   test("lists one URL per comparison and points every hreflang at a listed canonical", () => {
     const xml = buildSitemapXml(ALL, [], BASE);
     const urls = new Set(locs(xml));
@@ -145,7 +177,9 @@ describe("sitemap.xml", () => {
       listModelFacts(ALL).map((facts) => [facts.slug, facts]),
     );
     for (const url of pathsUnder([...urls], "/models/compare/")) {
-      const [, locale, , , leftSlug, rightSlug] = new URL(url).pathname.split("/");
+      const [, locale, , , leftSlug, rightSlug] = new URL(url).pathname.split(
+        "/",
+      );
       const left = leftSlug && chatModels.get(leftSlug);
       const right = rightSlug && chatModels.get(rightSlug);
       if (!left || !right) {

@@ -557,7 +557,7 @@ export const translations: typeof enTranslations = {
       billingHint: "Plan, créditos y direcciones guardadas.",
       security: "Seguridad",
       securityHint: "Mantén tu cuenta cerrada.",
-      data: "Datos &quot; privacidad",
+      data: "Datos y privacidad",
       dataHint: "Tus datos, tu llamada.",
       creatorHint: "Crece su público y sus ingresos.",
       basics: "Básicos",

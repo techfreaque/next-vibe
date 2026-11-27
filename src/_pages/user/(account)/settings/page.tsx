@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { canonicalPageUrl } from "next-vibe/core/i18n/core/metadata";
 import { NOINDEX_FOLLOW_ROBOTS } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -36,6 +37,7 @@ export async function generateMetadata({
   return {
     title: `${t("title")}: ${configTranslations.appName}`,
     description: t("description"),
+    alternates: { canonical: canonicalPageUrl(locale, "user/settings") },
     robots: NOINDEX_FOLLOW_ROBOTS,
   };
 }

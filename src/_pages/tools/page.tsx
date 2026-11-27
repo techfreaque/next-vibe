@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { NOINDEX_FOLLOW_ROBOTS } from "next-vibe/core/i18n/core/metadata";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { HelpGetResponseOutput } from "next-vibe/help-tool/definition";
 import type { HelpGetRequestInput } from "next-vibe/help-tool/definition";
@@ -23,6 +24,10 @@ import { DEMO_COMPANY_NAME } from "@/companies/demo-company";
 import { parseToolsInitialState } from "./initial-state";
 import { ToolsLoadError } from "./load-error";
 import { ToolsPageClient } from "./page-client";
+
+export function generateMetadata(): { robots: typeof NOINDEX_FOLLOW_ROBOTS } {
+  return { robots: NOINDEX_FOLLOW_ROBOTS };
+}
 
 export interface ToolsPageProps {
   params: Promise<{ locale: CountryLanguage }>;

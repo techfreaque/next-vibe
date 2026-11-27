@@ -48,7 +48,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Orden ordenada",
     },
     statusFilters: {
-      title: "Estado &quot; Filtros de campaña",
+      title: "Estado y Filtros de campaña",
       description: "Filtro por estado, etapa de campaña y fuente",
     },
     locationFilters: {
@@ -161,11 +161,11 @@ export const translations: typeof enTranslations = {
       placeholder: "Introduzca el término de búsqueda",
     },
     searchPagination: {
-      title: "Búsqueda &quot; Paginación &quot;",
+      title: "Búsqueda y Paginación",
       description: "Controles de búsqueda y paginación",
     },
     statusFilters: {
-      title: "Estado &quot; Filtros de campaña",
+      title: "Estado y Filtros de campaña",
       description: "Filtro por estado, etapa de campaña y fuente",
     },
     locationFilters: {

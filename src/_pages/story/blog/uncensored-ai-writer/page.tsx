@@ -23,6 +23,7 @@ import { Link } from "next-vibe/ui/components/link";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { WRITING_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import { formatTokenCount } from "@/_pages/models/_shared/model-facts";
 import { formatNumber } from "@/_pages/models/_shared/model-format";
 import { configScopedTranslation } from "@/env/i18n";
@@ -77,13 +78,6 @@ const DARK_PREFERENCE: readonly ChatModelId[] = [
 const POLISH_PREFERENCE: readonly ChatModelId[] = [
   ChatModelId.GLM_5_3_UNCENSORED,
   ChatModelId.KIMI_K3_1_PRO_UNCENSORED,
-];
-
-const PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.DRUMMER_ARTEMIS_31B],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
-  [ChatModelId.GLM_5_3, ChatModelId.GLM_5_3_UNCENSORED],
 ];
 
 type PickKey = "dark" | "long" | "voice" | "polish" | "draft";
@@ -201,7 +195,7 @@ export async function tanstackLoader({
   const [facts, rows, pairs] = await Promise.all([
     loadUsFacts(locale),
     loadUncensoredRows(locale),
-    loadComparePairs(PAIRS),
+    loadComparePairs(WRITING_PAIRS),
   ]);
   return { locale, us: usParams(facts), rows: rows.filter(isCreative), pairs };
 }

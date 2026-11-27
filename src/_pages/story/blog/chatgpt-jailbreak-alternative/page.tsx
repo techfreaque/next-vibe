@@ -11,7 +11,6 @@
  */
 
 import type { Metadata } from "next";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { Div } from "next-vibe/ui/components/div";
@@ -24,6 +23,7 @@ import { ExternalLink } from "next-vibe/ui/components/link";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { JAILBREAK_ALTERNATIVE_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -68,18 +68,6 @@ interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-/** GPT against an uncensored model, then base models against their builds. */
-const PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.GPT_6_2_SOL, ChatModelId.GLM_5_3_UNCENSORED],
-  [ChatModelId.GPT_6_2_SOL, ChatModelId.UNCENSORED_LM_V1_2],
-  [ChatModelId.GLM_5_3, ChatModelId.GLM_5_3_UNCENSORED],
-  [ChatModelId.KIMI_K3_1_PRO, ChatModelId.KIMI_K3_1_PRO_UNCENSORED],
-  [
-    ChatModelId.DEEPSEEK_V4_1_FLASH,
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-  ],
-];
-
 const TEST_STEPS: readonly ("ask" | "switch" | "compare" | "keep")[] = [
   "ask",
   "switch",
@@ -106,7 +94,7 @@ export async function tanstackLoader({
   const [facts, rows, pairs] = await Promise.all([
     loadUsFacts(locale),
     loadUncensoredRows(locale),
-    loadComparePairs(PAIRS),
+    loadComparePairs(JAILBREAK_ALTERNATIVE_PAIRS),
   ]);
   return { locale, us: usParams(facts), rows, pairs };
 }

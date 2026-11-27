@@ -38,7 +38,7 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
         className="h-10 px-2.5 sm:h-9 sm:px-3.5"
         aria-label={t("nav.startChatting")}
       >
-        <Link href={`/${locale}/threads`}>
+        <Link href={`/${locale}/threads/incognito/new`}>
           <MessageSquare className="size-4 sm:hidden" />
           <Span className="hidden sm:inline">{t("nav.startChatting")}</Span>
         </Link>

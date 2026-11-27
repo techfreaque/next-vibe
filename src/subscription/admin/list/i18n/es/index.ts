@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
       description: "Filtrar y navegar suscripciones",
     },
     searchFilters: {
-      title: "Búsqueda &quot; Filtros",
+      title: "Búsqueda y Filtros",
       description: "Suscripciones de filtros",
     },
     search: {

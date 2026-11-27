@@ -14,17 +14,17 @@ import { Check } from "next-vibe/ui/components/icons/Check";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { Span } from "next-vibe/ui/components/span";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
-import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { getScreenWidth } from "next-vibe/ui/lib/screen";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useState } from "react";
 
 const COPIED_RESET_MS = 2000;
 /** Below this viewport width, long code starts wrapped. */
-const PHONE_MAX_WIDTH = 640;
-/** Lines longer than this count as long on a phone. */
-const PHONE_WRAP_MIN_LINE = 60;
+const WRAP =
+  "[&_code]:!whitespace-pre-wrap [&_code]:![overflow-wrap:anywhere] [&_pre]:!whitespace-pre-wrap [&_pre]:![overflow-wrap:anywhere]";
+const WRAP_ON_PHONE =
+  "max-sm:[&_code]:!whitespace-pre-wrap max-sm:[&_code]:![overflow-wrap:anywhere] max-sm:[&_pre]:!whitespace-pre-wrap max-sm:[&_pre]:![overflow-wrap:anywhere]";
 
 export interface CodeTabPanel {
   /** Tab label, e.g. "curl", "Python". */
@@ -70,6 +70,8 @@ export function CopyButton({
       )}
       onClick={(): void => {
         void (async (): Promise<void> => {
+          const { copyToClipboard } =
+            await import("next-vibe/ui/lib/clipboard");
           const ok = await copyToClipboard(text, logger);
           setCopied(ok);
           if (ok) {
@@ -97,6 +99,7 @@ export function CodeTabsFrame({
   copiedLabel,
   wrapLabel,
   wrapByDefault,
+  wrapOnPhone,
   className,
 }: {
   tabs: CodeTabPanel[];
@@ -108,23 +111,15 @@ export function CodeTabsFrame({
   wrapLabel: string;
   /** Initial wrap state. Unset: long one-liners start wrapped on phones. */
   wrapByDefault?: boolean;
+  wrapOnPhone: boolean;
   className?: string;
 }): JSX.Element {
+  const logger = useLogger();
   const [active, setActive] = useState(0);
   // null = follow the default: long one-liners start wrapped on phones.
   const [wrapChoice, setWrapChoice] = useState<boolean | null>(null);
-  const { width } = useWindowSize();
-  const lines = tabs.flatMap((tab) => tab.code.split("\n"));
-  const longestLine = Math.max(...lines.map((line) => line.length));
-  // Wrapped shell reads worse than scrolled shell: `\` continuations and
-  // flags end up orphaned, so blocks with continuations never auto-wrap.
-  const hasContinuations = lines.some((line) => line.trimEnd().endsWith("\\"));
-  const wrap =
-    wrapChoice ??
-    wrapByDefault ??
-    (width < PHONE_MAX_WIDTH &&
-      !hasContinuations &&
-      longestLine > PHONE_WRAP_MIN_LINE);
+  const wrap = wrapChoice ?? wrapByDefault;
+  const autoWrap = wrap === undefined && wrapOnPhone;
   const current = tabs[active] ?? tabs[0];
   const showTabs = tabs.length > 1;
 
@@ -186,7 +181,7 @@ export function CodeTabsFrame({
             type="button"
             variant="ghost"
             size="sm"
-            aria-pressed={wrap}
+            aria-pressed={wrap ?? false}
             title={wrapLabel}
             className={cn(
               "h-8 gap-1.5 px-2.5 text-xs",
@@ -194,7 +189,11 @@ export function CodeTabsFrame({
                 ? "bg-white/10 text-white hover:bg-white/15 hover:text-white"
                 : "text-slate-300 hover:bg-white/10 hover:text-white",
             )}
-            onClick={(): void => setWrapChoice(!wrap)}
+            onClick={(): void => {
+              const wraps =
+                wrap ?? (wrapOnPhone && getScreenWidth(logger) < 640);
+              setWrapChoice(!wraps);
+            }}
           >
             <AlignLeft className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">{wrapLabel}</Span>
@@ -216,13 +215,18 @@ export function CodeTabsFrame({
           className={cn(
             "relative min-w-0",
             index === active ? "block" : "hidden",
-            wrap
-              ? "[&_code]:!whitespace-pre-wrap [&_code]:![overflow-wrap:anywhere] [&_pre]:!whitespace-pre-wrap [&_pre]:![overflow-wrap:anywhere]"
-              : "[&>div]:[scrollbar-color:rgb(71_85_105)_transparent] [&>div]:[scrollbar-width:thin]",
+            "[&>div]:[scrollbar-color:rgb(71_85_105)_transparent] [&>div]:[scrollbar-width:thin]",
+            wrap && WRAP,
+            autoWrap && WRAP_ON_PHONE,
           )}
         >
           {!wrap && (
-            <Span className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-slate-950 to-transparent" />
+            <Span
+              className={cn(
+                "pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-slate-950 to-transparent",
+                autoWrap && "max-sm:hidden",
+              )}
+            />
           )}
           {tab.panel}
         </Div>

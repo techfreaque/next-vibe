@@ -137,7 +137,9 @@ export function MobileMenuClient({
                 className="w-full justify-center gap-2"
                 onClick={toggleMenu}
               >
-                <Link href={`/${locale}/threads`}>
+                <Link
+                  href={`/${locale}/threads/${isPublic ? "incognito" : "private"}/new`}
+                >
                   <MessageSquare className="h-4 w-4" />
                   <Span>
                     {isPublic ? t("nav.startChatting") : t("nav.goToApp")}

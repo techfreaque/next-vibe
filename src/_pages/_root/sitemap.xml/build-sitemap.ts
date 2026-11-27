@@ -20,11 +20,19 @@ import { configScopedTranslation } from "@/env/i18n";
 
 import { CREATE_KINDS } from "../../create/_shared/create-kinds";
 import {
+  CLAUDE_COMPARISON_ANCHORS,
+  CLAUDE_COMPARISON_PARTNERS,
+  EDITORIAL_COMPARISON_PAIRS,
+} from "../../models/_shared/editorial-comparison-pairs";
+import {
   latestModelChangelogDate,
   MODEL_CHANGELOG_PATH,
 } from "../../models/_shared/model-changelog";
+import { LINKED_COMPARISON_LIMIT } from "../../models/_shared/model-compare";
 import {
   canonicalComparisonPath,
+  findAbliteratedBase,
+  isIndexableComparison,
   listModelFacts,
   suggestComparisons,
 } from "../../models/_shared/model-facts";
@@ -57,12 +65,10 @@ export const SITEMAP_STATIC_PATHS: readonly string[] = [
   "/help",
   "/skills",
   "/models",
+  "/models/compare",
   "/create",
   ...CREATE_KINDS.map((kind) => `/create/${kind}`),
 ];
-
-/** Comparison pages per model: its suggested "compare with" set, deduped. */
-const COMPARISONS_PER_MODEL = 3;
 
 export interface SitemapEntry {
   /** Locale-less path, e.g. "/models/claude-opus-5-5". */
@@ -126,6 +132,7 @@ export function collectSitemapEntries(
 
   const models = listModelFacts(availability);
   const seenPairs = new Set<string>();
+  const byId = new Map(models.map((model) => [model.id, model]));
   for (const facts of models) {
     entries.push({ path: `/models/${facts.slug}`, lastmod: null });
   }
@@ -133,30 +140,45 @@ export function collectSitemapEntries(
     entries.push({ path: `/models/${facts.slug}`, lastmod: null });
   }
   for (const facts of models) {
-    if (facts.isLegacy) {
-      if (facts.successor !== null) {
-        const path = canonicalComparisonPath(facts, facts.successor);
-        if (!seenPairs.has(path)) {
-          seenPairs.add(path);
-          entries.push({ path, lastmod: null });
-        }
-      }
-      continue;
-    }
     for (const other of suggestComparisons(
       facts,
       availability,
-      COMPARISONS_PER_MODEL,
+      LINKED_COMPARISON_LIMIT,
     )) {
       const path = canonicalComparisonPath(facts, other);
-      if (seenPairs.has(path)) {
-        continue;
-      }
       seenPairs.add(path);
-      entries.push({ path, lastmod: null });
     }
   }
-  return entries;
+  const claude = CLAUDE_COMPARISON_ANCHORS.find(
+    (id) => byId.get(id)?.isLegacy === false,
+  );
+  const claudePairs =
+    claude === undefined
+      ? []
+      : CLAUDE_COMPARISON_PARTNERS.map(
+          (id): readonly [typeof claude, typeof id] => [claude, id],
+        );
+  for (const [a, b] of [...EDITORIAL_COMPARISON_PAIRS, ...claudePairs]) {
+    const left = byId.get(a);
+    const right = byId.get(b);
+    if (left && right && isIndexableComparison(left, right)) {
+      seenPairs.add(canonicalComparisonPath(left, right));
+    }
+  }
+  const currentModels = models.filter((model) => !model.isLegacy);
+  for (const model of currentModels) {
+    if (model.uncensoredMethod !== "abliterated") {
+      continue;
+    }
+    const base = findAbliteratedBase(model, currentModels);
+    if (base) {
+      seenPairs.add(canonicalComparisonPath(base, model));
+    }
+  }
+  return [
+    ...entries,
+    ...[...seenPairs].map((path) => ({ path, lastmod: null })),
+  ];
 }
 
 function escapeXml(value: string): string {

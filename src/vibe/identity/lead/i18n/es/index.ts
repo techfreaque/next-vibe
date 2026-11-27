@@ -163,7 +163,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Orden ordenada",
     },
     statusFilters: {
-      title: "Estado &quot; Filtros de campaña",
+      title: "Estado y Filtros de campaña",
       description: "Filtro por estado, etapa de campaña y fuente",
     },
     locationFilters: {
@@ -1526,7 +1526,7 @@ export const translations: typeof enTranslations = {
         placeholder: "https://example.com",
       },
       locationPreferences: {
-        title: "Lugar &quot; Preferencias",
+        title: "Ubicación y preferencias",
         description: "Preferencias geográficas y lingüísticas",
       },
       country: {
@@ -3443,7 +3443,7 @@ export const translations: typeof enTranslations = {
             content: "Actualizado en",
           },
           identity: {
-            title: "Dispositivo &quot; identidad &quot;",
+            title: "Dispositivo y identidad",
             description:
               "Seguimiento de la identidad y la información del dispositivo",
           },
@@ -3977,7 +3977,7 @@ export const translations: typeof enTranslations = {
         activeSubscriberSince: "Suscriptor activo desde",
         viewUserProfile: "Ver perfil de usuario",
         viewUserDetail: "Ver detalle de usuario",
-        notesAndMetadata: "Notas &quot; Metadatos &quot;",
+        notesAndMetadata: "Notas y Metadatos",
         notes: "Notas",
         metadata: "Metadatos",
         created: "Creado",
@@ -4003,7 +4003,7 @@ export const translations: typeof enTranslations = {
         tabBasic: "Básica",
         tabCampaign: "Campaña",
         tabAdvanced: "Avances",
-        deviceIdentity: "Dispositivo &quot; identidad &quot;",
+        deviceIdentity: "Dispositivo y identidad",
         ipAddress: "Dirección de IP",
         userAgent: "Agente de usuario",
         deviceType: "Tipo de dispositivo",
@@ -4155,11 +4155,11 @@ export const translations: typeof enTranslations = {
         placeholder: "Introduzca el término de búsqueda",
       },
       searchPagination: {
-        title: "Búsqueda &quot; Paginación &quot;",
+        title: "Búsqueda y Paginación",
         description: "Controles de búsqueda y paginación",
       },
       statusFilters: {
-        title: "Estado &quot; Filtros de campaña",
+        title: "Estado y Filtros de campaña",
         description: "Filtro por estado, etapa de campaña y fuente",
       },
       locationFilters: {
@@ -4442,14 +4442,14 @@ export const translations: typeof enTranslations = {
     },
     refresh: "Actualizar",
     sections: {
-      timeFilters: "Período de tiempo &amp; Rango de fecha",
+      timeFilters: "Período de tiempo y Rango de fecha",
       comparison: "Ajustes de comparación",
       leadFilters: "Filtros de contactos",
       engagement: "Filtros de compromiso",
       conversion: "Filtros de conversión",
       dataCompleteness: "Completación de datos",
       additional: "Filtros adicionales",
-      searchSort: "Buscar &quot; Ordenar &quot;",
+      searchSort: "Buscar y Ordenar",
     },
     timePeriod: {
       label: "Período de tiempo",
@@ -5420,6 +5420,8 @@ export const translations: typeof enTranslations = {
       },
       patch: {
         error: {
+          invalidStatusTransition:
+            "Este contacto no puede pasar del estado {{current}} al estado {{next}}.",
           not_found: {
             title: "Lead not found",
           },

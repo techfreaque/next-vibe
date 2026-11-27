@@ -612,7 +612,7 @@ export const translations: typeof enTranslations = {
       liabilitiesAndEquity: "Pasivo + Equidad",
       selectCompany: "Elige una empresa para consultar el informe.",
     },
-    title: "Profit &quot; Loss &quot;",
+    title: "Pérdidas y ganancias",
     titleShort: "PL",
     description:
       "Ingresos vs. gastos para un rango de fechas. Muestra ganancias brutas, ganancias operativas y beneficios netos.",
@@ -652,7 +652,7 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "PL List",
-      description: "Profit &quot; loss statement computed",
+      description: "Estado de resultados calculado",
     },
     errors: {
       unauthorized: {
@@ -696,7 +696,7 @@ export const translations: typeof enTranslations = {
       balanced: "Saldo",
       unbalanced: "No balanceado",
       noEntries: "No hay entradas para este período",
-      liabilitiesAndEquity: "Pasivo &quot; Equidad &quot;",
+      liabilitiesAndEquity: "Pasivos y patrimonio",
       selectCompany: "Elige una empresa para consultar el informe.",
     },
     title: "Hoja de equilibrio",
@@ -865,7 +865,7 @@ export const translations: typeof enTranslations = {
       journalEntries: "Journal Entries",
       periods: "Períodos",
       balanceSheet: "Hoja de equilibrio",
-      profitLoss: "Profit &quot; Loss &quot;",
+      profitLoss: "Pérdidas y ganancias",
       trialBalance: "Saldo de juicio",
       taxReport: "Informe fiscal",
     },

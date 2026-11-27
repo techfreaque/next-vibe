@@ -194,7 +194,10 @@ export function TanstackPage({ locale }: CareersPageData): JSX.Element {
         subtitle={t("cta.subtitle")}
         actions={
           <>
-            <Cta href={`/${locale}/threads`} label={t("cta.primary")} />
+            <Cta
+              href={`/${locale}/threads/incognito/new`}
+              label={t("cta.primary")}
+            />
             <Cta
               href={`/${locale}/story/blog`}
               label={t("cta.secondary")}

@@ -41,7 +41,9 @@ import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import { buildDocsSnippets } from "@/_pages/docs/api/snippets";
+import { COMPATIBLE_API_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import { toModelSlug } from "@/_pages/models/_shared/model-facts";
+import { isAvailableComparison } from "@/_pages/models/_shared/model-facts";
 import { compareHref } from "@/_pages/models/_shared/model-format";
 import { listMediaFacts } from "@/_pages/models/_shared/model-media-facts";
 import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
@@ -142,14 +144,6 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
   },
 ];
 
-/** Head-to-heads a developer picking an API model actually asks about. */
-const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.CLAUDE_SONNET_5_5, ChatModelId.GPT_6_1_SOL],
-  [ChatModelId.CLAUDE_SONNET_5_5, ChatModelId.KIMI_K3_1_PRO],
-  [ChatModelId.GPT_6_1_SOL, ChatModelId.GEMINI_4_ARGON],
-  [ChatModelId.GLM_5_3, ChatModelId.DEEPSEEK_V4_PRO],
-];
-
 const FAQ_KEYS: readonly (
   | "openrouter"
   | "openrouterModels"
@@ -180,6 +174,7 @@ export interface CompatibleApiPostPageData {
   subCredits: number;
   packPrice: string;
   packCredits: number;
+  comparisons: typeof COMPATIBLE_API_PAIRS;
 }
 
 export async function tanstackLoader({
@@ -199,6 +194,9 @@ export async function tanstackLoader({
     ...getApiAccessPrices(locale),
     subCredits: subscription.credits,
     packCredits: pack.credits,
+    comparisons: COMPATIBLE_API_PAIRS.filter((pair) =>
+      isAvailableComparison(pair, availability),
+    ),
   };
 }
 
@@ -281,6 +279,7 @@ export function TanstackPage({
   subCredits,
   packPrice,
   packCredits,
+  comparisons,
 }: CompatibleApiPostPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -522,7 +521,7 @@ export function TanstackPage({
           ))}
           <ArticleP>{t("picks.compare")}</ArticleP>
           <Div className="flex flex-col">
-            {COMPARE_PAIRS.map(([a, b]) => (
+            {comparisons.map(([a, b]) => (
               <CardLink
                 key={`${a}-${b}`}
                 href={compareHref(locale, a, b)}

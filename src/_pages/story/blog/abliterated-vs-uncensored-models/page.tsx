@@ -11,10 +11,8 @@
  */
 
 import type { Metadata } from "next";
-import {
-  chatModelDefinitions,
-  ChatModelId,
-} from "next-vibe/agent/ai-stream/models";
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { chatModelDefinitions } from "next-vibe/agent/ai-stream/models";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import type { UncensoredModelMethod } from "next-vibe/agent/models/models";
 import {
@@ -43,6 +41,7 @@ import {
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { ABLITERATED_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import {
   formatTokenCount,
   getModelFacts,
@@ -91,16 +90,6 @@ const SLUG = "abliterated-vs-uncensored-models";
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
-
-/** Base models and the corresponding uncensored variants in the catalog. */
-const PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.GLM_5_3, ChatModelId.GLM_5_3_UNCENSORED],
-  [
-    ChatModelId.DEEPSEEK_V4_1_FLASH,
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-  ],
-  [ChatModelId.KIMI_K3_1_PRO, ChatModelId.KIMI_K3_1_PRO_UNCENSORED],
-];
 
 /** Registry method, or "unlisted" when the provider does not document it. */
 type KindKey = UncensoredModelMethod | "unlisted";
@@ -181,32 +170,34 @@ export async function tanstackLoader({
       .map((facts) => ({ id: facts.id, slug: facts.slug, name: facts.name }));
     return models.length > 0 ? [{ key, models }] : [];
   });
-  const pairs = PAIRS.flatMap(([baseId, uncensoredId]): PairRow[] => {
-    const base = getModelFacts(baseId, availability);
-    const unc = getModelFacts(uncensoredId, availability);
-    if (base === null || unc === null || base.isLegacy || unc.isLegacy) {
-      return [];
-    }
-    const side = (facts: typeof base): PairSide => ({
-      id: facts.id,
-      slug: facts.slug,
-      name: facts.name,
-      content: facts.content,
-      contextWindow: facts.contextWindow,
-      messagePrice: formatMoney(facts.creditsPerMessage, locale),
-    });
-    return [
-      {
-        base: side(base),
-        uncensored: side(unc),
-        method: unc.uncensoredMethod ?? "unlisted",
-        ratio:
-          base.creditsPerMessage > 0
-            ? unc.creditsPerMessage / base.creditsPerMessage
-            : 0,
-      },
-    ];
-  });
+  const pairs = ABLITERATED_PAIRS.flatMap(
+    ([baseId, uncensoredId]): PairRow[] => {
+      const base = getModelFacts(baseId, availability);
+      const unc = getModelFacts(uncensoredId, availability);
+      if (base === null || unc === null || base.isLegacy || unc.isLegacy) {
+        return [];
+      }
+      const side = (facts: typeof base): PairSide => ({
+        id: facts.id,
+        slug: facts.slug,
+        name: facts.name,
+        content: facts.content,
+        contextWindow: facts.contextWindow,
+        messagePrice: formatMoney(facts.creditsPerMessage, locale),
+      });
+      return [
+        {
+          base: side(base),
+          uncensored: side(unc),
+          method: unc.uncensoredMethod ?? "unlisted",
+          ratio:
+            base.creditsPerMessage > 0
+              ? unc.creditsPerMessage / base.creditsPerMessage
+              : 0,
+        },
+      ];
+    },
+  );
   const own = uncensored.find(
     (facts) => facts.id === OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
   );

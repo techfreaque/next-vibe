@@ -95,7 +95,7 @@ export const translations: typeof enTranslations = {
 
     // Search Modal
     searchModal: {
-      searchAndCreate: "Buscar &quot; Crear &quot;",
+      searchAndCreate: "Buscar y Crear",
       newChat: "Nuevo chat",
       searchThreadsPlaceholder: "Búsqueda de hilos...",
       noThreadsFound: "No hay hilos encontrados",
@@ -822,11 +822,11 @@ export const translations: typeof enTranslations = {
       start: "Comienzo de Chatear",
       skip: "Skip, lo arreglaré más tarde.",
       coding: {
-        label: "Coding &quot; Tech",
+        label: "Programación y tecnología",
         hint: "Vibe Coder, Coder",
       },
       research: {
-        label: "Research &quot; Analysis",
+        label: "Investigación y análisis",
         hint: "Researcher, Data Analyst",
       },
       writing: {
@@ -834,11 +834,11 @@ export const translations: typeof enTranslations = {
         hint: "Escritor, Editor",
       },
       business: {
-        label: "Estrategia de Negocios &quot;",
+        label: "Negocios y estrategia",
         hint: "Business Advisor, Product Manager",
       },
       learning: {
-        label: "Aprender &quot; estudiar &quot;",
+        label: "Aprender y estudiar",
         hint: "Tutor, Interlocutor Socrático",
       },
       chat: {
@@ -848,11 +848,11 @@ export const translations: typeof enTranslations = {
     },
     // Companion personalities (kept for skills i18n)
     thea: {
-      tagline: "Warm &amp; sabio",
+      tagline: "Cercano y sabio",
       description: "Como un amigo de apoyo que realmente te atrapa.",
     },
     hermes: {
-      tagline: "Bold &apos; direct",
+      tagline: "Audaz y directo",
       description: "Como un entrenador que te empuja a ser tu mejor.",
     },
     // Legacy keys (for backwards compat)
@@ -923,7 +923,7 @@ export const translations: typeof enTranslations = {
     sortZA: "Clasificar Z-A",
   },
   dialogs: {
-    searchAndCreate: "Buscar &quot; Crear &quot;",
+    searchAndCreate: "Buscar y Crear",
     deleteChat: 'Eliminar el chat " {{title}} "?',
     deleteFolderConfirm:
       'Eliminar la carpeta " {{name}}" y mover {{count}} chat(s) a General?',
@@ -1223,13 +1223,13 @@ export const translations: typeof enTranslations = {
   },
   modelUtilities: {
     chat: "Chat de todos los días",
-    smart: "Avanzado &amp; inteligente",
-    coding: "Coding &quot; Development",
+    smart: "Avanzado y inteligente",
+    coding: "Programación y desarrollo",
     creative: "Escritura creativa",
-    analysis: "Análisis &quot; Investigación &quot;",
+    analysis: "Análisis y Investigación",
     fast: "Rápido y eficiente",
     multimodal: "Multimodal (Vision)",
-    vision: "Visión &quot; Entendimiento de imagen &quot;",
+    vision: "Visión y Entendimiento de imagen",
     imageGen: "Generación de imágenes",
     uncensored: "Sin censura",
     legacy: "Modelos de Legacy",
@@ -1798,7 +1798,7 @@ export const translations: typeof enTranslations = {
   },
   welcomeTour: {
     authDialog: {
-      title: "Desbloquear carpetas privadas &quot; compartidas",
+      title: "Desbloquear carpetas privadas y compartidas",
       description:
         "Regístrese o inicie sesión para acceder a carpetas privadas y compartidas. Tus chats se sincronizarán entre dispositivos.",
       continueTour: "Viaje continuo",
@@ -1838,7 +1838,7 @@ export const translations: typeof enTranslations = {
         "Encuentra exactamente lo que necesitas. Buscar por nombre, proveedor o capacidad. Trate de buscar 'sin censura' para ver modelos sin restricciones de contenido.",
     },
     modelSelectorGroup: {
-      title: "Organizado por Proveedor &amp; Categoría",
+      title: "Organizado por Proveedor y Categoría",
       description:
         "Examine modelos agrupados por empresa (OpenAI, Anthropic, Gab) o propósito (Uncensored, Coding, Creative). Vea lo que ofrece cada proveedor.",
     },
@@ -1864,7 +1864,7 @@ export const translations: typeof enTranslations = {
         "Encuentra el estilo correcto rápido. Buscar por nombre, categoría o descripción.",
     },
     characterSelectorGroup: {
-      title: "Organizado por Fuente &quot; Categoría &quot;",
+      title: "Organizado por Fuente y Categoría",
       description:
         "Vista por fuente (Inicio, Personalizado, Comunidad) o categoría (Creativo, técnico, profesional). Encuentra lo que se adapte a tus necesidades.",
     },

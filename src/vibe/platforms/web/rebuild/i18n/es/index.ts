@@ -12,12 +12,12 @@ export const translations: typeof enTranslations = {
     rebuild: "Rebuild",
   },
   post: {
-    title: "Reconstrucción &quot; Reini &quot;",
+    title: "Reconstruir y reiniciar",
     titleShort: "Rebuild",
     description:
       "Recompilar la aplicación y hot-restart el servidor running Next.js. Ejecuta 6 pasos en secuencia: 1) generación de códigos, 2) verificación vibe (código de calidad), 3) Next.js construcción de producción, 4) migración de bases de datos, 5) visualización de bases de datos, 6) hot-restart a través SIGUSR1. El control de vibración bloquea la construcción si hay errores - use 'vibe check' o la herramienta de verificación MCP para ver detalles. WARNING : La respuesta HTTP puede ser cortada porque el servidor se reinicia antes de que la respuesta termine.",
     form: {
-      title: "Reconstrucción &quot; Reini &quot;",
+      title: "Reconstruir y reiniciar",
       description: "Reconstruir la aplicación y reiniciar el servidor",
     },
     fields: {

@@ -54,7 +54,7 @@ export const translations: typeof enTranslations = {
       intelligence: {
         label: "Inteligencia",
         description:
-          "Nivel mínimo de inteligencia. Rápido = rápido &amp; eficiente. Inteligente = calidad equilibrada. Brillante = profundo razonamiento.",
+          "Nivel mínimo de inteligencia. Rápido = rápido y eficiente. Inteligente = calidad equilibrada. Brillante = profundo razonamiento.",
         placeholder: "Cualquier inteligencia",
       },
       page: {

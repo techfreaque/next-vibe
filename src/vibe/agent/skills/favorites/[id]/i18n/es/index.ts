@@ -189,8 +189,8 @@ export const translations: typeof enTranslations = {
       loadingText: "Salvando...",
     },
     saveAndUseButton: {
-      label: "Guardar &quot; Uso &quot;",
-      loadingText: "Salvando &quot; Activando...",
+      label: "Guardar y usar",
+      loadingText: "Guardando y activando...",
     },
     id: {
       label: "ID favorito",

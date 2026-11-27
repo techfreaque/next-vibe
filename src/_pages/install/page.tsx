@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { canonicalPageUrl } from "next-vibe/core/i18n/core/metadata";
 import type { InstallerGetResponseOutput } from "next-vibe/env/installer/definition";
 import { scopedTranslation } from "next-vibe/env/installer/i18n";
 import { InstallerRepository } from "next-vibe/env/installer/repository";
@@ -43,6 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t("meta.title", { appName: configT("appName") }),
     description: t("meta.description"),
+    alternates: { canonical: canonicalPageUrl(locale, "install") },
     robots: { index: false, follow: false },
   };
 }

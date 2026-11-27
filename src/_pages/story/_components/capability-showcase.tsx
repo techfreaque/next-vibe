@@ -1021,7 +1021,7 @@ function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
   const levels = [
     {
       key: "private" as const,
-      href: `/${locale}/threads/private`,
+      href: `/${locale}/threads/private/new`,
       icon: Lock,
       iconClass: "text-sky-600 dark:text-sky-300",
       bgClass:
@@ -1029,7 +1029,7 @@ function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
     },
     {
       key: "shared" as const,
-      href: `/${locale}/threads/shared`,
+      href: `/${locale}/threads/shared/new`,
       icon: Users,
       iconClass: "text-teal-600 dark:text-teal-300",
       bgClass:
@@ -1045,7 +1045,7 @@ function PrivacyVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
     },
     {
       key: "incognito" as const,
-      href: `/${locale}/threads/incognito`,
+      href: `/${locale}/threads/incognito/new`,
       icon: ShieldPlus,
       iconClass: "text-purple-600 dark:text-purple-300",
       bgClass:

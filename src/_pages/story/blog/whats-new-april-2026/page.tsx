@@ -354,7 +354,7 @@ export function TanstackPage({
           actions={
             <>
               <Cta
-                href={`/${locale}/threads`}
+                href={`/${locale}/threads/incognito/new`}
                 label={t("close.cta", { appName })}
               />
               <Cta

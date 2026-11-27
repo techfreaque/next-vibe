@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
       description: "Gestionar el programa de remisión",
     },
     searchFilters: {
-      title: "Búsqueda &quot; Filtros",
+      title: "Búsqueda y Filtros",
       description: "Datos de referencia del filtro",
     },
     search: {

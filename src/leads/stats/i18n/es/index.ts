@@ -62,14 +62,14 @@ export const translations: typeof enTranslations = {
   },
   refresh: "Actualizar",
   sections: {
-    timeFilters: "Período de tiempo &amp; Rango de fecha",
+    timeFilters: "Período de tiempo y Rango de fecha",
     comparison: "Ajustes de comparación",
     leadFilters: "Filtros de contactos",
     engagement: "Filtros de compromiso",
     conversion: "Filtros de conversión",
     dataCompleteness: "Completación de datos",
     additional: "Filtros adicionales",
-    searchSort: "Buscar &quot; Ordenar &quot;",
+    searchSort: "Buscar y Ordenar",
   },
   timePeriod: {
     label: "Período de tiempo",

@@ -102,7 +102,7 @@ export const translations: typeof enTranslations = {
     },
     welcomeTour: {
       authDialog: {
-        title: "Desbloquear carpetas privadas &quot; compartidas",
+        title: "Desbloquear carpetas privadas y compartidas",
         description:
           "Regístrese o inicie sesión para acceder a carpetas privadas y compartidas. Tus chats se sincronizarán entre dispositivos.",
         continueTour: "Viaje continuo",
@@ -398,7 +398,7 @@ export const translations: typeof enTranslations = {
     copyContent: "Copiado para el portapapeles",
   },
   dialogs: {
-    searchAndCreate: "Buscar &quot; Crear &quot;",
+    searchAndCreate: "Buscar y Crear",
     deleteChat: 'Eliminar el chat " {{title}} "?',
     deleteFolderConfirm:
       'Eliminar la carpeta " {{name}}" y mover {{count}} chat(s) a General?',
@@ -448,7 +448,7 @@ export const translations: typeof enTranslations = {
       "permission-denied-android":
         "El micrófono está bloqueado. Pulse el icono de bloqueo en la barra de direcciones → Ajustes del sitio → Micrófono → Permitir.",
       "permission-denied-mac":
-        "El micrófono está bloqueado. Configuración de sistema abierto → Privacidad &amp; Seguridad → Micrófono y habilitar su navegador.",
+        "El micrófono está bloqueado. Configuración de sistema abierto → Privacidad y Seguridad → Micrófono y habilitar su navegador.",
       "permission-dismissed":
         "El micrófono está cerrado. Toque el micrófono de nuevo y elija Permitir.",
       "permission-denied-site":

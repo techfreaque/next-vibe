@@ -17,7 +17,9 @@ import { buildLocaleRedirectPath, detectLocale } from "./index";
 
 const supportedLocales: CountryLanguage[] = Object.values(
   languageConfig.countryInfo,
-).map(({ language, code }): CountryLanguage => `${language}-${code}`);
+).flatMap(({ languages, code }) =>
+  languages.map((language): CountryLanguage => `${language}-${code}`),
+);
 const options = {
   supportedLocales,
   defaultLocale: "en-GLOBAL" as const,
@@ -70,7 +72,7 @@ describe("locale redirect mapping", () => {
   it("negotiates Slovak from the URL, browser, cookie, or country", () => {
     expect(target("/sk-SK/story")).toBe("(none)");
     expect(target("/sk-sk/story")).toBe("/sk-SK/story");
-    expect(target("/sk/story")).toBe("/sk-GLOBAL/story");
+    expect(target("/sk/story")).toBe("/sk-SK/story");
     expect(target("/story", { "accept-language": "sk-SK" })).toBe(
       "/sk-SK/story",
     );
@@ -78,18 +80,52 @@ describe("locale redirect mapping", () => {
     expect(target("/story", { cookie: "locale=sk-SK" })).toBe("/sk-SK/story");
   });
 
+  it("lands Indian visitors on en-IN, Hindi speakers on hi-IN", () => {
+    expect(target("/hi-IN/story")).toBe("(none)");
+    expect(target("/en-IN/story")).toBe("(none)");
+    expect(target("/hi-GLOBAL/story")).toBe("(none)");
+    expect(target("/hi-in/story")).toBe("/hi-IN/story");
+    expect(target("/hi/story")).toBe("/hi-IN/story");
+    expect(target("/story", { "accept-language": "hi" })).toBe("/hi-IN/story");
+    expect(target("/story", { "accept-language": "hi-IN,hi;q=0.9" })).toBe(
+      "/hi-IN/story",
+    );
+    expect(target("/story", { "cf-ipcountry": "IN" })).toBe("/en-IN/story");
+    expect(
+      target("/story", {
+        "accept-language": "en-US,en;q=0.9",
+        "cf-ipcountry": "IN",
+      }),
+    ).toBe("/en-IN/story");
+    expect(
+      target("/story", {
+        "accept-language": "hi-IN,hi;q=0.9,en;q=0.8",
+        "cf-ipcountry": "IN",
+      }),
+    ).toBe("/hi-IN/story");
+    expect(
+      target("/story", {
+        "accept-language": "en-IN,en;q=0.9,hi;q=0.8",
+        "cf-ipcountry": "IN",
+      }),
+    ).toBe("/en-IN/story");
+    expect(target("/story", { cookie: "locale=hi-IN" })).toBe("/hi-IN/story");
+  });
+
   it("replaces a language-only segment", () => {
     expect(target("/en/user/referral")).toBe("/en-GLOBAL/user/referral");
-    expect(target("/de/user/referral")).toBe("/de-GLOBAL/user/referral");
-    expect(target("/PL")).toBe("/pl-GLOBAL");
-    expect(target("/fr/story")).toBe("/fr-GLOBAL/story");
+    expect(target("/de/user/referral")).toBe("/de-DE/user/referral");
+    expect(target("/PL")).toBe("/pl-PL");
+    expect(target("/fr/story")).toBe("/fr-FR/story");
     expect(target("/api/en/credits")).toBe("/api/en-GLOBAL/credits");
   });
 
-  it("uses the cookie / Accept-Language locale of the same language", () => {
-    expect(target("/en/user", { cookie: "locale=en-US" })).toBe("/en-US/user");
+  it("uses the canonical SEO locale for a bare language", () => {
+    expect(target("/en/user", { cookie: "locale=en-US" })).toBe(
+      "/en-GLOBAL/user",
+    );
     expect(target("/en/user", { "accept-language": "en-US,en;q=0.9" })).toBe(
-      "/en-US/user",
+      "/en-GLOBAL/user",
     );
     expect(target("/de/user", { "accept-language": "de-DE" })).toBe(
       "/de-DE/user",
@@ -98,9 +134,7 @@ describe("locale redirect mapping", () => {
       "/fr-FR/user",
     );
     // Cookie of another language does not override the requested language
-    expect(target("/de/user", { cookie: "locale=en-US" })).toBe(
-      "/de-GLOBAL/user",
-    );
+    expect(target("/de/user", { cookie: "locale=en-US" })).toBe("/de-DE/user");
   });
 
   it("replaces an unsupported locale with the same language when supported", () => {

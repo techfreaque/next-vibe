@@ -169,7 +169,7 @@ export const translations: typeof enTranslations = {
     cancel: "Cancelar",
     save: "Guardar cambios",
     saving: "Salvando...",
-    apply: "Aplicar &quot; Reiniciar &quot;",
+    apply: "Aplicar y Reiniciar",
     applying: "Aplicando...",
     saved: "Ajustes guardados con éxito",
     restartRequired:
@@ -345,7 +345,7 @@ export const translations: typeof enTranslations = {
     copied: "¡Copiado!",
     downloadButton: "Descargar.env.prod",
     instructions:
-      "Copia este archivo en su servidor:\nscp.env.prod user@yourserver:/app/.env\nO pegar manualmente:\nssh user@yourserver &quot; nano /app/.env",
+      "Copia este archivo en su servidor:\nscp .env.prod user@yourserver:/app/.env\nO pegar manualmente:\nssh user@yourserver && nano /app/.env",
     checklist: "Lista de verificación del despliegue",
     close: "Cerrar",
   },

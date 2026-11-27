@@ -1,4 +1,9 @@
 export const translations = {
+  compareHub: {
+    title: "Compare AI models",
+    description:
+      "Compare available AI models side by side. See how they differ in price, context, capabilities and content filters.",
+  },
   meta: {
     category: "AI Models",
     index: {

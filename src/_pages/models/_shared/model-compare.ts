@@ -59,6 +59,8 @@ export const SAME_RATIO = 1.1;
 const MAX_REASONS = 5;
 /** Other comparisons listed per model. */
 const MORE_COMPARISONS = 3;
+/** One extra candidate allows the current pair to be excluded. */
+export const LINKED_COMPARISON_LIMIT = MORE_COMPARISONS + 1;
 /** Read-more cards on a compare page. */
 const MAX_BLOG_LINKS = 3;
 
@@ -561,7 +563,7 @@ export function moreComparisons(
   availability: AgentEnvAvailability,
 ): CompareLink[] {
   const self: ModelRef = { id: facts.id, slug: facts.slug, name: facts.name };
-  return suggestComparisons(facts, availability, MORE_COMPARISONS + 1)
+  return suggestComparisons(facts, availability, LINKED_COMPARISON_LIMIT)
     .filter((other) => other.id !== exclude.id)
     .slice(0, MORE_COMPARISONS)
     .map((other) => {

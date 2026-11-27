@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { canonicalPageUrl } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -33,6 +34,7 @@ export async function generateMetadata({
     title,
     description: t("widget.heroDescription"),
     // Personal one-time link - keep it out of search indexes
+    alternates: { canonical: canonicalPageUrl(locale, "story/newsletter") },
     robots: { index: false, follow: false },
   };
 }

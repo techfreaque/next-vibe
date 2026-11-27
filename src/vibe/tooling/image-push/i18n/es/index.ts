@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     imagePush: "Image Push",
   },
   post: {
-    title: "Construir &quot; Empujar imagen",
+    title: "Construir y Empujar imagen",
     titleShort: "Imagen de empuje",
     description:
       "Construir la imagen Docker de producción y entregarla al registro o directamente a un servidor a través de SSH, por lo que el servidor de despliegue sólo tira (o ya tiene) en lugar de construirla",
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
       title: "Configuración de impulso de imagen",
       description:
         "Configurar el nombre de imagen, etiqueta y plataforma de destino",
-      submit: "Construir &quot; Empujar",
+      submit: "Construir y Empujar",
       runAgain: "Corre otra vez.",
     },
     fields: {

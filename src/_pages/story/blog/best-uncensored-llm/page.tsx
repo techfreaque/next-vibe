@@ -28,6 +28,7 @@ import { Link } from "next-vibe/ui/components/link";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { BEST_UNCENSORED_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import { formatTokenCount } from "@/_pages/models/_shared/model-facts";
 import { configScopedTranslation } from "@/env/i18n";
 
@@ -130,17 +131,6 @@ const HEAD_TO_HEAD: readonly [ChatModelId, ChatModelId] = [
   ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
 ];
 
-const PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  HEAD_TO_HEAD,
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
-  [
-    ChatModelId.UNCENSORED_LM_V1_2,
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-  ],
-  [ChatModelId.KIMI_K3_1_PRO, ChatModelId.KIMI_K3_1_PRO_UNCENSORED],
-  [ChatModelId.GLM_5_3, ChatModelId.GLM_5_3_UNCENSORED],
-];
-
 const FAQ_KEYS: readonly (
   | "best"
   | "free"
@@ -191,7 +181,7 @@ export async function tanstackLoader({
   const [facts, rows, pairs] = await Promise.all([
     loadUsFacts(locale),
     loadUncensoredRows(locale),
-    loadComparePairs(PAIRS),
+    loadComparePairs(BEST_UNCENSORED_PAIRS),
   ]);
   return { locale, us: usParams(facts), rows, pairs };
 }

@@ -28,7 +28,7 @@ export function AppEntryButton({ locale }: AppEntryButtonProps): JSX.Element {
       className="h-9 px-2.5 sm:px-3"
       aria-label={t("nav.goToApp")}
     >
-      <Link href={`/${locale}/threads`}>
+      <Link href={`/${locale}/threads/private/new`}>
         <MessageSquare className="h-4 w-4" />
         <Span className="hidden sm:inline">{t("nav.goToApp")}</Span>
       </Link>

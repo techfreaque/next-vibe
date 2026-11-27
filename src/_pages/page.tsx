@@ -10,7 +10,7 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { notFound } from "next-vibe/ui/lib/not-found";
-import { redirect } from "next-vibe/ui/lib/redirect";
+import { permanentRedirect, redirect } from "next-vibe/ui/lib/redirect";
 
 interface ChatPageProps {
   params: Promise<{
@@ -59,15 +59,15 @@ export async function tanstackLoader({
     const defaultFolder = isAuthenticated
       ? DefaultFolderId.PRIVATE
       : DefaultFolderId.INCOGNITO;
-    redirect(`/${locale}/threads/${defaultFolder}`);
+    redirect(`/${locale}/threads/${defaultFolder}/new`);
   }
 
   // Dev and prod: logged-in users go straight to chat
   if (isAuthenticated) {
-    redirect(`/${locale}/threads/${DefaultFolderId.PRIVATE}`);
+    redirect(`/${locale}/threads/${DefaultFolderId.PRIVATE}/new`);
   }
 
-  redirect(`/${locale}/story`);
+  permanentRedirect(`/${locale}/story`);
 }
 
 export function TanstackPage(): never {

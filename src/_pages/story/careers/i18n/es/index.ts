@@ -30,7 +30,7 @@ export const translations: typeof enTranslations = {
     title: "Que construye con next-vibe",
     items: {
       freelancers: {
-        title: "Freelancers &quot; agencies",
+        title: "Profesionales independientes y agencias",
         description:
           "Entregar AI: herramientas propulsadas a los clientes sin construir backends separados, CLIs y UIs. Una base de código, cada superficie.",
       },
@@ -56,7 +56,7 @@ export const translations: typeof enTranslations = {
     title: "Lo que puedes construir",
     items: {
       erpIntegration: {
-        title: "ERP &amp; integración del sistema empresarial",
+        title: "ERP y integración del sistema empresarial",
         description:
           "Pase los datos de producción en una habilidad AI que clasifica defectos, actualiza el inventario o activa flujos de trabajo reordenados. Tu punto final es el puente.",
       },

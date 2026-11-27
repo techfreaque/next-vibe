@@ -70,7 +70,7 @@ export const translations: typeof enTranslations = {
       quickAdd: "Quick Add",
       tweakAndAdd: "Tweak y Add",
       edit: "Editar",
-      copyAndCustomize: "Copia &quot; Personalizar &quot;",
+      copyAndCustomize: "Copiar y personalizar",
       delete: "Eliminar",
       actions: "Acciones",
       designSelector: {
@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
       models: {
         brain: "Cerebro",
         eyes: "Ojos",
-        ears: "Orejas &quot; Voz &quot;",
+        ears: "Oídos y voz",
         media: "Medios",
         slots: {
           chat: "Chat",
@@ -190,8 +190,8 @@ export const translations: typeof enTranslations = {
         description: "habilidad recuperada con éxito",
       },
       share: {
-        button: "Compartir &quot; Ganar &quot;",
-        title: "Compartir esta habilidad &quot; ganar",
+        button: "Compartir y Ganar",
+        title: "Compartir esta habilidad y ganar",
         description:
           "Comparte esta habilidad con tu enlace de referencia. Ganar un 10% de comisión recurrente de cada usuario que se registra.",
         selectCode: "Seleccione el código de referencia:",
@@ -236,7 +236,7 @@ export const translations: typeof enTranslations = {
         allSkills: "Todas las habilidades",
         featuredSkill: "Habilidad destacada",
         aboutSkill: "Sobre esta habilidad",
-        modelsVariants: "Modelos &quot; Variantes",
+        modelsVariants: "Modelos y Variantes",
       },
     },
     patch: {
@@ -698,7 +698,7 @@ export const translations: typeof enTranslations = {
     technical: {
       name: "Asistente técnico",
       description: "Explicaciones técnicas detalladas y precisas",
-      tagline: "Precisión &quot; Expertise",
+      tagline: "Precisión y experiencia",
       shortDesc: "Experiencia técnica y solución de problemas",
       suggestedPrompts: {
         0: "Explique cómo funciona la limpieza useEffect de React, con un ejemplo.",
@@ -844,7 +844,7 @@ export const translations: typeof enTranslations = {
     },
     professional: {
       name: "Profesional",
-      description: "Clear, concise, and business-focused",
+      description: "Claro, conciso y orientado a los negocios",
       tagline: "Excelencia empresarial",
       shortDesc: "Comunicaciones profesionales y empresariales",
       suggestedPrompts: {
@@ -943,7 +943,7 @@ export const translations: typeof enTranslations = {
       name: "4chan",
       description:
         "Greentext y bromas mordaces. El tono directo de los foros de imágenes de antes.",
-      tagline: "Anónimo &quot; Unfiltered",
+      tagline: "Anónimo y sin filtros",
       shortDesc: "Anónimo estilo de cultura de imagen",
       suggestedPrompts: {
         0: "¿Qué tiene de malo el mundo?",
@@ -1012,7 +1012,7 @@ export const translations: typeof enTranslations = {
     teacher: {
       name: "Maestro",
       description: "Educación y explicación",
-      tagline: "Paciente &quot; Despejado &quot;",
+      tagline: "Paciencia y claridad",
       shortDesc: "Enseñanza y explicaciones de los pacientes",
       suggestedPrompts: {
         0: "Enséñame fotosíntesis como si tuviera 10 años, y luego me acuestas.",
@@ -1116,7 +1116,7 @@ export const translations: typeof enTranslations = {
       name: "Thea",
       description:
         "Diosa griega de luz. Un compañero dedicado con sabiduría antigua.",
-      tagline: "Luz &quot; Devoción",
+      tagline: "Luz y Devoción",
       shortDesc: "Conversaciones reflexivas y empáticas",
       suggestedPrompts: {
         0: "Ayúdame a ser mejor socio.",
@@ -1182,7 +1182,7 @@ export const translations: typeof enTranslations = {
       name: "Hermes",
       description:
         "Dios griego de mensajeros. Un compañero fuerte con sabiduría masculina atemporal.",
-      tagline: "Fuerza &quot; Sabiduría",
+      tagline: "Fuerza y Sabiduría",
       shortDesc: "Completación rápida y eficiente de tareas",
       suggestedPrompts: {
         0: "Dame un desafío de 30 días para construir disciplina.",
@@ -1476,8 +1476,9 @@ export const translations: typeof enTranslations = {
     },
     coder: {
       name: "Programador",
-      description: "Expert software developer for all languages",
-      tagline: "Build &quot; Debug",
+      description:
+        "Desarrollador experto en distintos lenguajes de programación",
+      tagline: "Programa y depura",
       shortDesc: "Desarrollo y programación del software",
       suggestedPrompts: {
         0: "¿Por qué mi función asinc devuelve una promesa en lugar del valor?",
@@ -1529,7 +1530,7 @@ export const translations: typeof enTranslations = {
     hacker: {
       name: "Hacker",
       description: "Ingeniero de seguridad ofensiva y defensiva",
-      tagline: "Break &apos; Defend",
+      tagline: "Ataca y defiende",
       shortDesc: "Investigación de seguridad, pentesta y endurecimiento",
       suggestedPrompts: {
         0: "¿Cómo funcionó Log4Shell, y cómo lo veo en mis registros?",
@@ -1749,8 +1750,8 @@ export const translations: typeof enTranslations = {
     },
     scientist: {
       name: "Científico",
-      description: "Scientific expert for clear explanations",
-      tagline: "Science Explained",
+      description: "Explicaciones claras de ciencia y método científico",
+      tagline: "La ciencia en claro",
       shortDesc: "Método científico y análisis",
       suggestedPrompts: {
         0: "¿Por qué soñamos? ¿Qué dice la ciencia en realidad?",
@@ -2088,7 +2089,7 @@ export const translations: typeof enTranslations = {
     socialMediaManager: {
       name: "Social Media Manager",
       description: "Contenido y estrategia de los medios sociales",
-      tagline: "Engage &quot; Grow",
+      tagline: "Conecta y crece",
       shortDesc: "Estrategia y contenido de los medios sociales",
       suggestedPrompts: {
         0: "Escribe 5 leyendas de Instagram para una nueva panadería vegana.",
@@ -2403,7 +2404,7 @@ export const translations: typeof enTranslations = {
       name: "Gestor de tareas cron",
       description:
         "Especialista en el cronogramador de tareas que puede crear, actualizar, eliminar y monitorear empleos cron y su historial de ejecución",
-      tagline: "Programa &quot; Monitor &quot;",
+      tagline: "Programa y supervisa",
       shortDesc: "Gestión y seguimiento de la tarea de los Cron",
       suggestedPrompts: {
         0: "Listar todas las tareas de cron activas y sus horarios",
@@ -2467,7 +2468,7 @@ export const translations: typeof enTranslations = {
       name: "Moderador público",
       description:
         "Especialista en gestión de contenidos para gestionar hilos públicos, mensajes y contenido comunitario",
-      tagline: "Curate &quot; Organize",
+      tagline: "Selecciona y organiza",
       shortDesc: "Gestión de contenidos públicos y hilos",
       suggestedPrompts: {
         0: "Lista de recientes hilos públicos",
@@ -2498,7 +2499,7 @@ export const translations: typeof enTranslations = {
       name: "Arquitecto de software",
       description:
         "Especialista en Arquitectura que los delegados codifiquen tareas al Código Claude para su implementación. Disponible sólo en Hermes.",
-      tagline: "Design &quot; Delegate",
+      tagline: "Diseña y delega",
       shortDesc: "Decisiones de arquitectura vía Claude Code",
       suggestedPrompts: {
         0: "Planificar la implementación de una nueva característica",
@@ -2530,7 +2531,7 @@ export const translations: typeof enTranslations = {
       name: "Agente de despliegue",
       description:
         "Especialista en Despliegue que maneja construye, libera y administración de servidores a través de SSH. Disponible sólo en Hermes.",
-      tagline: "Build &quot; Deploy",
+      tagline: "Compila y despliega",
       shortDesc: "Implementación y gestión de servidores",
       suggestedPrompts: {
         0: "Construir la aplicación para la producción",
@@ -2561,7 +2562,7 @@ export const translations: typeof enTranslations = {
       name: "Agente de recompilación",
       description:
         "Recompila la aplicación y reinicia el servidor sin interrupciones mediante la señal SIGUSR1.",
-      tagline: "Construir &quot; Reiniciar",
+      tagline: "Construir y Reiniciar",
       shortDesc: "Recompilación y reinicio sin interrupciones",
       suggestedPrompts: {
         0: "Reconstruir y reiniciar el servidor de producción",

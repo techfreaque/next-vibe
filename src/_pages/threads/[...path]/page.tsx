@@ -12,6 +12,7 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { isDefaultFolderId } from "next-vibe/agent/chat/config";
 import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
 import type { FolderContentsResponseOutput } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
 import { scopedTranslation as folderContentsScopedTranslation } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/i18n";
@@ -44,7 +45,11 @@ import { SkillsRepository } from "next-vibe/agent/skills/repository";
 import { coreEnv } from "next-vibe/core/env";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { NOINDEX_FOLLOW_ROBOTS } from "next-vibe/core/i18n/core/metadata";
+import {
+  canonicalPageUrl,
+  NOINDEX_FOLLOW_ROBOTS,
+} from "next-vibe/core/i18n/core/metadata";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { VibeMode } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -54,6 +59,7 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
+import { notFound } from "next-vibe/ui/lib/not-found";
 import { redirect } from "next-vibe/ui/lib/redirect";
 import type { JSX } from "react";
 
@@ -88,9 +94,19 @@ interface ThreadsPathPageProps {
  * every nav bar and model page, so blocking them in robots.txt only produced
  * "Indexed, though blocked by robots.txt".
  */
-export const generateMetadata: (
-  props: ThreadsPathPageProps,
-) => Metadata = () => ({ robots: NOINDEX_FOLLOW_ROBOTS });
+export async function generateMetadata({
+  params,
+}: ThreadsPathPageProps): Promise<Metadata> {
+  const { locale, path } = await params;
+  const canonicalPath =
+    path[0] === DefaultFolderId.PUBLIC
+      ? "threads/public"
+      : "threads/incognito/new";
+  return {
+    robots: NOINDEX_FOLLOW_ROBOTS,
+    alternates: { canonical: canonicalPageUrl(locale, canonicalPath) },
+  };
+}
 
 export interface ThreadsPathPageData {
   locale: CountryLanguage;
@@ -119,6 +135,18 @@ export async function tanstackLoader({
   searchParams,
 }: ThreadsPathPageProps): Promise<ThreadsPathPageData> {
   const { locale, path } = await params;
+  const [root, ...segments] = path;
+  if (
+    !root ||
+    !isDefaultFolderId(root) ||
+    segments.some(
+      (segment, index) =>
+        !isUUID(segment) &&
+        !(segment === NEW_MESSAGE_ID && index === segments.length - 1),
+    )
+  ) {
+    notFound();
+  }
   const resolvedSearchParams = await searchParams;
   const logger = createEndpointLogger(false, locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
@@ -162,9 +190,7 @@ export async function tanstackLoader({
   }
   const prefillQuery =
     prefillParams.size > 0 ? `?${prefillParams.toString()}` : "";
-  const incognitoTarget = prefillQuery
-    ? `/${locale}/threads/incognito/${NEW_MESSAGE_ID}${prefillQuery}`
-    : `/${locale}/threads/incognito`;
+  const incognitoTarget = `/${locale}/threads/incognito/${NEW_MESSAGE_ID}${prefillQuery}`;
 
   if (
     user?.isPublic &&
@@ -381,6 +407,13 @@ export async function tanstackLoader({
     }
     if (threadsResult.success) {
       initialThreadsData = threadsResult.data;
+    }
+    if (
+      messagesResult &&
+      !messagesResult.success &&
+      messagesResult.errorType === ErrorResponseTypes.NOT_FOUND
+    ) {
+      notFound();
     }
     if (messagesResult && messagesResult.success) {
       initialMessagesData = messagesResult.data;

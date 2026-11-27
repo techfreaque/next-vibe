@@ -88,7 +88,7 @@ export function UnbottledCta({
               className="h-12 border-0 bg-primary px-8 font-semibold text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90"
               asChild
             >
-              <Link href={`/${locale}/threads`}>
+              <Link href={`/${locale}/threads/incognito/new`}>
                 <MessageSquare className="mr-2 h-4 w-4" />
                 {t("home.ctaUnbottled.primary")}
               </Link>
