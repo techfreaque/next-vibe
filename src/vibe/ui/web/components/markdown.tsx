@@ -6,6 +6,7 @@ import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
 import { ExternalLink as ExternalLinkComponent } from "next-vibe/ui/components/link";
+import { Video } from "next-vibe/ui/components/video";
 import type { JSX } from "react";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -771,6 +772,27 @@ const MarkdownImage = memo(function MarkdownImage({
 
   if (!src) {
     return <></>;
+  }
+
+  const [pathname] = src.split(/[?#]/, 1);
+  if (pathname && /\.(?:mp4|webm)$/i.test(pathname)) {
+    return (
+      <span className="my-6 block w-fit max-w-full">
+        <Video
+          src={src}
+          controls
+          playsInline
+          preload="metadata"
+          aria-label={alt}
+          className="max-w-full rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg"
+        />
+        {alt && (
+          <span className="mt-2 block text-center text-sm italic text-slate-500 dark:text-slate-400">
+            {alt}
+          </span>
+        )}
+      </span>
+    );
   }
 
   const handleImageClick = (): void => {
