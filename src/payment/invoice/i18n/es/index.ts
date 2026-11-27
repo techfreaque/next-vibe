@@ -7,17 +7,17 @@ export const translations: typeof enTranslations = {
     invoice: "factura",
     transactions: "transacciones",
   },
-  defaultItem: "Tema de facturación",
+  defaultItem: "Concepto de factura",
   success: {
     created: "Factura creada con éxito",
   },
   post: {
-    title: "Factura",
-    titleShort: "Factura",
-    description: "Punto final de facturación",
+    title: "Crear factura de Stripe",
+    titleShort: "Factura de Stripe",
+    description: "Crear una factura de Stripe para un cliente",
     form: {
-      title: "Configuración de facturación",
-      description: "Configurar los parámetros de factura",
+      title: "Detalles de la factura",
+      description: "Introduce el importe, la divisa y la fecha de vencimiento",
     },
     response: {
       success: "Factura creada con éxito",

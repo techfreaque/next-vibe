@@ -1,23 +1,25 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
-import { Div } from "next-vibe/ui/components/div";
-import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
+import { scopedTranslation as companiesScopedTranslation } from "../../../i18n";
 import type definition from "./definition";
 
 export function MemberInviteWidget({
@@ -28,69 +30,62 @@ export function MemberInviteWidget({
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const locale = useWidgetLocale();
+  const { t: tCompanies } = companiesScopedTranslation.scopedT(locale);
+  const invited = Boolean(data?.result?.memberId);
 
-  if (data?.result?.memberId) {
-    return (
-      <Div className="flex flex-col gap-4">
-        <Div className="flex flex-col items-center gap-3 py-8 text-center">
-          <CheckCircle2 className="h-10 w-10 text-emerald-500" />
-          <Div className="flex flex-col gap-1">
-            <Span className="text-base font-semibold">
-              {t("post.widget.invited")}
-            </Span>
-            {data.result.role && (
-              <Div className="flex justify-center">
-                <Badge variant="secondary" className="text-xs">
-                  {data.result.role}
-                </Badge>
-              </Div>
-            )}
-          </Div>
-        </Div>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => navigation.pop()}
-          className="gap-1.5"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("post.widget.back")}
-        </Button>
-      </Div>
-    );
-  }
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("post.widget.back")}
+    </Button>
+  ) : undefined;
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
+    <AdminForm
+      title={t("post.title")}
+      description={t("post.description")}
+      backButton={backButton}
+      primaryAction={
+        invited ? null : (
+          <SubmitButtonWidget<typeof definition.POST> field={{}} />
+        )
+      }
+    >
+      {data?.result?.memberId ? (
+        <ResultBanner
+          variant="success"
+          title={t("post.widget.invited")}
+          message={data.result.role ? tCompanies(data.result.role) : undefined}
         >
-          <ChevronLeft className="h-4 w-4" />
-          {t("post.widget.back")}
-        </Button>
+          {navigation.canGoBack && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => navigation.pop()}
+            >
+              {t("post.widget.back")}
+            </Button>
+          )}
+        </ResultBanner>
+      ) : (
+        <AdminFormSection title={t("post.title")}>
+          <EmailFieldWidget
+            fieldName="email"
+            field={withValue(field.children.email, undefined, null)}
+          />
+          <SelectFieldWidget
+            fieldName="role"
+            field={withValue(field.children.role, undefined, null)}
+          />
+        </AdminFormSection>
       )}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-lg font-semibold">{t("post.title")}</Span>
-        <Span className="text-sm text-muted-foreground">
-          {t("post.description")}
-        </Span>
-      </Div>
-      <EmailFieldWidget
-        fieldName="email"
-        field={withValue(field.children.email, undefined, null)}
-      />
-      <SelectFieldWidget
-        fieldName="role"
-        field={withValue(field.children.role, undefined, null)}
-      />
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
-    </Div>
+    </AdminForm>
   );
 }

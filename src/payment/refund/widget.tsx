@@ -279,8 +279,9 @@ export function PaymentRefundWidget({
   const currency = CurrenciesArr.find((code) => code === refund?.currency);
 
   return (
-    <WidgetShell className="min-w-0">
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
       <WidgetHeader
+        size="page"
         title={t("widget.title")}
         backButton={
           !responseOnly && <NavigateButtonWidget field={children.backButton} />

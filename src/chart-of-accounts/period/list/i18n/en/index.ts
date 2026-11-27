@@ -1,6 +1,6 @@
 export const translations = {
   get: {
-    title: "Accounting Periods",
+    title: "Accounting periods",
     titleShort: "Periods",
     description: "List all accounting periods for a company",
     companyId: {
@@ -20,31 +20,31 @@ export const translations = {
     errors: {
       unauthorized: { title: "Unauthorized", description: "Login required" },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid company ID",
       },
       forbidden: {
         title: "Forbidden",
         description: "Insufficient permissions",
       },
-      server: { title: "Server Error", description: "Could not load periods" },
+      server: { title: "Server error", description: "Could not load periods" },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       conflict: { title: "Conflict", description: "Data conflict" },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Could not reach the server",
       },
-      notFound: { title: "Not Found", description: "No periods found" },
+      notFound: { title: "Not found", description: "No periods found" },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Periods Loaded",
+      title: "Periods loaded",
       description: "Accounting periods retrieved",
     },
     widget: {
@@ -60,7 +60,7 @@ export const translations = {
       LOCKED: "Locked",
     },
   },
-  title: "Period List",
+  title: "Period list",
   description: "List accounting periods",
   category: "Chart of Accounts",
   tag: "Period",

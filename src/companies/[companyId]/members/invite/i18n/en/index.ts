@@ -19,15 +19,15 @@ export const translations = {
     invite: "Invite",
   },
   post: {
-    title: "Invite Member",
-    titleShort: "Invite Member",
+    title: "Invite member",
+    titleShort: "Invite member",
     description: "Invite a registered user to the company by email",
     companyId: {
       label: "Company ID",
       description: "The company to invite the user to",
     },
     email: {
-      label: "User Email",
+      label: "User email",
       description: "Email of the registered user to invite",
       placeholder: "colleague@company.com",
     },
@@ -38,44 +38,44 @@ export const translations = {
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check the email and try again",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to invite members",
       },
       forbidden: {
-        title: "Access Denied",
+        title: "Access denied",
         description: "Admin or Owner role required to invite members",
       },
       conflict: {
-        title: "Already a Member",
+        title: "Already a member",
         description: "This user is already a member of the company",
       },
       server: {
-        title: "Server Error",
-        description: "Something went wrong — try again",
+        title: "Server error",
+        description: "Something went wrong. Try again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Check your connection and try again",
       },
       notFound: {
-        title: "User Not Found",
+        title: "User not found",
         description: "No registered user found with this email",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Member Invited",
+      title: "Member invited",
       description: "The user has been added to the company",
     },
     response: {

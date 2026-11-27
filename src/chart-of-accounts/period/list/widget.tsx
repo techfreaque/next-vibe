@@ -1,12 +1,17 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { BarChart } from "next-vibe/ui/components/icons/BarChart";
-import { Building } from "next-vibe/ui/components/icons/Building";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { formatDocDate } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
@@ -36,15 +41,15 @@ function PeriodRow({
   locale: CountryLanguage;
 }): JSX.Element {
   const isOpen = period.status === PeriodStatus.OPEN;
-  const statusVariant = isOpen
-    ? "default"
+  const statusVariant: StatusPillVariant = isOpen
+    ? "success"
     : period.status === PeriodStatus.LOCKED
-      ? "destructive"
-      : "secondary";
+      ? "danger"
+      : "muted";
 
   return (
     <Div
-      className={`flex items-center gap-3 py-2.5 px-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors cursor-pointer `}
+      className="flex items-center gap-3 py-3 px-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors cursor-pointer"
       onClick={() => {
         onView(period.id);
       }}
@@ -55,13 +60,15 @@ function PeriodRow({
         >
           {period.name}
         </Span>
-        <Span className="text-xs text-muted-foreground">
+        <Span className="text-xs text-muted-foreground tabular-nums">
           {`${formatDocDate(period.startDate, locale)} – ${formatDocDate(period.endDate, locale)}`}
         </Span>
       </Div>
-      <Badge variant={statusVariant} className="text-xs shrink-0">
-        {statusLabel}
-      </Badge>
+      <StatusPill
+        status={period.status}
+        label={statusLabel}
+        variant={statusVariant}
+      />
     </Div>
   );
 }
@@ -119,42 +126,39 @@ export function CoaPeriodListWidget(
     })();
   };
 
-  // Loading state
   if (!data) {
     return (
-      <Div className="flex flex-col items-center gap-4 py-10 rounded-lg border border-dashed">
-        <Div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted border-2 border-dashed border-muted-foreground/30">
-          <Building className="h-6 w-6 text-muted-foreground" />
-        </Div>
-        <Span className="text-sm text-muted-foreground">
-          {t("get.widget.loading")}
-        </Span>
-      </Div>
+      <WidgetShell layout="page" className="mx-auto max-w-3xl">
+        <WidgetHeader size="page" title={t("get.title")} />
+        <LoadingBlock message={t("get.widget.loading")} />
+      </WidgetShell>
     );
   }
 
   const periods = data.periods ?? [];
 
   return (
-    <Div className="flex flex-col gap-4">
-      {/* Header bar */}
-      <Div className="flex items-center justify-between gap-2">
-        <Div className="flex flex-wrap items-center gap-2">
-          <Span className="text-sm font-medium">{t("get.title")}</Span>
-          <Badge variant="outline">
-            {new Intl.NumberFormat(locale).format(periods.length)}
-          </Badge>
-        </Div>
-        {!isPickerMode && (
-          <Button variant="default" size="sm" onClick={handleCreate}>
-            {t("get.widget.createButton")}
-          </Button>
-        )}
-      </Div>
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
+      <WidgetHeader
+        size="page"
+        title={t("get.title")}
+        subtitle={new Intl.NumberFormat(locale).format(periods.length)}
+        actions={
+          !isPickerMode ? (
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={handleCreate}
+            >
+              {t("get.widget.createButton")}
+            </Button>
+          ) : undefined
+        }
+      />
 
-      {/* Period list or empty state */}
       {periods.length > 0 ? (
-        <Div className="rounded-md border overflow-hidden">
+        <Div className="rounded-lg border bg-card overflow-hidden">
           <Div className="flex items-center gap-3 px-4 py-2 bg-muted/50 border-b text-xs font-medium text-muted-foreground">
             <Span className="flex-1">{t("get.response.name")}</Span>
             <Span className="shrink-0">{t("get.response.status")}</Span>
@@ -176,18 +180,15 @@ export function CoaPeriodListWidget(
           ))}
         </Div>
       ) : (
-        <Div className="flex flex-col items-center gap-3 py-12 text-center border border-dashed rounded-md">
-          <BarChart className="h-8 w-8 text-muted-foreground" />
-          <Span className="text-sm text-muted-foreground">
-            {t("get.widget.empty")}
-          </Span>
-          {!isPickerMode && (
-            <Button variant="default" size="sm" onClick={handleCreate}>
-              {t("get.widget.createButton")}
-            </Button>
-          )}
-        </Div>
+        <EmptyBlock
+          title={t("get.widget.empty")}
+          action={
+            !isPickerMode
+              ? { label: t("get.widget.createButton"), onClick: handleCreate }
+              : undefined
+          }
+        />
       )}
-    </Div>
+    </WidgetShell>
   );
 }

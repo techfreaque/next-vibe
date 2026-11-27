@@ -47,7 +47,7 @@ export const translations = {
     errors: {
       unauthorized: { title: "Unauthorized", description: "Login required" },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check all fields",
       },
       forbidden: {
@@ -55,25 +55,25 @@ export const translations = {
         description: "Cannot modify system account fields",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Could not update account",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       conflict: { title: "Conflict", description: "Data conflict" },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Could not reach the server",
       },
-      notFound: { title: "Not Found", description: "Account not found" },
+      notFound: { title: "Not found", description: "Account not found" },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
-    success: { title: "Account Updated", description: "Changes saved" },
+    success: { title: "Account updated", description: "Changes saved" },
     widget: {
       savedLabel: "Saved",
       failedLabel: "Failed",

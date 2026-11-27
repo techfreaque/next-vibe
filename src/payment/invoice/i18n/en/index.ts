@@ -10,12 +10,12 @@ export const translations = {
     created: "Invoice created successfully",
   },
   post: {
-    title: "Invoice",
-    titleShort: "Invoice",
-    description: "Invoice endpoint",
+    title: "Create Stripe invoice",
+    titleShort: "Stripe invoice",
+    description: "Create a Stripe invoice for a customer",
     form: {
-      title: "Invoice configuration",
-      description: "Configure invoice parameters",
+      title: "Invoice details",
+      description: "Enter the amount, currency, and due date",
     },
     response: {
       success: "Invoice created successfully",

@@ -1,7 +1,7 @@
 export const translations = {
   post: {
-    title: "Open Accounting Period",
-    titleShort: "New Period",
+    title: "Open accounting period",
+    titleShort: "New period",
     description: "Create a new accounting period for a company",
     companyId: {
       label: "Company ID",
@@ -9,17 +9,17 @@ export const translations = {
       placeholder: "Company UUID",
     },
     name: {
-      label: "Period Name",
+      label: "Period name",
       description: "e.g. January 2026",
       placeholder: "January 2026",
     },
     startDate: {
-      label: "Start Date",
+      label: "Start date",
       description: "Period start date",
       placeholder: "",
     },
     endDate: {
-      label: "End Date",
+      label: "End date",
       description: "Period end date",
       placeholder: "",
     },
@@ -27,16 +27,16 @@ export const translations = {
     errors: {
       unauthorized: { title: "Unauthorized", description: "Login required" },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check start/end dates",
       },
       forbidden: {
         title: "Forbidden",
         description: "Insufficient permissions",
       },
-      server: { title: "Server Error", description: "Could not create period" },
+      server: { title: "Server error", description: "Could not create period" },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       conflict: {
@@ -44,17 +44,17 @@ export const translations = {
         description: "Date range overlaps with existing period",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Could not reach the server",
       },
-      notFound: { title: "Not Found", description: "Company not found" },
+      notFound: { title: "Not found", description: "Company not found" },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Period Created",
+      title: "Period created",
       description: "Accounting period opened",
     },
     widget: {
@@ -62,7 +62,7 @@ export const translations = {
       back: "Back",
     },
   },
-  title: "Create Period",
+  title: "Create period",
   description: "Open a new accounting period",
   category: "Chart of Accounts",
   tag: "Period",

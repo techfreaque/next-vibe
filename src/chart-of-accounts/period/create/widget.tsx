@@ -3,17 +3,20 @@
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
@@ -27,6 +30,7 @@ export function CoaPeriodCreateWidget({
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const created = Boolean(data?.id);
 
   const handleView = (periodId: string): void => {
     void (async (): Promise<void> => {
@@ -37,71 +41,69 @@ export function CoaPeriodCreateWidget({
     })();
   };
 
-  if (data?.id) {
-    return (
-      <Div className="flex flex-col gap-4">
-        <Div className="flex flex-col gap-2 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-          <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-            {t("post.success.title")}
-          </Span>
-          <Span className="text-base font-semibold mt-1">{data.name_out}</Span>
-        </Div>
-        <Button
-          type="button"
-          variant="default"
-          size="sm"
-          onClick={() => {
-            handleView(data.id);
-          }}
-        >
-          {t("post.widget.viewButton")}
-        </Button>
-      </Div>
-    );
-  }
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("post.widget.back")}
+    </Button>
+  ) : undefined;
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
+    <AdminForm
+      title={t("post.title")}
+      backButton={backButton}
+      primaryAction={
+        created ? null : (
+          <SubmitButtonWidget<typeof definition.POST> field={{}} />
+        )
+      }
+    >
+      {data?.id ? (
+        <ResultBanner
+          variant="success"
+          title={t("post.success.title")}
+          message={data.name_out}
         >
-          <ChevronLeft className="h-4 w-4" />
-          {t("post.widget.back")}
-        </Button>
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            onClick={() => {
+              handleView(data.id);
+            }}
+          >
+            {t("post.widget.viewButton")}
+          </Button>
+        </ResultBanner>
+      ) : (
+        <AdminFormSection title={t("post.title")}>
+          <EntityPickerFieldWidget
+            fieldName="companyId"
+            field={withValue(field.children.companyId, undefined, null)}
+          />
+          <TextFieldWidget
+            fieldName="name"
+            field={withValue(field.children.name, undefined, null)}
+          />
+          <Div className="grid grid-cols-1 gap-3 @md:grid-cols-2">
+            <DateFieldWidget
+              utcCalendarDay
+              fieldName="startDate"
+              field={withValue(field.children.startDate, undefined, null)}
+            />
+            <DateFieldWidget
+              utcCalendarDay
+              fieldName="endDate"
+              field={withValue(field.children.endDate, undefined, null)}
+            />
+          </Div>
+        </AdminFormSection>
       )}
-
-      <Span className="text-base font-semibold">{t("post.title")}</Span>
-
-      <Div className="flex flex-col gap-3">
-        <EntityPickerFieldWidget
-          fieldName="companyId"
-          field={withValue(field.children.companyId, undefined, null)}
-        />
-        <TextFieldWidget
-          fieldName="name"
-          field={withValue(field.children.name, undefined, null)}
-        />
-        <Div className="grid grid-cols-2 gap-3">
-          <DateFieldWidget
-            utcCalendarDay
-            fieldName="startDate"
-            field={withValue(field.children.startDate, undefined, null)}
-          />
-          <DateFieldWidget
-            utcCalendarDay
-            fieldName="endDate"
-            field={withValue(field.children.endDate, undefined, null)}
-          />
-        </Div>
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
-    </Div>
+    </AdminForm>
   );
 }

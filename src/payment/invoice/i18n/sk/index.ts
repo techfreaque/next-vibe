@@ -12,12 +12,12 @@ export const translations: typeof enTranslations = {
     created: "Faktúra bola vytvorená.",
   },
   post: {
-    title: "Faktúra",
-    titleShort: "Faktúra",
-    description: "Nástroj fakturácie",
+    title: "Vytvoriť Stripe faktúru",
+    titleShort: "Stripe faktúra",
+    description: "Vytvorte Stripe faktúru pre zákazníka",
     form: {
-      title: "Nastavenie faktúry",
-      description: "Nastavte parametre faktúry.",
+      title: "Údaje faktúry",
+      description: "Zadajte sumu, menu a dátum splatnosti.",
     },
     response: {
       success: "Faktúra bola vytvorená.",

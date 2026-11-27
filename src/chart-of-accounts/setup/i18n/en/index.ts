@@ -32,7 +32,7 @@ export const translations = {
         description: "You must be logged in to set up a chart of accounts",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check the company and accounting template.",
       },
       forbidden: {
@@ -40,11 +40,11 @@ export const translations = {
         description: "Only company owners and admins can set up accounts",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Try applying the template again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       conflict: {
@@ -53,15 +53,15 @@ export const translations = {
           "Reload the company’s current accounts before applying the template.",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Could not reach the server",
       },
       notFound: {
-        title: "Template Not Found",
+        title: "Template not found",
         description: "No chart of accounts template found for this country",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
@@ -84,7 +84,7 @@ export const translations = {
       viewPeriods: "View accounting periods",
     },
   },
-  title: "Chart of Accounts Setup",
+  title: "Chart of accounts setup",
   description: "Initialize company accounts from template",
   category: "Chart of Accounts",
   tag: "Setup",

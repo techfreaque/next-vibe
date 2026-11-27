@@ -12,12 +12,12 @@ export const translations: typeof enTranslations = {
     created: "Rechnung erfolgreich erstellt",
   },
   post: {
-    title: "Titel",
-    titleShort: "Rechnung",
-    description: "Endpunkt-Beschreibung",
+    title: "Stripe-Rechnung erstellen",
+    titleShort: "Stripe-Rechnung",
+    description: "Eine Stripe-Rechnung für einen Kunden erstellen",
     form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+      title: "Rechnungsdetails",
+      description: "Betrag, Währung und Fälligkeitsdatum angeben",
     },
     response: {
       success: "Rechnung erfolgreich erstellt",

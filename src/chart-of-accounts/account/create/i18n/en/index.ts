@@ -78,7 +78,7 @@ export const translations = {
     errors: {
       unauthorized: { title: "Unauthorized", description: "Login required" },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check all required fields",
       },
       forbidden: {
@@ -86,24 +86,24 @@ export const translations = {
         description: "Insufficient permissions",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Could not create account",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       conflict: {
-        title: "Code Taken",
+        title: "Code taken",
         description: "An account with this code already exists",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Could not reach the server",
       },
-      notFound: { title: "Not Found", description: "Company not found" },
+      notFound: { title: "Not found", description: "Company not found" },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },

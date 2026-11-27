@@ -1,6 +1,6 @@
 export const translations = {
   post: {
-    title: "Deactivate Account",
+    title: "Deactivate account",
     titleShort: "Deactivate",
     description:
       "Soft-deactivate an account. Cannot deactivate system accounts or accounts with posted journal entry lines.",
@@ -12,7 +12,7 @@ export const translations = {
     errors: {
       unauthorized: { title: "Unauthorized", description: "Login required" },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid account ID",
       },
       forbidden: {
@@ -20,30 +20,30 @@ export const translations = {
         description: "System accounts cannot be deactivated",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Could not deactivate account",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       conflict: {
-        title: "Has Transactions",
+        title: "Has transactions",
         description:
           "Cannot deactivate an account that has journal entry lines",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Could not reach the server",
       },
-      notFound: { title: "Not Found", description: "Account not found" },
+      notFound: { title: "Not found", description: "Account not found" },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Account Deactivated",
+      title: "Account deactivated",
       description: "The account is now inactive",
     },
     widget: {
@@ -57,7 +57,7 @@ export const translations = {
       cancelButton: "Cancel",
     },
   },
-  title: "Deactivate Account",
+  title: "Deactivate account",
   description: "Soft-deactivate an account",
   category: "Chart of Accounts",
   tag: "Account",

@@ -12,12 +12,12 @@ export const translations: typeof enTranslations = {
     created: "Facture créée",
   },
   post: {
-    title: "Facture",
-    titleShort: "Facture",
-    description: "Endpoint de facture",
+    title: "Créer une facture Stripe",
+    titleShort: "Facture Stripe",
+    description: "Créer une facture Stripe pour un client",
     form: {
-      title: "Configuration de la facture",
-      description: "Configurez les paramètres de la facture",
+      title: "Détails de la facture",
+      description: "Indiquez le montant, la devise et la date d'échéance",
     },
     response: {
       success: "Facture créée",

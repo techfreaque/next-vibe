@@ -7,22 +7,19 @@
 "use client";
 
 import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Pre } from "next-vibe/ui/components/pre";
-import { P } from "next-vibe/ui/components/typography";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
-  useWidgetNavigation,
   useWidgetPlatform,
   useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AdminForm } from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { IntFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/int-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
@@ -55,7 +52,6 @@ export function ReferralCodeBonusWidget({
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const result = useWidgetValue<typeof definition.POST>();
-  const { pop, canGoBack } = useWidgetNavigation();
   const children = field.children;
 
   if (responseOnly && (isCliPlatform(platform) || platform === Platform.MCP)) {
@@ -63,20 +59,20 @@ export function ReferralCodeBonusWidget({
   }
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-6 pb-6 flex flex-col gap-4">
-      {canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("post.widget.back")}
-        </Button>
-      )}
-      <P className="text-sm text-muted-foreground">{t("post.widget.hint")}</P>
+    <AdminForm
+      title={t("post.title")}
+      description={t("post.widget.hint")}
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "post.widget.submit" }}
+        />
+      }
+      result={
+        result ? (
+          <ResultBanner variant="success" title={summary(result, t)} />
+        ) : undefined
+      }
+    >
       <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2">
         <TextFieldWidget
           fieldName="code"
@@ -87,11 +83,6 @@ export function ReferralCodeBonusWidget({
           field={withValue(children.bonusCredits, undefined, null)}
         />
       </Div>
-      <FormAlertWidget field={{}} />
-      {result && <P className="text-sm font-medium">{summary(result, t)}</P>}
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "post.widget.submit" as const }}
-      />
-    </Div>
+    </AdminForm>
   );
 }
