@@ -482,16 +482,18 @@ export function AccountPanel({
   const groups = useDestinations(props);
   return (
     <Div className="flex min-h-0 flex-1 flex-col border-t border-border">
-      <Div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 py-1.5">
+      <Div className="shrink-0 border-b border-border px-2 py-2">
         <Button
           variant="ghost"
           size="unset"
           onClick={onClose}
-          className="mb-1 h-10 w-full justify-start gap-2 rounded-md border-b border-border px-2 text-sm font-semibold text-foreground"
+          className="h-10 w-full shrink-0 justify-start gap-2 rounded-lg border border-primary/20 bg-primary/10 px-3 text-sm font-semibold text-primary hover:bg-primary/15 hover:text-primary"
         >
           <ArrowLeft className="size-4" />
-          {t("chats")}
+          {t("backToChat")}
         </Button>
+      </Div>
+      <Div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3 pt-2">
         <Div className="flex items-center gap-2.5 px-1.5 py-1.5">
           <Avatar user={user} identity={identity} />
           <IdentityLines identity={identity} className="flex-1" />

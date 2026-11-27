@@ -81,8 +81,7 @@ export const translations: typeof enTranslations = {
       help: "Avis et support",
       about: "À propos",
       websiteBlog: "Articles",
-      newsletter:
-        "Newsletter : jusqu'à {{freeCreditsMax}} crédits gratuits par mois",
+      newsletter: "Newsletter : {{freeCreditsMax}} crédits gratuits par mois",
       admin: "Tableau de bord admin",
     },
     confirmations: {

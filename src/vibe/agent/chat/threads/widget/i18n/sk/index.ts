@@ -81,7 +81,7 @@ export const translations: typeof enTranslations = {
       help: "Spätná väzba a podpora",
       about: "O platforme",
       websiteBlog: "Príbehy",
-      newsletter: "Odber noviniek: mesačne až {{freeCreditsMax}} kred. zdarma",
+      newsletter: "Odber noviniek: {{freeCreditsMax}} kred. zdarma mesačne",
       admin: "Prehľad správcu",
     },
     confirmations: {

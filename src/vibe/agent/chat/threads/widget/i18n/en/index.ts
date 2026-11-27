@@ -79,7 +79,7 @@ export const translations = {
       help: "Feedback & Support",
       about: "About",
       websiteBlog: "Stories",
-      newsletter: "Newsletter: up to {{freeCreditsMax}} free credits/month",
+      newsletter: "Newsletter: {{freeCreditsMax}} free credits/month",
       admin: "Admin Dashboard",
     },
     confirmations: {

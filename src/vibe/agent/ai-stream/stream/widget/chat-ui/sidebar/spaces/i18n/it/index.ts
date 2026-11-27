@@ -20,5 +20,5 @@ export const translations: typeof enTranslations = {
   websiteBlog: "Sito e blog",
   admin: "Amministrazione",
   explore: "Esplora",
-  chats: "Chat",
+  backToChat: "Torna alla chat",
 };

@@ -18,5 +18,5 @@ export const translations = {
   websiteBlog: "Website & blog",
   admin: "Admin",
   explore: "Explore",
-  chats: "Chats",
+  backToChat: "Back to chat",
 };
