@@ -21,10 +21,6 @@ export const API_KEY_DISPLAY_LENGTH = 14;
  */
 export const API_KEY_DEFAULT_BURST_LIMIT_PER_MINUTE = 1_200;
 
-/** @deprecated The existing framework page still displays the default API burst ceiling. */
-export const API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE =
-  API_KEY_DEFAULT_BURST_LIMIT_PER_MINUTE;
-
 /**
  * Default per-key concurrency cap (simultaneous in-flight streams). Prevents
  * runaway clients from exhausting server sockets/memory. Configurable via
