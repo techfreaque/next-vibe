@@ -2380,6 +2380,7 @@ class ViteCompiler {
                 const address = srv.httpServer?.address();
                 const boundPort =
                   address && typeof address !== "string" ? address.port : port;
+                const boundUrls = srv.resolvedUrls;
                 try {
                   // Use closeRef.fn (which calls closeAllConnections first) so the
                   // TCP socket on port 3100 is released before we try to re-bind it.
@@ -2390,8 +2391,10 @@ class ViteCompiler {
                   } else {
                     await srv.close();
                   }
-                } catch {
-                  /* ignore close errors */
+                } catch (error) {
+                  viteLogger.error(
+                    `TanStack dev server failed to close before restart: ${parseError(error).message}`,
+                  );
                 }
                 // The fresh server must see the edited .env, not the boot values.
                 const changedKeys = applyEnvFileChanges();
@@ -2406,13 +2409,18 @@ class ViteCompiler {
                   closeRef,
                   true,
                 );
-                if (result.success) {
-                  result.reportReady();
-                } else {
-                  process.stderr.write(
-                    `\n❌ TanStack restart failed: ${result.message ?? "unknown error"}\n`,
+                if (!result.success) {
+                  return Promise.reject(
+                    new Error(
+                      `TanStack dev server failed to restart: ${result.message}`,
+                    ),
                   );
                 }
+                // Vite checks for URL changes on the original server after this
+                // callback. The replacement uses the same port and reports
+                // readiness itself. Closing the original cleared its URLs.
+                srv.resolvedUrls = boundUrls;
+                result.reportReady();
               };
             },
           } as Plugin,

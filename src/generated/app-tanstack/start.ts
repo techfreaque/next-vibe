@@ -172,6 +172,7 @@ interface BunRuntimeRequest {
 }
 
 const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
+  const requestStart = Date.now();
   try {
     (request as Request & BunRuntimeRequest).runtime?.bun?.server?.timeout(
       request,
@@ -195,7 +196,6 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
     _widgetPreloadDone = true;
     await preloadAllLazyWidgets();
   }
-  const requestStart = Date.now();
   const url = new URL(request.url);
   const rawPath = `${url.pathname}${url.search ? url.search : ""}`;
   // Use a human-readable label for /_serverFn/ requests; otherwise the full path
