@@ -1493,6 +1493,20 @@
       "when": 1795735295120,
       "tag": "20261126232135_loose_ezekiel_stane",
       "breakpoints": true
+    },
+    {
+      "idx": 213,
+      "version": "7",
+      "when": 1795736700000,
+      "tag": "20261126234500_leads_is_bot",
+      "breakpoints": true
+    },
+    {
+      "idx": 214,
+      "version": "7",
+      "when": 1795736885818,
+      "tag": "20261126234805_tool_navigation_preferences",
+      "breakpoints": true
     }
   ]
 }
