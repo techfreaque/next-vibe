@@ -24,6 +24,7 @@ export function fail({
   cause,
   expected,
   publicRoleDenial,
+  allowance,
 }: {
   message: TranslatedKeyType;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
@@ -38,6 +39,8 @@ export function fail({
   expected?: boolean;
   /** The server resolved a guest for an endpoint that requires a user. */
   publicRoleDenial?: true;
+  /** A daily allowance refused the request (see AllowanceRefusal). */
+  allowance?: AllowanceRefusal;
 }): ErrorResponseType {
   return {
     success: false,
@@ -46,6 +49,7 @@ export function fail({
     cause,
     ...(expected ? { expected: true } : {}),
     ...(publicRoleDenial ? { publicRoleDenial } : {}),
+    ...(allowance ? { allowance } : {}),
   };
 }
 
@@ -345,7 +349,30 @@ export type ErrorResponseType<
   expected?: boolean;
   /** Lets a client still showing a signed-in user refresh its identity. */
   publicRoleDenial?: true;
+  /** A daily allowance refused the request: what is left and when it resets. */
+  allowance?: AllowanceRefusal;
 };
+
+/**
+ * Machine-readable side of a daily-allowance refusal (402), so a client can
+ * explain it (reset time in the viewer's zone, what still fits) instead of
+ * showing a generic "not enough credits".
+ * - `pool`: the allowance shared by every free caller is used up.
+ * - `caller`: this caller's own daily share (device / network) is used up.
+ * - `inFlight`: the caller's credits are held by a request still running.
+ */
+export const allowanceRefusalSchema = z.object({
+  scope: z.enum(["pool", "caller", "inFlight"]),
+  /** Credits still spendable under the allowance today (0 when none). */
+  remaining: z.number(),
+  /** ISO time the allowance resets. */
+  resetsAt: z.string(),
+});
+/**
+ * Inferred (not an interface) so it keeps an implicit index signature:
+ * ErrorResponseType must stay assignable to WidgetData.
+ */
+export type AllowanceRefusal = z.infer<typeof allowanceRefusalSchema>;
 
 export interface SuccessResponseType<TResponseData> {
   success: true;

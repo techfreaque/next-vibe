@@ -719,6 +719,24 @@ export const translations: typeof enTranslations = {
   },
   outOfCredits: {
     dismiss: "Zamknij",
+    dailyLimit: {
+      title: "Dzisiejszy darmowy limit wykorzystany",
+      whyCaller: "Darmowe kredyty mają dzienny limit na urządzenie i sieć.",
+      whyPool:
+        "Wszyscy odwiedzający dzielą jeden dzienny limit darmowych kredytów, a dzisiejszy już się skończył.",
+      kept: "Twoje darmowe kredyty ({{balance}}) zostają na koncie i znów działają od {{time}} ({{relative}}).",
+      keptNoBalance:
+        "Twoje darmowe kredyty zostają na koncie i znów działają od {{time}} ({{relative}}).",
+      lighterFits: "Dzisiejszy limit wystarczy jeszcze na {{model}}.",
+      pickLighter: "Wybierz lżejszy model",
+      guestPlan:
+        "Nie chcesz czekać? Plan wymaga darmowego konta. Płatne kredyty działają od razu.",
+    },
+    inFlight: {
+      title: "Odpowiedź wciąż się generuje",
+      description:
+        "Twoje darmowe kredyty ją pokrywają. Poczekaj, aż skończy, i wyślij ponownie.",
+    },
     guest: {
       title: "Darmowe kredyty się skończyły",
       description:

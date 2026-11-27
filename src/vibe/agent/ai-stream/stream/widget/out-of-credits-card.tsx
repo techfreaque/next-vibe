@@ -2,11 +2,14 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { scopedTranslation as frameworkMessages } from "next-vibe/core/i18n/shared";
+import type { AllowanceRefusal } from "next-vibe/core/route/response.schema";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Gift } from "next-vibe/ui/components/icons/Gift";
+import { Layers } from "next-vibe/ui/components/icons/Layers";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
@@ -37,9 +40,9 @@ import { isLivePlan } from "@/subscription/plan-offers";
 import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
 import { useModelSelectorState } from "../../../chat/model-selector-state";
-import { scopedTranslation as consentMessages } from "../../../models/uncensored-consent/i18n";
-import { useAIStreamStore } from "../hooks/store";
+import { useProviderAvailability } from "../../../env-availability-store";
 import { scopedTranslation } from "../i18n";
+import { describeReset, findLighterModel } from "./daily-limit";
 
 interface OutOfCreditsCardProps {
   locale: CountryLanguage;
@@ -53,6 +56,15 @@ interface OutOfCreditsCardProps {
    * "card": standalone bordered card (message list).
    */
   variant?: "composer" | "card";
+  /**
+   * A daily allowance (not the wallet) refused the send: its own card, never
+   * stacked on "not enough credits" (the wallet may hold plenty).
+   */
+  allowance?: AllowanceRefusal;
+  /** Spendable credits the composer knows (daily limit card names them). */
+  balance?: number;
+  /** Selected model: the daily limit card suggests a lighter one. */
+  currentModelId?: string;
   className?: string;
 }
 
@@ -81,13 +93,12 @@ export function OutOfCreditsCard({
   reason,
   onDismiss,
   variant = "card",
+  allowance,
+  balance,
+  currentModelId,
   className,
 }: OutOfCreditsCardProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-
-  const refusalMessage = useAIStreamStore((state) =>
-    variant === "composer" ? state.creditRefusalMessage : undefined,
-  );
 
   return (
     <Div
@@ -114,25 +125,6 @@ export function OutOfCreditsCard({
         </Button>
       )}
       <Div className={cn(onDismiss && "pr-8")}>
-        {refusalMessage && !reason && (
-          <P aria-live="polite" className="mb-2 text-sm font-medium">
-            {refusalMessage}
-          </P>
-        )}
-        {variant === "composer" && onDismiss && !reason && (
-          <Button
-            type="button"
-            variant="link"
-            size="unset"
-            className="mb-2 h-auto p-0 text-sm"
-            onClick={(): void => {
-              onDismiss();
-              useModelSelectorState.getState().setModelSelectorOpen(true);
-            }}
-          >
-            {consentMessages.scopedT(locale).t("dialog.pickAnother")}
-          </Button>
-        )}
         {reason ? (
           <Div className="flex flex-col items-start gap-2">
             <P>{frameworkMessages.scopedT(locale).t(reason)}</P>
@@ -143,6 +135,21 @@ export function OutOfCreditsCard({
               {creditMessages.scopedT(locale).t("purchase.post.title")}
             </Link>
           </Div>
+        ) : allowance?.scope === "inFlight" ? (
+          <CardHead
+            icon={<Loader2 className="h-4 w-4 animate-spin" />}
+            title={t("outOfCredits.inFlight.title")}
+            description={t("outOfCredits.inFlight.description")}
+          />
+        ) : allowance ? (
+          <DailyLimitBody
+            locale={locale}
+            isGuest={isGuest}
+            allowance={allowance}
+            balance={balance}
+            currentModelId={currentModelId}
+            onDismiss={onDismiss}
+          />
         ) : isGuest ? (
           <GuestBody locale={locale} />
         ) : (
@@ -176,6 +183,126 @@ function CardHead({
           {description}
         </P>
       </Div>
+    </Div>
+  );
+}
+
+/**
+ * The daily free limit (per device and network, or the shared pool) refused
+ * the send while the wallet may still hold credits. Says why, that the
+ * credits are kept, when they work again (viewer's clock), then the ways
+ * forward: a lighter model only when one fits what is left today, else a
+ * plan (members) or an account (guests: plans need one).
+ */
+function DailyLimitBody({
+  locale,
+  isGuest,
+  allowance,
+  balance,
+  currentModelId,
+  onDismiss,
+}: {
+  locale: CountryLanguage;
+  isGuest: boolean;
+  allowance: AllowanceRefusal;
+  balance: number | undefined;
+  currentModelId: string | undefined;
+  onDismiss: (() => void) | undefined;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const user = useWidgetUser();
+  const availability = useProviderAvailability();
+  const pathname = usePathname();
+  const reset = describeReset(allowance.resetsAt, locale);
+  const lighter = findLighterModel({
+    remaining: allowance.remaining,
+    currentModelId,
+    user,
+    availability,
+  });
+  const why =
+    allowance.scope === "pool"
+      ? t("outOfCredits.dailyLimit.whyPool")
+      : t("outOfCredits.dailyLimit.whyCaller");
+  const kept =
+    balance !== undefined && balance >= MIN_SHORT_OF_CREDITS_BALANCE
+      ? t("outOfCredits.dailyLimit.kept", {
+          balance: formatCreditAmount(balance, locale),
+          time: reset.time,
+          relative: reset.relative,
+        })
+      : t("outOfCredits.dailyLimit.keptNoBalance", {
+          time: reset.time,
+          relative: reset.relative,
+        });
+  const callback = `callbackUrl=${encodeURIComponent(pathname)}`;
+
+  return (
+    <Div data-testid="daily-limit-card" className="flex flex-col">
+      <CardHead
+        icon={<Clock className="h-4 w-4" />}
+        title={t("outOfCredits.dailyLimit.title")}
+        description={`${why} ${kept}`}
+      />
+      {lighter && (
+        <Div
+          data-testid="daily-limit-lighter"
+          className="mt-3 flex flex-col gap-2 @md/ooc:flex-row @md/ooc:items-center @md/ooc:justify-between @md/ooc:gap-4 @md/ooc:pl-11"
+        >
+          <P className="m-0 text-xs leading-snug text-muted-foreground">
+            {t("outOfCredits.dailyLimit.lighterFits", {
+              model: lighter.model.name,
+            })}
+          </P>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="w-full flex-shrink-0 @md/ooc:w-auto"
+            onClick={(): void => {
+              onDismiss?.();
+              useModelSelectorState.getState().setModelSelectorOpen(true);
+            }}
+          >
+            <Layers className="mr-1.5 h-4 w-4" />
+            {t("outOfCredits.dailyLimit.pickLighter")}
+          </Button>
+        </Div>
+      )}
+      {isGuest ? (
+        <Div className="mt-3 flex flex-col gap-2 border-t border-dashed border-border/70 pt-3 @md/ooc:flex-row @md/ooc:items-center @md/ooc:justify-between @md/ooc:gap-4 @md/ooc:pl-11">
+          <P className="m-0 text-xs leading-snug text-muted-foreground">
+            {t("outOfCredits.dailyLimit.guestPlan")}
+          </P>
+          <Div className="flex flex-shrink-0 flex-col gap-2 @md/ooc:flex-row @md/ooc:items-center @md/ooc:gap-4">
+            <Button asChild size="sm" className="w-full @md/ooc:w-auto">
+              <Link
+                data-testid="daily-limit-signup"
+                href={`/${locale}/user/signup?${callback}`}
+              >
+                <Gift className="mr-1.5 h-4 w-4" />
+                {t("outOfCredits.guest.signUp")}
+              </Link>
+            </Button>
+            <P className="m-0 whitespace-nowrap text-center text-xs text-muted-foreground">
+              {t("outOfCredits.guest.haveAccount")}{" "}
+              <Link
+                href={`/${locale}/user/login?${callback}`}
+                className="font-medium text-primary underline-offset-2 hover:underline"
+              >
+                {t("outOfCredits.guest.logIn")}
+              </Link>
+            </P>
+          </Div>
+        </Div>
+      ) : (
+        <Div className="mt-3 flex flex-col gap-2 border-t border-dashed border-border/70 pt-3 @md/ooc:pl-11">
+          <P className="m-0 text-xs font-medium text-muted-foreground">
+            {t("outOfCredits.member.orTopUp")}
+          </P>
+          <CreditOffers locale={locale} />
+        </Div>
+      )}
     </Div>
   );
 }

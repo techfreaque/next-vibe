@@ -165,6 +165,8 @@ export class CreditValidatorHandler {
       return fail({
         message: capGate.message,
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        // Scope, what is left and the reset: the composer explains the limit.
+        allowance: capGate.allowance,
       });
     }
 

@@ -338,6 +338,7 @@ export function useAIStream(): UseAIStreamReturn {
             .setCreditRefusal(
               creditPolicyReason(errorType.errorKey) ?? true,
               result.message,
+              result.allowance,
             );
           return false;
         }

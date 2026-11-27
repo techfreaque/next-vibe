@@ -108,6 +108,12 @@ export class PublicCapRepository {
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
   }
 
+  /** When the daily counters reset (the lazy reset in gate runs after this). */
+  static nextReset(): Date {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+  }
+
   private static async recordEvent(
     event: {
       kind: PublicCapEventKind;
@@ -496,7 +502,12 @@ export class PublicCapRepository {
         }
         const [row] = await tx.select().from(publicFreeTierDailyCap).limit(1);
         if (!row) {
-          return { ok: false as const, refusal: "capUnavailable" as const };
+          return {
+            ok: false as const,
+            refusal: "capUnavailable" as const,
+            scope: undefined,
+            left: 0,
+          };
         }
 
         const spenders = await tx
@@ -572,28 +583,46 @@ export class PublicCapRepository {
           },
         };
 
+        const leadUsed = leadSpend + reserved.lead;
+        const ipUsed = ipSpend + reserved.ip;
+        const poolLeft = row.capAmount - spendToday;
+        // What this caller could still spend today under every ceiling.
+        const callerLeft = Math.max(
+          0,
+          Math.min(
+            poolLeft,
+            leadId ? row.perLeadCap - leadUsed : poolLeft,
+            ipHash ? row.perIpCap - ipUsed : poolLeft,
+          ),
+        );
+
         if (spendToday >= row.capAmount) {
           return {
             ok: false as const,
             refusal: "capExceeded" as const,
+            scope: "pool" as const,
+            left: 0,
             event: { kind: "global-cap" as const, ...base },
           };
         }
         // Single-request clamp: one generation must not blow the remaining pool.
-        if (expectedCost > row.capAmount - spendToday) {
+        if (expectedCost > poolLeft) {
           return {
             ok: false as const,
             refusal: "capExceeded" as const,
+            scope: "pool" as const,
+            left: callerLeft,
             event: { kind: "single-request" as const, ...base },
           };
         }
-        const leadUsed = leadSpend + reserved.lead;
         if (leadId && leadUsed + expectedCost > row.perLeadCap) {
           // spendToday/capAmount are the shared pool; name the lead's own
           // spend and sub-cap, or the refusal looks like a bug.
           return {
             ok: false as const,
             refusal: "leadCapExceeded" as const,
+            scope: "caller" as const,
+            left: callerLeft,
             event: {
               kind: "lead-cap" as const,
               ...base,
@@ -602,11 +631,12 @@ export class PublicCapRepository {
             },
           };
         }
-        const ipUsed = ipSpend + reserved.ip;
         if (ipHash && ipUsed + expectedCost > row.perIpCap) {
           return {
             ok: false as const,
             refusal: "leadCapExceeded" as const,
+            scope: "caller" as const,
+            left: callerLeft,
             event: {
               kind: "ip-cap" as const,
               ...base,
@@ -623,6 +653,8 @@ export class PublicCapRepository {
           return {
             ok: false as const,
             refusal: "reservedByRunningReply" as const,
+            scope: "inFlight" as const,
+            left: Math.max(0, Math.min(callerLeft, walletLeft)),
             event: {
               kind: "pool-reserved" as const,
               ...base,
@@ -665,6 +697,13 @@ export class PublicCapRepository {
         return fail({
           message: t(`repository.${outcome.refusal}`),
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+          allowance: outcome.scope
+            ? {
+                scope: outcome.scope,
+                remaining: roundCredits(outcome.left),
+                resetsAt: PublicCapRepository.nextReset().toISOString(),
+              }
+            : undefined,
         });
       }
       return success({

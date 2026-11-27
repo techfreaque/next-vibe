@@ -746,6 +746,25 @@ export const translations: typeof enTranslations = {
   },
   outOfCredits: {
     dismiss: "Chiudi",
+    dailyLimit: {
+      title: "Limite gratuito di oggi raggiunto",
+      whyCaller:
+        "I crediti gratuiti hanno un limite giornaliero per dispositivo e rete.",
+      whyPool:
+        "Tutti i visitatori condividono un limite giornaliero di crediti gratuiti, e quello di oggi è esaurito.",
+      kept: "I tuoi {{balance}} crediti gratuiti restano tuoi e tornano attivi alle {{time}} ({{relative}}).",
+      keptNoBalance:
+        "I tuoi crediti gratuiti restano tuoi e tornano attivi alle {{time}} ({{relative}}).",
+      lighterFits: "Il limite di oggi basta ancora per {{model}}.",
+      pickLighter: "Scegli un modello più leggero",
+      guestPlan:
+        "Non vuoi aspettare? Per un piano serve un account gratuito. I crediti a pagamento funzionano subito.",
+    },
+    inFlight: {
+      title: "Una risposta è ancora in corso",
+      description:
+        "I tuoi crediti gratuiti la stanno coprendo. Lasciala finire, poi invia di nuovo.",
+    },
     guest: {
       title: "Crediti gratuiti esauriti",
       description:

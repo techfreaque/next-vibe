@@ -12,7 +12,7 @@ import { z } from "zod";
 
 import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 import type { VibeTranslationKey } from "../i18n/shared";
-import { ErrorResponseTypes } from "./response.schema";
+import { allowanceRefusalSchema, ErrorResponseTypes } from "./response.schema";
 
 const errorKeys: ReadonlySet<string> = new Set(
   Object.values(ErrorResponseTypes).map(({ errorKey }) => errorKey),
@@ -22,6 +22,7 @@ export const errorResponseSchema = z.object({
   success: z.literal(false),
   message: z.string() as z.ZodType<TranslatedKeyType>,
   publicRoleDenial: z.literal(true).optional(),
+  allowance: allowanceRefusalSchema.optional(),
   errorType: z.object({
     errorKey: z.custom<VibeTranslationKey>(
       (value) => typeof value === "string" && errorKeys.has(value),

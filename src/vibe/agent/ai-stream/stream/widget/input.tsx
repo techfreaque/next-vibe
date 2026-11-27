@@ -555,6 +555,9 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     activeThreadId ? s.isAborting(activeThreadId) : false,
   );
   const creditRefusal = useAIStreamStore((s) => s.creditRefusal);
+  const creditRefusalAllowance = useAIStreamStore(
+    (s) => s.creditRefusalAllowance,
+  );
   const setCreditRefusal = useAIStreamStore((s) => s.setCreditRefusal);
   // Submitting state - send clicked but stream hasn't confirmed start yet
   const isSubmitting = useChatInputStore((s) => s.isSubmitting);
@@ -718,6 +721,9 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           isGuest={user.isPublic}
           reason={typeof creditRefusal === "string" ? creditRefusal : undefined}
           variant="composer"
+          allowance={creditRefusal ? creditRefusalAllowance : undefined}
+          balance={messageOps.creditsTotal}
+          currentModelId={selectedModel ?? undefined}
           onDismiss={
             outOfCredits ? undefined : (): void => setCreditRefusal(false)
           }

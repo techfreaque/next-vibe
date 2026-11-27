@@ -726,6 +726,24 @@ export const translations = {
   },
   outOfCredits: {
     dismiss: "Dismiss",
+    dailyLimit: {
+      title: "Free limit for today reached",
+      whyCaller: "Free credits have a daily limit per device and network.",
+      whyPool:
+        "Free credits share one daily limit across all visitors, and today's is used up.",
+      kept: "Your {{balance}} free credits stay yours and work again at {{time}} ({{relative}}).",
+      keptNoBalance:
+        "Your free credits stay yours and work again at {{time}} ({{relative}}).",
+      lighterFits: "Today's limit still has room for {{model}}.",
+      pickLighter: "Pick a lighter model",
+      guestPlan:
+        "Can't wait? Plans need a free account. Paid credits work right away.",
+    },
+    inFlight: {
+      title: "A reply is still running",
+      description:
+        "Your free credits are covering it. Let it finish, then send again.",
+    },
     guest: {
       title: "Out of free credits",
       description:

@@ -355,7 +355,14 @@ export function CreditOffers({
         </Div>
       )}
       <Div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        <Span>{t("quickCheckout.secure")}</Span>
+        {/* Name only the methods the live card checkout offers. */}
+        {cardProvider === PaymentProvider.STRIPE ? (
+          <Span>{t("quickCheckout.secure")}</Span>
+        ) : cardProvider === PaymentProvider.WHOP ? (
+          <Span>{t("quickCheckout.secureCard")}</Span>
+        ) : (
+          <Span />
+        )}
         <Link
           href={`/${locale}/subscription/buy`}
           className="inline-flex items-center gap-1 font-medium text-primary underline-offset-2 hover:underline"

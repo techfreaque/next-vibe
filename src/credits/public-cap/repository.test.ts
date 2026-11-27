@@ -152,6 +152,36 @@ describe("PublicCapRepository", () => {
     expect(fine.success).toBe(true);
   });
 
+  it("tells the client why, what is left today and when it resets", async () => {
+    await setRow({ spendToday: 0, capAmount: 1000, perLeadCap: 10 });
+    const id = lead("allowance");
+    await PublicCapRepository.incrementSpend(8, logger, { leadId: id });
+    const caller = await PublicCapRepository.gate(
+      { leadId: id, ipAddress: undefined, expectedCost: 3, model: "m" },
+      logger,
+      defaultLocale,
+    );
+    assert(!caller.success);
+    expect(caller.allowance?.scope).toBe("caller");
+    expect(caller.allowance?.remaining).toBeCloseTo(2, 5);
+    expect(
+      new Date(caller.allowance?.resetsAt ?? 0).getTime(),
+    ).toBeGreaterThan(Date.now());
+
+    await setRow({ spendToday: 1000, capAmount: 1000 });
+    const pooled = await PublicCapRepository.gate(
+      { leadId: lead("pool"), ipAddress: undefined, expectedCost: 1, model: "m" },
+      logger,
+      defaultLocale,
+    );
+    assert(!pooled.success);
+    expect(pooled.allowance).toEqual({
+      scope: "pool",
+      remaining: 0,
+      resetsAt: expect.any(String),
+    });
+  });
+
   it("names a signed-in actor and the pool math on a refusal", async () => {
     await setRow({ spendToday: 0, capAmount: 1000, perLeadCap: 10 });
     const id = lead("signed-in");

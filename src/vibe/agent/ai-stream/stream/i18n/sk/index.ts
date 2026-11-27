@@ -731,6 +731,24 @@ export const translations: typeof enTranslations = {
   },
   outOfCredits: {
     dismiss: "Zavrieť",
+    dailyLimit: {
+      title: "Dnešný bezplatný limit je vyčerpaný",
+      whyCaller: "Bezplatné kredity majú denný limit na zariadenie a sieť.",
+      whyPool:
+        "Všetci návštevníci zdieľajú jeden denný limit bezplatných kreditov a ten dnešný sa minul.",
+      kept: "Tvoje bezplatné kredity ({{balance}}) ti zostávajú a znova fungujú od {{time}} ({{relative}}).",
+      keptNoBalance:
+        "Tvoje bezplatné kredity ti zostávajú a znova fungujú od {{time}} ({{relative}}).",
+      lighterFits: "Dnešný limit ešte stačí na {{model}}.",
+      pickLighter: "Vybrať ľahší model",
+      guestPlan:
+        "Nechceš čakať? Na plán potrebuješ bezplatný účet. Platené kredity fungujú hneď.",
+    },
+    inFlight: {
+      title: "Odpoveď ešte beží",
+      description:
+        "Tvoje bezplatné kredity ju práve pokrývajú. Nechaj ju dobehnúť a pošli znova.",
+    },
     guest: {
       title: "Minuli sa ti bezplatné kredity",
       description:

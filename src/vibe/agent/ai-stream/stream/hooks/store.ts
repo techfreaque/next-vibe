@@ -10,6 +10,7 @@
  * No framework equivalent exists for this transient client-side state.
  */
 
+import type { AllowanceRefusal } from "next-vibe/core/route/response.schema";
 import { create } from "zustand";
 
 import type { CreditPolicyReason } from "@/credits/anti-farming/reason";
@@ -42,6 +43,8 @@ interface AIStreamState {
    */
   creditRefusal: boolean | CreditPolicyReason;
   creditRefusalMessage?: string;
+  /** Set when a daily allowance (not the wallet) refused the send. */
+  creditRefusalAllowance?: AllowanceRefusal;
   /**
    * Request id of the LATEST send when the server refused it for credits
    * (402), else null. Set per send by startStream, so the callers that roll
@@ -53,6 +56,7 @@ interface AIStreamState {
   setCreditRefusal: (
     value: boolean | CreditPolicyReason,
     message?: string,
+    allowance?: AllowanceRefusal,
   ) => void;
 
   isAborting: (threadId: string) => boolean;
@@ -79,10 +83,11 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   setLastSendCreditRefusalRequestId: (requestId): void =>
     set({ lastSendCreditRefusalRequestId: requestId }),
 
-  setCreditRefusal: (value, message): void =>
+  setCreditRefusal: (value, message, allowance): void =>
     set({
       creditRefusal: value,
       creditRefusalMessage: value ? message : undefined,
+      creditRefusalAllowance: value ? allowance : undefined,
     }),
 
   isAborting: (threadId: string): boolean =>
@@ -148,6 +153,7 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
       incognitoStreams: new Set<string>(),
       creditRefusal: false,
       creditRefusalMessage: undefined,
+      creditRefusalAllowance: undefined,
       lastSendCreditRefusalRequestId: null,
     }),
 }));
