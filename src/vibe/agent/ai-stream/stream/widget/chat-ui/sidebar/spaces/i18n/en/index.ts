@@ -1,0 +1,22 @@
+export const translations = {
+  locations: "Chat spaces",
+  credits: "Credits",
+  pending: "Loading",
+  depleted: "Used up",
+  low: "Running low",
+  part: "Some left",
+  ample: "Plenty left",
+  topUp: "Top up credits",
+  account: "Account",
+  guest: "Guest",
+  notSignedIn: "Not signed in",
+  topUpNow: "Top up now",
+  lockedHintShort: "Unlock free",
+  lockedHint: "Locked spaces: unlock with a free account.",
+  guestPitch:
+    "Sign up to sync your chats and unlock Private, Shared and Background.",
+  websiteBlog: "Website & blog",
+  admin: "Admin",
+  explore: "Explore",
+  chats: "Chats",
+};

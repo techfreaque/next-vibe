@@ -4,31 +4,26 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
-import { Palette } from "next-vibe/ui/components/icons/Palette";
-import { Link } from "next-vibe/ui/components/link";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
 import { ResizableContainer } from "next-vibe/ui/components/resizable";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX, ReactNode } from "react";
 import { useMemo } from "react";
-
-import { scopedTranslation as studioTranslation } from "@/_pages/create/i18n";
 
 import foldersDefinition from "../../../../../chat/folders/[rootFolderId]/definition";
 import { useChatBootContext } from "../../../../../chat/hooks/context";
 import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
-import { SidebarFooter } from "./footer/sidebar-footer";
+import { SidebarContent } from "./spaces/sidebar-content";
 import {
   useSidebarCollapsed,
   useSidebarInitialized,
 } from "./use-sidebar-collapsed";
 
-const SIDEBAR_WIDTH = "w-65";
-const SIDEBAR_MIN_WIDTH_PX = 245;
+const SIDEBAR_MIN_WIDTH_PX = 320;
 const SIDEBAR_MAX_WIDTH_VW = 90;
+const MOBILE_SIDEBAR_SLIDE_PX = 360;
 
 interface SidebarWrapperProps {
   locale: CountryLanguage;
@@ -76,7 +71,7 @@ function WidgetSidebar({
   );
 
   return (
-    <Div className="flex flex-col h-full bg-background overflow-hidden">
+    <SidebarContent locale={locale} user={user} logger={logger}>
       <EndpointsPage
         logger={logger}
         key={currentRootFolderId}
@@ -88,15 +83,7 @@ function WidgetSidebar({
         className="flex-1 h-full overflow-hidden"
         endpointOptions={foldersEndpointOptions}
       />
-      <Link
-        href={`/${locale}/create`}
-        className="mx-2 my-1 flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-medium hover:bg-accent"
-      >
-        <Palette className="h-4 w-4" />
-        {studioTranslation.scopedT(locale).t("navName")}
-      </Link>
-      <SidebarFooter locale={locale} user={user} logger={logger} />
-    </Div>
+    </SidebarContent>
   );
 }
 
@@ -122,14 +109,11 @@ export function SidebarWrapper({
           {sidebarReady && !collapsed && (
             <MotionDiv
               key="mobile-sidebar"
-              initial={{ x: -260 }}
+              initial={{ x: -MOBILE_SIDEBAR_SLIDE_PX }}
               animate={{ x: 0 }}
-              exit={{ x: -260 }}
+              exit={{ x: -MOBILE_SIDEBAR_SLIDE_PX }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={cn(
-                "fixed inset-y-0 left-0 z-[210] bg-background border-r border-border",
-                SIDEBAR_WIDTH,
-              )}
+              className="fixed inset-y-0 left-0 z-[210] w-[min(calc(100vw-2.5rem),360px)] border-r border-border bg-background"
             >
               <Div className="h-full w-full bg-background">
                 <WidgetSidebar
@@ -167,10 +151,10 @@ export function SidebarWrapper({
   return (
     <Div className="flex flex-row flex-1 min-h-0 w-full">
       <ResizableContainer
-        defaultWidth={260}
+        defaultWidth={344}
         minWidth={SIDEBAR_MIN_WIDTH_PX}
         maxWidth={`${SIDEBAR_MAX_WIDTH_VW}vw`}
-        storageId="chat-sidebar"
+        storageId="chat-spaces-v4-D"
         className="bg-background z-10"
         collapsed={collapsed}
       >
