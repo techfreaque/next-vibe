@@ -65,6 +65,12 @@ export const translations = {
     suggestion: "Did you mean {{email}}?",
     expired: "This signup has expired. Start again to get a new code.",
     retry: "Start signup again",
+    subject: "{{code}} is your {{appName}} code",
+    wrongCode: "Wrong code. Use the code from the newest email and try again.",
+    staleLink:
+      "This link is from an older email. Open the newest one, or enter its code.",
+    alreadyConfirmed: "This email is already confirmed. Log in to continue.",
+    login: "Log in",
   },
   category: "Users",
 

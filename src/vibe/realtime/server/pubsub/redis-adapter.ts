@@ -23,6 +23,8 @@
  * The `ioredis` package must be installed: `bun add ioredis`
  */
 
+import { createHash } from "node:crypto";
+
 import type { Redis, RedisOptions } from "ioredis";
 import { z } from "zod";
 
@@ -114,6 +116,97 @@ if since < evicted then return {cursorStr, 0, {}} end
 return {cursorStr, 1, redis.call('ZRANGEBYSCORE', KEYS[2], '(' .. ARGV[1], '+inf')}
 `;
 
+/** A replay Lua script plus its SHA1, the key Redis caches it under. */
+export interface ReplayScript {
+  readonly source: string;
+  readonly sha: string;
+}
+
+function replayScript(source: string): ReplayScript {
+  return { source, sha: createHash("sha1").update(source).digest("hex") };
+}
+
+const PUBLISH = replayScript(PUBLISH_SCRIPT);
+const PREPARE = replayScript(PREPARE_SCRIPT);
+
+/**
+ * The two scripting calls the adapter needs (ioredis `Redis` satisfies it);
+ * `TReply` is the client's raw reply type, validated by the caller.
+ */
+export interface ScriptClient<TReply> {
+  evalsha(
+    ...args: [sha1: string, numkeys: number, ...args: (string | number)[]]
+  ): Promise<TReply>;
+  eval(
+    ...args: [script: string, numkeys: number, ...args: (string | number)[]]
+  ): Promise<TReply>;
+}
+
+/** Outcome of one script run; `error` = Redis unreachable or script failed. */
+export type ScriptRunResult<TReply> =
+  | { ok: true; reply: TReply }
+  | { ok: false; error: string };
+
+function scriptError(error: Error | string): string {
+  return error instanceof Error ? error.message : error;
+}
+
+/**
+ * Run a replay script by SHA (EVALSHA), loading it with EVAL only when Redis
+ * does not have it cached (first call, Redis restart, SCRIPT FLUSH).
+ * Plain EVAL shipped the ~2 KB publish script with every event; a token
+ * stream publishes dozens per second, and a burst of them through one
+ * /ws/broadcast spent its time copying script text into the socket buffer
+ * (prod 2026-11-27 09:34: 203 ms event-loop stall, publishSync x32 and
+ * ioredis writeBuffered x22).
+ */
+export async function runReplayScript<TReply>(
+  client: ScriptClient<TReply>,
+  script: ReplayScript,
+  numKeys: number,
+  args: (string | number)[],
+): Promise<ScriptRunResult<TReply>> {
+  try {
+    return {
+      ok: true,
+      reply: await client.evalsha(script.sha, numKeys, ...args),
+    };
+  } catch (shaError) {
+    const message = scriptError(
+      shaError instanceof Error ? shaError : String(shaError),
+    );
+    if (!message.startsWith("NOSCRIPT")) {
+      return { ok: false, error: message };
+    }
+  }
+  try {
+    return {
+      ok: true,
+      reply: await client.eval(script.source, numKeys, ...args),
+    };
+  } catch (evalError) {
+    return {
+      ok: false,
+      error: scriptError(
+        evalError instanceof Error ? evalError : String(evalError),
+      ),
+    };
+  }
+}
+
+/**
+ * Publisher connection options. Auto-pipelining sends every command issued
+ * in the same tick as ONE socket write (order kept), so a burst of publishes
+ * costs one write instead of one per event.
+ */
+export const PUBLISHER_OPTIONS: RedisOptions = {
+  connectTimeout: 10_000,
+  keepAlive: 10_000,
+  enableAutoPipelining: true,
+  // A publish waits for at most one reconnect, then fails (caught).
+  maxRetriesPerRequest: 1,
+};
+
 const prepareReplySchema = z.tuple([
   z.string(),
   z.number(),
@@ -135,6 +228,15 @@ function parseRedisWireMessage(raw: string): RedisWireMessage | null {
   } catch {
     return null;
   }
+}
+
+/** Replay entries parsed per event-loop turn in prepareReplay. */
+export const REPLAY_PARSE_CHUNK = 200;
+
+function yieldToEventLoop(): Promise<void> {
+  return new Promise((resolve) => {
+    setImmediate(resolve);
+  });
 }
 
 /** Reconnect backoff: 200 ms doubling, capped at 5 s, never gives up. */
@@ -208,8 +310,7 @@ export class RedisPubSubAdapter implements PubSubAdapter {
 
       const publisher = new RedisClient(this.redisUrl, {
         ...BASE_OPTIONS,
-        // A publish waits for at most one reconnect, then fails (caught).
-        maxRetriesPerRequest: 1,
+        ...PUBLISHER_OPTIONS,
       });
       const subscriber = new RedisClient(this.redisUrl, {
         ...BASE_OPTIONS,
@@ -277,20 +378,16 @@ export class RedisPubSubAdapter implements PubSubAdapter {
     // seq it assigns, so the stored and the published message are one string.
     const body = JSON.stringify({ event, data }).slice(1);
     // Rejected only while Redis is unreachable; the watch() line reports it.
-    this.publisher
-      .eval(
-        PUBLISH_SCRIPT,
-        3,
-        SEQ_KEY,
-        eventsKey(channel),
-        stateKey(channel),
-        channel,
-        body,
-        this.replayLimits.windowMs,
-        this.replayLimits.maxEvents,
-        this.replayLimits.stateTtlMs,
-      )
-      .catch(() => undefined);
+    runReplayScript(this.publisher, PUBLISH, 3, [
+      SEQ_KEY,
+      eventsKey(channel),
+      stateKey(channel),
+      channel,
+      body,
+      this.replayLimits.windowMs,
+      this.replayLimits.maxEvents,
+      this.replayLimits.stateTtlMs,
+    ]).catch(() => undefined); // never rejects; a failure is Redis unreachable
   }
 
   subscribe<T extends AnyEndpointEventEnvelope>(
@@ -331,23 +428,26 @@ export class RedisPubSubAdapter implements PubSubAdapter {
     if (!this.publisher) {
       return { cursor: 0, complete: since === undefined, events: [] };
     }
-    const reply = prepareReplySchema.safeParse(
-      await this.publisher.eval(
-        PREPARE_SCRIPT,
-        3,
-        SEQ_KEY,
-        eventsKey(channel),
-        stateKey(channel),
-        since === undefined ? "" : String(since),
-        this.replayLimits.stateTtlMs,
-      ),
-    );
+    const run = await runReplayScript(this.publisher, PREPARE, 3, [
+      SEQ_KEY,
+      eventsKey(channel),
+      stateKey(channel),
+      since === undefined ? "" : String(since),
+      this.replayLimits.stateTtlMs,
+    ]);
+    const reply = prepareReplySchema.safeParse(run.ok ? run.reply : null);
     if (!reply.success) {
       return { cursor: 0, complete: since === undefined, events: [] };
     }
     const [cursor, complete, messages] = reply.data;
     const events: ReplayEntry[] = [];
-    for (const raw of messages) {
+    for (const [index, raw] of messages.entries()) {
+      // A replay can hold up to maxEvents (4,000) stream deltas. Parsing
+      // them in one run blocked the loop for every other socket (prod
+      // 2026-11-27: 116 ms stall in parseRedisWireMessage < syncSubscription).
+      if (index > 0 && index % REPLAY_PARSE_CHUNK === 0) {
+        await yieldToEventLoop();
+      }
       const parsed = parseRedisWireMessage(raw);
       if (parsed?.seq !== undefined) {
         events.push({

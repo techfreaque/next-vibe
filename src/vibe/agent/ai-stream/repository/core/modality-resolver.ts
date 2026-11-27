@@ -194,6 +194,10 @@ export function resolveChatModelId(
  * Passing an explicit `model` together with a favorite/skill-variant source is
  * ambiguous (two model sources) → error. Passing none → error. Exactly one wins.
  */
+function isChatModelIdString(id: string): id is ChatModelId {
+  return Object.hasOwn(chatModelDefinitions, id);
+}
+
 export async function resolveModelSkill(params: {
   model: ChatModelId | undefined;
   /** Source 1: skill ID (no variant) accompanying an explicit model.
@@ -323,6 +327,19 @@ export async function resolveModelSkill(params: {
   // setup gets the skill's identity for its tool/model cascades.
   if (skill) {
     const skillVariant = await resolveSkillVariant(skill, null);
+    if (!skillVariant && isChatModelIdString(skill)) {
+      // A model id passed as the skill (prod 2026-11-27: skill
+      // "gemini-4-carbon"): the caller meant that model. Run it as an
+      // explicit model with no skill instead of refusing the turn.
+      logger.info(
+        "[resolveModelSkill] Model id passed as skill, using it as the model",
+        {
+          skill,
+          isPublic: user.isPublic,
+        },
+      );
+      return resolveModelSkill({ ...params, model: skill, skill: undefined });
+    }
     if (!skillVariant) {
       // Unknown skill id (AI callers invent ones like "chatgpt"): say so, so
       // the caller can pick a real one instead of reading "model or skill

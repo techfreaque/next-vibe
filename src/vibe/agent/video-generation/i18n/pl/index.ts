@@ -69,6 +69,14 @@ export const translations: typeof enTranslations = {
       jobId: "ID zadania asynchronicznego",
     },
     errors: {
+      referenceNotImage:
+        "Link z {{host}} otwiera stronę, a nie plik obrazu. Użyj bezpośredniego linku do obrazu (prawy klik na obraz, kopiuj adres obrazu) albo wgraj plik.",
+      referenceUnreachable:
+        "Link do obrazu z {{host}} się nie ładuje (HTTP {{status}}). Sprawdź link albo wgraj obraz. Nic nie pobraliśmy.",
+      modelDiscontinued:
+        "Dostawca wycofał {{model}} i ten model już nie generuje. Wybierz inny model wideo. Nic nie pobraliśmy.",
+      referenceStagingFailed:
+        "Dostawca wideo nie przyjął obrazu wejściowego. Spróbuj ponownie albo wybierz inny model wideo. Nic nie pobraliśmy.",
       referenceUnavailable:
         "Obraz wejściowy jest niedostępny. Został usunięty albo należy do czatu, do którego nie masz dostępu. Użyj obrazu z tego czatu albo wgraj go ponownie.",
       validation_failed: {

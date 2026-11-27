@@ -12,6 +12,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import type { DefaultFolderId } from "../../../../core/execution-context";
 import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
 import { useChatInputStore } from "../hooks/input-store";
+import { useAIStreamStore } from "../hooks/store";
 import {
   clearDraft,
   saveDraft,
@@ -185,18 +186,30 @@ export function useInputHandlers({
 
         if (result.createdThreadId) {
           setNavigation(preNavSnapshot);
-          // logger.warn(message, ...metadata) - "Chat" was being passed as the
-          // message with the real description silently dropped (metadata only
-          // keeps plain objects), so this reached the server as a bare
-          // "[client] Chat" with no useful detail.
-          logger.warn(
-            "Stream failed - reverted navigation store to pre-send state",
-            {
-              threadId: result.createdThreadId,
-              restoredDraftText: currentInput.length > 0,
-              restoredDraftAttachments: currentAttachments.length,
-            },
-          );
+          const revert = {
+            threadId: result.createdThreadId,
+            restoredDraftText: currentInput.length > 0,
+            restoredDraftAttachments: currentAttachments.length,
+          };
+          const creditRefusalRequestId =
+            useAIStreamStore.getState().lastSendCreditRefusalRequestId;
+          if (creditRefusalRequestId !== null) {
+            // Designed recovery from a credit refusal the server logged; the
+            // send wrote its one client row under this requestId.
+            logger.debug("Credit refusal - reverted navigation store", {
+              ...revert,
+              requestId: creditRefusalRequestId,
+            });
+          } else {
+            // logger.warn(message, ...metadata) - "Chat" was being passed as
+            // the message with the real description silently dropped
+            // (metadata only keeps plain objects), so this reached the server
+            // as a bare "[client] Chat" with no useful detail.
+            logger.warn(
+              "Stream failed - reverted navigation store to pre-send state",
+              revert,
+            );
+          }
         }
       }
 

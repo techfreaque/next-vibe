@@ -161,6 +161,7 @@ describe("deductAndEmitCredits — fail closed", () => {
           settlement: "completed-turn",
         },
         chargeExceedsTurnBudget: false,
+        spentElsewhereDuringTurn: 3,
       }),
     );
     const result = await shapeRunResult({

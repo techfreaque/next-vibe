@@ -73,6 +73,10 @@ export const translations: typeof enTranslations = {
       outputAspectRatio: "Relación entre los aspectos",
     },
     errors: {
+      referenceNotImage:
+        "El enlace de {{host}} abre una página web, no un archivo de imagen. Usa un enlace directo a la imagen (clic derecho, copiar dirección de la imagen) o sube la imagen.",
+      referenceUnreachable:
+        "El enlace de imagen de {{host}} no carga (HTTP {{status}}). Revisa el enlace o sube la imagen. No se te ha cobrado nada.",
       referenceUnavailable:
         "La imagen de referencia no está disponible. Fue borrado, o pertenece a un chat que no puede abrir. Utilice una imagen de este chat o subirla de nuevo.",
       validation_failed: {

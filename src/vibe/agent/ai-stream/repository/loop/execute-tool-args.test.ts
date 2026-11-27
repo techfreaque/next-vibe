@@ -151,6 +151,24 @@ describe("normalizeExecuteToolArgs", () => {
     });
   });
 
+  it("repairs an encoded input object that was closed too early or sent twice", () => {
+    expect(
+      normalizeExecuteToolArgs({
+        toolName: "cortex-write",
+        input: '{"path":"/a.md"}, "content":"hi"}',
+      }),
+    ).toEqual({ toolName: "cortex-write", input: { path: "/a.md", content: "hi" } });
+    expect(
+      normalizeExecuteToolArgs({
+        toolName: "cortex-read",
+        input: '{"path":"/a.md"}{"path":"/a.md"}',
+      }),
+    ).toEqual({ toolName: "cortex-read", input: { path: "/a.md" } });
+    expect(
+      normalizeExecuteToolArgs({ toolName: "cortex-read", input: '{"path":' }),
+    ).toEqual({ toolName: "cortex-read", input: '{"path":' });
+  });
+
   it("keeps malformed explicit inner input available for validation", () => {
     expect(
       normalizeExecuteToolArgs({

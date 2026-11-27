@@ -208,19 +208,42 @@ export function wrapErrorResponse(
   // calling an account-only endpoint, empty path params, version skew), so
   // they stay visible at warn. 5xx is an unexpected server failure.
   const errorCode = error.errorType.errorCode;
-  const logMeta = {
+  const requestMeta = request ? describeRequestForLog(request) : undefined;
+  const classMeta = {
     endpoint: endpoint?.aliases?.[0] ?? endpoint?.path?.join("/"),
     endpointPath: endpoint?.path.join("/"),
     errorKey: error.errorType.errorKey,
     errorCode,
     publicRoleDenial: error.publicRoleDenial === true,
-    ...(request ? describeRequestForLog(request) : {}),
   };
+  const logMeta = { ...classMeta, ...requestMeta };
   if (error.expected) {
     // A benign, expected 4xx - a logged-out visitor's /me probe, or a public
     // caller hitting a role-gated endpoint. Not a fault; kept at debug so real
     // auth drops (a logged-IN user wrongly seen as public) stay visible at warn.
     logger.debug(`API Error (expected):\n${logChain.join("\n")}`, logMeta);
+  } else if (errorCode === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode) {
+    // A credit refusal (empty wallet, daily free limit, allowance held by a
+    // running reply). The deciding layer logged it with the numbers
+    // ("[AiStream] Setup failed", "[PublicCap] <kind>", "[TTS] Insufficient
+    // credits", same requestId). The translated chain carries amounts and
+    // the locale, which split one class into one row per sentence and
+    // language (16 rows for "exceeds your free limit"); it moves under
+    // refusalDetail so the class is one row per endpoint + error key.
+    logger.warn(
+      `API Error:\npayment refused [${error.errorType.errorKey} / ${String(errorCode)}]`,
+      {
+        ...classMeta,
+        method: requestMeta?.method ?? null,
+        auth: requestMeta?.auth ?? null,
+        refusalDetail: {
+          chain: logChain.join("\n"),
+          path: requestMeta?.path ?? null,
+          referer: requestMeta?.referer ?? null,
+          client: requestMeta?.client ?? null,
+        },
+      },
+    );
   } else if (
     error.errorType.errorKey ===
     ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey
@@ -232,7 +255,27 @@ export function wrapErrorResponse(
   } else if (errorCode >= 500) {
     logger.error(`API Error:\n${logChain.join("\n")}`, logMeta);
   } else {
-    logger.warn(`API Error:\n${logChain.join("\n")}`, logMeta);
+    // Any other refusal (wrong code, taken email, throwaway inbox, invalid
+    // login, CSRF, validation). Same shape as the 402 row: the translated
+    // chain carried the locale and per-person values (an email address, a
+    // code age), one row per language and sentence (2026-11-27: 6 rows for
+    // "code invalid or expired"). Class = endpoint + error key; the chain,
+    // page and client stay under refusalDetail. The browser no longer
+    // re-reports a refusal answered with its request id (callApi).
+    logger.warn(
+      `API Error:\nrequest refused [${error.errorType.errorKey} / ${String(errorCode)}]`,
+      {
+        ...classMeta,
+        method: requestMeta?.method ?? null,
+        auth: requestMeta?.auth ?? null,
+        refusalDetail: {
+          chain: logChain.join("\n"),
+          path: requestMeta?.path ?? null,
+          referer: requestMeta?.referer ?? null,
+          client: requestMeta?.client ?? null,
+        },
+      },
+    );
   }
 
   const wireError = request

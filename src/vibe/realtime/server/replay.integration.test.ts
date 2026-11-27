@@ -268,6 +268,26 @@ describe("WS reconnect catch-up (real client + real server)", () => {
     expect(raw.frames).toEqual([]);
   });
 
+  it("WS-REPLAY-4: a deploy drain keeps the process's own loopback hub socket", async () => {
+    const selfHub = await openRawSocket("?selfHub=1&requestId=self-hub-test-0001");
+    const browser = await openRawSocket();
+    const browserClosed = Promise.withResolvers<number>();
+    browser.ws.addEventListener("close", (event) => browserClosed.resolve(event.code), {
+      once: true,
+    });
+    let selfHubClosed = false;
+    selfHub.ws.addEventListener("close", () => {
+      selfHubClosed = true;
+    });
+    // Other sockets of earlier cases may still be open; the self-hub one is
+    // never among the closed ones.
+    expect(server?.closeClients()).toBeGreaterThanOrEqual(1);
+    expect(await browserClosed.promise).toBe(1012);
+    await delay(100);
+    expect(selfHubClosed).toBe(false);
+    selfHub.ws.close();
+  });
+
   it("refreshes stale guest subscriptions once and binds the new lead on the same socket", async () => {
     const client = await import("../client/client");
     const staleLead = "2a694531-5f2a-41bc-b5e1-7acb04e05486";
@@ -337,13 +357,13 @@ function subscribeFrame(channel: string, since: number | undefined): string {
   });
 }
 
-async function openRawSocket(): Promise<{
+async function openRawSocket(query = ""): Promise<{
   ws: WebSocket;
   frames: string[];
   send: (frame: string) => void;
   nextAck: (channel: string) => Promise<SubscribedAck>;
 }> {
-  const ws = new LeadWebSocket(`ws://${location.host}/ws`);
+  const ws = new LeadWebSocket(`ws://${location.host}/ws${query}`);
   const frames: string[] = [];
   ws.addEventListener("message", (event) => {
     if (typeof event.data === "string") {

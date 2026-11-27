@@ -2919,6 +2919,10 @@ export class CreditRepository {
             ipAddress: capIpAddress,
             expectedCost: amount,
             model: feature ?? "feature",
+            actor: {
+              userId: identifier.userId,
+              isSignedIn: identifier.userId !== undefined,
+            },
           },
           logger,
           locale,
@@ -4675,6 +4679,24 @@ export class CreditRepository {
         if (creditPolicyReason(result.errorType.errorKey)) {
           return result;
         }
+        // A refusal (4xx) was logged where it was decided: the free-tier gate
+        // writes its "[PublicCap] <kind>" row with the pool math, an empty
+        // wallet writes "Insufficient credits for tool/endpoint". Logging it
+        // again here as an ERROR named every correct refusal a failed
+        // deduction (2026-11-27: a 0.01 memoryWrite embedding charge refused
+        // by the ip-cap at 130 of 130 credits). Pass the refusal's own
+        // message on instead of "Failed to deduct, try again".
+        if (result.errorType.errorCode < 500) {
+          logger.debug(`Credit deduction refused for ${feature}`, {
+            cost,
+            errorKey: result.errorType.errorKey,
+          });
+          return fail({
+            message: result.message,
+            errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+            cause: result,
+          });
+        }
         logger.error(`Failed to deduct credits for ${feature}`, {
           ...identifier,
           cost,
@@ -5391,6 +5413,10 @@ export class CreditRepository {
         expectedCost,
         model,
         reservation: { poolKey: freeTierPoolKey(pool), spendable },
+        actor: {
+          userId: user.isPublic ? undefined : user.id,
+          isSignedIn: !user.isPublic,
+        },
       },
       logger,
       locale,

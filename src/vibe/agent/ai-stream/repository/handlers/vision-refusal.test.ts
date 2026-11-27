@@ -45,6 +45,11 @@ describe("isModerationError", () => {
       true,
     );
     expect(isModerationError("blocked by content_policy")).toBe(true);
+    expect(
+      isModerationError(
+          '[Alibaba] data: {"error":{"code":"data_inspection_failed","message":"Input video data may contain inappropriate content."}}',
+      ),
+    ).toBe(true);
   });
 
   test("ordinary failures are not moderation", () => {

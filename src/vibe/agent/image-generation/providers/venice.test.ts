@@ -41,3 +41,46 @@ it("sends an explicitly requested edit ratio and leaves the source ratio automat
     expect(result.success).toBe(true);
   }
 });
+
+it("retries a busy model once before reporting an outage (prod 11-25 chroma 503)", async () => {
+  let calls = 0;
+  const handler = async (): Promise<Response> => {
+    calls += 1;
+    if (calls === 1) {
+      return Response.json(
+        { error: "The model is at capacity. Please try again later." },
+        { status: 503, headers: { "retry-after": "0.01" } },
+      );
+    }
+    return Response.json({ data: [{ b64_json: "AAAA" }] });
+  };
+  const result = await generateWithVenice({
+    providerModel: "chroma",
+    prompt: "fixture",
+    size: "1024x1024",
+    fetchImpl: Object.assign(handler, { preconnect: fetch.preconnect }),
+    locale: "en-US",
+    logger: createEndpointLogger(false, "en-US"),
+  });
+  expect(calls).toBe(2);
+  expect(result.success).toBe(true);
+});
+
+it("names an unloadable reference link instead of a provider error", async () => {
+  const handler = async (): Promise<Response> =>
+    new Response("missing", { status: 404 });
+  const result = await generateWithVenice({
+    providerModel: "firered-image-edit",
+    prompt: "fixture",
+    size: "1024x1024",
+    inputMediaUrl: "https://93.184.215.14/missing.png",
+    fetchImpl: Object.assign(handler, { preconnect: fetch.preconnect }),
+    locale: "en-US",
+    logger: createEndpointLogger(false, "en-US"),
+  });
+  expect(result.success).toBe(false);
+  expect(result.success ? "" : result.message).toContain("HTTP 404");
+  expect(result.success ? null : result.errorType?.errorKey).toBe(
+    "errorTypes.not_found",
+  );
+});

@@ -32,6 +32,12 @@ export enum StreamErrorType {
   /** User explicitly cancelled the generation - shown as a neutral "stopped" indicator */
   STREAM_INTERRUPTED = "STREAM_INTERRUPTED",
   TURN_STEP_LIMIT = "TURN_STEP_LIMIT",
+  /**
+   * The provider's content filter refused the turn. The server logs it once
+   * ("[AI Stream] Provider content filter triggered", with provider, model,
+   * finish reasons and request ids); the bubble does not re-report it as a fault.
+   */
+  CONTENT_FILTERED = "CONTENT_FILTERED",
 }
 
 /**

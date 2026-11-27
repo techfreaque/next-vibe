@@ -197,3 +197,15 @@ describe("PhaseProfiler", () => {
     }
   });
 });
+
+it("names profiler window closes that overlap a stall", () => {
+  globalThis.__vibeProfilerCloses = [
+    { startedAt: 1_000, endedAt: 1_080, traces: 9_000 },
+    { startedAt: 5_000, endedAt: 5_004, traces: 700 },
+  ];
+  expect(PhaseProfiler.closesDuring(1_050, 1_200)).toBe(
+    `80 ms / 9000 traces at ${new Date(1_000).toISOString()}`,
+  );
+  expect(PhaseProfiler.closesDuring(2_000, 3_000)).toBeUndefined();
+  globalThis.__vibeProfilerCloses = undefined;
+});

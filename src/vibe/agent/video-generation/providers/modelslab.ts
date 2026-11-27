@@ -12,7 +12,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
-import { extractModelsLabJobId } from "../../shared/provider-job-id";
+import {
+  extractHeaderRequestId,
+  extractModelsLabJobId,
+} from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 interface ModelsLabVideoResponse {
@@ -52,6 +55,13 @@ export interface ModelsLabVideoModelSpec {
   defaultResolution?: string;
   /** Extra fixed params the model requires. */
   extra?: Readonly<Record<string, string | boolean>>;
+  /**
+   * aspect_ratio sent when the request names none. Sora 2 Pro offers only
+   * 16:9 here, so the repository passes no ratio; the provider's examples
+   * always carry one and a submit without it came back as "OpenAI API request
+   * failed" (prod 2026-11-27, 2 of 2 attempts).
+   */
+  defaultAspect?: string;
 }
 
 const V7_VIDEO_BASE = "https://modelslab.com/api/v7/video-fusion";
@@ -112,11 +122,17 @@ export const MODELSLAB_VIDEO_MODELS: Readonly<
     apiModelId: "Hailuo-2.3-Fast-i2v",
     route: "image-to-video",
   },
-  "sora-2": { apiModelId: "sora-2", route: "text-to-video", aspect: "size" },
+  "sora-2": {
+    apiModelId: "sora-2",
+    route: "text-to-video",
+    aspect: "size",
+    defaultAspect: "1280x720",
+  },
   "sora-2-pro-t2v": {
     apiModelId: "sora-2-pro-t2v",
     route: "text-to-video",
     aspect: "size",
+    defaultAspect: "1280x720",
   },
   "veo-3.1-fast": {
     apiModelId: "veo-3.1-fast",
@@ -174,7 +190,10 @@ export type ModelsLabVideoRequest =
       endpoint: string;
       body: Record<string, string | number | boolean>;
     }
-  | { ok: false; reason: "imageRequired" | "unsupportedInput" };
+  | {
+      ok: false;
+      reason: "imageRequired" | "unsupportedInput" | "imageNotStaged";
+    };
 
 /**
  * Pure request builder (no key, no I/O): endpoint + JSON body for one clip.
@@ -198,18 +217,17 @@ export function buildModelsLabVideoRequest(params: {
     resolution,
     initImage,
   } = params;
-  // Own files reach us as data URIs (the provider cannot fetch our storage);
-  // without the flag ModelsLab rejects them: "init image must be a valid url
-  // when base64 is a representation of false" (prod 2026-11-18).
-  const imageFields = initImage
-    ? {
-        init_image: initImage,
-        ...(initImage.startsWith("data:") ? { base64: true } : {}),
-      }
-    : {};
-
   const spec = MODELSLAB_VIDEO_MODELS[providerModel];
   if (!spec) {
+    // Legacy v6 takes inline data URIs behind the flag; without it: "init
+    // image must be a valid url when base64 is a representation of false"
+    // (prod 2026-11-18).
+    const imageFields = initImage
+      ? {
+          init_image: initImage,
+          ...(initImage.startsWith("data:") ? { base64: true } : {}),
+        }
+      : {};
     // Legacy v6 open models (wan2.1 / wan2.2 / ltx-2.3 community ids):
     // frame-based, max 25 frames.
     const isUltraModel =
@@ -243,19 +261,29 @@ export function buildModelsLabVideoRequest(params: {
   if (spec.route === "image-to-video" && !initImage) {
     return { ok: false, reason: "imageRequired" };
   }
+  // v7 validates init_image as a URL ("init_image(s) must be a valid URL.",
+  // prod 2026-11-27 ltx-2-3-pro-i2v with a data URI): the caller stages
+  // inline bytes through stageModelsLabImage first.
+  if (initImage?.startsWith("data:")) {
+    return { ok: false, reason: "imageNotStaged" };
+  }
 
   const body: Record<string, string | number | boolean> = {
     model_id: spec.apiModelId,
     prompt,
     duration: String(durationSeconds),
-    ...(spec.route === "image-to-video" ? imageFields : {}),
+    ...(spec.route === "image-to-video" && initImage
+      ? { init_image: initImage }
+      : {}),
     ...spec.extra,
   };
   if (aspectRatio && spec.aspect === "ratio") {
     body.aspect_ratio = aspectRatio;
   }
-  if (aspectRatio && spec.aspect === "size") {
-    const size = SORA_SIZE_BY_RATIO[aspectRatio];
+  if (spec.aspect === "size") {
+    const size =
+      (aspectRatio ? SORA_SIZE_BY_RATIO[aspectRatio] : undefined) ??
+      spec.defaultAspect;
     if (size) {
       body.aspect_ratio = size;
     }
@@ -268,6 +296,62 @@ export function buildModelsLabVideoRequest(params: {
     }
   }
   return { ok: true, endpoint: `${V7_VIDEO_BASE}/${spec.route}`, body };
+}
+
+const MODELSLAB_BASE64_UPLOAD_URL =
+  "https://modelslab.com/api/v6/base64_to_url";
+
+/**
+ * Stage an inline image (browser upload, own storage file) with ModelsLab's
+ * temporary upload API and return the hosted URL v7 routes accept. Same call
+ * the ModelsLab image adapter uses for init_image.
+ */
+async function stageModelsLabImage(params: {
+  dataUri: string;
+  key: string;
+  providerModel: string;
+  logger: EndpointLogger;
+  signal?: AbortSignal;
+  fetchImpl: typeof globalThis.fetch;
+}): Promise<string | null> {
+  const { dataUri, key, providerModel, logger, signal, fetchImpl } = params;
+  const response = await fetchImpl(MODELSLAB_BASE64_UPLOAD_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key, base64_string: dataUri }),
+    signal,
+  });
+  const text = await response.text();
+  let parsed: ModelsLabVideoResponse | null = null;
+  try {
+    parsed = JSON.parse(text) as ModelsLabVideoResponse;
+  } catch {
+    parsed = null;
+  }
+  const url =
+    response.ok && parsed?.status === "success" ? parsed.output?.[0] : null;
+  if (url && /^https?:\/\//.test(url)) {
+    return url;
+  }
+  logger.error("[ModelsLab Video] Input image upload failed", {
+    providerModel,
+    status: response.status,
+    providerStatus: parsed?.status ?? null,
+    providerMessage: parsed?.message ?? text.slice(0, 300),
+    mimeType: dataUri.slice(5, dataUri.indexOf(";")),
+    base64Chars: dataUri.length,
+  });
+  return null;
+}
+
+/** "{"status":"error","message":"..."}" body -> the provider's message. */
+function submitErrorMessage(errorText: string): string | undefined {
+  try {
+    const parsed = JSON.parse(errorText) as { message?: string };
+    return typeof parsed.message === "string" ? parsed.message : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 // Real interval ALWAYS — never a test-only shortcut. pollDelay() collapses to
@@ -339,7 +423,27 @@ export async function generateVideoWithModelsLab(params: {
     // and let the provider report its own error. (Our own storage URLs are
     // already inlined to data URIs by the repository before this call.)
     let resolvedInitImage = inputImageUrl;
-    if (inputImageUrl && inputImageUrl.startsWith("http")) {
+    const spec = MODELSLAB_VIDEO_MODELS[providerModel];
+    if (
+      inputImageUrl?.startsWith("data:") &&
+      spec?.route === "image-to-video"
+    ) {
+      const staged = await stageModelsLabImage({
+        dataUri: inputImageUrl,
+        key: agentEnv.MODELSLAB_API_KEY,
+        providerModel,
+        logger,
+        signal,
+        fetchImpl,
+      });
+      if (!staged) {
+        return fail({
+          message: t("post.errors.referenceStagingFailed"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
+      resolvedInitImage = staged;
+    } else if (inputImageUrl && inputImageUrl.startsWith("http")) {
       try {
         const probe = await fetchImpl(inputImageUrl, {
           method: "HEAD",
@@ -367,6 +471,18 @@ export async function generateVideoWithModelsLab(params: {
       isUltra,
     });
     if (!request.ok) {
+      if (request.reason === "imageNotStaged") {
+        // stageModelsLabImage covers every v7 image route; reaching this
+        // means a route was added without staging.
+        logger.error("[ModelsLab Video] Inline image reached a v7 route", {
+          providerModel,
+          route: spec?.route ?? null,
+        });
+        return fail({
+          message: t("post.errors.referenceStagingFailed"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
       return fail({
         message:
           request.reason === "imageRequired"
@@ -389,12 +505,43 @@ export async function generateVideoWithModelsLab(params: {
 
     if (!submitResponse.ok) {
       const errorText = await submitResponse.text();
+      const providerMessage = submitErrorMessage(errorText);
+      // A retired model id answers 404 "has been discontinued" (prod
+      // 2026-11-27 kling-v2-1-master): say so instead of a raw JSON body.
+      const discontinued =
+        providerMessage !== undefined &&
+        /discontinued|no longer available/i.test(providerMessage);
+      // The request shape (never the prompt or key) so a provider-side
+      // failure ("OpenAI API request failed") can be replayed by hand.
       logger.error("[ModelsLab Video] Failed to submit request", {
         status: submitResponse.status,
-        error: errorText,
+        error: errorText.slice(0, 500),
+        providerModel,
+        apiModelId: request.body.model_id ?? null,
+        endpoint: request.endpoint,
+        sentFields: Object.keys(request.body).toSorted().join(","),
+        duration: request.body.duration ?? null,
+        aspectRatio: request.body.aspect_ratio ?? null,
+        resolution: request.body.resolution ?? null,
+        imageSource: resolvedInitImage
+          ? resolvedInitImage.startsWith("data:")
+            ? "data-uri"
+            : (/^https?:\/\/([^/]+)/.exec(resolvedInitImage)?.[1] ?? "other")
+          : null,
+        reason: discontinued ? "model-discontinued" : null,
+        providerJobId:
+          extractHeaderRequestId(submitResponse.headers, [
+            "x-request-id",
+            "request-id",
+            "cf-ray",
+          ]) ?? null,
       });
       return fail({
-        message: t("post.errors.providerError", { error: errorText }),
+        message: discontinued
+          ? t("post.errors.modelDiscontinued", { model: providerModel })
+          : t("post.errors.providerError", {
+              error: providerMessage ?? errorText.slice(0, 500),
+            }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }

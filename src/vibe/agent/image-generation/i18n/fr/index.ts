@@ -73,6 +73,10 @@ export const translations: typeof enTranslations = {
       outputAspectRatio: "Format",
     },
     errors: {
+      referenceNotImage:
+        "Le lien vers {{host}} ouvre une page web, pas un fichier image. Utilise un lien direct vers l'image (clic droit, copier l'adresse de l'image) ou importe l'image.",
+      referenceUnreachable:
+        "Le lien d'image vers {{host}} ne se charge pas (HTTP {{status}}). Vérifie le lien ou importe l'image. Rien ne t'a été facturé.",
       referenceUnavailable:
         "L'image de référence n'est pas disponible. Elle a été supprimée, ou elle appartient à une discussion que vous ne pouvez pas ouvrir. Utilisez une image de cette discussion ou renvoyez-la.",
       validation_failed: {

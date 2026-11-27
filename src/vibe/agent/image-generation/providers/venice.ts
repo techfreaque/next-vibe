@@ -1,5 +1,6 @@
 import "server-only";
 
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -13,6 +14,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { parseBase64DataUri } from "../../shared/media-generation";
+import { pollDelay } from "../../shared/poll-delay";
 import {
   extractHeaderRequestId,
   normalizeProviderJobId,
@@ -30,6 +32,8 @@ import { scopedTranslation } from "../i18n";
 
 const VENICE_IMAGES_URL = "https://api.venice.ai/api/v1/images/generations";
 const VENICE_IMAGE_EDIT_URL = "https://api.venice.ai/api/v1/image/edit";
+const VENICE_RETRY_WAIT_MS = 3000;
+const VENICE_RETRY_MAX_WAIT_MS = 8000;
 
 interface VeniceImageResponse {
   id?: string;
@@ -150,23 +154,45 @@ export async function generateWithVenice(params: {
   });
 
   try {
-    const response = await fetchImpl(VENICE_IMAGES_URL, {
-      method: "POST",
-      headers: {
-        // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${agentEnv.VENICE_AI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const send = (): Promise<Response> =>
+      fetchImpl(VENICE_IMAGES_URL, {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.VENICE_AI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: providerModel,
+          prompt,
+          n: 1,
+          size: apiSize,
+          response_format: "b64_json",
+          output_format: "webp",
+          moderation: "low",
+        }),
+      });
+    let response = await send();
+    let attempts = 1;
+    // "The model is at capacity. Please try again later." (503, prod
+    // 2026-11-25 chroma) clears within seconds: one paced retry before the
+    // user sees an outage. Nothing is billed for the refused attempt.
+    if (response.status === 503 || response.status === 429) {
+      const retryAfterSeconds = Number(response.headers.get("retry-after"));
+      const waitMs =
+        Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+          ? Math.min(retryAfterSeconds * 1000, VENICE_RETRY_MAX_WAIT_MS)
+          : VENICE_RETRY_WAIT_MS;
+      logger.debug("[Venice Images] Busy, retrying once", {
+        status: response.status,
         model: providerModel,
-        prompt,
-        n: 1,
-        size: apiSize,
-        response_format: "b64_json",
-        output_format: "webp",
-        moderation: "low",
-      }),
-    });
+        waitMs,
+      });
+      await response.body?.cancel().catch(() => undefined);
+      await pollDelay(waitMs, response);
+      response = await send();
+      attempts = 2;
+    }
 
     // A gateway error page (HTML 502/503) is an outage, not a parse crash.
     const rawText = await response.text();
@@ -185,6 +211,15 @@ export async function generateWithVenice(params: {
         status: response.status,
         model: providerModel,
         size: apiSize,
+        attempts,
+        retryAfter: response.headers.get("retry-after"),
+        providerJobId:
+          extractHeaderRequestId(response.headers, [
+            "x-venice-request-id",
+            "x-request-id",
+            "request-id",
+            "cf-ray",
+          ]) ?? null,
       });
       return fail({
         // The status tells a refusal (400/403) from an outage (5xx/429).
@@ -300,18 +335,34 @@ async function editWithVenice(params: {
     } else {
       const refRes = await fetchPublicUrl(inputMediaUrl, fetchImpl);
       if (!refRes?.ok) {
+        const refUrl = URL.canParse(inputMediaUrl)
+          ? new URL(inputMediaUrl)
+          : null;
+        // Own storage links never get here (resolveMediaReference inlines
+        // them), so an own-host link that 404s is a page or a path the
+        // storage parser did not recognise (prod 2026-11-25, 2 rows): log
+        // our own path so the next one shows which. Third-party paths stay
+        // out (user content).
+        const ownHost =
+          refUrl !== null &&
+          URL.canParse(coreEnv.NEXT_PUBLIC_APP_URL) &&
+          new URL(coreEnv.NEXT_PUBLIC_APP_URL).host === refUrl.host;
         logger.error("[Venice Images] Reference image fetch failed", {
           status: refRes?.status ?? null,
           blocked: refRes === null,
-          host: URL.canParse(inputMediaUrl)
-            ? new URL(inputMediaUrl).host
-            : null,
+          host: refUrl?.host ?? null,
+          ownHostPath: ownHost ? refUrl.pathname.slice(0, 200) : null,
+          contentType: refRes?.headers.get("content-type") ?? null,
+          model: providerModel,
         });
+        await refRes?.body?.cancel().catch(() => undefined);
         return fail({
-          message: t("post.errors.externalServiceError", {
-            message: `reference image fetch HTTP ${refRes?.status ?? "blocked"}`,
+          message: t("post.errors.referenceUnreachable", {
+            host: refUrl?.host ?? "-",
+            status: String(refRes?.status ?? "-"),
           }),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          // The repository passes NOT_FOUND through as the link problem.
+          errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
       const refArrayBuf = await refRes.arrayBuffer();

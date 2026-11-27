@@ -137,15 +137,45 @@ describe("POST /user/public/signup", () => {
       },
       user: publicUser,
     });
+    // Same browser: no second mail, the code already sent stays valid.
+    expect(second.success && second.data.pendingId).toBe(
+      first.success && first.data.pendingId,
+    );
 
-    expect(second.success).toBe(false);
-    if (second.success) {
+    const otherLeadId = await createAnonymousLead(
+      { userAgent: randomUUID() },
+      defaultLocale,
+      logger,
+    );
+    mailScopes.push(`lead:${otherLeadId}`);
+    const other = await sendTestRequest({
+      toolExecutionContext: undefined,
+      endpoint,
+      data: {
+        privateName: "Other Browser",
+        publicName: "Other",
+        email,
+        password: "SecurePass123",
+        confirmPassword: "SecurePass123",
+        acceptTerms: true,
+        subscribeToNewsletter: false,
+      },
+      user: {
+        isPublic: true,
+        leadId: otherLeadId,
+        roles: [UserPermissionRole.PUBLIC],
+      },
+    });
+    await db.delete(leads).where(eq(leads.id, otherLeadId));
+
+    expect(other.success).toBe(false);
+    if (other.success) {
       return;
     }
-    expect(second.errorType?.errorCode).toBe(
+    expect(other.errorType?.errorCode).toBe(
       ErrorResponseTypes.VALIDATION_ERROR.errorCode,
     );
-    expect(second.message).toBe(t("confirmation.cooldown"));
+    expect(other.message).toBe(t("confirmation.cooldown"));
   });
 
   it("rejects weak password (too short) with VALIDATION_ERROR", async () => {

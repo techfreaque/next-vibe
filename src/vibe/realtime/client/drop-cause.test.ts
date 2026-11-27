@@ -45,6 +45,14 @@ describe("classifyWsDrop", () => {
     expect(classifyWsDrop({ ...base, msSinceVisibilityChange: 125 })).toBe("detected-on-resume");
   });
 
+  it("names a visible page whose device slept or froze it", () => {
+    expect(classifyWsDrop({ ...base, deviceSuspendedMs: 74_000 })).toBe("device-suspended");
+    expect(classifyWsDrop({ ...base, msSinceDeviceResume: 4_000 })).toBe("device-suspended");
+    expect(classifyWsDrop({ ...base, deviceSuspendedMs: 900, msSinceDeviceResume: 60_000 })).toBe(
+      "silent-drop",
+    );
+  });
+
   it("leaves visible mid-session cuts as silent drops", () => {
     expect(classifyWsDrop(base)).toBe("silent-drop");
     expect(classifyWsDrop({ ...base, code: 1011, wasClean: true })).toBe("server-close");

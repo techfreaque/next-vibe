@@ -12,6 +12,8 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { expect } from "vitest";
 
+import { CreditGrantReason } from "@/credits/enum";
+
 import { rootlessToolExecutionContext } from "../../../../../core/execution-context";
 import { chatMessages } from "../../../../chat/db";
 
@@ -88,7 +90,11 @@ export async function pinBalance(
   const result = await sendTestRequest({
     toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: adminAddDef.POST,
-    data: { targetUserId: user.id, amount: Math.ceil(deficit) },
+    data: {
+      targetUserId: user.id,
+      amount: Math.ceil(deficit),
+      reason: CreditGrantReason.TESTER,
+    },
     user,
   });
   expect(

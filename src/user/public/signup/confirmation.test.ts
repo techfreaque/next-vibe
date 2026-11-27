@@ -109,6 +109,37 @@ afterAll(async () => {
 });
 
 describe("pending signup", () => {
+  it("keeps the code just sent when the same browser submits again", async () => {
+    const { user, email, inbox, pendingId, act } = await start();
+    const again = await SignupRepository.registerUser(
+      {
+        email,
+        password: "SignupPass104",
+        confirmPassword: "SignupPass104",
+        privateName: "Signup retry",
+        publicName: "Signup retry",
+        acceptTerms: true,
+        subscribeToNewsletter: false,
+      },
+      user,
+      defaultLocale,
+      logger,
+      Platform.NEXT_API,
+      t,
+      undefined,
+      async () => expect.fail("a resubmit within the cooldown must not send"),
+    );
+    expect(again.success && again.data.pendingId).toBe(pendingId);
+    expect(inbox).toHaveLength(1);
+    const [row] = await db.select().from(pendingSignups).where(eq(pendingSignups.id, pendingId));
+    expect(row.privateName).toBe("Signup retry");
+    expect(await verifyPassword("SignupPass104", row.passwordHash)).toBe(true);
+    const confirmed = await act({ code: inbox[0].code });
+    expect(confirmed.success).toBe(true);
+    const [account] = await db.select().from(users).where(eq(users.email, email));
+    accountIds.push(account.id);
+  });
+
   it("carries the original lead through correction and cross-browser confirmation", async () => {
     const admin = await resolveTestAdminUser();
     const [ref] = await db
@@ -166,7 +197,12 @@ describe("pending signup", () => {
     expect((await act({ newEmail: corrected }, other)).success).toBe(false);
     expect((await act({ newEmail: corrected })).success).toBe(true);
     expect(inbox.map((mail) => mail.email)).toEqual([email, corrected]);
-    expect((await act({ code: inbox[0].code })).success).toBe(false);
+    // The first email's code and link stop working after the correction; the
+    // answer points at the newest email instead of "invalid or expired".
+    const oldCode = await act({ code: inbox[0].code });
+    expect(!oldCode.success && oldCode.message).toBe(t("confirmation.wrongCode"));
+    const oldLink = await act({ token: inbox[0].token });
+    expect(!oldLink.success && oldLink.message).toBe(t("confirmation.staleLink"));
     expect((await act({ token: inbox[0].token }, other)).success).toBe(false);
     const confirmed = await act({ token: inbox[1].token }, other);
     expect(confirmed.success && confirmed.data.redirectTo).toBe("/en-US/threads");
@@ -176,7 +212,11 @@ describe("pending signup", () => {
     try {
       const staleStatus = await act({});
       expect(!staleStatus.success && staleStatus.message).toBe(
-        t("confirmation.expired"),
+        t("confirmation.alreadyConfirmed"),
+      );
+      const usedLink = await act({ token: inbox[1].token });
+      expect(!usedLink.success && usedLink.message).toBe(
+        t("confirmation.alreadyConfirmed"),
       );
       expect(warn).toHaveBeenCalledWith(
         "Signup confirmation has no pending signup for this lead",

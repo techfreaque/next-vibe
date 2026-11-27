@@ -188,13 +188,14 @@ describe("processStreamingResponseWithToolCalls", () => {
   it("reports the shape of rejected markup without its arguments", async () => {
     const warn = mock(() => undefined);
     const response = await processStreamingResponseWithToolCalls(
-      upstream(['<tool_calls>{"name":"example","arguments":{"value":"private fixture"}}</tool_calls>'], "stop"),
+      upstream(['<tool_calls>{"tool":"example","arguments":{"value":"private fixture"}}</tool_calls>'], "stop"),
       { ...logger, warn }, "test", true,
     );
     await response.text();
+    // A bare call object now parses; one without a tool name still cannot run.
     expect(warn).toHaveBeenCalledWith("[test] Tool-call markup did not parse", expect.objectContaining({
       markupBoundary: { endsWithArray: false, endsWithObject: true, endsWithCodeFence: false },
-      markupBodyKind: "object", hasJsonNameField: true, hasJsonArgumentsField: true,
+      markupBodyKind: "object", hasJsonNameField: false, hasJsonArgumentsField: true,
     }));
     expect(JSON.stringify(warn.mock.calls)).not.toContain("private fixture");
   });
@@ -215,5 +216,57 @@ describe("processStreamingResponseWithToolCalls", () => {
     expect(result.finishReason).toBe("length");
     // Stopped shortly after the cap, not after all pieces + finish + usage.
     expect(pull.count).toBeLessThan(pieces.length);
+  });
+});
+
+describe("parseToolCalls entry validation", () => {
+  // Prod 2026-11-27: Uncensored LM sent rename-thread arguments without a
+  // name; the nameless call made the AI SDK throw "Expected 'function.name'
+  // to be a string." and the turn ended in an error bubble.
+  it("drops an entry without a tool name and keeps the valid ones", () => {
+    const { toolCalls, textContent } = parseToolCalls(
+      'Answer.<tool_calls>[{"arguments": {"title": "Chapter one"}}, {"name": "web-search", "arguments": {"query": "x"}}]</tool_calls>',
+      logger,
+    );
+    expect(textContent).toBe("Answer.");
+    expect(toolCalls).toEqual([
+      { name: "web-search", arguments: { query: "x" } },
+    ]);
+  });
+
+  it("accepts OpenAI-style entries with string arguments", () => {
+    const { toolCalls } = parseToolCalls(
+      '<tool_calls>[{"function": {"name": "rename-thread", "arguments": "{\\"title\\": \\"Trip\\"}"}}, {"name": "fetch-url", "parameters": {"url": "https://a.b"}}]</tool_calls>',
+      logger,
+    );
+    expect(toolCalls).toEqual([
+      { name: "rename-thread", arguments: { title: "Trip" } },
+      { name: "fetch-url", arguments: { url: "https://a.b" } },
+    ]);
+  });
+
+  it("treats a block of only nameless entries as no tool call", () => {
+    const { toolCalls } = parseToolCalls(
+      '<tool_calls>[{"title": "Chapter one"}]</tool_calls>',
+      logger,
+    );
+    expect(toolCalls).toBeNull();
+  });
+
+  it("parses an array missing its closing bracket and a bare call object", () => {
+    const unclosed = parseToolCalls(
+      'Ok.<tool_calls>[{"name": "web-search", "arguments": {"query": "x"}}</tool_calls>',
+      logger,
+    );
+    expect(unclosed.toolCalls).toEqual([
+      { name: "web-search", arguments: { query: "x" } },
+    ]);
+    const bare = parseToolCalls(
+      '<tool_calls>{"name": "rename-thread", "arguments": {"title": "Trip"}}</tool_calls>',
+      logger,
+    );
+    expect(bare.toolCalls).toEqual([
+      { name: "rename-thread", arguments: { title: "Trip" } },
+    ]);
   });
 });

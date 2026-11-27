@@ -34,12 +34,18 @@ import { defaultLocale } from "../../core/i18n/core/config";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
+import { mintRequestId } from "../../logger/with-log-context";
+import { isDrainRequested } from "../../platforms/web/drain";
 import { serverSystemEnv } from "../../platforms/web/env";
 import { WS_SIDECAR_OFFSET } from "../../platforms/web/proxy";
 import { buildUserWsChannel } from "../core/channel";
 import { getLocalBroadcast } from "../core/local-broadcast";
 import type { AnyEndpointEventEnvelope } from "../core/structured-events";
-import { parseWsFrame, type WsWireMessage } from "../core/types";
+import {
+  parseWsFrame,
+  WS_SELF_HUB_PARAM,
+  type WsWireMessage,
+} from "../core/types";
 import { getPubSubAdapter } from "./pubsub/index";
 
 /**
@@ -365,8 +371,11 @@ export const KeyedRemoteSignal = {
           return;
         }
         let opened: WebSocket | null = null;
+        // Correlates this socket with the hub's own upgrade/close logs.
+        const hubRequestId = mintRequestId();
+        const connectStartedAt = Date.now();
         try {
-          opened = await openHubWs(user, logger);
+          opened = await openHubWs(user, logger, hubRequestId);
         } catch (err) {
           const error = err instanceof Error ? err.message : String(err);
           if (attempt === 0) {
@@ -453,6 +462,15 @@ export const KeyedRemoteSignal = {
             // The exact loopback URL this socket targeted, so a port/host
             // mismatch is visible in the log without re-deriving it by hand.
             wsBase,
+            // Joins the hub's "[WS] ..." upgrade rows of this exact socket.
+            hubRequestId,
+            attempt,
+            everOpened,
+            msSinceConnect: Date.now() - connectStartedAt,
+            // A non-101 during a deploy drain is the hub refusing upgrades;
+            // the hub admits self connections then, so this tells a
+            // regression apart from a hub that is not running.
+            drainRequested: isDrainRequested(),
             // Bun's message embeds the full URL: never log the self-JWT.
             error: (
               detail.message ??
@@ -656,13 +674,18 @@ export const KeyedRemoteSignal = {
 async function openHubWs(
   user: JwtPayloadType,
   logger: EndpointLogger,
+  requestId: string,
 ): Promise<WebSocket | null> {
-  const wsBase = localHubWsUrl();
-  if (!wsBase) {
+  const base = localHubWsUrl();
+  if (!base) {
     return null;
   }
+  // selfHub: this process's own loopback subscription. The hub keeps it
+  // through a deploy drain: the work waiting on it (a running stream's stop
+  // signal) stays in this process and cannot move to the peer node.
+  const wsBase = `${base}?${WS_SELF_HUB_PARAM}=1&requestId=${encodeURIComponent(requestId)}`;
   if (user.isPublic) {
-    const url = `${wsBase}?leadId=${encodeURIComponent(user.leadId)}`;
+    const url = `${wsBase}&leadId=${encodeURIComponent(user.leadId)}`;
     try {
       return new WebSocket(url);
     } catch (err) {
@@ -679,7 +702,7 @@ async function openHubWs(
     return null;
   }
   const leadId = user.leadId;
-  const url = `${wsBase}?token=${encodeURIComponent(signed.data)}&leadId=${encodeURIComponent(leadId)}`;
+  const url = `${wsBase}&token=${encodeURIComponent(signed.data)}&leadId=${encodeURIComponent(leadId)}`;
   try {
     return new WebSocket(url);
   } catch (err) {

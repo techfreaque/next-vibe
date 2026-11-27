@@ -375,7 +375,15 @@ const { GET } = createEndpoint({
         }
         const { getAudioQueue } =
           await import("../../../../ai-stream/stream/hooks/audio-queue");
-        getAudioQueue(logger).enqueue(audioData, chunkIndex, logger);
+        // The server sends a stored-file URL (portable, root-relative) or,
+        // when the upload failed, the inline data URL; resolveMediaSrc keeps
+        // data URLs and rebases the path for native (no page origin).
+        const { resolveMediaSrc } = await import("../../../storage/media-src");
+        getAudioQueue(logger).enqueue(
+          audioData.length > 0 ? resolveMediaSrc(audioData) : audioData,
+          chunkIndex,
+          logger,
+        );
       },
     },
 

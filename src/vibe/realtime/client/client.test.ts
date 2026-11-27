@@ -42,7 +42,7 @@ class TestSocket extends EventTarget {
   }
 }
 
-it("reports quick reconnects and times out hidden, offline drops", async () => {
+it("reports quick reconnects and holds hidden drops until the tab is back", async () => {
   const originalSocket = globalThis.WebSocket;
   const fakeWindow = Object.assign(new EventTarget(), {
     location: { protocol: "https:", host: "example.com" },
@@ -139,6 +139,19 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     jest.advanceTimersByTime(1000);
     TestSocket.sockets[2]?.drop(1006, "retry failed");
     jest.advanceTimersByTime(19_000);
+    // Hidden tab, failed upgrade: no background retry loop and no deadline
+    // report while nobody can see the page.
+    expect(TestSocket.sockets).toHaveLength(3);
+    expect(errors).toEqual([]);
+    Object.defineProperty(navigator, "onLine", { value: true });
+    fakeWindow.dispatchEvent(new Event("online"));
+    expect(TestSocket.sockets).toHaveLength(3);
+    fakeDocument.visibilityState = "visible";
+    fakeDocument.dispatchEvent(new Event("visibilitychange"));
+    expect(TestSocket.sockets).toHaveLength(4);
+    jest.advanceTimersByTime(300);
+    TestSocket.sockets[3]?.open();
+    expect(errors).toHaveLength(1);
     expect(errors[0]).toMatchObject({
       message: "[WS Client] Connection lost",
       context: {
@@ -151,27 +164,19 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
         ).searchParams.get("requestId"),
         lastFailedHandshakeMs: 0,
         lastFailedHandshakeCode: 1006,
-        pendingHandshakeRequestId: new URL(
+        reconnectRequestId: new URL(
           TestSocket.sockets[3]?.url ?? "",
         ).searchParams.get("requestId"),
-        pendingHandshakeMs: 17_000,
-        retryScheduled: false,
-        msSinceVisibilityChange: 0,
-        msSinceNetworkChange: 0,
-        offlineMs: 20_000,
+        dropCause: "browser-offline",
+        noticeableDownMs: 300,
+        offlineMs: 20_300,
         hiddenAtClose: true,
         online: false,
-        recovered: false,
-        dropReportTrigger: "deadline",
+        recovered: true,
+        dropReportTrigger: "reconnected",
       },
     });
-    TestSocket.sockets[3]?.open();
-    expect(errors).toHaveLength(1);
 
-    Object.defineProperty(navigator, "onLine", { value: true });
-    fakeWindow.dispatchEvent(new Event("online"));
-    fakeDocument.visibilityState = "visible";
-    fakeDocument.dispatchEvent(new Event("visibilitychange"));
     TestSocket.sockets[3]?.drop(1006, "connection interrupted");
     for (const delay of [1000, 2000, 4000, 8000, 16000, 30000]) {
       jest.advanceTimersByTime(delay);

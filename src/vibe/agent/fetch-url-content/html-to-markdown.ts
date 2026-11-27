@@ -1,5 +1,7 @@
 import TurndownService from "turndown";
 
+import { stripInlineImageData } from "./inline-image-data";
+
 /** Convert documents against the final fetched URL, including redirects. */
 export function htmlToMarkdown(html: string, sourceUrl: string): string {
   const converter = new TurndownService({
@@ -23,6 +25,10 @@ export function htmlToMarkdown(html: string, sourceUrl: string): string {
         return content;
       }
       const alt = converter.escape(node.getAttribute("alt") ?? "");
+      if (/^data:/i.test(src)) {
+        // Inline payload: keep only the description.
+        return alt ? `[image: ${alt}]` : "";
+      }
       const title = node.getAttribute("title")?.replaceAll('"', '\\"');
       let resolved = src;
       try {
@@ -35,5 +41,5 @@ export function htmlToMarkdown(html: string, sourceUrl: string): string {
       return `![${alt}](${destination}${title ? ` "${title}"` : ""})`;
     },
   });
-  return converter.turndown(html);
+  return stripInlineImageData(converter.turndown(html));
 }

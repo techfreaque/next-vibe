@@ -14,7 +14,10 @@ import {
   sql,
 } from "drizzle-orm";
 import { coreEnv } from "next-vibe/core/env";
-import { LanguagesArr } from "next-vibe/core/i18n/core/config";
+import {
+  type CountryLanguage,
+  LanguagesArr,
+} from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
@@ -26,6 +29,7 @@ import { db } from "next-vibe/database";
 import { Environment } from "next-vibe/env/env-util";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { configScopedTranslation } from "@/env/i18n";
 import { messengerAccounts } from "@/messenger/accounts/db";
 import {
   CampaignType,
@@ -185,6 +189,35 @@ async function recordBounces(
     .onConflictDoNothing();
 }
 
+/**
+ * Whether a returned subject is a signup challenge in this locale. The
+ * current subject carries the six-digit code; the plain "confirm" subject is
+ * what every challenge used before 2026-11-27 (DSNs can arrive days later).
+ */
+function isSignupChallengeSubject(
+  subject: string,
+  locale: CountryLanguage,
+): boolean {
+  const { t } = scopedTranslation.scopedT(locale);
+  if (t("confirmation.link") === subject) {
+    return true;
+  }
+  const marker = "\u0000";
+  const [prefix, suffix] = t("confirmation.subject", {
+    code: marker,
+    appName: configScopedTranslation.scopedT(locale).t("appName"),
+  }).split(marker);
+  if (prefix === undefined || suffix === undefined) {
+    return false;
+  }
+  return (
+    subject.length === prefix.length + 6 + suffix.length &&
+    subject.startsWith(prefix) &&
+    subject.endsWith(suffix) &&
+    /^\d{6}$/.test(subject.slice(prefix.length, prefix.length + 6))
+  );
+}
+
 export async function recordSignupDeliveryReport(
   report: DeliveryReport,
   receivedAt: Date,
@@ -315,7 +348,7 @@ export async function recordSignupDeliveryReport(
     const [match] = matches;
     if (
       matches.length !== 1 ||
-      scopedTranslation.scopedT(match.locale).t("confirmation.link") !== subject
+      !isSignupChallengeSubject(subject, match.locale)
     ) {
       continue;
     }

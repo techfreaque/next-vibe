@@ -214,47 +214,8 @@ export class ExecuteToolGuards {
     toolExecutionContext: ToolExecutionContext;
     logger: EndpointLogger;
   }): Promise<{ status: string; toolName: string } | null> {
-    const { toolName, data, toolExecutionContext, logger } = params;
-    if (
-      data.callbackMode === "approve" ||
-      toolExecutionContext.isConfirmedReExecution === true ||
-      (toolExecutionContext.headless === true &&
-        toolExecutionContext.relayReceiver !== true)
-    ) {
-      return null;
-    }
-    // A route left out of this server build (bundle-ignored, e.g. builder /
-    // check) has no loadable definition here either: getEndpoint would throw
-    // "Cannot find package". Nothing to confirm; the executor answers it.
-    const { isRouteExcludedFromBuild } =
-      await import("@/generated/routes/handlers");
-    if (isRouteExcludedFromBuild(toolName)) {
-      return null;
-    }
-    const { getEndpoint } = await import("@/generated/endpoints/endpoint");
-    const targetEndpoint = await getEndpoint(toolName);
-    const contextRequiresConfirmation =
-      toolExecutionContext.confirmationOverrides?.some(
-        (o) =>
-          o.requiresConfirmation &&
-          (o.toolId === toolName ||
-            (targetEndpoint ? o.toolId === getPreferredName(toolName) : false)),
-      ) ?? false;
-    logger.debug("[RouteExecute] Confirmation gate evaluated", {
-      toolName,
-      headless: toolExecutionContext.headless,
-      relayReceiver: toolExecutionContext.relayReceiver,
-      overrideCount: toolExecutionContext.confirmationOverrides?.length ?? 0,
-      overrideToolIds:
-        toolExecutionContext.confirmationOverrides
-          ?.filter((o) => o.requiresConfirmation)
-          .map((o) => o.toolId)
-          .join(",") ?? "",
-      endpointRequiresConfirmation:
-        targetEndpoint?.requiresConfirmation === true,
-      contextRequiresConfirmation,
-    });
-    if (!targetEndpoint?.requiresConfirmation && !contextRequiresConfirmation) {
+    const { toolName, toolExecutionContext, logger } = params;
+    if (!(await ExecuteToolGuards.isConfirmationRequired(params))) {
       return null;
     }
     logger.debug(
@@ -284,6 +245,62 @@ export class ExecuteToolGuards {
   }
 
   /**
+   * Whether the requiresConfirmation gate fires for this call (no side
+   * effects). See applyConfirmationGate.
+   */
+  static async isConfirmationRequired(params: {
+    toolName: string;
+    data: { callbackMode?: string | null };
+    toolExecutionContext: ToolExecutionContext;
+    logger: EndpointLogger;
+  }): Promise<boolean> {
+    const { toolName, data, toolExecutionContext, logger } = params;
+    if (
+      data.callbackMode === "approve" ||
+      toolExecutionContext.isConfirmedReExecution === true ||
+      (toolExecutionContext.headless === true &&
+        toolExecutionContext.relayReceiver !== true)
+    ) {
+      return false;
+    }
+    // A route left out of this server build (bundle-ignored, e.g. builder /
+    // check) has no loadable definition here either: getEndpoint would throw
+    // "Cannot find package". Nothing to confirm; the executor answers it.
+    const { isRouteExcludedFromBuild } =
+      await import("@/generated/routes/handlers");
+    if (isRouteExcludedFromBuild(toolName)) {
+      return false;
+    }
+    const { getEndpoint } = await import("@/generated/endpoints/endpoint");
+    const targetEndpoint = await getEndpoint(toolName);
+    const contextRequiresConfirmation =
+      toolExecutionContext.confirmationOverrides?.some(
+        (o) =>
+          o.requiresConfirmation &&
+          (o.toolId === toolName ||
+            (targetEndpoint ? o.toolId === getPreferredName(toolName) : false)),
+      ) ?? false;
+    logger.debug("[RouteExecute] Confirmation gate evaluated", {
+      toolName,
+      headless: toolExecutionContext.headless,
+      relayReceiver: toolExecutionContext.relayReceiver,
+      overrideCount: toolExecutionContext.confirmationOverrides?.length ?? 0,
+      overrideToolIds:
+        toolExecutionContext.confirmationOverrides
+          ?.filter((o) => o.requiresConfirmation)
+          .map((o) => o.toolId)
+          .join(",") ?? "",
+      endpointRequiresConfirmation:
+        targetEndpoint?.requiresConfirmation === true,
+      contextRequiresConfirmation,
+    });
+    return (
+      targetEndpoint?.requiresConfirmation === true ||
+      contextRequiresConfirmation
+    );
+  }
+
+  /**
    * The whole pre-execution gate for a local call, in one entry point: the
    * permission cascade followed by the requiresConfirmation gate.
    *
@@ -302,8 +319,10 @@ export class ExecuteToolGuards {
     ctx: RouteExecuteContext;
     callbackMode: string | null | undefined;
     instanceId: string | undefined;
+    /** The target's input: validated before a call is parked for approval. */
+    input: Record<string, WidgetData>;
   }): Promise<ResponseType<WidgetData> | null> {
-    const { ctx, callbackMode, instanceId } = params;
+    const { ctx, callbackMode, instanceId, input } = params;
     const { toolName, user, logger, t, toolExecutionContext } = ctx;
 
     // Resolve the callable tool set (pinned ∪ available) + denied via THE central
@@ -352,12 +371,27 @@ export class ExecuteToolGuards {
     // remote dispatch path: the endpoint definition AND the per-context
     // confirmation cascade both apply uniformly wherever the tool would run.
     if (!instanceId) {
-      const gate = await ExecuteToolGuards.applyConfirmationGate({
+      const gateParams = {
         toolName,
         data: { callbackMode },
         toolExecutionContext,
         logger,
-      });
+      };
+      // A call that cannot run never reaches the confirmation dialog: the
+      // model gets the validation error now (approving it could only fail).
+      if (await ExecuteToolGuards.isConfirmationRequired(gateParams)) {
+        const { validateBeforeConfirmation } =
+          await import("./confirm-validate");
+        const invalid = await validateBeforeConfirmation({ ctx, input });
+        if (invalid) {
+          logger.debug(
+            "[RouteExecute] Gated call failed validation - not parked for confirmation",
+            { toolName },
+          );
+          return invalid;
+        }
+      }
+      const gate = await ExecuteToolGuards.applyConfirmationGate(gateParams);
       if (gate) {
         return success(gate);
       }

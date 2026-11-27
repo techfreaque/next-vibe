@@ -6,4 +6,12 @@ export const translations: typeof enTranslations = {
     searchEndpoints: "Ricerca di punti...",
     value: "{{value}}",
   },
+  errors: {
+    unknownInputKeys: {
+      noneReached:
+        "{{toolName}} non ha ricevuto nessuno dei suoi argomenti. Sconosciuti: {{unknownKeys}}. Attesi: {{expectedKeys}}.",
+      dropped:
+        "{{error}} Argomenti sconosciuti scartati: {{unknownKeys}}. Attesi: {{expectedKeys}}.",
+    },
+  },
 };

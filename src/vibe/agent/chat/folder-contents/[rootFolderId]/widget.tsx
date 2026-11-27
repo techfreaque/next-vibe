@@ -99,13 +99,14 @@ import { FolderPermissionsDialog } from "../../folders/[rootFolderId]/widget/fol
 import { FolderProjectDialog } from "../../folders/[rootFolderId]/widget/folder-project-dialog";
 import renameDefinitions from "../../folders/subfolders/[subFolderId]/rename/definition";
 import { scopedTranslation as renameFolderTranslation } from "../../folders/subfolders/[subFolderId]/rename/i18n";
-import { useChatBootContext } from "../../hooks/context";
+import { useBootSeed, useChatBootContext } from "../../hooks/context";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
 } from "../../i18n";
 import { ThreadShareDialog } from "../../threads/[threadId]/share-links/widget";
+import { handleThreadDeleteError } from "../../threads/[threadId]/stale-delete";
 import { scopedTranslation as threadsScopedTranslation } from "../../threads/i18n";
 import type { FolderContentsItem } from "./definition";
 import definitions from "./definition";
@@ -371,6 +372,17 @@ function ThreadRow({
         await ChatThreadsRepositoryClient.deleteThread(item.id, logger, locale);
       } else {
         const threadDef = await import("../../threads/[threadId]/definition");
+        const deletedRow = {
+          threadId: item.id,
+          rootFolderId: item.rootFolderId,
+          folderId: item.folderId ?? null,
+          list: "folder-contents" as const,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+          ownerKnown: item.userId !== null,
+          streamingState: item.streamingState ?? null,
+          isActive,
+        };
         await apiClient.mutate(
           threadDef.default.DELETE,
           logger,
@@ -378,6 +390,18 @@ function ThreadRow({
           { rootFolderId: item.rootFolderId },
           { threadId: item.id },
           locale,
+          {
+            onError: ({ error }) =>
+              handleThreadDeleteError(error, deletedRow, logger, () =>
+                apiClient.refetchEndpoint(definitions.GET, logger, {
+                  urlPathParams: { rootFolderId: item.rootFolderId },
+                  requestData: {
+                    subFolderId: item.folderId ?? null,
+                    threadIds: null,
+                  },
+                }),
+              ),
+          },
         );
       }
     })();
@@ -839,6 +863,17 @@ function ThreadRowShared({
         pushState(`/${locale}/threads/${item.rootFolderId}/${NEW_MESSAGE_ID}`);
       }
       const threadDef = await import("../../threads/[threadId]/definition");
+      const deletedRow = {
+        threadId: item.id,
+        rootFolderId: item.rootFolderId,
+        folderId: item.folderId ?? null,
+        list: "folder-contents" as const,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        ownerKnown: item.userId !== null,
+        streamingState: item.streamingState ?? null,
+        isActive,
+      };
       await apiClient.mutate(
         threadDef.default.DELETE,
         logger,
@@ -846,6 +881,18 @@ function ThreadRowShared({
         { rootFolderId: item.rootFolderId },
         { threadId: item.id },
         locale,
+        {
+          onError: ({ error }) =>
+            handleThreadDeleteError(error, deletedRow, logger, () =>
+              apiClient.refetchEndpoint(definitions.GET, logger, {
+                urlPathParams: { rootFolderId: item.rootFolderId },
+                requestData: {
+                  subFolderId: item.folderId ?? null,
+                  threadIds: null,
+                },
+              }),
+            ),
+        },
       );
     })();
     setDeleteDialogOpen(false);
@@ -1159,6 +1206,12 @@ function FolderRow({
     return isDescendantOrSelf(parent, ancestorId);
   };
   const isExpanded = isDescendantOrSelf(activeFolderId, item.id);
+  // SSR snapshot of this subfolder seeds its list once per page load only.
+  const subFolderSeed = useBootSeed(
+    isExpanded && initialSubFolderId === item.id
+      ? initialSubFolderContentsData
+      : null,
+  );
   const isActive = activeFolderId === item.id;
   const isDefault = isDefaultFolder(item.id);
   const isIncognito = activeRootFolderId === DefaultFolderId.INCOGNITO;
@@ -1642,10 +1695,7 @@ function FolderRow({
               read: {
                 urlPathParams: { rootFolderId: activeRootFolderId },
                 initialState: { subFolderId: item.id, threadIds: null },
-                initialData:
-                  initialSubFolderId === item.id
-                    ? (initialSubFolderContentsData ?? undefined)
-                    : undefined,
+                initialData: subFolderSeed,
                 queryOptions: {
                   refetchOnWindowFocus: false,
                   staleTime: 30_000,

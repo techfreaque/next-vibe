@@ -68,6 +68,7 @@ import type { EndpointLogger } from "../../../logger/types";
 import { takeWsActivitySummary } from "../../../realtime/server/activity";
 import {
   summarizeInFlightRequests,
+  summarizeLargeResponses,
   summarizeRecentRequests,
 } from "../../../realtime/server/http-proxy";
 import { TASK_WATCHDOG_SWEEP_ALIAS } from "../../../tasks/watchdog/constants";
@@ -198,6 +199,13 @@ const EL_LAG_WARN_MS = 100;
 const EL_LAG_HISTOGRAM_RESOLUTION_MS = 20;
 const EL_LAG_ERROR_MS = 500;
 const EL_LAG_CRITICAL_MS = 2000;
+/** Host CPU steal share of a lag window that attributes the lag to the host. */
+const EL_HOST_CPU_STEAL_PCT = 30;
+/**
+ * Host steal across the stall itself (all 4 vCPUs) that attributes it to the
+ * host: half of the box's CPU time went to other guests while the loop waited.
+ */
+const EL_STALL_HOST_CPU_STEAL_PCT = 50;
 
 /**
  * Supervisor heap cap in MB. The supervisor only runs the watch loop — no app code.
@@ -819,6 +827,8 @@ export class ServerStartRepository {
       const stallCaptureMs = EL_LAG_WARN_MS - STALL_TICK_MS;
       interface SchedulerSample {
         counters: Awaited<ReturnType<typeof readThreadSchedulerSample>>;
+        /** Host /proc/stat totals at the same moment (steal across a stall). */
+        host: Awaited<ReturnType<typeof readHostCpuSample>>;
         readStartedAt: number;
         readElapsedMs: number;
       }
@@ -829,9 +839,17 @@ export class ServerStartRepository {
           return schedulerRead;
         }
         const readStartedAt = performance.now();
-        schedulerRead = readThreadSchedulerSample().then((counters) => {
+        schedulerRead = Promise.all([
+          readThreadSchedulerSample(),
+          readHostCpuSample(),
+        ]).then(([counters, host]) => {
           const readElapsedMs = performance.now() - readStartedAt;
-          lastSchedulerSample = { counters, readStartedAt, readElapsedMs };
+          lastSchedulerSample = {
+            counters,
+            host,
+            readStartedAt,
+            readElapsedMs,
+          };
           maxSchedulerSampleMs = Math.max(maxSchedulerSampleMs, readElapsedMs);
           schedulerRead = undefined;
           return lastSchedulerSample;
@@ -850,11 +868,13 @@ export class ServerStartRepository {
         scheduler: Promise<{
           counters: ReturnType<typeof threadSchedulerDelta>;
           sampleIntervalMs: number | undefined;
+          stallHostCpuStealPct: number | undefined;
         }>;
         runningTasks: string[];
         taskTimings: string;
         taskOverlaps: { label: string; overlapMs: number }[];
         recentRequests: string;
+        largeResponses: string | undefined;
         pgResultDecodes: ReturnType<typeof summarizePgResultDecodes>;
       } | null = null;
       const stallTicker = setInterval(() => {
@@ -894,11 +914,23 @@ export class ServerStartRepository {
                 Math.round(
                   sample.readStartedAt - previousSchedulerSample.readStartedAt,
                 ),
+              // Host steal from the sample before the stall to the one right
+              // after it. The 5 s window average dilutes a one-second burst:
+              // prod stalls in seconds 1-3 of a minute (55 of 110) carried a
+              // median 31.5 % window steal and almost never overlapped a cron.
+              stallHostCpuStealPct:
+                previousSchedulerSample && sample.readStartedAt >= now
+                  ? hostCpuStealPercent(
+                      previousSchedulerSample.host,
+                      sample.host,
+                    )
+                  : undefined,
             })),
             runningTasks: probed?.labels ?? [],
             taskTimings: probed?.timings ?? "",
             taskOverlaps: probed?.overlaps ?? [],
             recentRequests: summarizeRecentRequests(),
+            largeResponses: summarizeLargeResponses(startedAt, endedAt),
             pgResultDecodes: summarizePgResultDecodes(startedAt, endedAt),
           };
           // Close the sampling window that covered the stall now, so its
@@ -1020,6 +1052,18 @@ export class ServerStartRepository {
               : undefined;
           // Taken every window (it resets), logged only with a lag row
           const wsActivity = takeWsActivitySummary();
+          // The hypervisor ran other guests on this vCPU for a large share of
+          // the window (S1 2026-11-25..27: 20-48 % steal in most lag rows, the
+          // sampled stack is then whatever woke up first). These windows get
+          // their own message so the host-capacity problem is one row that
+          // counts up instead of hiding among per-stack code stalls.
+          const stallHostCpuStealPct = scheduler?.stallHostCpuStealPct;
+          const hostCpuStolen =
+            (windowHostCpuStealPct !== undefined &&
+              windowHostCpuStealPct >= EL_HOST_CPU_STEAL_PCT) ||
+            (stallHostCpuStealPct !== undefined &&
+              stallHostCpuStealPct >= EL_STALL_HOST_CPU_STEAL_PCT);
+          const lagSuffix = hostCpuStolen ? " while the host stole CPU" : "";
           // Shared context for every lag level: when, how big the heap was
           // (a full GC on a large heap is one candidate), what ran.
           const lagContext = {
@@ -1027,10 +1071,14 @@ export class ServerStartRepository {
             windowCpuPressure,
             windowCpuThrottle,
             windowHostCpuStealPct,
-            hostCpuStealEvidence:
-              windowHostCpuStealPct !== undefined && windowHostCpuStealPct >= 30
-                ? "elevated-hypervisor-cpu-steal-in-lag-window"
-                : undefined,
+            stallHostCpuStealPct,
+            // The watchdog's own profiler close, when it fell inside the stall
+            profilerCloses: stall
+              ? PhaseProfiler.closesDuring(stall.startedAt, stall.endedAt)
+              : undefined,
+            hostCpuStealEvidence: hostCpuStolen
+              ? "elevated-hypervisor-cpu-steal-in-lag-window"
+              : undefined,
             heapMb,
             prevHeapMb,
             rssMb: Math.round(mem.rss / 1024 / 1024),
@@ -1060,6 +1108,8 @@ export class ServerStartRepository {
             // Per run: start/end wall clock, to place it against stallStartedAt
             taskTimings: stall?.taskTimings || undefined,
             recentRequests: stall?.recentRequests,
+            // Multi-MB proxied bodies near the stall (route + bytes, no URL)
+            largeResponses: stall?.largeResponses,
             largePgDispatches: stall
               ? largePgDispatchesDuring(stall.startedAt, stall.endedAt)
               : undefined,
@@ -1085,7 +1135,7 @@ export class ServerStartRepository {
           if (maxMs >= EL_LAG_CRITICAL_MS && lastLagLevel < 3) {
             lastLagLevel = 3;
             logger.error(
-              "[EventLoop] CRITICAL lag - server may appear frozen",
+              `[EventLoop] CRITICAL lag - server may appear frozen${lagSuffix}`,
               {
                 maxMs: Math.round(maxMs),
                 meanMs: Math.round(meanMs),
@@ -1094,14 +1144,17 @@ export class ServerStartRepository {
             );
           } else if (maxMs >= EL_LAG_ERROR_MS && lastLagLevel < 2) {
             lastLagLevel = 2;
-            logger.error("[EventLoop] High lag - requests may be timing out", {
-              maxMs: Math.round(maxMs),
-              meanMs: Math.round(meanMs),
-              ...lagContext,
-            });
+            logger.error(
+              `[EventLoop] High lag - requests may be timing out${lagSuffix}`,
+              {
+                maxMs: Math.round(maxMs),
+                meanMs: Math.round(meanMs),
+                ...lagContext,
+              },
+            );
           } else if (maxMs >= EL_LAG_WARN_MS && lastLagLevel < 1) {
             lastLagLevel = 1;
-            logger.warn("[EventLoop] Elevated lag", {
+            logger.warn(`[EventLoop] Elevated lag${lagSuffix}`, {
               maxMs: Math.round(maxMs),
               meanMs: Math.round(meanMs),
               ...lagContext,
@@ -1334,6 +1387,21 @@ export class ServerStartRepository {
       })
       .catch((error) => {
         logger.warn("Email renderer warmup failed", {
+          error: parseError(error).message,
+        });
+      })
+      .then(async () => {
+        if (ServerStartRepository.nextServerShuttingDown) {
+          return undefined;
+        }
+        // Load the ~1 MB endpoint meta for the AI tool policy off the request
+        // path; otherwise the first chat request stalls the event loop.
+        const { prewarmAiToolPolicy } =
+          await import("../../../agent/chat/settings/ai-tool-policy");
+        return prewarmAiToolPolicy();
+      })
+      .catch((error) => {
+        logger.warn("AI tool policy warmup failed", {
           error: parseError(error).message,
         });
       });
@@ -2022,12 +2090,16 @@ export class ServerStartRepository {
     try {
       // Port layout and the Bun proxy itself live behind ../proxy — see that
       // module for the two modes (proxy / VIBE_DISABLE_PROXY) this selects.
-      const { resolveWebProxyPorts, startWebProxy } = await import("../proxy");
+      const { resolveWebProxyPorts, startWebProxy, warmRealtimeModules } =
+        await import("../proxy");
       const {
         appPort: nextPort,
         wsPort,
         disableProxy,
       } = await resolveWebProxyPorts(port);
+      // Load the WS server + Redis client now, in slices, while the Next.js
+      // child boots; startWebProxy awaits the same promise before it binds.
+      void warmRealtimeModules(logger);
 
       // Kill any stale processes on both ports
       ServerStartRepository.killProcessOnPort(nextPort, logger);

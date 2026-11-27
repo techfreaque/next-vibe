@@ -27,6 +27,7 @@ import { findUnreadableAttachment } from "./attachment-readability";
 import { getAudioQueue } from "./audio-queue";
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
+import { useAIStreamStore } from "./store";
 
 /**
  * Client-only rows (optimistic placeholders, local error bubbles from a failed
@@ -94,6 +95,9 @@ export async function sendMessage(
     locale,
   } = deps;
   const { content } = params;
+  // Per send: a failure before startStream must not inherit the previous
+  // send's credit refusal (rollback logging reads it).
+  useAIStreamStore.getState().setLastSendCreditRefusalRequestId(null);
   let sendStage = "prepare-thread";
   if (settings.ttsAutoplay) {
     getAudioQueue(logger).primeForGesture();
@@ -451,14 +455,33 @@ export async function sendMessage(
     );
 
     // If stream failed and we created a new thread optimistically, revert everything
+    // Request id of a 402 the server logged for this send (null otherwise).
+    const creditRefusalRequestId = streamStarted
+      ? null
+      : useAIStreamStore.getState().lastSendCreditRefusalRequestId;
     if (!streamStarted && createdThreadIdForNewThread) {
       sendStage = "rollback-thread";
-      logger.warn("Stream failed - reverting optimistic new thread", {
+      const rollback = {
         threadId: createdThreadIdForNewThread,
         rootFolderId: currentRootFolderId,
         model: settings.selectedModel,
         attachmentCount: params.attachments?.length ?? 0,
-      });
+      };
+      if (creditRefusalRequestId !== null) {
+        // The designed recovery from a credit refusal: the server logged the
+        // refusal and startStream wrote the one client row for it ("Stream
+        // request rejected by server", same requestId). A second warn row per
+        // refusal is the same event again (2026-11-27).
+        logger.debug("Credit refusal - reverting optimistic new thread", {
+          ...rollback,
+          requestId: creditRefusalRequestId,
+        });
+      } else {
+        logger.warn(
+          "Stream failed - reverting optimistic new thread",
+          rollback,
+        );
+      }
 
       // Remove from threads sidebar cache
       apiClient.updateEndpointData(

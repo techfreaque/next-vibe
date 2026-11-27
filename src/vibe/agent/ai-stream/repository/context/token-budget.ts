@@ -96,20 +96,6 @@ export function truncateToContextWindow(
     }
   }
 
-  logger.warn("[Truncation] Messages exceed context window - truncating", {
-    model,
-    largestMessageRole: messages[largestIndex]?.role ?? null,
-    largestMessageTokens: largestTokens,
-    estimatedTokens: currentTokens,
-    systemTokens,
-    toolsTokens,
-    overhead,
-    limit,
-    modelContextWindow,
-    reservedOutputTokens,
-    messageCount: messages.length,
-  });
-
   // Partition: system messages + last user message are protected
   const systemIndices = new Set<number>();
   let lastUserIndex = -1;
@@ -155,19 +141,40 @@ export function truncateToContextWindow(
     }
   }
 
-  logger.warn("[Truncation] Truncation complete", {
-    model,
-    droppedCount: dropped.size,
-    remainingCount: truncated.length,
-    estimatedTokensAfter: tokens,
-    // Only system messages + the last user message left (they are never
-    // dropped) and the estimate still exceeds the limit: the provider call
-    // goes out over budget. The estimate is chars/3.5, so a call can still
-    // succeed (prod 2026-11-14 21:26: 4 messages, 0 droppable, call fine);
-    // a following provider context-length error is the real failure.
-    protectedCount: systemIndices.size,
-    stillOverLimit: tokens > limit,
-  });
+  // One row per truncation, carrying the input and the outcome. It used to
+  // be two warns ("... - truncating" and "Truncation complete"), so a single
+  // over-budget turn produced two error-log rows and the outcome sat under a
+  // message that read like success (prod 2026-11-27 19:42: a 3.5 MB text
+  // attachment, ~743k estimated tokens for a 32k model, 0 droppable).
+  const stillOverLimit = tokens > limit;
+  logger.warn(
+    stillOverLimit
+      ? "[Truncation] Protected messages alone exceed the context window - provider call goes out over budget"
+      : "[Truncation] Messages exceed context window - dropped older messages",
+    {
+      model,
+      largestMessageRole: messages[largestIndex]?.role ?? null,
+      largestMessageTokens: largestTokens,
+      estimatedTokens: currentTokens,
+      systemTokens,
+      toolsTokens,
+      overhead,
+      limit,
+      modelContextWindow,
+      reservedOutputTokens,
+      messageCount: messages.length,
+      droppedCount: dropped.size,
+      remainingCount: truncated.length,
+      estimatedTokensAfter: tokens,
+      // Only system messages + the last user message left (they are never
+      // dropped) and the estimate still exceeds the limit. The estimate is
+      // chars/3.5, so a small overrun can still succeed (prod 2026-11-14
+      // 21:26: 4 messages, 0 droppable, call fine); a following provider
+      // context-length error is the real failure.
+      protectedCount: systemIndices.size,
+      stillOverLimit,
+    },
+  );
 
   return truncated;
 }

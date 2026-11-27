@@ -15,9 +15,11 @@ import { ErrorResponseTypes, fail } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import { isErrorResponseType, parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
+import { REFUSAL_DETAIL_LOG_KEY } from "../../logger/refusal-detail";
 import type { EndpointLogger } from "../../logger/types";
 import { extractSchemaDefaults } from "../_shared/utils";
 import { containsFile } from "./api-utils-shared";
+import { callApiReportsFailure } from "./call-api-report-policy";
 import { createFormErrorMap } from "./form-error-map";
 import { scopedTranslation as hooksTranslation } from "./i18n";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
@@ -349,9 +351,14 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           endpoint: endpoint.path.join("/"),
           keys: Object.keys(validatedData ?? {}),
         });
+        // Correlation id of the HTTP call; set once callApi dispatched it.
+        const call: { requestId?: string } = {};
         // Failure path: a failed ResponseType from mutateAsync, or an
         // unexpected exception thrown while handling the result.
-        const handleFailure = (error: ErrorResponseType | Error): void => {
+        const handleFailure = (
+          error: ErrorResponseType | Error,
+          answeredByCall = false,
+        ): void => {
           const formSnapshot = formMethods.getValues();
           // No manual "[client] " prefix - the client-log receiver
           // (error-monitor/client-log/repository.ts) already prepends it to
@@ -381,11 +388,36 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
             // found) are expected, user-facing outcomes the form displays -
             // warn. A 5xx is an error.
             const isServerFailure = error.errorType.errorCode >= 500;
-            (isServerFailure ? logger.error : logger.warn).bind(logger)(
-              "Error in submitForm",
-              parseError(error),
-              logMeta,
-            );
+            if (
+              answeredByCall &&
+              call.requestId !== undefined &&
+              callApiReportsFailure(error.errorType.errorKey, user.isPublic)
+            ) {
+              // callApi already reported this failed call ("Endpoint call
+              // rejected/failed: <endpoint>", same requestId) and the server
+              // logged its side. A second row per failure under a stack-only
+              // fingerprint split every refusal again (2026-11-27: 20 rows).
+              logger.debug("submitForm: failure reported by callApi", {
+                ...logMeta,
+                requestId: call.requestId,
+              });
+            } else {
+              // Only client row for this failure (callApi skips public auth
+              // denials and sign-in steps). Class at the top level, the
+              // translated message under refusalDetail: the message text and
+              // stack split one class per locale and build (2026-11-27: 8 rows
+              // for public login 401s and guest folder-create 403s).
+              (isServerFailure ? logger.error : logger.warn).bind(logger)(
+                "Error in submitForm",
+                {
+                  ...logMeta,
+                  requestId: call.requestId ?? null,
+                  status: error.errorType.errorCode,
+                  isPublicUser: user.isPublic,
+                  [REFUSAL_DETAIL_LOG_KEY]: { message: error.message },
+                },
+              );
+            }
             errorResponse = error;
           } else {
             // Unexpected throw (code bug in a callback) — real error.
@@ -414,10 +446,13 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           const result = await mutation.mutateAsync({
             requestData: validatedData,
             urlPathParams,
+            onRequestId: (id) => {
+              call.requestId = id;
+            },
           });
 
           if (!result.success) {
-            handleFailure(result);
+            handleFailure(result, true);
             return undefined;
           }
 
@@ -472,7 +507,16 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         });
       })();
     },
-    [clearFormError, endpoint, formMethods, locale, logger, mutation, setError],
+    [
+      clearFormError,
+      endpoint,
+      formMethods,
+      locale,
+      logger,
+      mutation,
+      setError,
+      user.isPublic,
+    ],
   );
 
   // Create the response object from mutation data

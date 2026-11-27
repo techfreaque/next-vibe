@@ -128,16 +128,24 @@ export function ErrorMessageBubble({
     const isCreditRefusal =
       structuredErrorCode === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode ||
       isBalanceCutStreamError(message);
-    (isCreditRefusal ? logger.warn : logger.error).bind(logger)(
+    // A provider content-filter refusal: the server already logged it once
+    // with provider, model, finish reasons and request ids. The bubble row
+    // keeps what the user saw, under refusalDetail, linked by threadId.
+    const isServerLoggedRefusal =
+      isCreditRefusal || message.errorType === StreamErrorType.CONTENT_FILTERED;
+    const occurrence = {
+      messageId: message.id,
+      threadId: message.threadId,
+      parentId: message.parentId,
+      rootFolderId,
+      model: message.model,
+      skill: message.skill,
+      errorText: errorText.slice(0, 300),
+    };
+    (isServerLoggedRefusal ? logger.warn : logger.error).bind(logger)(
       "Chat: Error message bubble shown to user",
       {
         component: "ErrorMessageBubble",
-        messageId: message.id,
-        threadId: message.threadId,
-        parentId: message.parentId,
-        rootFolderId,
-        model: message.model,
-        skill: message.skill,
         errorType: message.errorType,
         errorCode: message.errorCode,
         structuredErrorCode,
@@ -151,8 +159,16 @@ export function ErrorMessageBubble({
           message.errorCode,
         errorPayloadFormat: structuredErrorKey ? "structured" : "plain",
         localOnly: message.metadata?.isLocalOnly === true,
-        errorText: errorText.slice(0, 300),
         ageMs,
+        // A credit refusal bubble is one class per error key: the translated
+        // amounts, model and thread go outside the fingerprint (2026-11-27:
+        // 58 rows, one per sentence x locale x folder). The server's
+        // "[AI Stream] Turn cut short" / "Setup failed" row holds the numbers.
+        serverRow:
+          message.errorType === StreamErrorType.CONTENT_FILTERED
+            ? "[AI Stream] Provider content filter triggered"
+            : null,
+        ...(isServerLoggedRefusal ? { refusalDetail: occurrence } : occurrence),
       },
     );
   }, [isStepLimit, logger, message, messages, rootFolderId]);

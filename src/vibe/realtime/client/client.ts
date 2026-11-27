@@ -47,7 +47,11 @@ import type {
   WsWireMessage,
 } from "../core/types";
 import { parseWsClientFrame } from "../core/types";
-import { classifyWsDrop, WS_SERVICE_RESTART_CODE } from "./drop-cause";
+import {
+  classifyWsDrop,
+  DEVICE_SUSPEND_MIN_MS,
+  WS_SERVICE_RESTART_CODE,
+} from "./drop-cause";
 
 /**
  * Internal wire handler — accepts wire-protocol data (WsWireMessage["data"]).
@@ -109,6 +113,46 @@ const FIRST_RESTART_HANDSHAKE_MS = 5_000;
 /** Retry an exhausted connection slowly while the tab is visible and online. */
 const RECONNECT_COOLDOWN_MS = 60_000;
 const MAX_FAST_RECONNECT_ATTEMPTS = 6;
+/**
+ * RFC 6455 readyState values, read from the spec instead of the WebSocket
+ * global. A page script or extension that swaps window.WebSocket for a
+ * wrapper class can drop the static constants: with `WebSocket.OPEN`
+ * undefined, `null?.readyState === WebSocket.OPEN` was true, connect() never
+ * opened a socket and the first subscribe threw "Cannot read properties of
+ * null (reading 'send')" into the layout ErrorBoundary (2026-11-20/27).
+ */
+const WS_CONNECTING = 0;
+const WS_OPEN = 1;
+const WS_CLOSING = 2;
+const WS_CLOSED = 3;
+/**
+ * Background park: a hidden tab's socket is closed by us (1000) once it has
+ * been quiet this long, and reopened with replay when the tab is visible
+ * again. Browsers and mobile OSes otherwise kill or freeze a hidden tab's
+ * socket on their own schedule (iOS suspends right after hiding, Chrome
+ * stops answering pings in long-hidden tabs). Each of those kills used to
+ * surface as a client "Connection lost" plus a server "Closed idle socket"
+ * row, and a hidden tab reconnected and died again every few minutes. The
+ * user saw nothing while hidden; after resume they got a half-dead socket.
+ */
+const BACKGROUND_PARK_QUIET_MS = 5_000;
+/**
+ * Right after a stream request (preWarmChannel) the channel can go quiet
+ * between steps (tool calls, media generation) while the answer is still
+ * running. Wait longer before parking so a hidden tab keeps receiving it.
+ */
+const STREAM_PARK_QUIET_MS = 30_000;
+const STREAM_ACTIVITY_WINDOW_MS = 10 * 60_000;
+/**
+ * Liveness tick of a visible page. A gap in it means the device slept or
+ * froze the page (laptop lid, screen lock, occluded window) while the page
+ * still counted as visible: the browser stops answering pings, the server
+ * closes the socket, and the close only surfaces on wake. Without this such
+ * drops were indistinguishable from a real mid-session cut ("silent-drop").
+ */
+const LIVENESS_TICK_MS = 5_000;
+const BACKGROUND_PARK_CLOSE_CODE = 1000;
+const BACKGROUND_PARK_CLOSE_REASON = "background-park";
 
 // Shared connection state
 let sharedWs: WebSocket | null = null;
@@ -147,6 +191,15 @@ let openedAt: number | null = null;
 let lastFrameAt: number | null = null;
 let lastVisibilityChangeAt: number | null = null;
 let lastNetworkChangeAt: number | null = null;
+// Background park state: when the last stream request pre-warmed a channel,
+// the pending quiet check, and whether the current outage waits for the tab
+// to become visible again instead of retrying in the background.
+let lastPreWarmAt: number | null = null;
+let parkTimer: ReturnType<typeof setTimeout> | null = null;
+let reconnectHeldForVisibility = false;
+let livenessTimer: ReturnType<typeof setInterval> | null = null;
+let lastLivenessTickAt: number | null = null;
+let lastDeviceResumeAt: number | null = null;
 
 /** Close details of the socket that started the current outage. */
 interface DropInfo {
@@ -168,6 +221,10 @@ interface DropInfo {
   sinceLastFrameMs: number | null;
   msSinceVisibilityChange: number | null;
   msSinceNetworkChange: number | null;
+  /** Liveness-timer gap right before the close (null = tab hidden). */
+  deviceSuspendedMs: number | null;
+  /** Time since the last device suspend of a visible page ended. */
+  msSinceDeviceResume: number | null;
 }
 // The current outage: its first close, whether it was reported, and how long
 // it lasted while the user could notice it (tab visible + browser online).
@@ -288,15 +345,21 @@ function startDropCheck(logger: EndpointLogger): void {
       stopDropCheck();
       return;
     }
-    if (Date.now() - disconnectedAt >= DROP_REPORT_AFTER_MS) {
+    // A drop that waits for the tab to come back is only an outage once the
+    // user can see it: count visible + online time, not wall-clock time.
+    const downMs = reconnectHeldForVisibility
+      ? currentNoticeableDownMs()
+      : Date.now() - disconnectedAt;
+    if (downMs >= DROP_REPORT_AFTER_MS) {
       reportDrop(logger, "deadline");
     }
   }, DROP_CHECK_INTERVAL_MS);
 }
 
 function sendToServer(msg: WsClientMessage): void {
-  if (sharedWs?.readyState === WebSocket.OPEN) {
-    sharedWs.send(JSON.stringify(msg));
+  const ws = sharedWs;
+  if (ws !== null && ws.readyState === WS_OPEN) {
+    ws.send(JSON.stringify(msg));
   }
 }
 
@@ -368,6 +431,7 @@ function handleOpen(
   maxReconnectTimerOverrunMs = 0;
   noticeableDownMs = 0;
   noticeableSince = null;
+  reconnectHeldForVisibility = false;
   stopDropCheck();
   reconnectAttempts = 0;
   reconnectPaused = false;
@@ -391,6 +455,83 @@ function handleOpen(
         }
       }
     }, IDENTITY_RESUBSCRIBE_GRACE_MS);
+  }
+  // Opened while hidden (a new subscription or an active-stream retry): park
+  // it again once it goes quiet.
+  scheduleBackgroundPark();
+}
+
+function livenessTick(): void {
+  const now = Date.now();
+  if (
+    lastLivenessTickAt !== null &&
+    isTabVisible() &&
+    now - lastLivenessTickAt - LIVENESS_TICK_MS >= DEVICE_SUSPEND_MIN_MS
+  ) {
+    lastDeviceResumeAt = now;
+  }
+  lastLivenessTickAt = now;
+}
+
+function ensureLivenessTimer(): void {
+  if (livenessTimer !== null) {
+    return;
+  }
+  lastLivenessTickAt = Date.now();
+  livenessTimer = setInterval(livenessTick, LIVENESS_TICK_MS);
+}
+
+function clearParkTimer(): void {
+  if (parkTimer !== null) {
+    clearTimeout(parkTimer);
+    parkTimer = null;
+  }
+}
+
+/** How long a hidden socket must be quiet before it is parked. */
+function backgroundParkQuietMs(now: number): number {
+  return lastPreWarmAt !== null &&
+    now - lastPreWarmAt < STREAM_ACTIVITY_WINDOW_MS
+    ? STREAM_PARK_QUIET_MS
+    : BACKGROUND_PARK_QUIET_MS;
+}
+
+/**
+ * Hidden tab: close the shared socket ourselves once it is quiet, before the
+ * browser or OS kills it. Re-checks while traffic keeps flowing. The channel
+ * cursors stay, so the visible tab resubscribes with `since` and the server
+ * replays the gap (or the channel refetches when the gap is too old).
+ */
+function scheduleBackgroundPark(): void {
+  clearParkTimer();
+  const ws = sharedWs;
+  if (
+    !ws ||
+    ws.readyState !== WS_OPEN ||
+    isTabVisible() ||
+    pageUnloading ||
+    channels.size === 0
+  ) {
+    return;
+  }
+  const now = Date.now();
+  const quietMs = now - (lastFrameAt ?? openedAt ?? now);
+  const neededMs = backgroundParkQuietMs(now);
+  if (quietMs < neededMs) {
+    parkTimer = setTimeout(scheduleBackgroundPark, neededMs - quietMs);
+    return;
+  }
+  sharedWs = null;
+  pendingHandshake = null;
+  refreshHandshakeDeadline();
+  openedAt = null;
+  lastFrameAt = null;
+  reconnectAttempts = 0;
+  reconnectPaused = false;
+  try {
+    ws.close(BACKGROUND_PARK_CLOSE_CODE, BACKGROUND_PARK_CLOSE_REASON);
+  } catch {
+    /* already closing */
   }
 }
 
@@ -498,8 +639,8 @@ function connect(logger: EndpointLogger): void {
   if (
     pageUnloading ||
     typeof WebSocket === "undefined" ||
-    sharedWs?.readyState === WebSocket.OPEN ||
-    sharedWs?.readyState === WebSocket.CONNECTING
+    sharedWs?.readyState === WS_OPEN ||
+    sharedWs?.readyState === WS_CONNECTING
   ) {
     return;
   }
@@ -514,6 +655,7 @@ function connect(logger: EndpointLogger): void {
   const url = `${protocol}//${getCurrentHost()}/ws?requestId=${requestId}${retry}${restart}`;
 
   lastLogger = logger;
+  ensureLivenessTimer();
   const connectStartedAt = Date.now();
   const handshakeContext = readHandshakeContext();
   const ws = new WebSocket(url);
@@ -616,8 +758,30 @@ function connect(logger: EndpointLogger): void {
             : closedAt - lastVisibilityChangeAt,
         msSinceNetworkChange:
           lastNetworkChangeAt === null ? null : closedAt - lastNetworkChangeAt,
+        deviceSuspendedMs:
+          isTabVisible() && lastLivenessTickAt !== null
+            ? Math.max(0, closedAt - lastLivenessTickAt - LIVENESS_TICK_MS)
+            : null,
+        msSinceDeviceResume:
+          lastDeviceResumeAt === null ? null : closedAt - lastDeviceResumeAt,
       };
       startDropCheck(logger);
+    }
+    // Hidden tab and the socket carried no live traffic (or never opened):
+    // nothing in the background needs it. Wait for the tab to come back
+    // instead of retrying where the browser throttles timers and the OS
+    // suspends the network; the visibility handler reconnects right away and
+    // the drop is reported then, with its visible downtime. An active stream
+    // (recent frames) keeps retrying so a hidden tab still receives it.
+    const socketActiveSince = socketLastFrameAt ?? socketOpenedAt;
+    if (
+      !isTabVisible() &&
+      (socketActiveSince === null ||
+        closedAt - socketActiveSince >= backgroundParkQuietMs(closedAt))
+    ) {
+      reconnectHeldForVisibility = true;
+      clearReconnectTimer();
+      return;
     }
     // Report the end of the fast retries once. A foreground tab can still
     // recover after a longer outage without waiting for another user action.
@@ -658,12 +822,13 @@ function connect(logger: EndpointLogger): void {
     // back fast, with jitter so every tab does not reconnect in the same tick.
     // Events emitted during the gap are replayed on resubscribe (bounded
     // buffer); an older gap makes the channel refetch.
-    // Otherwise exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s.
-    // A going-away close is also immediately retryable while the document
-    // is still active. pagehide cancels the retry on an actual navigation.
+    // Otherwise exponential backoff: 2s, 4s, 8s, 16s, 30s after the first try.
+    // Any close of a visible, online tab is retried at once too: the user is
+    // looking at the page, and a cut connection (1006 from a carrier, NAT or
+    // proxy) usually reconnects on the first try. pagehide cancels the retry
+    // on an actual navigation.
     const fastClose =
-      event.code === WS_SERVICE_RESTART_CODE ||
-      (event.code === 1001 && event.wasClean && isTabVisible() && isOnline());
+      event.code === WS_SERVICE_RESTART_CODE || (isTabVisible() && isOnline());
     const delay =
       fastClose && reconnectAttempts === 0
         ? 100 + Math.floor(Math.random() * 400)
@@ -712,7 +877,7 @@ function refreshHandshakeDeadline(): void {
       handshakeTimer = null;
       if (
         sharedWs === ws &&
-        ws.readyState === WebSocket.CONNECTING &&
+        ws.readyState === WS_CONNECTING &&
         isTabVisible() &&
         isOnline()
       ) {
@@ -743,6 +908,7 @@ if (typeof document !== "undefined") {
   addWindowListener("pagehide", () => {
     pageUnloading = true;
     clearReconnectTimer();
+    clearParkTimer();
     noticeableDownMs = currentNoticeableDownMs();
     noticeableSince = null;
     if (lastLogger) {
@@ -766,9 +932,19 @@ if (typeof document !== "undefined") {
   });
   addDocumentListener("visibilitychange", () => {
     lastVisibilityChangeAt = Date.now();
+    // Hidden tabs throttle timers on purpose; only a gap while visible is a
+    // device suspend.
+    if (lastLivenessTickAt !== null) {
+      lastLivenessTickAt = lastVisibilityChangeAt;
+    }
     updateDropVisibility();
     refreshHandshakeDeadline();
-    resumeReconnect();
+    if (isTabVisible()) {
+      clearParkTimer();
+      resumeReconnect();
+    } else {
+      scheduleBackgroundPark();
+    }
   });
   addWindowListener("online", () => {
     lastNetworkChangeAt = Date.now();
@@ -792,8 +968,8 @@ function ensureConnected(logger: EndpointLogger): void {
   }
   if (
     !sharedWs ||
-    sharedWs.readyState === WebSocket.CLOSED ||
-    sharedWs.readyState === WebSocket.CLOSING
+    sharedWs.readyState === WS_CLOSED ||
+    sharedWs.readyState === WS_CLOSING
   ) {
     connect(logger);
   }
@@ -909,6 +1085,7 @@ export function preWarmChannel(
   logger: EndpointLogger,
   descriptor?: WsChannelDescriptor,
 ): void {
+  lastPreWarmAt = Date.now();
   getOrCreateChannel(channel, locale, logger, descriptor);
 }
 
@@ -942,11 +1119,16 @@ export function onChannelResync(
  * socket. The widgets re-subscribe for the new identity as their user prop
  * changes; channels from before the switch that are still mounted after a
  * short grace period resubscribe too (with `since`, so shared channels keep a
- * gap-free stream). No-op without a socket.
+ * gap-free stream). Without a socket (parked in the background, or between
+ * retries) the next socket already carries the new cookies: only mark the
+ * channels so it defers the pre-switch ones the same way.
  */
 export function reconnectForIdentityChange(logger: EndpointLogger): void {
   const old = sharedWs;
   if (!old) {
+    for (const state of channels.values()) {
+      state.identityStale = true;
+    }
     return;
   }
   sharedWs = null;

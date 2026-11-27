@@ -471,6 +471,16 @@ export class AbortErrorHandler {
                 modelCreditCost,
                 ...stepEstimate.fallbackPricing,
                 upstreamCostEvidence: "stream-interrupted-before-cost",
+                // Join keys for a per-request comparison with the provider's
+                // own generation stats (earlier steps of the same turn) and
+                // how far the cut step got before the stop.
+                providerRequestIds: ctx.providerJobIds.join(","),
+                finishedSteps: ctx.tokenStepCount,
+                stepElapsedMs:
+                  ctx.stepPricingStartedAt === undefined
+                    ? null
+                    : Date.now() - ctx.stepPricingStartedAt,
+                streamedChars: ctx.currentAssistantContent.length,
               },
             );
           }

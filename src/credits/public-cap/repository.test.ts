@@ -9,7 +9,7 @@ import { eq, inArray } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import {
   publicCapReservations,
@@ -150,6 +150,46 @@ describe("PublicCapRepository", () => {
     );
     expect(blocked.success).toBe(false);
     expect(fine.success).toBe(true);
+  });
+
+  it("names a signed-in actor and the pool math on a refusal", async () => {
+    await setRow({ spendToday: 0, capAmount: 1000, perLeadCap: 10 });
+    const id = lead("signed-in");
+    await PublicCapRepository.incrementSpend(9.5, logger, { leadId: id });
+    const warn = vi.spyOn(logger, "warn");
+    try {
+      const blocked = await PublicCapRepository.gate(
+        {
+          leadId: id,
+          ipAddress: undefined,
+          expectedCost: 1,
+          model: "fixture",
+          actor: { userId: "fixture-user", isSignedIn: true },
+        },
+        logger,
+        defaultLocale,
+      );
+      expect(blocked.success).toBe(false);
+      expect(warn).toHaveBeenCalledWith(
+        "[PublicCap] lead-cap: signed-in free user request refused",
+        expect.objectContaining({
+          kind: "lead-cap",
+          actor: "signed-in",
+          refusalDetail: expect.objectContaining({
+            userId: "fixture-user",
+            isSignedIn: true,
+            subCap: 10,
+            subCapSpend: 9.5,
+            limitLeft: 0.5,
+            overLimitBy: 0.5,
+            leadSettledToday: 9.5,
+            leadReservedLive: 0,
+          }),
+        }),
+      );
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it("limits a free model turn to the remaining personal allowance", async () => {

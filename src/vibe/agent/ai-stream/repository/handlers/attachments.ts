@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -108,7 +108,11 @@ export class FileAttachmentHandler {
   }
 
   /**
-   * Update message with attachment URLs after upload completes
+   * Swap the user message's attachment placeholders for the stored files.
+   * Merges into the existing metadata (gap-fill `variants` and any other key
+   * written meanwhile survive) and writes only id/url/filename/mimeType/size,
+   * never bytes. Returns the number of rows updated: 0 means the row does not
+   * exist (yet), which the caller logs as an error.
    */
   static async updateMessageWithAttachments(params: {
     userMessageId: string;
@@ -120,22 +124,30 @@ export class FileAttachmentHandler {
       size: number;
     }>;
     logger: EndpointLogger;
-  }): Promise<void> {
+  }): Promise<number> {
     const { userMessageId, attachments, logger } = params;
+    const stored = attachments.map((attachment) => ({
+      id: attachment.id,
+      url: attachment.url,
+      filename: attachment.filename,
+      mimeType: attachment.mimeType,
+      size: attachment.size,
+    }));
 
-    await db
+    const updated = await db
       .update(chatMessages)
       .set({
-        metadata: {
-          attachments,
-        },
+        metadata: sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || ${JSON.stringify({ attachments: stored })}::jsonb`,
       })
-      .where(eq(chatMessages.id, userMessageId));
+      .where(eq(chatMessages.id, userMessageId))
+      .returning({ id: chatMessages.id });
 
     logger.debug("[File Processing] Message updated with attachments", {
       messageId: userMessageId,
-      attachmentCount: attachments.length,
+      attachmentCount: stored.length,
+      updatedRows: updated.length,
     });
+    return updated.length;
   }
 }
 

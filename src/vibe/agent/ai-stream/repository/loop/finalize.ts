@@ -393,18 +393,41 @@ export async function complete(
   }
 
   if (finishReason === "content-filter") {
+    // ONE row per refusal: it carries the finish reasons, the provider's
+    // request id and the empty-stream fields, so the empty-stream branch
+    // below and the client bubble (CONTENT_FILTERED) do not report the same
+    // event again (prod 2026-11-26: 3 rows per refusal).
+    const filterRawFinishReason = await Promise.resolve(
+      streamResult.rawFinishReason,
+    ).catch(() => null);
     logger.warn("[AI Stream] Provider content filter triggered", {
       model,
       threadId,
       apiProvider: modelConfig.apiProvider,
       providerModel: modelConfig.providerModel,
+      finishReason,
+      providerNativeFinishReason:
+        filterRawFinishReason &&
+        /^[A-Za-z0-9_.-]{1,80}$/.test(filterRawFinishReason)
+          ? filterRawFinishReason
+          : null,
+      providerRequestIds: state.p.ctx.providerJobIds.join(","),
+      providerError: state.p.ctx.lastProviderErrorText,
       partialOutputChars: state.p.ctx.currentAssistantContent.length,
+      emptyStream: !(
+        state.p.ctx.currentAssistantMessageId &&
+        state.p.ctx.currentAssistantContent
+      ),
+      steps: state.p.ctx.tokenStepCount,
+      inputTokens: finalInputTokens,
       outputTokens: finalOutputTokens,
+      reasoningTokens,
+      outputCapped: state.p.ctx.creditBudgetCapped,
     });
     const { ctx, user, t } = state.p;
     await ctx.dbWriter.emitErrorMessage({
       threadId,
-      errorType: StreamErrorType.STREAM_ERROR,
+      errorType: StreamErrorType.CONTENT_FILTERED,
       error: fail({
         message: t("errors.contentFiltered"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
@@ -527,8 +550,16 @@ export async function complete(
           (finishReason === "length" || (isEmptyAnswer && pausedAt === null))));
     if (budgetCut) {
       logger.warn("[AI Stream] Turn cut short by the remaining balance", {
-        threadId,
-        model,
+        // Class: where the budget cut and whether an answer survived. The
+        // thread, model, step count and token caps are per occurrence and
+        // stay out of the fingerprint (2026-11-27: 26 rows, one per model).
+        refusalDetail: {
+          threadId,
+          model,
+          steps: ctx.tokenStepCount,
+          maxOutputTokens: ctx.creditBudgetOutputTokens,
+          configuredOutputModalities: modelConfig.outputs,
+        },
         finishReason: finishReason ?? null,
         loopStopped: ctx.creditBudgetStopped,
         budgetCutStage: ctx.creditBudgetStopped ? "next-step-input" : "output",
@@ -538,15 +569,12 @@ export async function complete(
         budgetNextRemainingCredits:
           ctx.creditBudgetNextStep?.remainingCredits ?? null,
         outputCapped: ctx.creditBudgetCapped,
-        maxOutputTokens: ctx.creditBudgetOutputTokens,
-        configuredOutputModalities: modelConfig.outputs,
         balanceEvidence: {
           spendableCreditsAtStart: state.p.creditBalance,
           creditsAlreadyDeducted: ctx.dbWriter.totalCreditsDeducted,
         },
         isEmptyAnswer,
         errorKey: ErrorResponseTypes.PAYMENT_REQUIRED.errorKey,
-        steps: ctx.tokenStepCount,
         creditCost: actualCreditCost,
       });
       await ctx.dbWriter.emitErrorMessage({
@@ -636,6 +664,13 @@ export async function complete(
     if (pausedAt !== null) {
       logger.debug(
         "[AI Stream] Paused after tool rounds without assistant text",
+        emptyStreamMeta,
+      );
+    } else if (finishReason === "content-filter") {
+      // Already reported once, with these fields, by
+      // "[AI Stream] Provider content filter triggered" above.
+      logger.debug(
+        "[AI Stream] Content-filtered empty stream (reported above)",
         emptyStreamMeta,
       );
     } else if (explained) {

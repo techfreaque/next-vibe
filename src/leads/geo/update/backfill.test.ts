@@ -84,3 +84,39 @@ it("fills a healthy lead within the batch limit when newer rows have duplicate e
     unresolved: 2,
   });
 });
+
+it("backfills the rest of a batch when the email index rejects some rows", async () => {
+  // Stand-in for prod's leads_email_unique, which rejects updates of rows
+  // whose duplicate email the NOT EXISTS guard could not see.
+  await pg.exec(`
+    CREATE FUNCTION reject_blocked_email() RETURNS trigger AS $$
+    BEGIN
+      IF NEW.email = 'blocked@example.test' THEN
+        RAISE unique_violation USING CONSTRAINT = 'leads_email_unique';
+      END IF;
+      RETURN NEW;
+    END $$ LANGUAGE plpgsql;
+    CREATE TRIGGER reject_blocked_email BEFORE UPDATE ON leads
+      FOR EACH ROW EXECUTE FUNCTION reject_blocked_email();
+    INSERT INTO leads (email, ip_address, created_at) VALUES
+      ('blocked@example.test', '198.51.100.77', now()),
+      ('healthy-a@example.test', '198.51.100.77', now()),
+      ('healthy-b@example.test', '198.51.100.77', now());
+  `);
+  const { backfillLeadCountries } = await import("./repository");
+  expect(await backfillLeadCountries(logger, 10)).toEqual({
+    backfilled: 2,
+    unresolved: 3,
+  });
+  expect(
+    (
+      await pg.query<{ email: string; geo_country: string | null }>(
+        "SELECT email, geo_country FROM leads WHERE email IN ('blocked@example.test', 'healthy-a@example.test', 'healthy-b@example.test') ORDER BY email",
+      )
+    ).rows,
+  ).toEqual([
+    { email: "blocked@example.test", geo_country: null },
+    { email: "healthy-a@example.test", geo_country: "GB" },
+    { email: "healthy-b@example.test", geo_country: "GB" },
+  ]);
+});

@@ -31,6 +31,7 @@ import {
 import { createOpenUncensored } from "../../providers/openuncensored";
 import { logProviderRequest } from "../../providers/shared/debug-file-logger";
 import type { ClientPromptCache } from "../../providers/shared/prompt-cache";
+import { withBufferedToolCalls } from "../../providers/shared/tool-call-delta-buffer";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
 import { createVeniceAI } from "../../providers/venice-ai";
 import { createFixtureFetch } from "../../testing/fetch-cache";
@@ -180,7 +181,7 @@ export class ProviderFactory {
               const replaceAfterRelease =
                 headers.get(GARBLED_REPLACE_HEADER) === "1";
               headers.delete(GARBLED_REPLACE_HEADER);
-              return fetchWithGarbledGuard(
+              const guarded = await fetchWithGarbledGuard(
                 url,
                 { ...options, headers },
                 parsed,
@@ -192,6 +193,12 @@ export class ProviderFactory {
                   replaceAfterRelease,
                 },
               );
+              // Hold tool-call deltas until the call is complete: the SDK
+              // finalizes a call on its first parsable prefix.
+              return withBufferedToolCalls(guarded, {
+                provider: "OpenRouter",
+                logger,
+              });
             }
 
             const sorted = sortObjectKeysPreservingStrings(parsed);

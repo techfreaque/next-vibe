@@ -9,6 +9,7 @@ import { TOOL_HELP_ALIAS } from "@/vibe/help-tool/constants";
 
 import { getPreferredName } from "../../../core/core-utils/path";
 import { isAdminToolConfigured } from "../../../core/definition/admin-availability.server";
+import type { EndpointMeta } from "../../../core/definition/endpoints-meta";
 import { db } from "../../../database";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import { THREAD_RENAME_ALIAS } from "../threads/rename/constants";
@@ -43,10 +44,38 @@ export async function readToolPreferences(
   return normalizeToolPreferences(settings?.toolPreferences);
 }
 
+/**
+ * The tool catalog this policy reads: the ~1 MB generated meta module, loaded
+ * ONCE per process and reduced to the entries with an AI default or admin
+ * availability rule. Evaluating that module inside a chat request stalled the
+ * event loop ~400 ms (prod 2026-11-27, 3 watchdog rows naming
+ * getPersonalAiToolDenies). Server start is meant to call {@link prewarmAiToolPolicy}
+ * off the request path; a request that still comes first shares the same
+ * promise instead of loading it again.
+ */
+let policyCatalog: Promise<EndpointMeta[]> | null = null;
+
+function loadPolicyCatalog(): Promise<EndpointMeta[]> {
+  policyCatalog ??= import("@/generated/endpoints/meta/en").then(
+    ({ endpointsMeta }) => endpointsMeta,
+    (error: Error) => {
+      // Let the next call try again instead of caching the failure.
+      policyCatalog = null;
+      return Promise.reject(error);
+    },
+  );
+  return policyCatalog;
+}
+
+/** Load the tool catalog ahead of the first chat request (server start). */
+export async function prewarmAiToolPolicy(): Promise<void> {
+  await loadPolicyCatalog();
+}
+
 export async function getPersonalAiToolDenies(
   preferences: ToolPreferences,
 ): Promise<string[]> {
-  const { endpointsMeta } = await import("@/generated/endpoints/meta/en");
+  const endpointsMeta = await loadPolicyCatalog();
   const denied = new Set(
     Object.entries(preferences.aiEnabled ?? {})
       .filter(([, enabled]) => !enabled)

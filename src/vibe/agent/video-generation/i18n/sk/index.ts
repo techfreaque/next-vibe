@@ -71,6 +71,14 @@ export const translations: typeof enTranslations = {
       jobId: "ID asynchrónnej úlohy",
     },
     errors: {
+      referenceNotImage:
+        "Odkaz z {{host}} otvára webovú stránku, nie súbor obrázka. Použi priamy odkaz na obrázok (pravý klik, kopírovať adresu obrázka) alebo obrázok nahraj.",
+      referenceUnreachable:
+        "Odkaz na obrázok z {{host}} sa nenačíta (HTTP {{status}}). Skontroluj odkaz alebo obrázok nahraj. Nič sme ti nestrhli.",
+      modelDiscontinued:
+        "Poskytovateľ model {{model}} stiahol a už negeneruje. Vyber iný video model. Nič sme ti nestrhli.",
+      referenceStagingFailed:
+        "Poskytovateľ videa nedokázal prijať vstupný obrázok. Skús to znova alebo vyber iný video model. Nič sme ti nestrhli.",
       referenceUnavailable:
         "Vstupný obrázok už nie je dostupný. Mohol byť odstránený alebo môže patriť do chatu, ku ktorému nemáš prístup. Použi obrázok z tohto chatu alebo ho nahraj znova.",
       validation_failed: {

@@ -19,13 +19,17 @@ it("records the credit recipient lookup kind without its value on an account mis
   await pg.exec(
     "CREATE TABLE users (id uuid, email text, private_name text, created_at timestamp)",
   );
+  await pg.exec("CREATE TABLE user_lead_links (user_id uuid, lead_id uuid)");
   for (const [target, lookupBy] of [
     ["absent@example.invalid", "email"],
     ["11000000-0000-4000-8000-000000000001", "id"],
   ] as const) {
     const result = await AdminAddCreditsRepository.getRecipient(target, sampleLogger, defaultLocale);
     expect(result.success).toBe(false);
-    expect(warn).toHaveBeenLastCalledWith("Credit grant recipient account not found", { lookupBy });
+    expect(warn).toHaveBeenLastCalledWith(
+      "Credit grant recipient account not found",
+      expect.objectContaining({ lookupBy, idIsLinkedLead: false }),
+    );
     expect(error).not.toHaveBeenCalled();
   }
   await pg.exec("ALTER TABLE users RENAME TO offline_users");

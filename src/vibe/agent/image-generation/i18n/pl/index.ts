@@ -71,6 +71,10 @@ export const translations: typeof enTranslations = {
       outputAspectRatio: "Proporcje",
     },
     errors: {
+      referenceNotImage:
+        "Link z {{host}} otwiera stronę, a nie plik obrazu. Użyj bezpośredniego linku do obrazu (prawy klik na obraz, kopiuj adres obrazu) albo wgraj plik.",
+      referenceUnreachable:
+        "Link do obrazu z {{host}} się nie ładuje (HTTP {{status}}). Sprawdź link albo wgraj obraz. Nic nie pobraliśmy.",
       referenceUnavailable:
         "Obraz referencyjny jest niedostępny. Został usunięty albo należy do czatu, do którego nie masz dostępu. Użyj obrazu z tego czatu albo wgraj go ponownie.",
       validation_failed: {

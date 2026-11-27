@@ -18,8 +18,12 @@ import { protectionEnv } from "@/credits/anti-farming/env";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 
-import type { ToolExecutionContext } from "../../../../core/execution-context";
+import {
+  DefaultFolderId,
+  type ToolExecutionContext,
+} from "../../../../core/execution-context";
 import { ChatMessageRole } from "../../../chat/enum";
+import { getStorageAdapter } from "../../../chat/storage/index";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import { agentEnv } from "../../../env";
 import {
@@ -44,6 +48,7 @@ import {
 } from "../../../text-to-speech/models";
 import { createFixtureFetch } from "../../testing/fetch-cache";
 import { serializeError } from "../errors/error-utils";
+import { toStoredAudioUrl } from "./streaming-tts-storage";
 
 /**
  * Minimum skills before emitting a TTS chunk
@@ -92,6 +97,8 @@ export class StreamingTTSHandler {
   private readonly availability: AgentEnvAvailability;
   /** Bound fixture/live fetch for the external TTS provider calls. */
   private readonly fetchImpl: typeof globalThis.fetch;
+  /** Incognito threads have no server-side row: chunk files belong to the lead. */
+  private readonly isIncognito: boolean;
   private isEnabled: boolean;
   private isCancelled = false;
   /**
@@ -133,6 +140,8 @@ export class StreamingTTSHandler {
       params.logger,
     );
     this.isEnabled = params.enabled;
+    this.isIncognito =
+      params.toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
   }
 
   /**
@@ -305,7 +314,19 @@ export class StreamingTTSHandler {
 
     try {
       const generated = await this.generateTTS(cleanText);
-      const audioDataUrl = generated?.audioUrl;
+      const audioDataUrl = generated?.audioUrl
+        ? await toStoredAudioUrl({
+            audioUrl: generated.audioUrl,
+            threadId: this.threadId,
+            messageId: this.messageId,
+            chunkIndex: chunkIdx,
+            owner: this.isIncognito
+              ? { leadId: this.user.leadId }
+              : { userId: this.user.id },
+            storage: getStorageAdapter(),
+            logger: this.logger,
+          })
+        : null;
 
       if (generated && audioDataUrl) {
         if (this.wsEmit) {

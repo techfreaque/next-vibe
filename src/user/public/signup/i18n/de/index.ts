@@ -70,6 +70,14 @@ export const translations: typeof enTranslations = {
     expired:
       "Diese Registrierung ist abgelaufen. Starte sie erneut, um einen neuen Code zu erhalten.",
     retry: "Registrierung neu starten",
+    subject: "{{code}} ist dein {{appName}}-Code",
+    wrongCode:
+      "Falscher Code. Nimm den Code aus der neuesten E-Mail und versuch es noch einmal.",
+    staleLink:
+      "Dieser Link stammt aus einer älteren E-Mail. Öffne die neueste oder gib ihren Code ein.",
+    alreadyConfirmed:
+      "Diese E-Mail-Adresse ist bereits bestätigt. Melde dich an, um weiterzumachen.",
+    login: "Anmelden",
   },
   category: "Benutzer",
 

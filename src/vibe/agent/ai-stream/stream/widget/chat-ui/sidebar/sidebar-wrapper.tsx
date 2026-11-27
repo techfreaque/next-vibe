@@ -12,7 +12,10 @@ import type { JSX, ReactNode } from "react";
 import { useMemo } from "react";
 
 import foldersDefinition from "../../../../../chat/folders/[rootFolderId]/definition";
-import { useChatBootContext } from "../../../../../chat/hooks/context";
+import {
+  useBootSeed,
+  useChatBootContext,
+} from "../../../../../chat/hooks/context";
 import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
 import { SidebarContent } from "./spaces/sidebar-content";
@@ -52,8 +55,11 @@ function WidgetSidebar({
 
   // Only pass server-prefetched data for the initial root folder.
   // Tab switches → key changes → fresh fetch via endpointOptions without initialData.
-  const foldersInitialData =
-    currentRootFolderId === initialRootFolderId ? initialFoldersData : null;
+  // and only once per page load: a remount after the cache was collected
+  // fetches fresh instead of reviving the page-load snapshot.
+  const foldersInitialData = useBootSeed(
+    currentRootFolderId === initialRootFolderId ? initialFoldersData : null,
+  );
 
   const foldersEndpointOptions = useMemo(
     () => ({
@@ -64,7 +70,7 @@ function WidgetSidebar({
           refetchOnWindowFocus: false,
           staleTime: 30 * 1000,
         },
-        initialData: foldersInitialData ?? undefined,
+        initialData: foldersInitialData,
       },
     }),
     [currentRootFolderId, foldersInitialData],

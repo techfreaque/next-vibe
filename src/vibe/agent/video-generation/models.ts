@@ -607,7 +607,13 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["5", "10"],
       },
     ],
-    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    // LEGACY 2026-11-27: ModelsLab discontinued kling-v2-1-master (404 "has
+    // been discontinued and is no longer available"); Kling 3.0 replaces it.
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -651,7 +657,13 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["5", "10"],
       },
     ],
-    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    // LEGACY 2026-11-27: ModelsLab discontinued kling-v2-1-master (404 "has
+    // been discontinued and is no longer available"); Kling 3.0 replaces it.
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,

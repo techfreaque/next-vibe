@@ -136,6 +136,66 @@ function describeElement(element: HTMLElement): string {
   );
 }
 
+/**
+ * React stamps every DOM node it renders with a `__reactFiber$<id>` key. An
+ * element without it on itself or its parent was put there by someone else
+ * (extension, translator, injected script): a resource error on it is not
+ * our asset (2026-11-27: extension-injected img.from / audio.audio-for-speech
+ * with an empty src looked like ours).
+ */
+function isReactRendered(element: Element | null): boolean {
+  if (!element) {
+    return false;
+  }
+  return Object.keys(element).some((key) => key.startsWith("__reactFiber$"));
+}
+
+/** Up to three ancestors (tag#id.class), to place a foreign element. */
+function ancestorChain(element: HTMLElement): string {
+  const chain: string[] = [];
+  let node = element.parentElement;
+  while (node && chain.length < 3) {
+    chain.push(describeElement(node).split(" > ").at(-1) ?? "");
+    node = node.parentElement;
+  }
+  return chain.join(" < ");
+}
+
+/** Delay before re-checking a failed load the browser may have cancelled. */
+const RESOURCE_RECHECK_MS = 2000;
+
+/**
+ * Whether a failed load succeeded later: an image that decoded, or a later
+ * successful Resource Timing entry for the same URL.
+ */
+function resourceRecovered(target: HTMLElement, src: string | null): boolean {
+  if (
+    target instanceof HTMLImageElement &&
+    target.complete &&
+    target.naturalWidth > 0
+  ) {
+    return true;
+  }
+  if (!src || typeof performance === "undefined") {
+    return false;
+  }
+  try {
+    const absolute = new URL(src, getCurrentUrl()).href;
+    return performance.getEntriesByName(absolute).some((entry) => {
+      if (!(entry instanceof PerformanceResourceTiming)) {
+        return false;
+      }
+      const status = entry.responseStatus;
+      return (
+        entry.responseEnd > 0 &&
+        (status === 0 ? entry.transferSize > 0 : status >= 200 && status < 400)
+      );
+    });
+  } catch {
+    return false;
+  }
+}
+
 /** The original file behind a next/image URL (`/_next/image?url=...`). */
 function nextImageSource(raw: string | null | undefined): string | null {
   if (!raw || !raw.includes("/_next/image")) {
@@ -221,8 +281,28 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
         ...mediaDiagnostics,
         ...navigationTimingEvidence(),
         ...resourceTiming(src),
+        // Not rendered by our React tree (extension / translator injected)
+        foreignElement: !isReactRendered(target),
+        ancestors: ancestorChain(target),
       };
-      logger.warn(`Resource failed to load: <${tag}>`, details);
+      // A load the browser never sent, or an image whose body arrived, is
+      // often cancelled (navigation, lazy swap, memory pressure) and loads
+      // fine right after. Re-check once and say so, so a cancelled load is
+      // told apart from a broken asset.
+      const recheck =
+        details.responseSource === "never-sent" ||
+        target instanceof HTMLImageElement;
+      if (!recheck) {
+        logger.warn(`Resource failed to load: <${tag}>`, details);
+        return;
+      }
+      setTimeout(() => {
+        logger.warn(`Resource failed to load: <${tag}>`, {
+          ...details,
+          recoveredLater: resourceRecovered(target, src),
+          recheckAfterMs: RESOURCE_RECHECK_MS,
+        });
+      }, RESOURCE_RECHECK_MS);
     }
     return;
   }

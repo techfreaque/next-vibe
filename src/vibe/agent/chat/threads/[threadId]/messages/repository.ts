@@ -341,9 +341,19 @@ export class MessagesRepository {
       };
     }
 
+    // Byte-free by contract: pick the stored fields so an in-memory attachment
+    // carrying base64 (`data`) can never be persisted into metadata.
     const metadata = {
       ...(params.attachments && params.attachments.length > 0
-        ? { attachments: params.attachments }
+        ? {
+            attachments: params.attachments.map((attachment) => ({
+              id: attachment.id,
+              url: attachment.url,
+              filename: attachment.filename,
+              mimeType: attachment.mimeType,
+              size: attachment.size,
+            })),
+          }
         : {}),
       ...params.extraMetadata,
     };

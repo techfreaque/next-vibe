@@ -27,6 +27,7 @@ import { Platform } from "next-vibe/platforms/platforms";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import type { ToolCall } from "../../../chat/db";
+import { takeToolCallWireEvidence } from "../../providers/shared/tool-call-delta-buffer";
 import type { PendingToolData } from "../core/stream";
 import { resolveToolParentId } from "./chain-tip";
 import {
@@ -117,6 +118,46 @@ async function enrichToolArgsWithRequestDefaults(
   }
 }
 
+/**
+ * Locale-independent class of a rejected tool call, from the raw arguments.
+ * The localized validation text lives in the turn evidence, so one class is
+ * one error_logs row instead of one per UI language and argument variant
+ * (2026-11-27: 47 rows for a handful of classes).
+ */
+function validationIssueKind(toolName: string, raw: WidgetData): string {
+  if (!isPlainRecord(raw)) {
+    return "arguments-not-object";
+  }
+  if (toolName !== EXECUTE_TOOL_ALIAS) {
+    return Object.keys(raw).length === 0
+      ? "arguments-empty"
+      : "arguments-rejected";
+  }
+  const target = raw["toolName"];
+  if (typeof target !== "string" || target.length === 0) {
+    return "wrapper-target-missing";
+  }
+  const input = raw["input"];
+  if (input === undefined) {
+    return Object.keys(raw).length === 1
+      ? "wrapper-only-target"
+      : "wrapper-input-missing";
+  }
+  if (!isPlainRecord(input)) {
+    return "wrapper-input-not-object";
+  }
+  return Object.keys(input).length === 0
+    ? "wrapper-input-empty"
+    : "target-input-rejected";
+}
+
+function wireEvidenceFor(toolCallId: string): {
+  [key: string]: string | number | null;
+} | null {
+  const evidence = takeToolCallWireEvidence(toolCallId.split("::dup")[0] ?? "");
+  return evidence ? { ...evidence } : null;
+}
+
 function logValidationFailure(
   state: StreamLoopState,
   call: ToolCall,
@@ -128,12 +169,17 @@ function logValidationFailure(
     model: state.p.model,
     toolName: loggedToolName(call.toolName),
     targetToolName: target ? loggedToolName(target) : undefined,
+    issueKind: validationIssueKind(call.toolName, raw),
     args: toolArgsForLog(raw),
-    issues: safeToolIssues(issues, raw),
     toolValidationTurnEvidence: {
+      issues: safeToolIssues(issues, raw),
       answerVisible: state.p.ctx.turnHasAnswerText,
       completedSteps: state.p.ctx.tokenStepCount,
       forcedAnswerStep: state.p.ctx.forcedAnswerStepUsed,
+      // How the call arrived on the wire (delta count, where its arguments
+      // first parsed, final size, repair): separates a model that really
+      // sent these arguments from a host that split or truncated them.
+      wire: wireEvidenceFor(call.toolCallId),
     },
   });
 }
@@ -1040,7 +1086,9 @@ async function executeFallbackTool(
           // vs model quirk); `repaired` = normalizeExecuteToolArgs changed them.
           model,
           skill: skill ?? null,
-          repaired: inputArgs !== rawArgs,
+          // Only the execute-tool wrapper is normalized; a direct tool call
+          // always dispatches a copy without callbackMode, which is no repair.
+          repaired: wrapper && inputArgs !== rawArgs,
         },
       );
       // Detail that used to arrive via messageParams is now interpolated into

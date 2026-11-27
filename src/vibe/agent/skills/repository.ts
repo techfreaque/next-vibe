@@ -1054,6 +1054,27 @@ export class SkillsRepository {
         .limit(1);
 
       if (!customSkill) {
+        // Prod 2026-11-27: "gemini-4-carbon" (a model id, not a skill) was
+        // fetched from a thread page. Record what the id is so the next
+        // occurrence names its source: a private skill of someone else, an
+        // unpublished or deleted one, or an id that was never a skill.
+        const [hidden] = await db
+          .select({ ownershipType: customSkills.ownershipType })
+          .from(customSkills)
+          .where(idCondition)
+          .limit(1)
+          .catch(() => [{ ownershipType: "lookup-failed" }]);
+        logger.warn("Skill lookup found no skill visible to this user", {
+          skillId,
+          variantId: variantId ?? null,
+          idShape: /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(skillId)
+            ? "uuid"
+            : /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(skillId)
+              ? "slug"
+              : "other",
+          existsHidden: hidden?.ownershipType ?? null,
+          isPublic: user.isPublic,
+        });
         return fail({
           message: t("id.get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,

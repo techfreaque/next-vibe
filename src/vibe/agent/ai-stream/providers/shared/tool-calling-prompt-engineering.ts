@@ -77,6 +77,81 @@ const adjacentToolCallArrays = z
   )
   .min(2);
 
+const promptToolCallSchema = z.looseObject({
+  name: z.string().nullish(),
+  arguments: z.union([z.record(z.string(), z.json()), z.string()]).nullish(),
+  parameters: z.record(z.string(), z.json()).nullish(),
+  function: z
+    .looseObject({
+      name: z.string().nullish(),
+      arguments: z
+        .union([z.record(z.string(), z.json()), z.string()])
+        .nullish(),
+    })
+    .nullish(),
+});
+
+function argumentsRecord(
+  value: Record<string, JSONValue> | string | null | undefined,
+): Record<string, JSONValue> | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  if (typeof value !== "string") {
+    return value;
+  }
+  try {
+    const parsed = z.record(z.string(), z.json()).safeParse(JSON.parse(value));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Validate a parsed `<tool_calls>` array entry by entry. Accepts the
+ * documented `{name, arguments}` plus the OpenAI-style shapes models copy
+ * (`{name, parameters}`, `{function: {name, arguments}}`, arguments as a JSON
+ * string). An entry without a tool name is dropped and logged: forwarding it
+ * made the AI SDK throw "Expected 'function.name' to be a string." and the
+ * whole turn ended in an error bubble (prod 2026-11-26/27, Uncensored LM and
+ * GLM 5.3 Flash sending rename-thread arguments without the name).
+ */
+export function normalizePromptToolCalls(
+  parsed: JSONValue,
+  logger: EndpointLogger,
+): ParsedToolCall[] | null {
+  if (!Array.isArray(parsed)) {
+    return null;
+  }
+  const calls: ParsedToolCall[] = [];
+  for (const entry of parsed) {
+    const shape = promptToolCallSchema.safeParse(entry);
+    const name = shape.success
+      ? (shape.data.name ?? shape.data.function?.name ?? "").trim()
+      : "";
+    const args = shape.success
+      ? (argumentsRecord(shape.data.arguments) ??
+        argumentsRecord(shape.data.parameters) ??
+        argumentsRecord(shape.data.function?.arguments) ??
+        {})
+      : {};
+    if (name === "") {
+      const keys = shape.success
+        ? Object.keys(shape.data).slice(0, 10)
+        : [typeof entry];
+      logger.warn("Prompt tool call without a tool name dropped", {
+        entryKeys: keys,
+        argumentKeys: Object.keys(args).slice(0, 10),
+        entryCount: parsed.length,
+      });
+      continue;
+    }
+    calls.push({ name, arguments: args });
+  }
+  return calls;
+}
+
 /**
  * Generate system prompt for tool calling instructions
  */
@@ -153,9 +228,14 @@ export function parseToolCalls(
   textContent: string;
   toolCalls: ParsedToolCall[] | null;
 } {
-  // Tolerant regex: matches <tool_calls>...</tool_calls>, </tool_call>, or unclosed blocks
+  // Tolerant regex: matches <tool_calls>...</tool_calls>, </tool_call>, or
+  // unclosed blocks. The body may be a JSON array (documented), an array
+  // missing its final `]`, or one bare call object (prod 2026-11-26/27:
+  // Uncensored LM and Venice GLM 5.3 Flash wrote both; the calls were
+  // dropped as "markup did not parse"). Those two forms need the closing
+  // tag: an unterminated block (a runaway cut off at the cap) never runs.
   const toolCallsRegex =
-    /<tool_calls>\s*(\[[\s\S]*?\])\s*(?:<\/tool_calls?\s*>|$)/g;
+    /<tool_calls>\s*(?:(\[[\s\S]*?\])\s*(?:<\/tool_calls?\s*>|$)|(\[[\s\S]*?|\{[\s\S]*?\})\s*<\/tool_calls?\s*>)/g;
 
   const allToolCalls: ParsedToolCall[] = [];
   let firstMatchIndex = -1;
@@ -166,7 +246,11 @@ export function parseToolCalls(
       firstMatchIndex = match.index ?? 0;
     }
 
-    const parsed = tryParseToolCallsJson(match[1], logger);
+    const body = match[1] ?? match[2] ?? "";
+    const parsed = tryParseToolCallsJson(
+      body.startsWith("{") ? `[${body}]` : body,
+      logger,
+    );
     if (parsed) {
       allToolCalls.push(...parsed);
     }
@@ -204,8 +288,8 @@ function tryParseToolCallsJson(
   jsonStr = jsonStr.replaceAll(/,(\s*[}\]])/g, "$1");
 
   try {
-    const parsed = JSON.parse(jsonStr) as ParsedToolCall[];
-    if (Array.isArray(parsed)) {
+    const parsed = normalizePromptToolCalls(JSON.parse(jsonStr), logger);
+    if (parsed) {
       return parsed;
     }
   } catch {
@@ -248,8 +332,8 @@ function tryParseToolCallsJson(
       jsonStr = jsonStr.replace(/]$/, `${"}".repeat(missing)}]`);
     }
 
-    const parsed = JSON.parse(jsonStr) as ParsedToolCall[];
-    if (Array.isArray(parsed)) {
+    const parsed = normalizePromptToolCalls(JSON.parse(jsonStr), logger);
+    if (parsed) {
       logger.info("Parsed tool calls after cleanup");
       return parsed;
     }
@@ -261,8 +345,8 @@ function tryParseToolCallsJson(
   try {
     const truncated = jsonStr.slice(0, jsonStr.lastIndexOf("]") + 1);
     if (truncated) {
-      const parsed = JSON.parse(truncated) as ParsedToolCall[];
-      if (Array.isArray(parsed)) {
+      const parsed = normalizePromptToolCalls(JSON.parse(truncated), logger);
+      if (parsed) {
         logger.info("Parsed tool calls after truncation");
         return parsed;
       }
@@ -277,8 +361,8 @@ function tryParseToolCallsJson(
   try {
     const repaired = repairToolCallsJson(stripControlChars(raw.trim()));
     repairedLength = repaired.length;
-    const parsed = JSON.parse(repaired) as ParsedToolCall[];
-    if (Array.isArray(parsed)) {
+    const parsed = normalizePromptToolCalls(JSON.parse(repaired), logger);
+    if (parsed) {
       logger.info("Parsed tool calls after structural repair");
       return parsed;
     }

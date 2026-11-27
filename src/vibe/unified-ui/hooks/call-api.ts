@@ -48,6 +48,7 @@ import {
   readProxyTimingHeader,
 } from "../../realtime/core/proxy-timing";
 import { containsFile, objectToFormData } from "./api-utils-shared";
+import { callApiReportsFailure } from "./call-api-report-policy";
 import { scopedTranslation as hooksTranslation } from "./i18n";
 
 const MUTATING_METHODS = new Set([
@@ -227,6 +228,8 @@ interface CallDiagnostics {
   unexpectedHttpError?: boolean;
   /** Sent as x-request-id; the server stamps it on its rows for this call. */
   requestId: string;
+  /** Sent with fetch keepalive (small body started while the tab was hidden). */
+  keepalive?: boolean;
   retryOf?: string;
   /** Kept in memory solely to find the browser timing for a failed fetch. */
   fetchUrl?: string;
@@ -248,6 +251,15 @@ interface CallDiagnostics {
    * cookie is invisible to JS: duplicate/foreign-path cookie, webview).
    */
   csrfHeaderSent?: boolean | null;
+  /**
+   * A read that failed while the tab was hidden is reported after the visible
+   * refetch: whether it recovered and which request recovered it.
+   */
+  hiddenRecovery?: {
+    recovered: boolean | null;
+    recoveryRequestId: string | null;
+    waitedForVisibleMs: number;
+  };
 }
 
 let devFullReloadAt = 0;
@@ -267,6 +279,37 @@ function currentVisibility(): string | null {
   } catch {
     return null;
   }
+}
+
+/** Longest a hidden-tab read failure waits for the tab to come back. */
+const HIDDEN_FAILURE_WAIT_MS = 10 * 60 * 1000;
+
+/**
+ * Resolves true once the page is visible (at once if it is), false after
+ * `timeoutMs` or when there is no document to watch.
+ */
+function waitUntilVisible(timeoutMs: number): Promise<boolean> {
+  const doc = globalThis.document;
+  if (currentVisibility() === "visible") {
+    return Promise.resolve(true);
+  }
+  if (!doc) {
+    return Promise.resolve(false);
+  }
+  return new Promise<boolean>((resolve) => {
+    const done = (visible: boolean): void => {
+      clearTimeout(timer);
+      doc.removeEventListener("visibilitychange", onChange);
+      resolve(visible);
+    };
+    const onChange = (): void => {
+      if (currentVisibility() === "visible") {
+        done(true);
+      }
+    };
+    const timer = setTimeout(() => done(false), timeoutMs);
+    doc.addEventListener("visibilitychange", onChange);
+  });
 }
 
 function browserOnline(): boolean {
@@ -381,19 +424,6 @@ function refreshBrowserIdentity(logger: EndpointLogger): void {
 }
 
 /**
- * Auth/permission denials a logged-out visitor gets by design (the client
- * probes /me and role-gated endpoints on public pages). The server marks these
- * `expected` and logs them at debug; mirror that so every anonymous page view
- * doesn't become an error row. A logged-IN user getting one is a real auth
- * drop and IS reported.
- */
-const PUBLIC_EXPECTED_ERROR_KEYS = new Set<string>([
-  ErrorResponseTypes.AUTH_ERROR.errorKey,
-  ErrorResponseTypes.UNAUTHORIZED.errorKey,
-  ErrorResponseTypes.FORBIDDEN.errorKey,
-]);
-
-/**
  * Central report for EVERY failed endpoint call made from a widget/hook
  * (useEndpoint, executeQuery, executeMutation all land here), so no caller
  * that just toasts or ignores `success === false` can hide a failure.
@@ -417,21 +447,54 @@ function reportApiFailure(
     response.errorType;
   const errorKey = errorType?.errorKey ?? "errorTypes.unknown_error";
   const errorCode = errorType?.errorCode ?? diag.status ?? 500;
-  // Both prompts ask the caller to complete the next sign-in step.
-  if (
-    errorKey === ErrorResponseTypes.TWO_FACTOR_REQUIRED.errorKey ||
-    errorKey === ErrorResponseTypes.EMAIL_CONFIRMATION_REQUIRED.errorKey
-  ) {
-    return;
-  }
-  if (user.isPublic && PUBLIC_EXPECTED_ERROR_KEYS.has(errorKey)) {
-    logger.debug("callApi: expected public-user denial", {
+  if (!callApiReportsFailure(errorKey, user.isPublic)) {
+    logger.debug("callApi: expected sign-in step or public-user denial", {
       endpoint: endpointPath,
       errorKey,
     });
     return;
   }
   const status = diag.status ?? null;
+  // A credit refusal the server answered itself (HTTP 402 carrying our own
+  // error envelope): the server wrote the refusal with its numbers under this
+  // requestId ("API Error: payment refused" plus the deciding layer's row).
+  // Re-reporting it here made one refusal 6 rows (2026-11-27); the feature's
+  // own client row (stream, TTS) keeps the UI side. Multipart uploads come
+  // back without the echoed request id, so the envelope is the proof.
+  if (
+    status === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode &&
+    errorType?.errorCode === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode &&
+    diag.thrown === undefined
+  ) {
+    logger.debug("callApi: credit refusal logged by the server", {
+      endpoint: `${endpointPath}/${endpoint.method}`,
+      requestId: diag.requestId,
+      errorKey,
+    });
+    return;
+  }
+  // Any other refusal our API answered for this exact request (4xx envelope,
+  // our request id echoed back): the server logged it at warn with the page,
+  // client and translated chain ("API Error: request refused [key / code]",
+  // plus the deciding layer's row, same requestId). A browser row on top made
+  // one wrong code or one taken email 3 rows (2026-11-27 auth lane).
+  if (
+    status !== null &&
+    status >= 400 &&
+    status < 500 &&
+    errorType?.errorCode === status &&
+    diag.thrown === undefined &&
+    diag.responseRequestId !== undefined &&
+    diag.responseRequestId === diag.requestId
+  ) {
+    logger.debug("callApi: refusal logged by the server", {
+      endpoint: `${endpointPath}/${endpoint.method}`,
+      requestId: diag.requestId,
+      errorKey,
+      status,
+    });
+    return;
+  }
   const isAbort = diag.thrown?.name === "AbortError";
   const noHttpResponse = diag.phase === "fetch" && status === null;
   const isServerSide =
@@ -476,6 +539,14 @@ function reportApiFailure(
     ),
     retryOfRequestId: diag.retryOf ?? null,
     csrfHeaderSent: diag.csrfHeaderSent ?? null,
+    keepalive: diag.keepalive ?? false,
+    ...(diag.hiddenRecovery
+      ? {
+          hiddenTabRecovered: diag.hiddenRecovery.recovered,
+          hiddenTabRecoveryRequestId: diag.hiddenRecovery.recoveryRequestId,
+          waitedForVisibleMs: diag.hiddenRecovery.waitedForVisibleMs,
+        }
+      : {}),
     ...(reportNetworkFailure ? networkFailureContext(diag, durationMs) : {}),
   };
   if (isServerSide) {
@@ -503,6 +574,14 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   onRequestId?: (requestId: string) => void,
 ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
   let retryOf: string | undefined;
+  let pendingHidden:
+    | {
+        result: ErrorResponseType;
+        diag: CallDiagnostics;
+        durationMs: number;
+        waitedForVisibleMs: number;
+      }
+    | undefined;
   for (;;) {
     const requestId = mintRequestId();
     onRequestId?.(requestId);
@@ -522,7 +601,70 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       diag,
     );
     if (result.success) {
+      if (pendingHidden) {
+        pendingHidden.diag.hiddenRecovery = {
+          recovered: true,
+          recoveryRequestId: requestId,
+          waitedForVisibleMs: pendingHidden.waitedForVisibleMs,
+        };
+        try {
+          reportApiFailure(
+            endpoint,
+            logger,
+            user,
+            pendingHidden.result,
+            pendingHidden.diag,
+            pendingHidden.durationMs,
+          );
+        } catch {
+          // Reporting must never turn a handled failure into a thrown one
+        }
+      }
       return result;
+    }
+    // A read the browser cut while the tab was hidden (frozen or backgrounded
+    // tab): one frozen tab wrote 10+ rows in the same millisecond and none
+    // said whether the data came back (2026-11-27). Wait for the tab to be
+    // visible, refetch once, then report the first failure ONCE with the
+    // outcome. A refetch that fails while visible is reported on its own
+    // (it carries retryOfRequestId), so the hidden attempt folds into it.
+    // The same holds for a keepalive POST (final telemetry, vitals, tracking
+    // or autosave flush sent from a hidden tab): Android Chrome still cut
+    // them ("Failed to fetch" 17 ms to 60 s after hide, 2026-11-27). They
+    // are small fire-and-forget writes, so resending once on return is safe.
+    const hiddenReadLoss =
+      retryOf === undefined &&
+      (endpoint.method === Methods.GET || diag.keepalive === true) &&
+      diag.phase === "fetch" &&
+      diag.thrown !== undefined &&
+      diag.thrown.name !== "AbortError" &&
+      isBrowserNetworkLossMessage(diag.thrown.message) &&
+      (diag.visibilityAtStart === "hidden" || currentVisibility() === "hidden");
+    if (hiddenReadLoss) {
+      const hiddenAt = Date.now();
+      const visible = await waitUntilVisible(HIDDEN_FAILURE_WAIT_MS);
+      if (visible && browserOnline()) {
+        pendingHidden = {
+          result,
+          diag,
+          durationMs: hiddenAt - diag.startedAt,
+          waitedForVisibleMs: Date.now() - hiddenAt,
+        };
+        retryOf = requestId;
+        continue;
+      }
+      diag.hiddenRecovery = {
+        recovered: null,
+        recoveryRequestId: null,
+        waitedForVisibleMs: Date.now() - hiddenAt,
+      };
+    } else if (pendingHidden) {
+      logger.debug("callApi: hidden-tab read failure folded into refetch", {
+        endpoint: `${endpoint.path.join("/")}/${endpoint.method}`,
+        hiddenRequestId: pendingHidden.diag.requestId,
+        requestId,
+      });
+      pendingHidden = undefined;
     }
     try {
       reportApiFailure(
@@ -725,6 +867,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
         currentVisibility() === "hidden"
       ) {
         options.keepalive = true;
+        diag.keepalive = true;
       }
     }
 

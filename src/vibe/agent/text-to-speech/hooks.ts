@@ -6,6 +6,7 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import {
   isBrowserNetworkLossMessage,
   parseError,
@@ -38,6 +39,12 @@ interface ChunkFetchResult {
   audio: string | null;
   /** Display message when the fetch failed; null on success or cancel. */
   error: string | null;
+  /**
+   * The server refused the chunk for credits (402). It logged the refusal
+   * with balance and minimum ("[TTS] Insufficient credits", same request);
+   * the UI shows the top-up message, so the client does not report it again.
+   */
+  creditRefusal?: boolean;
 }
 
 interface UseTTSAudioOptions {
@@ -228,7 +235,10 @@ export function useTTSAudio({
               return;
             }
 
-            logger.error(`TTS: Failed to fetch chunk ${chunkIndex + 1}`, {
+            const creditRefusal =
+              endpointError.errorType.errorCode ===
+              ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
+            const chunkContext = {
               errorType: endpointError.errorType,
               errorMessage: endpointError.message,
               isNetworkLoss,
@@ -242,12 +252,25 @@ export function useTTSAudio({
               // backgrounded tab; online + visible -> server/proxy drop.
               online,
               visibilityState: getVisibilityState(),
-            });
+            };
+            if (creditRefusal) {
+              // Logged by the server with balance + minimum; 2026-11-27 one
+              // refused play wrote 4 client rows on top of the server's 2.
+              logger.debug(
+                `TTS: Chunk ${chunkIndex + 1} refused for credits`,
+                chunkContext,
+              );
+            } else {
+              logger.error(
+                `TTS: Failed to fetch chunk ${chunkIndex + 1}`,
+                chunkContext,
+              );
+            }
             const errorMsg =
               endpointError.message || t("hooks.tts.failed-to-generate");
             setStore(messageId, { error: errorMsg });
             onError?.(errorMsg);
-            resolve({ audio: null, error: errorMsg });
+            resolve({ audio: null, error: errorMsg, creditRefusal });
           },
         });
       });
@@ -307,40 +330,46 @@ export function useTTSAudio({
             void fetchChunkAudio(
               nextFetchIndex,
               currentRefs.chunks[nextFetchIndex]!,
-            ).then(({ audio: nextAudio, error: prefetchError }) => {
-              if (nextAudio) {
-                const r = getTtsRefs(messageId);
-                r.audioQueue[nextFetchIndex] = nextAudio;
-                r.currentFetchingIndex++;
+            ).then(
+              ({ audio: nextAudio, error: prefetchError, creditRefusal }) => {
+                if (nextAudio) {
+                  const r = getTtsRefs(messageId);
+                  r.audioQueue[nextFetchIndex] = nextAudio;
+                  r.currentFetchingIndex++;
 
-                if (
-                  r.isProcessing &&
-                  r.currentPlayingIndex === nextFetchIndex
-                ) {
-                  playQueuedChunk();
-                }
-              } else {
-                const r = getTtsRefs(messageId);
-                // error null = cancelled, not a failure
-                if (prefetchError !== null) {
-                  logger.error(
-                    `TTS: Failed to prefetch chunk ${nextFetchIndex + 1}`,
-                    {
-                      error: prefetchError,
-                      chunkIndex: nextFetchIndex,
-                      totalChunks: r.chunks.length,
-                      currentPlayingIndex: r.currentPlayingIndex,
-                      voiceId: voicePreference,
-                    },
-                  );
+                  if (
+                    r.isProcessing &&
+                    r.currentPlayingIndex === nextFetchIndex
+                  ) {
+                    playQueuedChunk();
+                  }
                 } else {
-                  logger.debug(
-                    `TTS: Prefetch of chunk ${nextFetchIndex + 1} cancelled`,
-                  );
+                  const r = getTtsRefs(messageId);
+                  // error null = cancelled, not a failure
+                  if (prefetchError !== null && creditRefusal === true) {
+                    logger.debug(
+                      `TTS: Prefetch of chunk ${nextFetchIndex + 1} refused for credits`,
+                    );
+                  } else if (prefetchError !== null) {
+                    logger.error(
+                      `TTS: Failed to prefetch chunk ${nextFetchIndex + 1}`,
+                      {
+                        error: prefetchError,
+                        chunkIndex: nextFetchIndex,
+                        totalChunks: r.chunks.length,
+                        currentPlayingIndex: r.currentPlayingIndex,
+                        voiceId: voicePreference,
+                      },
+                    );
+                  } else {
+                    logger.debug(
+                      `TTS: Prefetch of chunk ${nextFetchIndex + 1} cancelled`,
+                    );
+                  }
                 }
-              }
-              return undefined;
-            });
+                return undefined;
+              },
+            );
           }
         }, prefetchDelay);
       };
@@ -545,13 +574,14 @@ export function useTTSAudio({
       refs.currentPlayingIndex = 0;
       refs.currentFetchingIndex = 1;
 
-      const { audio: firstAudio, error: firstError } = await fetchChunkAudio(
-        0,
-        chunks[0]!,
-      );
+      const {
+        audio: firstAudio,
+        error: firstError,
+        creditRefusal: firstCreditRefusal,
+      } = await fetchChunkAudio(0, chunks[0]!);
 
       if (!firstAudio) {
-        if (firstError !== null) {
+        if (firstError !== null && firstCreditRefusal !== true) {
           logger.error("TTS: Failed to fetch first chunk", {
             error: firstError,
             totalChunks: chunks.length,

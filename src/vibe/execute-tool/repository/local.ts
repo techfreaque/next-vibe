@@ -60,6 +60,7 @@ export class LocalExecution {
       ctx,
       callbackMode: data.callbackMode,
       instanceId,
+      input: input ?? {},
     });
     if (blocked) {
       return blocked;

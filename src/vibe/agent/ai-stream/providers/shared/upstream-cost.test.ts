@@ -177,7 +177,15 @@ describe("NanoGPT chat model surfaces the real cost", () => {
     expect((await result.usage).inputTokens).toBe(14);
     expect(readStepUpstreamCost(await result.providerMetadata)).toMatchObject({
       costUsd: null,
-      nanoGptCostEvidence: { sawUsage: true, sawPricing: false },
+      nanoGptCostEvidence: {
+        sawUsage: true,
+        sawPricing: false,
+        rawUsageCost: null,
+        rawPricingCost: null,
+        promptTokens: 14,
+        completionTokens: 2,
+        chunkCount: 2,
+      },
     });
   });
 });
@@ -232,7 +240,12 @@ it("NanoGPT distinguishes text arrays from media in rejected requests", async ()
       maxRetries: 0,
     })).rejects.toBeDefined();
     expect(report).toHaveBeenLastCalledWith("[NanoGPT] API Error", expect.objectContaining({
-      imageTransportCounts: { remote: 1, inline: 1, other: 0 },
+      imageTransportCounts: expect.objectContaining({
+        remote: 1,
+        inline: 1,
+        other: 0,
+        textDataUris: 0,
+      }),
     }));
     expect(JSON.stringify(report.mock.calls)).not.toContain("private-fixture");
   } finally {

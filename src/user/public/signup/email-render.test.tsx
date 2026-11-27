@@ -89,7 +89,8 @@ test.each(locales)(
         expect(result).toBe(messageId);
         const mail = send.mock.lastCall?.[0];
         expect(mail?.leadId).toBe("test-lead");
-        expect(mail?.subject).toBe(t("confirmation.link"));
+        expect(mail?.subject).toContain("123456");
+        expect(mail?.subject).not.toContain("{{");
         expect(
           buildListUnsubscribeHeaders(recipientEmail, mail?.unsubscribeUrl),
         ).toEqual({});

@@ -70,6 +70,14 @@ export const translations: typeof enTranslations = {
     suggestion: "¿Quisiste decir {{email}}?",
     expired: "El registro venció. Vuelve a empezar para recibir otro código.",
     retry: "Volver a registrarme",
+    subject: "{{code}} es tu código de {{appName}}",
+    wrongCode:
+      "Código incorrecto. Usa el código del correo más reciente e inténtalo otra vez.",
+    staleLink:
+      "Este enlace es de un correo anterior. Abre el más reciente o escribe su código.",
+    alreadyConfirmed:
+      "Este correo ya está confirmado. Inicia sesión para continuar.",
+    login: "Iniciar sesión",
   },
   category: "Usuarios",
 

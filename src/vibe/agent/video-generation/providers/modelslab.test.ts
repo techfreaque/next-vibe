@@ -1,7 +1,8 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 
 import { defaultLocale } from "../../../core/i18n/core/config";
 import { createEndpointLogger } from "../../../logger/server";
+import { agentEnv } from "../../env";
 import { ApiProvider } from "../../models/models";
 import { videoGenModelDefinitions } from "../models";
 import {
@@ -75,14 +76,13 @@ describe("buildModelsLabVideoRequest", () => {
       providerModel: "ltx-2-3-pro-i2v",
       prompt: "p",
       durationSeconds: 6,
-      initImage: "data:image/png;base64,AAAA",
+      initImage: IMAGE,
     });
     expect(fhd.ok && fhd.body).toEqual({
       model_id: "ltx-2-3-pro-i2v",
       prompt: "p",
       duration: "6",
-      init_image: "data:image/png;base64,AAAA",
-      base64: true,
+      init_image: IMAGE,
       resolution: "1920x1080",
     });
     const fourK = buildModelsLabVideoRequest({
@@ -110,6 +110,26 @@ describe("buildModelsLabVideoRequest", () => {
         expect(request.body.duration).toBe("6");
       }
     }
+  });
+
+  test("v7 refuses an unstaged data URI (prod 11-27: init_image(s) must be a valid URL)", () => {
+    expect(
+      buildModelsLabVideoRequest({
+        providerModel: "ltx-2-3-pro-i2v",
+        prompt: "p",
+        durationSeconds: 6,
+        initImage: "data:image/png;base64,AAAA",
+      }),
+    ).toEqual({ ok: false, reason: "imageNotStaged" });
+  });
+
+  test("Sora without a requested ratio still sends the 16:9 size (prod 11-27)", () => {
+    const sora = buildModelsLabVideoRequest({
+      providerModel: "sora-2-pro-t2v",
+      prompt: "p",
+      durationSeconds: 4,
+    });
+    expect(sora.ok && sora.body.aspect_ratio).toBe("1280x720");
   });
 
   test("Sora gets a WxH size, Grok its own model_id", () => {
@@ -197,5 +217,111 @@ describe("generateVideoWithModelsLab init_image rejections", () => {
     expect(await run("kling-v2-5-turbo-t2v")).toContain(
       "does not support image-to-video",
     );
+  });
+});
+
+describe("generateVideoWithModelsLab staging and submit failures", () => {
+  let originalKey: typeof agentEnv.MODELSLAB_API_KEY;
+  beforeEach(() => {
+    originalKey = agentEnv.MODELSLAB_API_KEY;
+    agentEnv.MODELSLAB_API_KEY = "local-provider-fixture";
+  });
+  afterEach(() => {
+    agentEnv.MODELSLAB_API_KEY = originalKey;
+  });
+
+  function fetchFrom(
+    handler: (url: string, init?: RequestInit) => Response,
+    calls: string[],
+  ): typeof globalThis.fetch {
+    return Object.assign(
+      async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const url = String(input);
+        calls.push(url);
+        return handler(url, init);
+      },
+      { preconnect: (): void => undefined },
+    );
+  }
+
+  test("an inline image is staged through base64_to_url before the v7 submit", async () => {
+    const calls: string[] = [];
+    let submitted: Record<string, string> | undefined;
+    const fetchImpl = fetchFrom((url, init) => {
+      if (url.endsWith("/v6/base64_to_url")) {
+        return Response.json({
+          status: "success",
+          output: ["https://pub.modelslab.example/temp/a.png"],
+        });
+      }
+      submitted = JSON.parse(String(init?.body)) as Record<string, string>;
+      return Response.json({
+        status: "success",
+        output: ["https://cdn.modelslab.example/v.mp4"],
+      });
+    }, calls);
+    const result = await generateVideoWithModelsLab({
+      providerModel: "ltx-2-3-pro-i2v",
+      prompt: "waves",
+      durationSeconds: 6,
+      logger: createEndpointLogger(false, defaultLocale),
+      locale: defaultLocale,
+      inputImageUrl: "data:image/png;base64,AAAA",
+      fetchImpl,
+    });
+    expect(result.success).toBe(true);
+    expect(calls[0]).toBe("https://modelslab.com/api/v6/base64_to_url");
+    expect(submitted?.init_image).toBe(
+      "https://pub.modelslab.example/temp/a.png",
+    );
+    expect(submitted?.base64).toBeUndefined();
+  });
+
+  test("a failed staging upload stops before the paid submit", async () => {
+    const calls: string[] = [];
+    const fetchImpl = fetchFrom(
+      () => Response.json({ status: "error", message: "bad" }, { status: 400 }),
+      calls,
+    );
+    const result = await generateVideoWithModelsLab({
+      providerModel: "ltx-2-3-pro-i2v",
+      prompt: "waves",
+      durationSeconds: 6,
+      logger: createEndpointLogger(false, defaultLocale),
+      locale: defaultLocale,
+      inputImageUrl: "data:image/png;base64,AAAA",
+      fetchImpl,
+    });
+    expect(result.success).toBe(false);
+    expect(calls).toEqual(["https://modelslab.com/api/v6/base64_to_url"]);
+  });
+
+  test("a discontinued model reads as retired, not as a raw JSON body", async () => {
+    const fetchImpl = fetchFrom(
+      () =>
+        Response.json(
+          {
+            status: "error",
+            code: "provider_error",
+            message:
+              "The model 'kling-v2-1-master' has been discontinued and is no longer available.",
+          },
+          { status: 404 },
+        ),
+      [],
+    );
+    const result = await generateVideoWithModelsLab({
+      providerModel: "kling-v2-1-master-t2v",
+      prompt: "waves",
+      durationSeconds: 5,
+      logger: createEndpointLogger(false, defaultLocale),
+      locale: defaultLocale,
+      fetchImpl,
+    });
+    expect(result.success).toBe(false);
+    expect(result.success ? "" : result.message).toContain(
+      "kling-v2-1-master-t2v",
+    );
+    expect(result.success ? "" : result.message).not.toContain("{");
   });
 });

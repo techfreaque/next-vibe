@@ -11,7 +11,7 @@
 
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { JSX, ReactNode } from "react";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 
@@ -191,4 +191,47 @@ const NULL_BOOT_VALUE: ChatBootValue = {
  */
 export function useChatBootContext(): ChatBootValue {
   return useContext(ChatBootContext) ?? NULL_BOOT_VALUE;
+}
+
+/**
+ * Boot payloads are a snapshot of the server state at page load. They may seed
+ * a cache key only ONCE per page: the chat page is a long-lived SPA (pushState
+ * navigation keeps the same boot props), and React Query garbage-collects an
+ * unmounted list after a few minutes. A later remount (sidebar reopened on
+ * mobile, root folder switched back, search cleared) handed the page-load
+ * snapshot in again as fresh initialData, so threads deleted since then came
+ * back in the sidebar and a delete on them returned 404 (prod 2026-11-27,
+ * the same thread deleted twice 11 minutes apart).
+ *
+ * Effects never run on the server, so SSR renders always seed.
+ */
+const seededBootPayloads = new WeakSet<WeakKey>();
+
+/**
+ * Returns `data` while it has never seeded a mounted consumer, undefined after.
+ * The payload is marked used once the consuming component commits, so the
+ * StrictMode double render and the hydration render both still get it.
+ */
+export function useBootSeed<TPayload extends WeakKey>(
+  data: TPayload | null | undefined,
+): TPayload | undefined {
+  const seed = pickBootSeed(data);
+  useEffect(() => {
+    markBootSeedUsed(seed);
+  }, [seed]);
+  return seed;
+}
+
+/** The payload while it has not seeded a committed consumer yet. */
+export function pickBootSeed<TPayload extends WeakKey>(
+  data: TPayload | null | undefined,
+): TPayload | undefined {
+  return data && !seededBootPayloads.has(data) ? data : undefined;
+}
+
+/** Marks a payload as used: later mounts fetch instead of reusing it. */
+export function markBootSeedUsed(data: WeakKey | undefined): void {
+  if (data) {
+    seededBootPayloads.add(data);
+  }
 }

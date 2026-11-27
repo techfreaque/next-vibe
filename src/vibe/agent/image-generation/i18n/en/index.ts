@@ -71,6 +71,10 @@ export const translations = {
       outputAspectRatio: "Aspect ratio",
     },
     errors: {
+      referenceNotImage:
+        "The link on {{host}} opens a web page, not an image file. Use a direct image link (right-click the picture, copy image address) or upload the image.",
+      referenceUnreachable:
+        "The image link on {{host}} does not load (HTTP {{status}}). Check the link or upload the image instead. You were not charged.",
       referenceUnavailable:
         "The reference image is not available. It was deleted, or it belongs to a chat you cannot open. Use an image from this chat or upload it again.",
       validation_failed: {

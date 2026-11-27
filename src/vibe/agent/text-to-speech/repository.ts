@@ -743,11 +743,18 @@ export class TextToSpeechRepository {
     }
     if (balanceResult.data.total < estimatedCredits) {
       logger.warn("[TTS] Insufficient credits", {
-        balance: balanceResult.data.total,
-        minimum: estimatedCredits,
-        voiceId: modelOption.id,
         apiProvider: modelOption.apiProvider,
-        characterCount,
+        userKind: user.isPublic ? "public" : "user",
+        // Per occurrence, outside the fingerprint (balance < minimum proves
+        // the refusal; characterCount drives the minimum).
+        refusalDetail: {
+          balance: balanceResult.data.total,
+          minimum: estimatedCredits,
+          voiceId: modelOption.id,
+          characterCount,
+          userId: user.isPublic ? null : user.id,
+          leadId: user.leadId,
+        },
       });
       return fail({
         message: t("post.errors.insufficientCredits", {

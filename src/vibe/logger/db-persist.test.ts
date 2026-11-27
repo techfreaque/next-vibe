@@ -233,6 +233,38 @@ describe("persistErrorLog", () => {
     expect(fingerprintsFor(message).size).toBe(2);
   });
 
+  it("keeps one refusal class in one row whatever its refusalDetail", async () => {
+    const message = "[AiStream] Setup failed: refusal collapse";
+    for (const [model, text] of [
+      ["kimi-k3", "Not enough credits: this request costs 9, your balance is 7."],
+      ["glm-5.3", "To zapytanie przekracza Twój dzisiejszy bezpłatny limit."],
+    ]) {
+      persistErrorLog(
+        "warn",
+        message,
+        undefined,
+        [
+          {
+            errorKey: "errorTypes.payment_required",
+            userKind: "user",
+            refusalDetail: { model, message: text },
+          },
+        ],
+        "en-US",
+      );
+    }
+    await settle(1300);
+    const rows = upserts.filter((r) => r.message === message);
+    expect(new Set(rows.map((r) => r.fingerprint)).size).toBe(1);
+    expect(occurrencesFor(message)).toBe(2);
+  });
+
+  it("normalizes masked emails like plain ones", () => {
+    expect(
+      normalizeForFingerprint("Login failed for ba***@bg2000.at and a@b.co"),
+    ).toBe("Login failed for <email> and <email>");
+  });
+
   it("normalizes per-occurrence parts but keeps the shape", () => {
     expect(
       normalizeForFingerprint(

@@ -1,3 +1,4 @@
+import { REFUSAL_DETAIL_LOG_KEY } from "../../refusal-detail";
 import { CLIENT_LOG_OCCURRENCES_KEY } from "./constants";
 
 /**
@@ -109,6 +110,22 @@ export const CLIENT_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "chunkReloadAt",
   "reloadRequestedAt",
   "reloadTimerElapsedMs",
+  // Business refusal detail (model, thread, translated text, amounts): the
+  // class stays in the fingerprint, the per-occurrence values do not.
+  REFUSAL_DETAIL_LOG_KEY,
+  // 2026-11-27 ws lane: per-occurrence WS downtime / device-sleep timings
+  "noticeableDownMs",
+  "deviceSuspendedMs",
+  "msSinceDeviceResume",
+  // 2026-11-27 web lane: dom-guard per-page fields. operation, resolution,
+  // translatedClass and extensionMarkers stay as the class.
+  "path",
+  "referrer",
+  "htmlLang",
+  "parentNode",
+  "targetNode",
+  "operations",
+  "targetActualParent",
 ]);
 
 /**

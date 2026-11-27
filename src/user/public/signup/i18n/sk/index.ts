@@ -69,6 +69,13 @@ export const translations: typeof enTranslations = {
     suggestion: "Máš na mysli {{email}}?",
     expired: "Platnosť registrácie vypršala. Začni znova a dostaneš nový kód.",
     retry: "Začať registráciu odznova",
+    subject: "{{code}} je tvoj kód pre {{appName}}",
+    wrongCode:
+      "Nesprávny kód. Použi kód z najnovšieho e-mailu a skús to znova.",
+    staleLink:
+      "Tento odkaz je zo staršieho e-mailu. Otvor najnovší alebo zadaj jeho kód.",
+    alreadyConfirmed: "Tento e-mail je už potvrdený. Prihlás sa a pokračuj.",
+    login: "Prihlásiť sa",
   },
   category: "Používatelia",
 

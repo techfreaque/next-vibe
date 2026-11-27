@@ -24,9 +24,11 @@ import { z } from "zod";
 
 import { agentEnv } from "../../env";
 import { ApiProvider } from "../../models/models";
+import { GARBLED_REPLACE_HEADER } from "./openrouter/garbled-guard";
 import { applyClientCache, isJsonRecord } from "./openrouter/routing";
 import { logProviderRequest } from "./shared/debug-file-logger";
 import type { ClientPromptCache } from "./shared/prompt-cache";
+import { withBufferedToolCalls } from "./shared/tool-call-delta-buffer";
 import { nanoGptCostExtractor } from "./shared/upstream-cost";
 import {
   summarizeUpstreamError,
@@ -74,7 +76,15 @@ async function describeRequestShape(
 ): Promise<{
   model: string | undefined;
   requestShape: Record<string, string | number | boolean> | null;
-  imageTransportCounts?: { remote: number; inline: number; other: number };
+  imageTransportCounts?: {
+    remote: number;
+    inline: number;
+    other: number;
+    textDataUris: number;
+    textImageUrls: number;
+    textMarkdownImages: number;
+    textImageRoles: string;
+  };
 }> {
   if (typeof body !== "string") {
     return { model: undefined, requestShape: null };
@@ -93,6 +103,31 @@ async function describeRequestShape(
   const multipart = request.messages.flatMap(({ content }) =>
     Array.isArray(content) ? [content] : [],
   );
+  // NanoGPT answers "does not support image inputs" for text-only models
+  // even when no image part is on the wire (prod 2026-11-27: 0 images, 0
+  // multipart messages, 12-13 tool messages). Count image references inside
+  // plain text per role so the next rejection names what it reacted to.
+  const textImageRefs = { dataUris: 0, imageUrls: 0, markdownImages: 0 };
+  const textImageRoles = new Set<string>();
+  for (const message of request.messages) {
+    if (typeof message.content !== "string") {
+      continue;
+    }
+    const dataUris = (message.content.match(/data:image\//gi) ?? []).length;
+    const imageUrls = (
+      message.content.match(
+        /https?:\/\/[^\s"')\]]+\.(?:png|jpe?g|webp|gif|avif|bmp)(?:\?[^\s"')\]]*)?/gi,
+      ) ?? []
+    ).length;
+    const markdownImages = (message.content.match(/!\[[^\]]*\]\(/g) ?? [])
+      .length;
+    textImageRefs.dataUris += dataUris;
+    textImageRefs.imageUrls += imageUrls;
+    textImageRefs.markdownImages += markdownImages;
+    if (dataUris + imageUrls + markdownImages > 0) {
+      textImageRoles.add(message.role);
+    }
+  }
   const parts = multipart.flat();
   const images = parts.filter(({ type }) => type === "image_url");
   const imageTransportCounts = { remote: 0, inline: 0, other: 0 };
@@ -108,7 +143,14 @@ async function describeRequestShape(
   }
   return {
     model: request.model,
-    imageTransportCounts,
+    // Kept in this key: it stays outside the error fingerprint.
+    imageTransportCounts: {
+      ...imageTransportCounts,
+      textDataUris: textImageRefs.dataUris,
+      textImageUrls: textImageRefs.imageUrls,
+      textMarkdownImages: textImageRefs.markdownImages,
+      textImageRoles: [...textImageRoles].join(","),
+    },
     requestShape: {
       chars: body.length,
       parsed: true,
@@ -151,11 +193,21 @@ export function createNanoGPT(
     input: RequestInfo | URL,
     init?: RequestInit,
   ): Promise<Response> => {
+    let replaceVisibleRequested = false;
     if (clientCache && typeof init?.body === "string") {
       const parsed = await safeParseJSON({ text: init.body, schema: z.json() });
       if (parsed.success && isJsonRecord(parsed.value)) {
         applyClientCache(parsed.value, clientCache);
         init = { ...init, body: JSON.stringify(parsed.value) };
+      }
+    }
+    if (init?.headers) {
+      // Internal opt-in header (chat loop): never sent upstream.
+      const outgoing = new Headers(init.headers);
+      if (outgoing.has(GARBLED_REPLACE_HEADER)) {
+        replaceVisibleRequested = outgoing.get(GARBLED_REPLACE_HEADER) === "1";
+        outgoing.delete(GARBLED_REPLACE_HEADER);
+        init = { ...init, headers: outgoing };
       }
     }
     if (typeof init?.body === "string") {
@@ -183,7 +235,20 @@ export function createNanoGPT(
       });
       return upstreamErrorResponse(response, upstreamError);
     }
-    return response;
+    // Hold tool-call deltas until each call is complete, and re-send once
+    // when NanoGPT ends the stream with "the final tool call was malformed"
+    // (prod 2026-11-25..27: GLM 5.3 Uncensored, DeepSeek V4.1 Flash, 14
+    // turns ended in an error bubble). The chat loop opts in to replacing
+    // already-visible text via the replace marker header.
+    return withBufferedToolCalls(response, {
+      provider: "NanoGPT",
+      logger,
+      retry: {
+        replaceVisible: replaceVisibleRequested,
+        signal: init?.signal,
+        resend: () => fetchImpl(input, init),
+      },
+    });
   };
 
   return {

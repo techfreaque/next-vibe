@@ -71,6 +71,14 @@ export const translations: typeof enTranslations = {
     expired:
       "Cette inscription a expiré. Recommencez pour recevoir un nouveau code.",
     retry: "Recommencer l’inscription",
+    subject: "{{code}} est votre code {{appName}}",
+    wrongCode:
+      "Code incorrect. Utilisez le code du dernier e-mail reçu et réessayez.",
+    staleLink:
+      "Ce lien vient d’un ancien e-mail. Ouvrez le plus récent ou saisissez son code.",
+    alreadyConfirmed:
+      "Cette adresse est déjà confirmée. Connectez-vous pour continuer.",
+    login: "Se connecter",
   },
   category: "Utilisateurs",
 

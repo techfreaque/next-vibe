@@ -48,7 +48,7 @@ import { parseChatUrl } from "@/_pages/chat/lib/url-parser";
 
 import { DefaultFolderId } from "../../../../core/execution-context";
 import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../../chat/enum";
-import { useChatBootContext } from "../../../chat/hooks/context";
+import { useBootSeed, useChatBootContext } from "../../../chat/hooks/context";
 import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
 import publicFeedDefinition from "../../../chat/public-feed/definition";
 import { useChatSettings } from "../../../chat/settings/hooks";
@@ -112,21 +112,30 @@ function AiStreamChatArea(): JSX.Element {
   const threadIdToRender =
     activeThreadId && activeThreadId !== NEW_MESSAGE_ID ? activeThreadId : null;
 
+  // The page-load messages seed the thread's cache once per page; reopening
+  // the thread later (after the cache was collected) fetches fresh.
+  const isInitialThread =
+    threadIdToRender !== null && threadIdToRender === initialThreadId;
+  const messagesSeed = useBootSeed(
+    isInitialThread ? initialMessagesData : null,
+  );
+  const pathSeed = useBootSeed(
+    isInitialThread && !initialMessagesData ? initialPathData : null,
+  );
+
   const messagesInitialData = useMemo(() => {
     if (!threadIdToRender) {
       return null;
     }
-    if (threadIdToRender === initialThreadId) {
-      if (initialMessagesData) {
-        return initialMessagesData;
-      }
-      if (initialPathData?.messages?.length) {
-        return {
-          streamingState: ThreadStreamingState.IDLE,
-          backgroundTasks: [],
-          messages: initialPathData.messages,
-        };
-      }
+    if (messagesSeed) {
+      return messagesSeed;
+    }
+    if (pathSeed?.messages?.length) {
+      return {
+        streamingState: ThreadStreamingState.IDLE,
+        backgroundTasks: [],
+        messages: pathSeed.messages,
+      };
     }
     const cached = apiClient.getEndpointData(messagesDefinition.GET, logger, {
       urlPathParams: { threadId: threadIdToRender },
@@ -136,14 +145,7 @@ function AiStreamChatArea(): JSX.Element {
       return cached.data;
     }
     return null;
-  }, [
-    threadIdToRender,
-    initialThreadId,
-    initialMessagesData,
-    initialPathData,
-    logger,
-    rootFolderId,
-  ]);
+  }, [threadIdToRender, messagesSeed, pathSeed, logger, rootFolderId]);
 
   const inputContainerRef = useRef<DivRefObject>(null);
   const inputHeight = useInputHeight(inputContainerRef);
@@ -291,6 +293,9 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
 
   const isPublicFeed =
     currentRootFolderId === DefaultFolderId.PUBLIC && !activeThreadId;
+  const publicFeedSeed = useBootSeed(
+    isPublicFeed ? initialPublicFeedData : null,
+  );
 
   // Delete dialog
   const deleteDialogOpen = useDeleteDialogStore((s) => s.deleteDialogOpen);
@@ -388,7 +393,7 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
                   className="h-full flex-1"
                   endpointOptions={{
                     read: {
-                      initialData: initialPublicFeedData ?? undefined,
+                      initialData: publicFeedSeed,
                     },
                   }}
                 />

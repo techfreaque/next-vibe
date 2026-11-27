@@ -62,6 +62,10 @@ export const GARBLED_REPLACE_HEADER = "x-unbottled-garbled-replace";
 /** Field of the synthetic chunk that tells the chat loop to drop the partial answer. */
 export const GARBLED_RETRY_MARKER_KEY = "unbottled_garbled_retry";
 export const UPSTREAM_BODY_READ_RETRY_RULE = "upstream-body-read";
+/** Replace-marker rule: NanoGPT re-sent a malformed-tool-call attempt. */
+export const MALFORMED_TOOL_CALL_RETRY_RULE = "malformed-tool-call";
+/** Replace-marker rule: NanoGPT re-sent an attempt the upstream reported busy. */
+export const PROVIDER_BUSY_RETRY_RULE = "provider-busy";
 
 export type FetchFn = (
   url: string | Request | URL,

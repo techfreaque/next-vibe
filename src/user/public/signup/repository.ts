@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gt } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -52,12 +52,14 @@ import {
   isDisposableEmail,
   normalizeEmailForUniqueness,
 } from "./email-identity";
+import { SignupEventType } from "./event-type";
 import type { SignupT } from "./i18n";
 import { scopedTranslation as signupScopedTranslation } from "./i18n";
 import {
   consumeSignupChallenge,
   issueSignupChallenge,
   pendingStatus,
+  RESEND_COOLDOWN_MS,
 } from "./pending";
 
 /**
@@ -171,22 +173,64 @@ export class SignupRepository {
 
       stage = "hashPassword";
       const passwordHash = await hashPassword(password);
-      stage = "issueChallenge";
-      const issued = await issueSignupChallenge(
-        {
-          email,
+      const pendingInput = {
+        email,
+        privateName,
+        publicName,
+        passwordHash,
+        subscribeToNewsletter,
+        referralCode: trimmedReferralCode,
+        leadId: user.leadId,
+        supportedSkillId: data.supportedSkillId,
+        localFavorites: data.localFavorites,
+        signupIp: SignupRepository.requestIp(request),
+        locale,
+        callbackUrl: safeCallbackPath(data.callbackUrl),
+      };
+      // Submitted again within a minute of a code reaching this address for
+      // this browser (double submit, or login just resent the email): keep
+      // that code and update the details. A new send would hit the resend
+      // cooldown and show "Too many requests" (prod 2026-11-26).
+      stage = "reuseRecentChallenge";
+      const [recent] = await db
+        .update(pendingSignups)
+        .set({
+          passwordHash,
           privateName,
           publicName,
-          passwordHash,
           subscribeToNewsletter,
-          referralCode: trimmedReferralCode,
-          leadId: user.leadId,
-          supportedSkillId: data.supportedSkillId,
-          localFavorites: data.localFavorites,
-          signupIp: SignupRepository.requestIp(request),
+          referralCode: pendingInput.referralCode ?? null,
+          supportedSkillId: pendingInput.supportedSkillId ?? null,
+          localFavorites: pendingInput.localFavorites ?? null,
           locale,
-          callbackUrl: safeCallbackPath(data.callbackUrl),
-        },
+          callbackUrl: pendingInput.callbackUrl ?? null,
+        })
+        .where(
+          and(
+            eq(pendingSignups.leadId, user.leadId),
+            eq(pendingSignups.email, email),
+            gt(pendingSignups.expiresAt, new Date()),
+            gt(
+              pendingSignups.sentAt,
+              new Date(Date.now() - RESEND_COOLDOWN_MS),
+            ),
+            eq(pendingSignups.bounced, false),
+            eq(pendingSignups.deliveryFailed, false),
+          ),
+        )
+        .returning();
+      if (recent) {
+        logger.info("Signup resubmitted within the resend cooldown", {
+          codeAgeMs: Date.now() - recent.sentAt.getTime(),
+        });
+        return success({
+          pendingId: recent.id,
+          message: pendingStatus(recent, t).message,
+        });
+      }
+      stage = "issueChallenge";
+      const issued = await issueSignupChallenge(
+        pendingInput,
         null,
         SignupRepository.requestIp(request),
         logger,
@@ -401,6 +445,14 @@ export class SignupRepository {
                 ? "different-lead"
                 : "missing-pending-row",
         });
+        // Another tab or device finished this signup: point to login instead
+        // of "start again", which ends at "account already exists".
+        if (lastPendingEvent === SignupEventType.CONFIRMED) {
+          return fail({
+            message: t("confirmation.alreadyConfirmed"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
         return fail({
           message: t("confirmation.expired"),
           errorType: ErrorResponseTypes.NOT_FOUND,

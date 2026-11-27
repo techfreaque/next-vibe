@@ -67,6 +67,8 @@ export function SignupConfirmationStep({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
+  // Already confirmed (another tab, device or the code): send to login.
+  const [confirmedElsewhere, setConfirmedElsewhere] = useState(false);
   const [editing, setEditing] = useState(false);
   const [address, setAddress] = useState("");
   const [code, setCode] = useState("");
@@ -117,20 +119,26 @@ export function SignupConfirmationStep({
             // newer edit if the user typed while the request was in flight.
             setCode((current) => (current === data.code ? "" : current));
           }
+          const alreadyConfirmed =
+            response.errorType.errorKey ===
+            ErrorResponseTypes.CONFLICT.errorKey;
           if (
             !background ||
             !hasStatus.current ||
             data.token !== undefined ||
-            response.errorType.errorCode === 404
+            response.errorType.errorCode === 404 ||
+            alreadyConfirmed
           ) {
             setError(response.message);
           }
           if (
             response.errorType.errorCode === 404 ||
+            alreadyConfirmed ||
             data.token !== undefined
           ) {
             unavailableRef.current = true;
             setUnavailable(true);
+            setConfirmedElsewhere(alreadyConfirmed);
           }
           return;
         }
@@ -265,7 +273,15 @@ export function SignupConfirmationStep({
           </Div>
         )}
         {unavailable ? (
-          <Link href={`/${locale}/user/signup`}>{t("confirmation.retry")}</Link>
+          confirmedElsewhere ? (
+            <Link href={`/${locale}/user/login`}>
+              {t("confirmation.login")}
+            </Link>
+          ) : (
+            <Link href={`/${locale}/user/signup`}>
+              {t("confirmation.retry")}
+            </Link>
+          )
         ) : (
           pendingId &&
           status &&

@@ -186,35 +186,47 @@ export async function processStreamingResponseWithToolCalls(
         )
         .trim();
       const firstBodyChar = /^<tool_calls>\s*(\S)/.exec(markup)?.[1];
-      logger.warn(`[${providerName}] Tool-call markup did not parse`, {
-        markupBoundary: {
-          endsWithArray: body.endsWith("]"),
-          endsWithObject: body.endsWith("}"),
-          endsWithCodeFence: body.endsWith("```"),
-        },
-        markupBodyKind:
-          firstBodyChar === "["
-            ? "array"
-            : firstBodyChar === "{"
-              ? "object"
-              : firstBodyChar === "<"
-                ? "tag"
-                : "text-or-empty",
-        hasJsonNameField: /"name"\s*:/.test(markup),
-        hasJsonArgumentsField: /"arguments"\s*:/.test(markup),
-        model,
-        markupChars: markup.length,
-        hasClosingTag,
-        parseStage: runawayCutOff
-          ? "markup-limit"
-          : hasClosingTag
-            ? "closed-block-rejected"
-            : "incomplete-block",
-        containsNamedCall: /<tool_call(?:\s|>)|<function(?:\s|>)/i.test(markup),
-        visibleOutputChars: toolMarkupStart,
-        finishReason,
-        runawayCutOff,
-      });
+      if (hasClosingTag && body === "") {
+        // `<tool_calls></tool_calls>`: the model asked for nothing (prod
+        // 2026-11-27, Uncensored LM after a full answer). Nothing was lost.
+        logger.info(`[${providerName}] Empty tool-call block ignored`, {
+          model,
+          visibleOutputChars: toolMarkupStart,
+          finishReason,
+        });
+      } else {
+        logger.warn(`[${providerName}] Tool-call markup did not parse`, {
+          markupBoundary: {
+            endsWithArray: body.endsWith("]"),
+            endsWithObject: body.endsWith("}"),
+            endsWithCodeFence: body.endsWith("```"),
+          },
+          markupBodyKind:
+            firstBodyChar === "["
+              ? "array"
+              : firstBodyChar === "{"
+                ? "object"
+                : firstBodyChar === "<"
+                  ? "tag"
+                  : "text-or-empty",
+          hasJsonNameField: /"name"\s*:/.test(markup),
+          hasJsonArgumentsField: /"arguments"\s*:/.test(markup),
+          model,
+          markupChars: markup.length,
+          hasClosingTag,
+          parseStage: runawayCutOff
+            ? "markup-limit"
+            : hasClosingTag
+              ? "closed-block-rejected"
+              : "incomplete-block",
+          containsNamedCall: /<tool_call(?:\s|>)|<function(?:\s|>)/i.test(
+            markup,
+          ),
+          visibleOutputChars: toolMarkupStart,
+          finishReason,
+          runawayCutOff,
+        });
+      }
     }
 
     // When we detect tool calls, we've already forwarded the content chunks
@@ -304,6 +316,22 @@ export async function processStreamingResponseWithToolCalls(
             // If we finished reading but never got the final chunk sent, send it now
             if (hasFinished && finishReason && !hasSentFinalChunks) {
               sendFinalChunks(controller);
+            }
+            if (!hasFinished) {
+              // The AI SDK then fails the step with "Response stream ended
+              // without a finish reason." (prod 2026-11-26, Uncensored LM):
+              // record how far the upstream got before it closed.
+              logger.warn(
+                `[${providerName}] Upstream stream closed without a finish reason`,
+                {
+                  model,
+                  accumulatedChars: accumulatedContent.length,
+                  forwardedChars: forwardedUpTo,
+                  toolMarkupDetected: hasDetectedToolCalls,
+                  usageReceived: usage !== undefined,
+                  bufferedTailChars: buffer.length,
+                },
+              );
             }
             break;
           }

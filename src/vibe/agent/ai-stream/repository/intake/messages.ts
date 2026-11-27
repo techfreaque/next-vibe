@@ -25,6 +25,13 @@ import { SpeechToTextRepository } from "../../../speech-to-text/repository";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
 import type { AiStreamT } from "../../stream/i18n";
 import { FileAttachmentHandler } from "../handlers/attachments";
+import {
+  type AttachmentUploadOutcome,
+  type AttachmentUploadResult,
+  chainAttachmentPersist,
+  type InlineAttachment,
+  toStoredAttachments,
+} from "./attachment-upload";
 
 /**
  * Process operation and handle audio transcription if present.
@@ -103,13 +110,32 @@ export async function processOperation(params: {
           // clear message and the STT layer already logged it. Provider and
           // server failures (5xx) stay errors.
           const sttErrorCode = transcriptionResult.errorType?.errorCode ?? 500;
-          (sttErrorCode >= 500 ? logger.error : logger.warn).bind(logger)(
-            "[Setup] Audio transcription failed",
-            {
-              error: transcriptionResult.message,
-              errorType: sttErrorCode,
-            },
-          );
+          const setupMeta = {
+            error: transcriptionResult.message,
+            errorType: sttErrorCode,
+            operation,
+            fileSize: data.audioInput.file.size,
+            fileType: data.audioInput.file.type,
+          };
+          if (
+            sttErrorCode < 500 &&
+            data.audioInput.file.size < SpeechToTextRepository.MIN_AUDIO_BYTES
+          ) {
+            // One row per rejected recording: the STT layer's warn ("[STT]
+            // Recording empty or too short", same requestId) already holds
+            // the sizes and mime types (prod 2026-11-27: 2 rows per tap).
+            logger.debug(
+              "[Setup] Audio transcription refused (reported by STT)",
+              setupMeta,
+            );
+          } else {
+            // Provider and server failures (5xx) stay errors; other 4xx
+            // refusals (e.g. insufficient credits) are logged by STT too.
+            (sttErrorCode >= 500 ? logger.error : logger.warn).bind(logger)(
+              "[Setup] Audio transcription failed",
+              setupMeta,
+            );
+          }
           return transcriptionResult;
         }
 
@@ -215,27 +241,10 @@ export async function createUserMessageWithAttachments(params: {
      * never committed). Emits and downstream chain logic must use THIS.
      */
     resolvedParentMessageId?: string | null;
-    fileUploadPromise?: Promise<{
-      success: boolean;
-      userMessageId: string;
-      attachments?: Array<{
-        id: string;
-        url: string;
-        filename: string;
-        mimeType: string;
-        size: number;
-      }>;
-    }>;
+    fileUploadPromise?: Promise<AttachmentUploadOutcome>;
     /** Fired user-message embed — awaited by the cortex search, not by callers. */
     userEmbedPromise?: Promise<void>;
-    attachmentMetadata?: Array<{
-      id: string;
-      url: string;
-      filename: string;
-      mimeType: string;
-      size: number;
-      data?: string;
-    }>;
+    attachmentMetadata?: InlineAttachment[];
   }>
 > {
   const {
@@ -297,28 +306,15 @@ export async function createUserMessageWithAttachments(params: {
     ? null
     : await UserRepository.getUserPublicName(userId, logger);
 
-  let fileUploadPromise:
-    | Promise<{
-        success: boolean;
-        userMessageId: string;
-        attachments?: Array<{
-          id: string;
-          url: string;
-          filename: string;
-          mimeType: string;
-          size: number;
-        }>;
-      }>
-    | undefined;
+  let fileUploadPromise: Promise<AttachmentUploadOutcome> | undefined;
 
-  let attachmentMetadata: Array<{
-    id: string;
-    url: string;
-    filename: string;
-    mimeType: string;
-    size: number;
-    data?: string;
-  }> = [];
+  // In-memory copy WITH the bytes: the current AI turn reads it directly.
+  // The DB row only ever gets the byte-free placeholders (toStoredAttachments).
+  let attachmentMetadata: InlineAttachment[] = [];
+
+  // Upload started BEFORE the insert (parallel), resolved into the row swap
+  // only AFTER the insert returned (chainAttachmentPersist).
+  let uploadPromise: Promise<AttachmentUploadResult> | undefined;
 
   // Process attachments (both modes)
   if (attachments && attachments.length > 0) {
@@ -332,52 +328,25 @@ export async function createUserMessageWithAttachments(params: {
       attachments.map(async (file) => {
         const buffer = Buffer.from(await file.arrayBuffer());
         return {
-          id: "", // Will be updated after upload for server mode
-          url: "", // Will be updated after upload for server mode
+          id: "", // Replaced by the stored file id after upload (server mode)
+          url: "", // Replaced by the stored file url after upload (server mode)
           filename: file.name,
           mimeType: file.type,
           size: file.size,
-          data: buffer.toString("base64"), // For immediate AI use
+          data: buffer.toString("base64"), // For immediate AI use, never persisted
         };
       }),
     );
 
     // Server mode: Upload to storage in background
     if (!isIncognito) {
-      fileUploadPromise = FileAttachmentHandler.processFileAttachments({
+      uploadPromise = FileAttachmentHandler.processFileAttachments({
         attachments,
         threadId,
         userMessageId,
         userId,
         logger,
         t,
-      }).then(async (result) => {
-        if (result.success) {
-          // Update message with permanent URLs only (no base64 in DB)
-          await FileAttachmentHandler.updateMessageWithAttachments({
-            userMessageId,
-            attachments: result.data,
-            logger,
-          });
-
-          return {
-            success: true,
-            userMessageId,
-            attachments: result.data,
-          };
-        }
-        logger.error(
-          "[File Processing] Failed to upload attachments to storage",
-          {
-            messageId: userMessageId,
-            errorMessage: result.message,
-          },
-        );
-
-        return {
-          success: false,
-          userMessageId,
-        };
       });
     }
   }
@@ -387,22 +356,40 @@ export async function createUserMessageWithAttachments(params: {
   // Fired user-message embed — awaited later by the cortex search, not here.
   let userEmbedPromise: Promise<void> = Promise.resolve();
   if (!isIncognito) {
-    const { resolvedParentId, embedPromise } =
-      await MessagesRepository.createUserMessage({
-        messageId: userMessageId,
+    const insertPromise = MessagesRepository.createUserMessage({
+      messageId: userMessageId,
+      threadId,
+      rootFolderId,
+      role: effectiveRole,
+      content: effectiveContent,
+      parentId: effectiveParentMessageId || null,
+      userId,
+      user: params.user,
+      authorName,
+      logger,
+      toolExecutionContext: params.toolExecutionContext,
+      attachments:
+        attachmentMetadata.length > 0
+          ? toStoredAttachments(attachmentMetadata)
+          : undefined,
+    });
+    if (uploadPromise) {
+      fileUploadPromise = chainAttachmentPersist({
+        uploadPromise,
+        rowWritten: insertPromise.then(() => undefined),
+        persist: (stored) =>
+          FileAttachmentHandler.updateMessageWithAttachments({
+            userMessageId,
+            attachments: stored,
+            logger,
+          }),
+        userMessageId,
         threadId,
-        rootFolderId,
-        role: effectiveRole,
-        content: effectiveContent,
-        parentId: effectiveParentMessageId || null,
-        userId,
-        user: params.user,
-        authorName,
+        files: attachmentMetadata,
         logger,
-        toolExecutionContext: params.toolExecutionContext,
-        attachments:
-          attachmentMetadata.length > 0 ? attachmentMetadata : undefined,
       });
+    }
+    const { resolvedParentId, embedPromise } = await insertPromise;
     resolvedParentMessageId = resolvedParentId;
     userEmbedPromise = embedPromise;
   }

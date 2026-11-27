@@ -33,9 +33,28 @@ const nanoGptCostSchema = z.object({
     .object({
       cost: z.number().nullish(),
       currency: z.string().nullish(),
+      prompt_tokens: z.number().nullish(),
+      completion_tokens: z.number().nullish(),
     })
     .nullish(),
 });
+
+/**
+ * What a NanoGPT stream reported when no positive USD cost arrived: whether
+ * a usage / pricing object was seen, the raw cost values (0, negative, other
+ * currency) and the token counts it reported, so a "cost missing" row tells
+ * a zero-cost answer, a non-USD cost and an absent field apart.
+ */
+interface NanoGptCostChunkEvidence {
+  costUsd: number | null;
+  sawUsage: boolean;
+  sawPricing: boolean;
+  rawPricingCost: number | null;
+  rawUsageCost: number | null;
+  currency: string | null;
+  promptTokens: number | null;
+  completionTokens: number | null;
+}
 
 const veniceCostSchema = z.object({
   cost: z.object({ usd: z.number().nullish() }).nullish(),
@@ -68,10 +87,19 @@ export function readNanoGptCostUsd(
 
 function readNanoGptCostChunk(
   body: Parameters<MetadataExtractor["extractMetadata"]>[0]["parsedBody"],
-): { costUsd: number | null; sawUsage: boolean; sawPricing: boolean } {
+): NanoGptCostChunkEvidence {
   const parsed = nanoGptCostSchema.safeParse(body);
   if (!parsed.success) {
-    return { costUsd: null, sawUsage: false, sawPricing: false };
+    return {
+      costUsd: null,
+      sawUsage: false,
+      sawPricing: false,
+      rawPricingCost: null,
+      rawUsageCost: null,
+      currency: null,
+      promptTokens: null,
+      completionTokens: null,
+    };
   }
   const pricing = parsed.data.x_nanogpt_pricing;
   const fromPricing = isUsd(pricing?.currency)
@@ -84,6 +112,11 @@ function readNanoGptCostChunk(
       (isUsd(usage?.currency) ? positiveCost(usage?.cost) : null),
     sawUsage: usage !== null && usage !== undefined,
     sawPricing: pricing !== null && pricing !== undefined,
+    rawPricingCost: pricing?.costUsd ?? null,
+    rawUsageCost: usage?.cost ?? null,
+    currency: pricing?.currency ?? usage?.currency ?? null,
+    promptTokens: usage?.prompt_tokens ?? null,
+    completionTokens: usage?.completion_tokens ?? null,
   };
 }
 
@@ -129,18 +162,39 @@ export const nanoGptCostExtractor: MetadataExtractor = {
     let costUsd: number | null = null;
     let sawUsage = false;
     let sawPricing = false;
+    let rawPricingCost: number | null = null;
+    let rawUsageCost: number | null = null;
+    let currency: string | null = null;
+    let promptTokens: number | null = null;
+    let completionTokens: number | null = null;
+    let chunkCount = 0;
     return {
       processChunk: (parsedChunk): void => {
+        chunkCount += 1;
         const evidence = readNanoGptCostChunk(parsedChunk);
         costUsd = evidence.costUsd ?? costUsd;
         sawUsage ||= evidence.sawUsage;
         sawPricing ||= evidence.sawPricing;
+        rawPricingCost = evidence.rawPricingCost ?? rawPricingCost;
+        rawUsageCost = evidence.rawUsageCost ?? rawUsageCost;
+        currency = evidence.currency ?? currency;
+        promptTokens = evidence.promptTokens ?? promptTokens;
+        completionTokens = evidence.completionTokens ?? completionTokens;
       },
       buildMetadata: () => {
         return (
           upstreamCostMetadata(ApiProvider.NANO_GPT, costUsd) ?? {
             [ApiProvider.NANO_GPT]: {
-              missingCostEvidence: { sawUsage, sawPricing },
+              missingCostEvidence: {
+                sawUsage,
+                sawPricing,
+                rawPricingCost,
+                rawUsageCost,
+                currency,
+                promptTokens,
+                completionTokens,
+                chunkCount,
+              },
             },
           }
         );

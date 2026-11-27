@@ -49,7 +49,7 @@ import cortexSearchDefinitions from "../../../../cortex/search/definition";
 import { DEFAULT_FOLDER_CONFIGS, isDefaultFolderId } from "../../../config";
 import { NEW_MESSAGE_ID } from "../../../enum";
 import folderContentsDefinition from "../../../folder-contents/[rootFolderId]/definition";
-import { useChatBootContext } from "../../../hooks/context";
+import { useBootSeed, useChatBootContext } from "../../../hooks/context";
 import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store";
 import { ThreadsList } from "../../../threads/widget/widget";
 import createFolderDefinition from "../create/definition";
@@ -396,6 +396,13 @@ export function FoldersListContainer(): React.JSX.Element {
     (isDebouncePending || (searchEndpoint?.read?.isLoading ?? false));
   // Only show search results view after debounce fires AND API responds
   const hasSearchResults = debouncedQuery.length > 0 && !isDebouncePending;
+  // Page-load snapshot seeds the root list once; a later remount fetches
+  // fresh so threads deleted since page load never come back.
+  const rootListSeed = useBootSeed(
+    !isSearchActive && activeRootFolderId === initialRootFolderId
+      ? initialFolderContentsData
+      : null,
+  );
 
   const handleClearSearch = useCallback(() => {
     setSearchQuery("");
@@ -586,10 +593,7 @@ export function FoldersListContainer(): React.JSX.Element {
                   read: {
                     urlPathParams: { rootFolderId: activeRootFolderId },
                     initialState: { subFolderId: null, threadIds: null },
-                    initialData:
-                      activeRootFolderId === initialRootFolderId
-                        ? (initialFolderContentsData ?? undefined)
-                        : undefined,
+                    initialData: rootListSeed,
                     queryOptions: {
                       refetchOnWindowFocus: false,
                       staleTime: 30 * 1000,

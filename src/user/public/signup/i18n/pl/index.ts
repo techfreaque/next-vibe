@@ -69,6 +69,13 @@ export const translations: typeof enTranslations = {
     expired:
       "Ta rejestracja wygasła. Rozpocznij ją ponownie, aby otrzymać nowy kod.",
     retry: "Rozpocznij rejestrację ponownie",
+    subject: "{{code}} to Twój kod do {{appName}}",
+    wrongCode: "Zły kod. Weź kod z najnowszego maila i spróbuj jeszcze raz.",
+    staleLink:
+      "Ten link pochodzi ze starszego maila. Otwórz najnowszy albo wpisz kod z niego.",
+    alreadyConfirmed:
+      "Ten adres jest już potwierdzony. Zaloguj się, żeby kontynuować.",
+    login: "Zaloguj się",
   },
   category: "Użytkownicy",
 

@@ -131,6 +131,45 @@ const LEAD_IP_SQL = sql.raw(
  * Resolve up to `limit` leads (newest first) that have an IP but no country.
  * Returns how many were written and how many are still open.
  */
+/** The email index rejected the update (see backfillLeadCountries). */
+const EMAIL_INDEX_CONFLICT = "email-index-conflict";
+
+async function updateLeadCountries(
+  countries: readonly { id: string; country: string }[],
+): Promise<number | typeof EMAIL_INDEX_CONFLICT> {
+  return db
+    .execute<QueryResultRow & { n: number }>(
+      sql`
+        WITH updated AS (
+          UPDATE leads SET geo_country = v.country
+          FROM jsonb_to_recordset(${JSON.stringify(countries)}::jsonb) AS v(id uuid, country text)
+          WHERE leads.id = v.id AND leads.geo_country IS NULL
+          RETURNING 1
+        ) SELECT count(*)::int AS n FROM updated
+      `,
+    )
+    .then(
+      ({ rows }) => rows[0]?.n ?? 0,
+      (error: Error) =>
+        isEmailUniqueViolation(parseError(error))
+          ? EMAIL_INDEX_CONFLICT
+          : // Any other failure keeps failing the run with its stage logged.
+            Promise.reject(error),
+    );
+}
+
+function isEmailUniqueViolation(parsed: Error): boolean {
+  const cause = parsed.cause instanceof Error ? parsed.cause : parsed;
+  // Field check instead of instanceof: node-postgres and PGlite raise
+  // different classes with the same SQLSTATE fields.
+  return (
+    "code" in cause &&
+    cause.code === "23505" &&
+    "constraint" in cause &&
+    cause.constraint === "leads_email_unique"
+  );
+}
+
 export async function backfillLeadCountries(
   logger: EndpointLogger,
   limit = GEO_BACKFILL_BATCH,
@@ -168,17 +207,36 @@ export async function backfillLeadCountries(
       }
       countries.push({ id: row.id, country: lookupCountry(table, row.ip) });
     }
-    const { rows: changed } = await db.execute<
-      QueryResultRow & { n: number }
-    >(sql`
-      WITH updated AS (
-        UPDATE leads SET geo_country = v.country
-        FROM jsonb_to_recordset(${JSON.stringify(countries)}::jsonb) AS v(id uuid, country text)
-        WHERE leads.id = v.id AND leads.geo_country IS NULL
-        RETURNING 1
-      ) SELECT count(*)::int AS n FROM updated
-    `);
-    backfilled = changed[0]?.n ?? 0;
+    const batch = await updateLeadCountries(countries);
+    if (batch !== EMAIL_INDEX_CONFLICT) {
+      backfilled = batch;
+    } else {
+      // The NOT EXISTS guard above did not see the duplicate, so the email
+      // index answers differently depending on the access path (prod
+      // 2026-11-27: 18 duplicate emails under a valid leads_email_unique,
+      // one inserted the same day). One bad row used to fail the whole
+      // batch every hour. Update row by row and name the blocked leads.
+      const blockedLeadIds: string[] = [];
+      for (const [index, row] of countries.entries()) {
+        if (index > 0 && index % 100 === 0) {
+          await yieldToEventLoop();
+        }
+        const single = await updateLeadCountries([row]);
+        if (single === EMAIL_INDEX_CONFLICT) {
+          blockedLeadIds.push(row.id);
+        } else {
+          backfilled += single;
+        }
+      }
+      logger.error(
+        "Geo IP backfill blocked by duplicate lead emails - leads_email_unique does not enforce uniqueness, the index needs a dedupe + REINDEX",
+        {
+          constraint: "leads_email_unique",
+          blockedCount: blockedLeadIds.length,
+          blockedLeadIds: blockedLeadIds.slice(0, 20).join(","),
+        },
+      );
+    }
   }
   const { rows: remaining } = await db.execute<QueryResultRow & { n: number }>(
     sql`SELECT count(*)::int AS n FROM leads l WHERE ${open}`,

@@ -34,6 +34,7 @@ import type { CountryLanguage } from "../../core/i18n/core/config";
 import { CountryLanguageValues } from "../../core/i18n/core/config";
 import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
+import { verifyCrawler } from "../../identity/middleware/lead-id/verified-crawler";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import { isWebSocketDrainActive } from "../../platforms/web/drain";
@@ -48,7 +49,7 @@ import type {
   WsGuestIdentityChangedFrame,
   WsWireMessage,
 } from "../core/types";
-import { parseWsClientMessage } from "../core/types";
+import { parseWsClientMessage, WS_SELF_HUB_PARAM } from "../core/types";
 import {
   recordWsBroadcast,
   recordWsBroadcastPost,
@@ -131,9 +132,15 @@ const WS_SERVER_RESTART_REASON = "server-restart";
 /** Reason sent with 1012 when a deploy drains this node (the server stays up). */
 const WS_SERVER_DRAIN_REASON = "server-draining";
 
-/** Close every open /ws socket with 1012 + `reason`; returns how many. */
-function closeAllWsClients(reason: string): number {
-  const sockets = [...wsClients];
+/**
+ * Close every open /ws socket with 1012 + `reason`; returns how many. A drain
+ * keeps this process's own loopback hub sockets (`keepSelfHub`): the stream
+ * waiting on such a signal keeps running here until the process stops.
+ */
+function closeAllWsClients(reason: string, keepSelfHub = false): number {
+  const sockets = [...wsClients].filter(
+    (ws) => !keepSelfHub || ws.data.selfHub !== true,
+  );
   for (const ws of sockets) {
     try {
       ws.close(WS_SERVER_RESTART_CODE, reason);
@@ -596,6 +603,17 @@ export function startWebSocketServer(
 
         if (!auth) {
           const cookieHeader = req.headers.get("cookie") ?? "";
+          const userAgent = req.headers.get("user-agent") ?? undefined;
+          const ip =
+            req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+            bunServer.requestIP(req)?.address ??
+            undefined;
+          // Verified search crawlers never get a lead cookie (lead-id
+          // middleware), so their rendered page cannot open a socket. Name
+          // them apart from a browser that lost or blocks its cookies.
+          const verifiedCrawler = await verifyCrawler(userAgent, ip, {
+            timeoutMs: 150,
+          });
           // Auth accepts EITHER httpOnly cookies (browser) OR ?token/?leadId
           // query params (server-to-server self-connections, e.g.
           // KeyedRemoteSignal's openHubWs). Log which was even attempted so a
@@ -613,12 +631,13 @@ export function startWebSocketServer(
               .some((entry) =>
                 entry.trimStart().startsWith(`${LEAD_ID_COOKIE_NAME}=`),
               ),
-            userAgent: req.headers.get("user-agent") ?? undefined,
+            userAgent,
             origin: req.headers.get("origin") ?? undefined,
-            ip:
-              req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-              bunServer.requestIP(req)?.address ??
-              undefined,
+            ip,
+            verifiedCrawler: verifiedCrawler?.id ?? null,
+            // A retry of an earlier upgrade from the same tab (the browser
+            // client's reconnect loop) versus its first attempt.
+            clientRetry: url.searchParams.get("retry") === "1",
             hasCookieHeader: cookieHeader.length > 0,
             cookieNames: cookieHeader
               ? cookieHeader
@@ -661,7 +680,13 @@ export function startWebSocketServer(
 
         // Auth and channel checks can finish after the drain swept the hub.
         // Let the ingress retry this upgrade on the serving peer.
-        if (isWebSocketDrainActive()) {
+        // A self-hub socket comes from this host's own process: there is no
+        // ingress to retry it on the peer, and its waiter stays here.
+        const selfHub =
+          url.searchParams.get(WS_SELF_HUB_PARAM) === "1" &&
+          !req.headers.has("origin") &&
+          isLoopbackAddress(bunServer.requestIP(req)?.address ?? "");
+        if (isWebSocketDrainActive() && !selfHub) {
           logger.info("[WS] Upgrade returned to ingress during deploy drain", {
             requestId,
           });
@@ -684,6 +709,7 @@ export function startWebSocketServer(
             pongCount: 0,
             connectorInstanceId,
             requestId,
+            selfHub: selfHub || undefined,
           } satisfies WsConnectionDataWithProxy,
         });
 
@@ -761,7 +787,7 @@ export function startWebSocketServer(
         // Normal /ws connection - register initial channels from query param
         recordWsOpen();
         wsClients.add(ws as ServerWebSocket<WsConnectionData>);
-        if (isWebSocketDrainActive()) {
+        if (isWebSocketDrainActive() && ws.data.selfHub !== true) {
           ws.close(WS_SERVER_RESTART_CODE, WS_SERVER_DRAIN_REASON);
           return;
         }
@@ -1011,7 +1037,7 @@ export function startWebSocketServer(
       clients: wsClients.size,
       connectors: connectorSockets.size,
     }),
-    closeClients: () => closeAllWsClients(WS_SERVER_DRAIN_REASON),
+    closeClients: () => closeAllWsClients(WS_SERVER_DRAIN_REASON, true),
     nextPort,
   };
 }

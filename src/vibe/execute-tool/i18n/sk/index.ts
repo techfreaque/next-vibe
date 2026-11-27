@@ -6,4 +6,12 @@ export const translations: typeof enTranslations = {
     searchEndpoints: "Hľadať koncové body…",
     value: "{{value}}",
   },
+  errors: {
+    unknownInputKeys: {
+      noneReached:
+        "{{toolName}} nedostal žiadny zo svojich argumentov. Neznáme: {{unknownKeys}}. Očakávané: {{expectedKeys}}.",
+      dropped:
+        "{{error}} Neznáme argumenty boli zahodené: {{unknownKeys}}. Očakávané: {{expectedKeys}}.",
+    },
+  },
 };

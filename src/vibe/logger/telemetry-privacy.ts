@@ -10,11 +10,26 @@ const REDACTED = "[redacted]";
 // Handle both intact and truncated JSON in historical validation diagnostics.
 const SERIALIZED_SECRET =
   /("(?:token|resetToken|verificationToken|confirmationToken|accessToken|refreshToken|authToken|magicLinkToken|emailCode|twoFactorCode|password|confirmPassword)"\s*:\s*")(?:\\.|[^"\\\r\n])*/gi;
+// ws:// and wss:// are URLs too: without them the `//host` part of
+// "ws://127.0.0.1:3000/ws" matched as a protocol-relative URL and was stored
+// as "ws:https://127.0.0.1:3000/ws" (2026-11-27). A `//` right after a colon
+// is never protocol-relative.
 const URL_IN_TEXT =
-  /https?:\/\/[^\s"'<>()]+|(?<![\w/%])\/{1,2}[^/\s"'<>()][^\s"'<>()]*/gi;
+  /(?:https?|wss?):\/\/[^\s"'<>()]+|(?<![\w/%:])\/{1,2}[^/\s"'<>()][^\s"'<>()]*/gi;
 
 /** Keep the host for diagnostics, with user info, credentials and queries removed. */
 function describeLogUrl(raw: string): string | null {
+  const ws = /^(wss?):\/\//i.exec(raw);
+  if (ws) {
+    // Same scrubbing as http(s); the stored URL keeps its own scheme.
+    const scheme = ws[1]?.toLowerCase() === "wss" ? "https" : "http";
+    const described = describeLogUrl(
+      `${scheme}${raw.slice(ws[1]?.length ?? 0)}`,
+    );
+    return described === null
+      ? null
+      : described.replace(/^https?/, ws[1]?.toLowerCase() ?? "ws");
+  }
   const path = sanitizeTelemetryUrl(raw);
   if (path === null) {
     return null;

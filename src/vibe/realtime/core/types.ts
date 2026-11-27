@@ -93,6 +93,9 @@ type WsWireFrame = WsWireMessage | WsWireBatch;
  * Parse and structurally validate a raw WS wire frame string.
  * Returns null on malformed JSON or unrecognized frame shape — callers skip silently.
  */
+/** Query flag a server process sets on its own loopback hub socket. */
+export const WS_SELF_HUB_PARAM = "selfHub";
+
 export function parseWsFrame(raw: string): WsWireFrame | null {
   try {
     const frame = JSON.parse(raw) as WsWireFrame;
@@ -301,6 +304,12 @@ export interface WsConnectionData {
    * can forcibly close it on disconnect without waiting for the client side.
    */
   connectorInstanceId?: string;
+  /**
+   * The process's own loopback subscription to its hub (KeyedRemoteSignal).
+   * Kept through a deploy drain: its waiter runs in this process and cannot
+   * move to the peer node. Set only for loopback upgrades without an Origin.
+   */
+  selfHub?: boolean;
   /**
    * Channels whose subscribe ack is still being prepared (replay read in
    * flight). Live events for such a channel are held here and flushed after

@@ -169,6 +169,40 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "budgetOverrunMs",
   "poolTotal",
   "poolIdle",
+  // 2026-11-27 ws lane: per-socket ping counters, hub correlation ids and
+  // connection timings ("[WS] Closed idle socket", hub socket errors).
+  "pingCount",
+  "lastPingAgeMs",
+  "lastPingBackpressured",
+  "hubRequestId",
+  "msSinceConnect",
+  "attempt",
+  "everOpened",
+  // 2026-11-27 runtime lane: the only varying keys on "[EventLoop] Elevated
+  // lag" (99 rows for one message), and per-occurrence truncation / geo
+  // backfill counts.
+  "timerStallHotStacks",
+  "stallHostCpuStealPct",
+  "profilerCloses",
+  "largeResponses",
+  "timerStallSamples",
+  "largestMessageTokens",
+  "estimatedTokens",
+  "estimatedTokensAfter",
+  "systemTokens",
+  "toolsTokens",
+  "overhead",
+  "limit",
+  "messageCount",
+  "droppedCount",
+  "remainingCount",
+  "protectedCount",
+  "blockedCount",
+  // 2026-11-27 web lane: "API Error:" companions carry the caller's browser
+  // family and page; they split one refusal into a row per browser and page.
+  // The row keeps both.
+  "client",
+  "referer",
 ]);
 
 /**

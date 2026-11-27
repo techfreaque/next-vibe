@@ -72,6 +72,10 @@ export const translations: typeof enTranslations = {
       outputAspectRatio: "Rapporto di ispezione",
     },
     errors: {
+      referenceNotImage:
+        "Il link di {{host}} apre una pagina web, non un file immagine. Usa un link diretto all'immagine (tasto destro, copia indirizzo immagine) o carica l'immagine.",
+      referenceUnreachable:
+        "Il link dell'immagine su {{host}} non si carica (HTTP {{status}}). Controlla il link o carica l'immagine. Non ti è stato addebitato nulla.",
       referenceUnavailable:
         "L'immagine di riferimento non è disponibile. E 'stato cancellato, o appartiene a una chat che non si può aprire. Utilizzare un'immagine da questa chat o caricarlo di nuovo.",
       validation_failed: {

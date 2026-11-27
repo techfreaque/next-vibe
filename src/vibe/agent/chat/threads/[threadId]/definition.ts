@@ -726,23 +726,45 @@ const { DELETE } = createEndpoint({
 
         const rootFolderId = responseData.rootFolderId;
         const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-        apiClient.updateEndpointData(
-          (await import("../definition")).default.GET,
-          logger,
-          (old) => {
-            if (!old?.success) {
-              return old;
-            }
-            return {
-              ...old,
-              data: {
-                ...old.data,
-                threads: old.data.threads.filter((t) => t.id !== threadId),
-              },
-            };
-          },
-          { requestData: { rootFolderId, subFolderId: null } },
-        );
+        const threadsGet = (await import("../definition")).default.GET;
+        // The payload has no folderId, and the threads list is cached per
+        // folder: drop the thread from the root list AND every known
+        // subfolder list of this root (a root-only update left deleted
+        // subfolder threads in place). Uncached keys are a no-op.
+        const foldersGet = (
+          await import("../../folders/[rootFolderId]/definition")
+        ).default.GET;
+        const folders = apiClient.getEndpointData(foldersGet, logger, {
+          urlPathParams: { rootFolderId },
+        });
+        const subFolderIds: (string | null)[] = [
+          null,
+          ...(folders?.success ? folders.data.folders.map((f) => f.id) : []),
+        ];
+        for (const subFolderId of subFolderIds) {
+          apiClient.updateEndpointData(
+            threadsGet,
+            logger,
+            (old) => {
+              if (!old?.success) {
+                return old;
+              }
+              const threads = old.data.threads.filter((t) => t.id !== threadId);
+              if (threads.length === old.data.threads.length) {
+                return old;
+              }
+              return {
+                ...old,
+                data: {
+                  ...old.data,
+                  threads,
+                  totalCount: Math.max(0, old.data.totalCount - 1),
+                },
+              };
+            },
+            { requestData: { rootFolderId, subFolderId } },
+          );
+        }
       },
     },
   },

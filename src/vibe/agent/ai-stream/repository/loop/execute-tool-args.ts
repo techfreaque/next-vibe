@@ -8,7 +8,10 @@
  *  2. A recognized callbackMode in the wrong case is canonicalized. Other
  *     values survive for validation.
  *  3. `input` sent as a JSON-encoded string instead of an object
- *     (kimi-k3 / glm-5.3, prod 2026-11-17) → parsed, when it is valid JSON.
+ *     (kimi-k3 / glm-5.3, prod 2026-11-17) → parsed, when it is valid JSON,
+ *     or when it is one of the two broken shapes the wire repair knows (an
+ *     object closed too early, or the object sent twice; glm-5.3 /
+ *     venice-deepseek, prod 2026-11-25 "malformed-json").
  *
  * Anything else is returned unchanged so genuine mistakes (e.g. no toolName at
  * all) still produce the validation error the model learns from.
@@ -19,6 +22,8 @@ import {
   CallbackModeDB,
   EXECUTE_TOOL_ALIAS,
 } from "next-vibe/execute-tool/constants";
+
+import { repairToolArguments } from "../../providers/shared/tool-call-delta-buffer";
 
 interface ArgsRecord {
   [key: string]: WidgetData;
@@ -65,11 +70,11 @@ function parseRecordString(value: string): ArgsRecord | null {
     return null;
   }
   try {
-    const parsed: WidgetData = JSON.parse(json);
+    const parsed: WidgetData = JSON.parse(repairToolArguments(json).text);
     return isRecord(parsed) ? parsed : null;
   } catch {
-    // Not valid JSON (truncated, or garbage like `<arg_value>`): leave it,
-    // the validation error tells the model what to fix.
+    // Not valid JSON even after the wire repair (truncated, or garbage like
+    // `<arg_value>`): leave it, the validation error tells the model what to fix.
     return null;
   }
 }

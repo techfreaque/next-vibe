@@ -82,7 +82,11 @@ import {
   shouldTriggerCompacting,
   truncateToContextWindow,
 } from "./context/token-budget";
-import { AbortReason, StreamAbortError } from "./core/constants";
+import {
+  AbortReason,
+  StreamAbortError,
+  StreamErrorType,
+} from "./core/constants";
 import { LocalStreamRuns } from "./core/local-stream-runs";
 import { resolveModelSkill } from "./core/modality-resolver";
 import {
@@ -90,6 +94,7 @@ import {
   QueueRegistry,
   setStreamingStateWaiting,
 } from "./core/stream";
+import { estimateModelMessageTokens } from "./core/token-estimator";
 import { findLatestThreadMessage, walkToLeafMessage } from "./core/tree-walk";
 import {
   emitSetupError,
@@ -117,12 +122,16 @@ import {
 } from "./setup/headless-intake-phase";
 import { type HeadlessAiStreamResult, setupAiStream } from "./setup/setup";
 
+/** Refuse a turn whose prompt estimate exceeds the window by this factor. */
+const CONTEXT_REFUSAL_FACTOR = 1.5;
+
 /**
  * The single source of truth for createAiStream's parameters. The overloads
  * are expressed as intersections with { awaitResult: true } / { awaitResult?: false }
  * so the ~20-field list exists exactly ONCE (it used to be typed three times
  * and had drifted between the copies).
  */
+
 export interface CreateAiStreamParams {
   data: AiStreamPostRequestOutput;
   locale: CountryLanguage;
@@ -1028,16 +1037,27 @@ export class AiStreamRepository {
           : isCronCreditSkip
             ? logger.debug
             : logger.warn;
-      logFn("[AiStream] Setup failed", {
-        errorType: errorCode,
-        errorKey: setupResult.errorType.errorKey,
+      const occurrence = {
         message: setupResult.message,
         threadId: data.threadId,
         model: data.model,
-        operation: data.operation,
         rootFolderId: data.rootFolderId,
+        userId: user.isPublic ? null : user.id,
+        leadId: leadId ?? null,
+      };
+      // A credit refusal is one class per error key + actor: the model,
+      // thread and translated amounts go under refusalDetail (outside the
+      // fingerprint). 2026-11-27: 47 rows for one refusal class. The gate's
+      // own row ("[PublicCap] <kind>", same requestId) carries the pool math.
+      const isCreditRefusal =
+        errorCode === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
+      logFn("[AiStream] Setup failed", {
+        errorType: errorCode,
+        errorKey: setupResult.errorType.errorKey,
+        operation: data.operation,
         userKind: user.isPublic ? "public" : "user",
         isCron: Boolean(cronTaskId),
+        ...(isCreditRefusal ? { refusalDetail: occurrence } : occurrence),
       });
       // Conversion wall (admin funnel): a person was refused for credits.
       // The client's own guard reports the refusals it catches before
@@ -1727,6 +1747,46 @@ export class AiStreamRepository {
           if (truncated.length !== messages.length) {
             messages.length = 0;
             messages.push(...truncated);
+          }
+
+          // Protected messages alone (system + the current user turn) far
+          // over the window: the provider can only reject it, after we paid
+          // for the attempt and showed a generic failure (prod 2026-11-27
+          // 19:42: a 3.5 MB text attachment, ~743k estimated tokens, to a
+          // 32k model). Refuse before any model call, nothing is charged.
+          // The estimate is chars/3.5, so only a clear overrun refuses.
+          const contextEstimate =
+            estimateModelMessageTokens(messages) +
+            Math.ceil(systemPrompt.length / 3.5);
+          if (
+            threadResultThreadId &&
+            contextEstimate >
+              compactingCheck.modelContextWindow * CONTEXT_REFUSAL_FACTOR
+          ) {
+            logger.warn(
+              "[AI Stream] Refused before the provider call: prompt far exceeds the model's context window",
+              {
+                model: data.model,
+                modelContextWindow: compactingCheck.modelContextWindow,
+                estimatedTokens: contextEstimate,
+                refusalFactor: CONTEXT_REFUSAL_FACTOR,
+                messageCount: messages.length,
+              },
+            );
+            await ctx.dbWriter.emitErrorMessage({
+              threadId: threadResultThreadId,
+              errorType: StreamErrorType.STREAM_ERROR,
+              error: fail({
+                message: aiStreamT("errors.contextTooLong"),
+                errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+              }),
+              content: aiStreamT("errors.contextTooLong"),
+              parentId: ctx.lastParentId,
+              sequenceId: ctx.lastSequenceId,
+              user,
+            });
+            ctx.cleanup();
+            return;
           }
 
           // Mark thread as streaming before gap-fill so the UI shows activity

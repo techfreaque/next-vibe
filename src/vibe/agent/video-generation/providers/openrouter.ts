@@ -12,6 +12,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
+import { classifyImageProviderError } from "../../image-generation/provider-error";
 import { parseBase64DataUri } from "../../shared/media-generation";
 import { pollDelay } from "../../shared/poll-delay";
 import {
@@ -379,6 +380,18 @@ export async function generateVideoWithOpenRouter(params: {
       logger.error("[OpenRouter Video] Submit failed", {
         status: submitRes.status,
         error: reason ?? submitText.slice(0, 200),
+        // Refusal vs outage vs bad input, the same split the user message
+        // gets in the repository (a 400 for an unloadable reference link is
+        // explained there by the reference probe).
+        failureKind: classifyImageProviderError(
+          reason ?? submitText.slice(0, 200),
+        ),
+        providerJobId:
+          extractHeaderRequestId(submitRes.headers, [
+            "x-request-id",
+            "x-generation-id",
+            "cf-ray",
+          ]) ?? null,
         providerModel,
         frameCount: frameImageParts.length,
         referenceCount: inputReferenceParts.length,
@@ -477,6 +490,9 @@ export async function generateVideoWithOpenRouter(params: {
         logger.error("[OpenRouter Video] Job terminal failure", {
           status: statusData.status,
           error: reason,
+          // contentPolicy = the provider's filter refused the prompt or the
+          // output (user sees the refusal text, is not charged).
+          failureKind: classifyImageProviderError(reason ?? statusData.status),
           // Which upstream model failed and after how long (outage vs. a
           // model-specific rejection); the user is not charged on this path.
           providerModel,

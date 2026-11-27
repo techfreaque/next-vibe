@@ -120,6 +120,7 @@ export function useAIStream(): UseAIStreamReturn {
   const startStream = useCallback(
     async (data: AiStreamPostRequestOutput): Promise<boolean> => {
       const threadId = data.threadId ?? "";
+      useAIStreamStore.getState().setLastSendCreditRefusalRequestId(null);
 
       // Uncensored model without the one-time 18+ consent: hold the send and
       // show the consent dialog instead of a request the server refuses.
@@ -282,21 +283,36 @@ export function useAIStream(): UseAIStreamReturn {
                 logger,
               )
             : null;
+        const occurrence = {
+          message: failMessage,
+          model: data.model,
+          threadId: data.threadId,
+          rootFolderId: data.rootFolderId,
+        };
         (isBrowserNetworkLoss || isCreditRefusal || isConsentRefusal
           ? logger.warn
           : logger.error
         ).bind(logger)(label, {
           requestId: attempt.requestId,
-          message: failMessage,
           errorKey: errorType.errorKey,
           errorCode: errorType.errorCode,
           errorName: parsedErr.name,
           operation: data.operation,
-          model: data.model,
-          threadId: data.threadId,
           errorMessageId,
-          rootFolderId: data.rootFolderId,
           online: isOnline(),
+          // A credit refusal is ONE client row per refusal (callApi leaves it
+          // to the server, the rollback below is its designed recovery). The
+          // translated amounts, model and thread stay out of the fingerprint.
+          ...(isCreditRefusal
+            ? {
+                refusalDetail: {
+                  ...occurrence,
+                  recovery: data.threadId
+                    ? "optimistic turn discarded, draft restored, top-up card shown"
+                    : "top-up card shown",
+                },
+              }
+            : occurrence),
         });
 
         // Consent refusal (uncensored model, no 18+ confirmation yet): the
@@ -311,6 +327,9 @@ export function useAIStream(): UseAIStreamReturn {
         // (visible on new and existing threads alike) - no error bubble, no
         // destructive toast.
         if (isCreditRefusal) {
+          useAIStreamStore
+            .getState()
+            .setLastSendCreditRefusalRequestId(attempt.requestId ?? "unknown");
           if (activeThreadId) {
             discardOptimisticTurn(activeThreadId, data.rootFolderId, logger);
           }

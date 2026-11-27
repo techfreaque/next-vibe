@@ -14,6 +14,14 @@ const SUSPENDED_TIMER_OVERRUN_MS = 10_000;
 const NETWORK_CHANGE_WINDOW_MS = 15_000;
 /** A close this soon after the tab became visible was detected on resume. */
 const RESUME_WINDOW_MS = 3_000;
+/**
+ * The page's own liveness timer stopped this long: the device slept or froze
+ * the page (laptop lid, screen lock, occluded window) while it still counted
+ * as visible. The server stopped getting pongs and closed the socket.
+ */
+export const DEVICE_SUSPEND_MIN_MS = 10_000;
+/** A close this soon after such a suspend ended is attributed to it. */
+const DEVICE_RESUME_WINDOW_MS = 15_000;
 
 export type WsDropCause =
   | "server-restart"
@@ -23,6 +31,7 @@ export type WsDropCause =
   | "background-suspended"
   | "background-tab"
   | "detected-on-resume"
+  | "device-suspended"
   | "going-away"
   | "server-close"
   | "silent-drop";
@@ -37,6 +46,12 @@ export interface WsDropEvidence {
   msSinceVisibilityChange: number | null;
   msSinceNetworkChange: number | null;
   maxReconnectTimerOverrunMs: number;
+  /**
+   * How long the page's liveness timer had stopped right before the close
+   * (null = it kept ticking), and how long ago the last such suspend ended.
+   */
+  deviceSuspendedMs?: number | null;
+  msSinceDeviceResume?: number | null;
 }
 
 export function classifyWsDrop(drop: WsDropEvidence): WsDropCause {
@@ -69,6 +84,16 @@ export function classifyWsDrop(drop: WsDropEvidence): WsDropCause {
     // The socket died while the tab was hidden; the browser only surfaced
     // the close once the tab came back.
     return "detected-on-resume";
+  }
+  if (
+    (drop.deviceSuspendedMs ?? 0) >= DEVICE_SUSPEND_MIN_MS ||
+    (drop.msSinceDeviceResume !== null &&
+      drop.msSinceDeviceResume !== undefined &&
+      drop.msSinceDeviceResume < DEVICE_RESUME_WINDOW_MS)
+  ) {
+    // Visible, but the device slept or froze the page: no pongs, so the
+    // server closed the socket, and the browser surfaced it on wake.
+    return "device-suspended";
   }
   if (drop.wasClean && drop.code === 1001) {
     return "going-away";

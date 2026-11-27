@@ -28,6 +28,7 @@ import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
 import type { FetchUrlContentGetResponseOutput } from "./definition";
 import { htmlToMarkdown } from "./html-to-markdown";
 import type { FetchUrlContentT } from "./i18n";
+import { stripInlineImageData } from "./inline-image-data";
 
 interface TruncateResult {
   content: string;
@@ -58,10 +59,28 @@ const proxyStatusSchema = z.object({
     })
     .optional(),
 });
+/** Scrappey render mode: a full browser (default) or a plain HTTP request. */
+type ScrapeMode = "browser" | "request";
+
+/** One scraper call inside a fetch, kept for the log row of its outcome. */
+export interface ScrapeAttempt {
+  mode: ScrapeMode;
+  ok: boolean;
+  elapsedMs: number;
+  deadlineMs: number;
+  deadlineFired: boolean;
+  failureStage?: "proxy-headers" | "proxy-body" | "proxy-status";
+  upstreamStatus?: number;
+  targetStatusCode?: number;
+  error?: string;
+}
+
 type FetchResult<T> =
-  | { ok: true; data: T }
+  | { ok: true; data: T; scraperAttempts?: ScrapeAttempt[] }
   | {
       ok: false;
+      /** Every scraper call this fetch made, in order. */
+      scraperAttempts?: ScrapeAttempt[];
       error: string;
       isTimeout?: boolean;
       upstreamStatus?: number;
@@ -268,20 +287,47 @@ function truncateMiddle(content: string): TruncateResult {
 
 // ─── FetchUrlService ──────────────────────────────────────────────────────────
 
+/**
+ * True when a failed browser-mode scrape can be fixed by Scrappey's
+ * plain-request mode. Exported for tests.
+ */
+export function shouldRetryInRequestMode(failure: {
+  isCallerError?: boolean;
+  upstreamStatus?: number;
+  targetStatusCode?: number;
+}): boolean {
+  if (failure.isCallerError) {
+    return false;
+  }
+  const target = failure.targetStatusCode;
+  // The target page itself refused (404, 403, 429...): another mode gets the
+  // same answer. 407 is the scraper's own proxy asking for auth, not the site.
+  if (target !== undefined && target >= 400 && target < 500 && target !== 407) {
+    return false;
+  }
+  const status = failure.upstreamStatus;
+  // No headers / dropped body / empty 2xx solution, or a scraper 5xx.
+  return status === undefined || status < 300 || status >= 500;
+}
+
 class FetchUrlService {
   /**
    * Scrappey solves anti-bot pages in a real browser; ordinary pages (Google
    * Books, Open Library, fandom wikis, AliExpress) regularly passed 30 s, and
    * every such run came back as a timeout (prod error log, Aug-Nov 2026).
-   * 60 s stays under the 90 s default tool timeout (transport/direct.ts).
+   * The browser run gets 50 s, the plain-request fallback 25 s: both together
+   * stay under the 90 s default tool timeout (transport/direct.ts).
    */
-  readonly TIMEOUT = 60_000;
+  readonly BROWSER_DEADLINE_MS = 50_000;
+  /** Plain-request fallback: no rendering, so a page answers in seconds. */
+  readonly REQUEST_MODE_DEADLINE_MS = 25_000;
+  /** Worst case of both attempts, still under the 90 s tool timeout. */
+  readonly TIMEOUT = this.BROWSER_DEADLINE_MS + this.REQUEST_MODE_DEADLINE_MS;
   private readonly SCRAPPEY_API_URL = "https://publisher.scrappey.com/api/v1";
 
   async fetchUrl(
     url: string,
     fetchImpl: typeof globalThis.fetch,
-    logger?: EndpointLogger,
   ): Promise<FetchResult<FetchUrlResult>> {
     const validateResult = this.validateUrl(url);
     if (!validateResult.ok) {
@@ -295,7 +341,8 @@ class FetchUrlService {
         ok: true,
         data: {
           url,
-          content: cached,
+          // Entries cached before inline images were stripped.
+          content: stripInlineImageData(cached),
           statusCode: 200,
           timeElapsed: 0,
           timestamp: Date.now(),
@@ -303,18 +350,7 @@ class FetchUrlService {
       };
     }
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, this.TIMEOUT);
-
-    const scrappeyResult = await this.fetchFromScrappey(
-      url,
-      controller.signal,
-      fetchImpl,
-      logger,
-    );
-    clearTimeout(timeoutId);
+    const scrappeyResult = await this.fetchFromScrappey(url, fetchImpl);
 
     if (!scrappeyResult.ok) {
       return scrappeyResult;
@@ -327,7 +363,10 @@ class FetchUrlService {
       scrappeyResponse.solution.currentUrl,
     );
     if (!markdownResult.ok) {
-      return markdownResult;
+      return {
+        ...markdownResult,
+        scraperAttempts: scrappeyResult.scraperAttempts,
+      };
     }
 
     const content = markdownResult.data;
@@ -337,6 +376,7 @@ class FetchUrlService {
 
     return {
       ok: true,
+      scraperAttempts: scrappeyResult.scraperAttempts,
       data: {
         url: scrappeyResponse.solution.currentUrl,
         content,
@@ -361,21 +401,13 @@ class FetchUrlService {
     if (!validateResult.ok) {
       return validateResult;
     }
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, this.TIMEOUT);
-    const result = await this.fetchFromScrappey(
-      url,
-      controller.signal,
-      fetchImpl,
-    );
-    clearTimeout(timeoutId);
+    const result = await this.fetchFromScrappey(url, fetchImpl);
     if (!result.ok) {
       return result;
     }
     return {
       ok: true,
+      scraperAttempts: result.scraperAttempts,
       data: {
         html: result.data.solution.response,
         statusCode: result.data.solution.statusCode,
@@ -384,40 +416,80 @@ class FetchUrlService {
     };
   }
 
+  /**
+   * Browser mode first; ONE fallback in Scrappey's plain-request mode when the
+   * browser run gave no page for a reason another mode can fix: no response
+   * headers before the deadline (prod 11-25..27: github.com, mcreference.com,
+   * soulsmodding.com, labvolt.com, kink.com, two CORS proxies, all at 60 s),
+   * a proxy 5xx (unverified solution, target 307 redirect or 407 proxy auth),
+   * or an empty solution. Our key/balance/quota (401/402/403/429), a rejected
+   * URL and a real target refusal (target 4xx) are passed back unchanged.
+   */
   private async fetchFromScrappey(
     url: string,
-    signal: AbortSignal,
     fetchImpl: typeof globalThis.fetch,
-    logger?: EndpointLogger,
   ): Promise<FetchResult<ScrappeyResponse>> {
-    const first = await this.requestScrappey(url, signal, fetchImpl);
-    // A complete 5xx with an explicitly unverified solution and no target
-    // status gives no page to return. Try this read once within its original
-    // deadline. A reported target refusal must be passed back to the caller.
-    if (
-      first.ok ||
-      first.upstreamStatus === undefined ||
-      first.upstreamStatus < 500 ||
-      first.solutionVerified !== false ||
-      first.targetStatusCode !== undefined ||
-      first.proxyBodyRead !== "complete" ||
-      (first.proxyElapsedMs ?? this.TIMEOUT) >= this.TIMEOUT / 2 ||
-      signal.aborted
-    ) {
-      return first;
+    const attempts: ScrapeAttempt[] = [];
+    const first = await this.timedScrappeyAttempt(
+      url,
+      "browser",
+      this.BROWSER_DEADLINE_MS,
+      fetchImpl,
+      attempts,
+    );
+    if (first.ok || !shouldRetryInRequestMode(first)) {
+      return { ...first, scraperAttempts: attempts };
     }
-    logger?.warn("Retrying URL fetch after unverified scraper response", {
-      upstreamStatus: first.upstreamStatus,
-      proxyElapsedMs: first.proxyElapsedMs,
-      solutionVerified: first.solutionVerified,
-    });
-    return this.requestScrappey(url, signal, fetchImpl);
+    const second = await this.timedScrappeyAttempt(
+      url,
+      "request",
+      this.REQUEST_MODE_DEADLINE_MS,
+      fetchImpl,
+      attempts,
+    );
+    return { ...second, scraperAttempts: attempts };
+  }
+
+  private async timedScrappeyAttempt(
+    url: string,
+    mode: ScrapeMode,
+    deadlineMs: number,
+    fetchImpl: typeof globalThis.fetch,
+    attempts: ScrapeAttempt[],
+  ): Promise<FetchResult<ScrappeyResponse>> {
+    const startedAt = performance.now();
+    const signal = AbortSignal.timeout(deadlineMs);
+    const result = await this.requestScrappey(url, signal, fetchImpl, mode);
+    attempts.push(
+      result.ok
+        ? {
+            mode,
+            ok: true,
+            elapsedMs: Math.round(performance.now() - startedAt),
+            deadlineMs,
+            deadlineFired: false,
+            targetStatusCode: result.data.solution.statusCode,
+          }
+        : {
+            mode,
+            ok: false,
+            elapsedMs: Math.round(performance.now() - startedAt),
+            deadlineMs,
+            deadlineFired: result.deadlineFired ?? signal.aborted,
+            failureStage: result.failureStage,
+            upstreamStatus: result.upstreamStatus,
+            targetStatusCode: result.targetStatusCode,
+            error: result.error,
+          },
+    );
+    return result;
   }
 
   private async requestScrappey(
     url: string,
     signal: AbortSignal,
     fetchImpl: typeof globalThis.fetch,
+    mode: ScrapeMode,
   ): Promise<FetchResult<ScrappeyResponse>> {
     const apiUrl = `${this.SCRAPPEY_API_URL}?key=${agentEnv.SCRAPPEY_API_KEY}`;
     const proxyStartedAt = performance.now();
@@ -432,6 +504,8 @@ class FetchUrlService {
         body: JSON.stringify({
           cmd: "request.get",
           url: url,
+          // "browser" is Scrappey's default; only the fallback names a mode.
+          ...(mode === "request" ? { requestType: "request" } : {}),
         }),
         signal,
       });
@@ -489,12 +563,21 @@ class FetchUrlService {
           ok: false,
           // eslint-disable-next-line i18next/no-literal-string
           error: "No content received from Scrappey API",
+          upstreamStatus,
+          targetStatusCode: data.solution?.statusCode,
+          proxyElapsedMs: Math.round(performance.now() - proxyStartedAt),
+          deadlineFired: signal.aborted,
+          failureStage: "proxy-body",
         };
       }
 
       return { ok: true, data };
     } catch (error) {
-      const isTimeout = error instanceof Error && error.name === "AbortError";
+      // AbortSignal.timeout rejects with TimeoutError, a plain abort with
+      // AbortError: both mean this attempt's deadline fired.
+      const isTimeout =
+        error instanceof Error &&
+        (error.name === "AbortError" || error.name === "TimeoutError");
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       return {
@@ -637,33 +720,37 @@ export class FetchUrlContentRepository {
     const result = await fetchService.fetchUrl(
       url,
       createFixtureFetch(toolExecutionContext, logger),
-      logger,
     );
+    const targetHost = URL.canParse(url) ? new URL(url).hostname : null;
+    const phases =
+      result.scraperAttempts?.map((attempt) => ({ ...attempt })) ?? [];
 
     if (!result.ok) {
-      // A slow site timing out or an unfetchable URL is the normal life of a
-      // scraper - warn with the reason. The scraper itself failing (5xx,
-      // no content, conversion error) is an error.
-      const isExpected = result.isTimeout === true || result.isCallerError;
-      (isExpected ? logger.warn : logger.error).bind(logger)(
-        "Fetch URL error",
-        {
-          error: result.error,
-          isTimeout: result.isTimeout ?? false,
-          isCallerError: result.isCallerError ?? false,
-          timeoutMs: fetchService.TIMEOUT,
-          proxyElapsedMs: result.proxyElapsedMs,
-          proxyBodyStatus: result.proxyBodyStatus,
-          proxyBodyRead: result.proxyBodyRead,
-          targetStatusCode: result.targetStatusCode,
-          solutionVerified: result.solutionVerified,
-          deadlineFired: result.deadlineFired,
-          elapsedMs: Date.now() - startedAt,
-          upstreamStatus: result.upstreamStatus,
-          failureStage: result.failureStage,
-          targetHost: URL.canParse(url) ? new URL(url).hostname : null,
-        },
-      );
+      // ONE row per failed tool call, after the fallback mode ran: the top
+      // level is the final attempt, `phases` lists every scraper call (mode,
+      // stage, status, elapsed, deadline). Deadline and caller-input failures
+      // stay warn, scraper failures (5xx, empty solution, conversion) error.
+      const isWarn = result.isTimeout === true || result.isCallerError;
+      (isWarn ? logger.warn : logger.error).bind(logger)("Fetch URL error", {
+        provider: "scrappey",
+        scraperMode: result.scraperAttempts?.at(-1)?.mode ?? null,
+        attemptCount: result.scraperAttempts?.length ?? 0,
+        phases,
+        error: result.error,
+        isTimeout: result.isTimeout ?? false,
+        isCallerError: result.isCallerError ?? false,
+        timeoutMs: fetchService.TIMEOUT,
+        proxyElapsedMs: result.proxyElapsedMs,
+        proxyBodyStatus: result.proxyBodyStatus,
+        proxyBodyRead: result.proxyBodyRead,
+        targetStatusCode: result.targetStatusCode,
+        solutionVerified: result.solutionVerified,
+        deadlineFired: result.deadlineFired,
+        elapsedMs: Date.now() - startedAt,
+        upstreamStatus: result.upstreamStatus,
+        failureStage: result.failureStage,
+        targetHost,
+      });
 
       if (result.isCallerError) {
         return fail({
@@ -682,6 +769,22 @@ export class FetchUrlContentRepository {
       return fail({
         message: t("get.errors.internal.detail", { message: result.error }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    const recoveredFrom = result.scraperAttempts?.find((a) => !a.ok);
+    if (recoveredFrom) {
+      // The page arrived, but only through the fallback mode: the browser run
+      // still cost the user its full wait. One row per host keeps the
+      // evidence of which sites hang Scrappey's browser.
+      logger.warn("Fetch URL recovered via scraper request mode", {
+        provider: "scrappey",
+        targetHost,
+        browserFailureStage: recoveredFrom.failureStage ?? null,
+        browserUpstreamStatus: recoveredFrom.upstreamStatus ?? null,
+        browserTargetStatus: recoveredFrom.targetStatusCode ?? null,
+        phases,
+        elapsedMs: Date.now() - startedAt,
       });
     }
 

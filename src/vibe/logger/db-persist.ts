@@ -17,6 +17,7 @@ import {
   MAX_STACK_LENGTH,
   type NewErrorLog,
 } from "./error-monitor/db";
+import { REFUSAL_DETAIL_LOG_KEY } from "./refusal-detail";
 import { serializeLogValue } from "./serialize";
 import { sanitizeLogText } from "./telemetry-privacy";
 import { type ErrorLogLevel, type LoggerMetadata } from "./types";
@@ -127,6 +128,12 @@ function extractMessage(
 const BASE_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "locale",
   "payload",
+  // Per-occurrence detail of a business refusal (out of credits, daily free
+  // limit): model, thread, translated message, amounts. 2026-11-27: one
+  // refusal class split into 47 "[AiStream] Setup failed" rows (one per
+  // model x message x folder). The class keys stay at the top level; the row
+  // keeps the latest detail and counts occurrences.
+  REFUSAL_DETAIL_LOG_KEY,
 ]);
 
 /**
@@ -147,6 +154,9 @@ export function normalizeForFingerprint(input: string): string {
         /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
         "<uuid>",
       )
+      // Masked addresses ("ba***@bg2000.at"): the * broke the plain rule,
+      // so a login failure got one row per address (2026-11-27 web lane).
+      .replace(/[\w.+*-]*\*+[\w.+*-]*@[\w-]+(?:\.[\w-]+)+/g, "<email>")
       .replace(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g, "<email>")
       .replace(
         /\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?/g,

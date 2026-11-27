@@ -448,7 +448,6 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
           const context = {
             endpoint: endpointKey,
             alias: endpoint.aliases?.[0] ?? null,
-            activationControl,
             firstInvalidField: firstInvalidField ?? null,
             firstInvalidFieldHasFocusTarget:
               typeof fieldRef === "object" &&
@@ -457,10 +456,17 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
               typeof fieldRef.focus === "function",
             fieldRules: signature.slice(0, 400),
             consecutiveBlockedSubmits: blocked,
-            fields: fields
-              .map(({ rule, message }) => `${rule} - ${message}`)
-              .join("; ")
-              .slice(0, 1000),
+            // The form refused the submit: endpoint + failing rules are the
+            // class; the translated messages (one per locale) and the control
+            // that triggered it are per occurrence and stay out of the
+            // fingerprint (2026-11-27: 40 rows for a handful of rules).
+            refusalDetail: {
+              activationControl,
+              fields: fields
+                .map(({ rule, message }) => `${rule} - ${message}`)
+                .join("; ")
+                .slice(0, 1000),
+            },
           };
           logger.warn(
             blocked < STUCK_SUBMIT_THRESHOLD

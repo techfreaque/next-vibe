@@ -170,6 +170,18 @@ export async function deductAndEmitCredits(
                 chargeExceedsTurnBudget:
                   creditsDeductedBeforeCharge + params.amount >
                   turnBudget.startingCredits + 1e-9,
+                // The capped debit took everything left, so whatever the turn
+                // started with and neither this turn nor this charge used was
+                // spent elsewhere while it ran (a parallel turn, a tool or
+                // memory charge on the same wallet). 2026-11-27: 13 of 28.2
+                // went to two other requests at the same second.
+                spentElsewhereDuringTurn:
+                  Math.round(
+                    (turnBudget.startingCredits -
+                      creditsDeductedBeforeCharge -
+                      deducted) *
+                      100,
+                  ) / 100,
               }
             : {}),
         },

@@ -110,9 +110,20 @@ export function validateData<TSchema extends z.ZodType>(
       // --interactive hint; every other surface gets the compact field list.
       // Formatting here is what lets the response carry finished text instead of
       // parts that four separate consumers had to reassemble.
+      // Schema messages are the endpoint's translation keys; the client form
+      // translates them, but API, MCP and CLI callers read this text as is
+      // (prod 2026-11-27: "description: post.skillDescription.validation.minLength").
+      const shownIssues = endpoint
+        ? translateIssueMessages(issues, endpoint, locale)
+        : issues;
       const message = isCliPlatform(platform)
-        ? formatValidationErrorDetails(t, issues, endpoint, asInputData(data))
-        : formatValidationErrorCompact(t, issues, endpoint);
+        ? formatValidationErrorDetails(
+            t,
+            shownIssues,
+            endpoint,
+            asInputData(data),
+          )
+        : formatValidationErrorCompact(t, shownIssues, endpoint);
 
       return fail({
         message,
@@ -130,6 +141,27 @@ export function validateData<TSchema extends z.ZodType>(
       errorType: ErrorResponseTypes.VALIDATION_ERROR,
     });
   }
+}
+
+/** A dotted translation key such as `post.skillDescription.validation.minLength`. */
+const TRANSLATION_KEY_PATTERN = /^[A-Za-z][\w-]*(?:\.[\w-]+)+$/;
+
+/**
+ * Resolve issue messages that are translation keys of the endpoint's scope.
+ * Zod's own text and keys outside the scope come back unchanged (the scoped
+ * `t` returns the key when it finds nothing).
+ */
+function translateIssueMessages(
+  issues: ZodIssue[],
+  endpoint: CreateApiEndpointAny,
+  locale: CountryLanguage,
+): ZodIssue[] {
+  const { t } = endpoint.scopedTranslation.scopedT(locale);
+  return issues.map((issue) =>
+    TRANSLATION_KEY_PATTERN.test(issue.message)
+      ? { ...issue, message: t(issue.message) }
+      : issue,
+  );
 }
 
 /**

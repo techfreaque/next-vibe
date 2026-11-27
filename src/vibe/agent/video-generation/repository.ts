@@ -26,6 +26,7 @@ import {
   classifyImageProviderError,
   ImageProviderFailureKind,
 } from "../image-generation/provider-error";
+import { findUnusableReference } from "../image-generation/reference-probe";
 import {
   MediaStudioRepository,
   type ProviderJobIdRecorder,
@@ -526,6 +527,37 @@ export class VideoGenerationRepository {
           ErrorResponseTypes.NOT_FOUND.errorKey
       ) {
         return generationResult;
+      }
+      // A third-party reference link the provider could not use (a web page,
+      // a 404 like the made-up example.com frame of prod 2026-11-27): name
+      // the link problem, not the provider's wording.
+      const referenceUrls = [
+        ...(resolvedFrameReferences ?? []).map((frame) => frame.url),
+        ...(resolvedSeedImageUrl ? [resolvedSeedImageUrl] : []),
+      ];
+      const unusable =
+        videoModel.apiProvider === ApiProvider.UNBOTTLED
+          ? null
+          : await findUnusableReference({
+              urls: [...new Set(referenceUrls)],
+              fetchImpl,
+              logger,
+              logTag: "VideoGen",
+              model: videoModel.id,
+              provider: videoModel.apiProvider,
+              providerError: generationResult.message,
+            });
+      if (unusable) {
+        return fail({
+          message:
+            unusable.reason === "notMedia"
+              ? t("post.errors.referenceNotImage", { host: unusable.host })
+              : t("post.errors.referenceUnreachable", {
+                  host: unusable.host,
+                  status: String(unusable.status ?? "-"),
+                }),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
       }
       return providerFailure(generationResult.message, t);
     }

@@ -69,6 +69,14 @@ export const translations: typeof enTranslations = {
       jobId: "Asynchrone Job-ID",
     },
     errors: {
+      referenceNotImage:
+        "Der Link auf {{host}} führt zu einer Webseite, nicht zu einer Bilddatei. Nimm einen direkten Bildlink (Rechtsklick aufs Bild, Bildadresse kopieren) oder lade das Bild hoch.",
+      referenceUnreachable:
+        "Der Bildlink auf {{host}} lädt nicht (HTTP {{status}}). Prüfe den Link oder lade das Bild direkt hoch. Dir wurde nichts berechnet.",
+      modelDiscontinued:
+        "{{model}} wurde vom Anbieter eingestellt und generiert nicht mehr. Wähle ein anderes Videomodell. Dir wurde nichts berechnet.",
+      referenceStagingFailed:
+        "Der Videoanbieter konnte das Eingabebild nicht annehmen. Versuch es nochmal oder wähle ein anderes Videomodell. Dir wurde nichts berechnet.",
       referenceUnavailable:
         "Das Eingabebild ist nicht verfügbar. Es wurde gelöscht oder gehört zu einem Chat, auf den du keinen Zugriff hast. Nimm ein Bild aus diesem Chat oder lade es neu hoch.",
       validation_failed: {

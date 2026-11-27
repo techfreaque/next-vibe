@@ -63,6 +63,8 @@ interface ProfileSession {
   timerStall?: TimerStall;
   /** Set once the sampling window closed (tail, window or hard cap) */
   released: boolean;
+  /** Wall clock of the release, to time the close (materialize + summarize) */
+  releasedAt?: number;
   /** Phases that overlapped the session (open ones are carried over) */
   phases: PhaseWindow[];
   startedAt: number;
@@ -107,6 +109,14 @@ declare global {
   var __vibeProfilerContinuous: EndpointLogger | null | undefined;
   /** Summary of the most recently released session */
   var __vibeProfilerPending: Promise<void> | undefined;
+  /** Recent window closes (profile materialization + summarize), newest last */
+  var __vibeProfilerCloses: ProfilerClose[] | undefined;
+}
+
+interface ProfilerClose {
+  startedAt: number;
+  endedAt: number;
+  traces: number;
 }
 
 type BunJsc = typeof BunJscModule;
@@ -403,6 +413,7 @@ function startSession(logger: EndpointLogger): ProfileSession {
         return;
       }
       session.released = true;
+      session.releasedAt = Date.now();
       globalThis.__vibeProfilerPending = done;
       resolveWindow();
     },
@@ -443,6 +454,20 @@ function startSession(logger: EndpointLogger): ProfileSession {
       }
       const result = await jsc.profile(() => sessionWindow, SAMPLE_INTERVAL_US);
       const stall = summarize(result, session, Date.now());
+      // The profiler's own close is main-thread work too. Record it so a lag
+      // row that overlaps it says so (prod watchdog-self rows at 0 % steal
+      // named only the ticker and PhaseProfiler.flush).
+      if (session.releasedAt !== undefined) {
+        const closes = (globalThis.__vibeProfilerCloses ??= []);
+        closes.push({
+          startedAt: session.releasedAt,
+          endedAt: Date.now(),
+          traces: result.stackTraces.traces.length,
+        });
+        if (closes.length > RECENT_RING_SIZE) {
+          closes.splice(0, closes.length - RECENT_RING_SIZE);
+        }
+      }
       const ring = recent();
       ring.push(stall);
       if (ring.length > RECENT_RING_SIZE) {
@@ -608,6 +633,24 @@ export class PhaseProfiler {
     if (timer !== undefined) {
       clearTimeout(timer);
     }
+  }
+
+  /**
+   * Profiler window closes that overlapped [from, to], as
+   * "<ms> ms / <traces> traces at <iso>" (undefined when none did).
+   */
+  static closesDuring(from: number, to: number): string | undefined {
+    const hits = (globalThis.__vibeProfilerCloses ?? []).filter(
+      (close) => close.startedAt <= to && close.endedAt >= from,
+    );
+    return hits.length > 0
+      ? hits
+          .map(
+            (close) =>
+              `${String(close.endedAt - close.startedAt)} ms / ${String(close.traces)} traces at ${new Date(close.startedAt).toISOString()}`,
+          )
+          .join("; ")
+      : undefined;
   }
 
   /** True while continuous sampling is enabled. */

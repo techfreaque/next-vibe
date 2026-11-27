@@ -69,6 +69,14 @@ export const translations = {
       jobId: "Async job ID",
     },
     errors: {
+      referenceNotImage:
+        "The link on {{host}} opens a web page, not an image file. Use a direct image link (right-click the picture, copy image address) or upload the image.",
+      referenceUnreachable:
+        "The image link on {{host}} does not load (HTTP {{status}}). Check the link or upload the image instead. You were not charged.",
+      modelDiscontinued:
+        "{{model}} was retired by its provider and no longer generates. Pick another video model. You were not charged.",
+      referenceStagingFailed:
+        "The video provider could not receive the input image. Try again or pick another video model. You were not charged.",
       referenceUnavailable:
         "The input image is not available. It was deleted, or it belongs to a chat you cannot open. Use an image from this chat or upload it again.",
       validation_failed: {

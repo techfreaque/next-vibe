@@ -44,6 +44,61 @@ async function walkJsFiles(dir: string, out: string[]): Promise<void> {
   }
 }
 
+interface RuntimeEnvSentinel {
+  sentinel: Buffer;
+  value: Buffer;
+}
+
+const SENTINEL_PREFIX_BYTES = Buffer.from(RUNTIME_ENV_SENTINEL_PREFIX, "utf8");
+
+/**
+ * Replaces every known sentinel in `content` at the byte level (native
+ * memmem scans, one allocation for the result). Returns undefined when the
+ * file holds no known sentinel, so the caller skips the write.
+ */
+export function replaceRuntimeEnvSentinels(
+  content: Buffer,
+  sentinels: readonly RuntimeEnvSentinel[],
+): { content: Buffer; count: number } | undefined {
+  let at = content.indexOf(SENTINEL_PREFIX_BYTES);
+  if (at === -1) {
+    return undefined;
+  }
+  const parts: Buffer[] = [];
+  let copiedUntil = 0;
+  let count = 0;
+  while (at !== -1) {
+    const match = sentinels.find(
+      ({ sentinel }) =>
+        at + sentinel.length <= content.length &&
+        content.compare(
+          sentinel,
+          0,
+          sentinel.length,
+          at,
+          at + sentinel.length,
+        ) === 0,
+    );
+    if (match) {
+      parts.push(content.subarray(copiedUntil, at), match.value);
+      copiedUntil = at + match.sentinel.length;
+      count++;
+      at = content.indexOf(SENTINEL_PREFIX_BYTES, copiedUntil);
+    } else {
+      // A sentinel for a key this container does not set: leave it as is.
+      at = content.indexOf(
+        SENTINEL_PREFIX_BYTES,
+        at + SENTINEL_PREFIX_BYTES.length,
+      );
+    }
+  }
+  if (count === 0) {
+    return undefined;
+  }
+  parts.push(content.subarray(copiedUntil));
+  return { content: Buffer.concat(parts), count };
+}
+
 /**
  * Lets one built image run across instances with different public env
  * (agent availability, local/cloud mode, Stripe key) without a rebuild - the
@@ -72,17 +127,13 @@ export async function patchRuntimeEnvPlaceholders(
     return;
   }
 
-  const valueBySentinel = new Map(
-    replacements.map(({ sentinel, value }) => [sentinel, value]),
-  );
-  const sentinelPattern = new RegExp(
-    replacements
-      .map(({ sentinel }) => sentinel)
-      .toSorted((a, b) => b.length - a.length)
-      .map((sentinel) => sentinel.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-      .join("|"),
-    "g",
-  );
+  // Longest first, so a sentinel that is a prefix of another never wins.
+  const sentinels: RuntimeEnvSentinel[] = replacements
+    .map(({ sentinel, value }) => ({
+      sentinel: Buffer.from(sentinel, "utf8"),
+      value: Buffer.from(value, "utf8"),
+    }))
+    .toSorted((a, b) => b.sentinel.length - a.sentinel.length);
 
   const startedAt = Date.now();
   const files: string[] = [];
@@ -92,45 +143,35 @@ export async function patchRuntimeEnvPlaceholders(
   let patchedTokens = 0;
 
   const patchFile = async (file: string): Promise<void> => {
-    let content: string;
+    // Raw bytes, never a decoded string: only ~200 of ~17,400 bundle files
+    // carry a sentinel, and decoding every file to UTF-16 plus a regex
+    // callback per match held the loop for up to 643 ms right after boot
+    // (prod 2026-11-26 12:42, hot frames runtime-env-patch.ts:110/126,
+    // 82 "[EventLoop] Elevated lag" occurrences across deploys). The
+    // sentinels are ASCII, so a byte match can never split a UTF-8 sequence.
+    let content: Buffer;
     try {
-      content = await readFile(file, "utf-8");
+      content = await readFile(file);
     } catch {
       return;
     }
-    // One prefix scan rules out the vast majority of files cheaply.
-    if (!content.includes(RUNTIME_ENV_SENTINEL_PREFIX)) {
+    const patched = replaceRuntimeEnvSentinels(content, sentinels);
+    if (!patched) {
       return;
     }
-
-    // One regex pass per file. Per-key split/join over large chunks still
-    // held the loop for 249 ms on the first async deploy (prod 2026-11-25
-    // 09:49, hot frame runtime-env-patch.ts:97 "join" x165).
-    let changed = false;
-    content = content.replace(sentinelPattern, (sentinel) => {
-      const value = valueBySentinel.get(sentinel);
-      if (value === undefined) {
-        return sentinel;
-      }
-      changed = true;
-      patchedTokens++;
-      return value;
-    });
+    patchedTokens += patched.count;
     // Let queued requests run between patched files.
     await new Promise<void>((resolve) => {
       setImmediate(resolve);
     });
-
-    if (changed) {
-      try {
-        await writeFile(file, content, "utf-8");
-        patchedFiles++;
-      } catch (error) {
-        logger.warn("[RuntimeEnvPatch] Failed to write patched file", {
-          file,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      }
+    try {
+      await writeFile(file, patched.content);
+      patchedFiles++;
+    } catch (error) {
+      logger.warn("[RuntimeEnvPatch] Failed to write patched file", {
+        file,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   };
 

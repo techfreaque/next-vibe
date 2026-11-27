@@ -60,6 +60,31 @@ export interface PublicCapGateParams {
    * reservations of the same pool are subtracted from it.
    */
   reservation?: { poolKey: string; spendable?: number };
+  /** Who asks: guest (lead only) or a signed-in account without paid credits. */
+  actor?: PublicCapActor;
+}
+
+export interface PublicCapActor {
+  userId?: string;
+  isSignedIn: boolean;
+}
+
+/** Settled vs reserved split behind a refusal's totals (log evidence only). */
+interface PublicCapRefusalEvidence {
+  poolSettledToday: number;
+  poolReservedLive: number;
+  leadSettledToday?: number;
+  leadReservedLive?: number;
+  ipSettledToday?: number;
+  ipReservedLive?: number;
+  walletPoolKey?: string;
+  walletSpendable?: number;
+  walletReservedLive?: number;
+}
+
+/** Credit amounts in logs: two decimals, no float noise (2627.1299999999997). */
+function roundCredits(value: number): number {
+  return Math.round(value * 100) / 100;
 }
 
 /**
@@ -95,19 +120,64 @@ export class PublicCapRepository {
       /** lead-cap / ip-cap: the sub-cap that refused and what was spent on it */
       subCapSpend?: number;
       subCap?: number;
+      /** Who asked: the free tier covers guests AND signed-in free accounts. */
+      actor?: PublicCapActor;
+      /** Pool math behind the decision (settled vs reserved credits). */
+      evidence?: PublicCapRefusalEvidence;
     },
     logger: EndpointLogger,
   ): Promise<void> {
     // Named per kind: "[PublicCap] event" said nothing about which guard
-    // fired. lead-cap / ip-cap / global-cap / single-request = a guest
-    // request was refused; threshold-80 = the shared pool is 80% spent,
-    // threshold-100 = it is used up; fail-closed = the cap check could not
-    // read the DB and refused.
+    // fired. lead-cap / ip-cap / global-cap / single-request / pool-reserved =
+    // a free-tier request was refused; threshold-80 = the shared pool is 80%
+    // spent, threshold-100 = it is used up; fail-closed = the cap check could
+    // not read the DB and refused.
+    // The free tier serves guests AND signed-in accounts without paid
+    // credits; "guest request refused" on a signed-in user's refusal sent
+    // triage looking for a session bug (2026-11-27). The label names the actor.
+    const isThreshold =
+      event.kind === "threshold-80" || event.kind === "threshold-100";
+    const actorLabel =
+      event.actor === undefined
+        ? "free-tier"
+        : event.actor.isSignedIn
+          ? "signed-in free user"
+          : "guest";
+    // Refused amount on top of the limit that refused it: > 0 proves the
+    // refusal arithmetically (limit - used < cost).
+    const limit = event.subCap ?? event.capAmount;
+    const used =
+      event.subCap === undefined ? event.spendToday : event.subCapSpend;
     logger.warn(
-      event.kind === "threshold-80" || event.kind === "threshold-100"
-        ? `[PublicCap] ${event.kind}: shared guest pool spend crossed`
-        : `[PublicCap] ${event.kind}: guest request refused`,
-      { ...event },
+      isThreshold
+        ? `[PublicCap] ${event.kind}: shared free-tier pool spend crossed`
+        : `[PublicCap] ${event.kind}: ${actorLabel} request refused`,
+      {
+        kind: event.kind,
+        actor:
+          event.actor === undefined
+            ? "unknown"
+            : event.actor.isSignedIn
+              ? "signed-in"
+              : "guest",
+        // Per occurrence (outside the fingerprint): who, what and the math.
+        refusalDetail: {
+          userId: event.actor?.userId ?? null,
+          isSignedIn: event.actor?.isSignedIn ?? null,
+          leadId: event.leadId ?? null,
+          ipHash: event.ipHash ?? null,
+          model: event.model ?? null,
+          cost: event.cost,
+          poolSpendToday: event.spendToday,
+          capAmount: event.capAmount,
+          subCap: event.subCap ?? null,
+          subCapSpend: event.subCapSpend ?? null,
+          limitLeft: used === undefined ? null : roundCredits(limit - used),
+          overLimitBy:
+            used === undefined ? null : roundCredits(used + event.cost - limit),
+          ...event.evidence,
+        },
+      },
     );
     try {
       await db.insert(publicCapEvents).values({
@@ -387,7 +457,8 @@ export class PublicCapRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<PublicCapAllowance>> {
     const { t } = scopedTranslation.scopedT(locale);
-    const { leadId, ipAddress, expectedCost, model, reservation } = params;
+    const { leadId, ipAddress, expectedCost, model, reservation, actor } =
+      params;
     const ipHash = ipAddress
       ? PublicCapRepository.hashIp(ipAddress)
       : undefined;
@@ -487,6 +558,18 @@ export class PublicCapRepository {
           cost: expectedCost,
           spendToday,
           capAmount: row.capAmount,
+          actor,
+          evidence: {
+            poolSettledToday: row.spendToday,
+            poolReservedLive: reserved.all,
+            leadSettledToday: leadId ? leadSpend : undefined,
+            leadReservedLive: leadId ? reserved.lead : undefined,
+            ipSettledToday: ipHash ? ipSpend : undefined,
+            ipReservedLive: ipHash ? reserved.ip : undefined,
+            walletPoolKey: reservation?.poolKey,
+            walletSpendable: reservation?.spendable,
+            walletReservedLive: reservation ? reserved.pool : undefined,
+          },
         };
 
         if (spendToday >= row.capAmount) {

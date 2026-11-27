@@ -9,7 +9,7 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 
-import { and, eq, lt, sql } from "drizzle-orm";
+import { and, eq, gt, lt, sql } from "drizzle-orm";
 import { chatFolders, chatThreads } from "next-vibe/agent/chat/db";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import type {
@@ -53,6 +53,8 @@ const HOUR = 60 * MINUTE;
 export const CONFIRMATION_TTL = 30 * MINUTE;
 /** A reminder link stays valid longer: it is read later, from the inbox. */
 export const REMINDER_CONFIRMATION_TTL = 24 * HOUR;
+/** One email per address per minute (also the UI's resend countdown). */
+export const RESEND_COOLDOWN_MS = MINUTE;
 const MAX_SENDS = 5;
 const MAX_GUESSES = 5;
 type PendingInput = Omit<
@@ -282,6 +284,57 @@ export const SignupChallengeRejectReason = {
 export type SignupChallengeRejectReasonValue =
   (typeof SignupChallengeRejectReason)[keyof typeof SignupChallengeRejectReason];
 
+/**
+ * What this browser's lead has when an email link matches no pending signup:
+ * - confirmed: the lead already finished a signup (link clicked after the
+ *   code was entered, or in a second tab)
+ * - newer-pending: a resend replaced the link with a newer one
+ * - none: nothing to recover; the person starts again
+ */
+export const SignupLinkState = {
+  CONFIRMED: "confirmed",
+  NEWER_PENDING: "newer-pending",
+  NONE: "none",
+  LOOKUP_FAILED: "lookup-failed",
+} as const;
+
+export type SignupLinkStateValue =
+  (typeof SignupLinkState)[keyof typeof SignupLinkState];
+
+async function signupLinkState(
+  tx: Pick<typeof db, "select">,
+  leadId: string,
+): Promise<SignupLinkStateValue> {
+  try {
+    const [confirmed] = await tx
+      .select({ id: signupEvents.id })
+      .from(signupEvents)
+      .where(
+        and(
+          eq(signupEvents.leadId, leadId),
+          eq(signupEvents.type, SignupEventType.CONFIRMED),
+        ),
+      )
+      .limit(1);
+    if (confirmed) {
+      return SignupLinkState.CONFIRMED;
+    }
+    const [pending] = await tx
+      .select({ id: pendingSignups.id })
+      .from(pendingSignups)
+      .where(
+        and(
+          eq(pendingSignups.leadId, leadId),
+          gt(pendingSignups.expiresAt, new Date()),
+        ),
+      )
+      .limit(1);
+    return pending ? SignupLinkState.NEWER_PENDING : SignupLinkState.NONE;
+  } catch {
+    return SignupLinkState.LOOKUP_FAILED;
+  }
+}
+
 export async function consumeSignupChallenge(
   proof: { token?: string; pendingId?: string; code?: string },
   leadId: string,
@@ -291,6 +344,7 @@ export async function consumeSignupChallenge(
   const invalid = (
     reason: SignupChallengeRejectReasonValue,
     row?: Pick<PendingSignup, "attempts" | "sentAt" | "deliveryFailed">,
+    linkState: SignupLinkStateValue | null = null,
   ): ErrorResponseType => {
     // No email, code or token: only what tells the cases apart. For a wrong
     // code: its shape (a pasted space or a 5-digit typo vs a stale code from
@@ -316,9 +370,25 @@ export async function consumeSignupChallenge(
       codeAgeMs:
         row?.sentAt instanceof Date ? Date.now() - row.sentAt.getTime() : null,
       codeDeliveryFailed: row?.deliveryFailed ?? null,
+      linkState,
     });
+    // Say what to do next. A resend replaces every earlier code and link,
+    // and prod 2026-11-27 showed people typing the first email's code right
+    // after a resend, or clicking a link after confirming in another tab.
+    if (linkState === SignupLinkState.CONFIRMED) {
+      return fail({
+        message: t("confirmation.alreadyConfirmed"),
+        errorType: ErrorResponseTypes.CONFLICT,
+      });
+    }
+    const guessesLeft = row ? MAX_GUESSES - (row.attempts + 1) : 0;
     return fail({
-      message: t("confirmation.invalid"),
+      message:
+        linkState === SignupLinkState.NEWER_PENDING
+          ? t("confirmation.staleLink")
+          : reason === SignupChallengeRejectReason.MISMATCH && guessesLeft > 0
+            ? t("confirmation.wrongCode")
+            : t("confirmation.invalid"),
       errorType: ErrorResponseTypes.INVALID_TOKEN_ERROR,
     });
   };
@@ -342,7 +412,11 @@ export async function consumeSignupChallenge(
       .where(match)
       .for("update");
     if (!row) {
-      return invalid(SignupChallengeRejectReason.MISSING);
+      return invalid(
+        SignupChallengeRejectReason.MISSING,
+        undefined,
+        proof.token ? await signupLinkState(tx, leadId) : null,
+      );
     }
     if (row.expiresAt.getTime() <= Date.now()) {
       return invalid(SignupChallengeRejectReason.EXPIRED);

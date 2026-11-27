@@ -10,9 +10,14 @@
  * model instead of reaching the chat model as if it were the image.
  */
 
-/** Provider error messages that mean "blocked by moderation", not "broken". */
+/**
+ * Provider error messages that mean "blocked by moderation", not "broken".
+ * data_inspection_failed: Alibaba (Qwen) input inspection, "Input video data
+ * may contain inappropriate content." (prod 2026-11-27, retried once on the
+ * same model before this pattern knew it).
+ */
 const MODERATION_ERROR_PATTERN =
-  /PROHIBITED_CONTENT|\bSAFETY\b|blocked the request|content.?filter|content.?policy|moderation/i;
+  /PROHIBITED_CONTENT|\bSAFETY\b|blocked the request|content.?filter|content.?policy|moderation|data_inspection_failed|may contain inappropriate content/i;
 
 /** Opening of a refusal reply ("I'm sorry, I can't describe this image"). */
 const REFUSAL_REPLY_PATTERN =

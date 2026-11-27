@@ -33,7 +33,7 @@ import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import type { AiT } from "../../platforms/ai/i18n";
-import { Platform } from "../../platforms/platforms";
+import { isCliPlatform, type Platform } from "../../platforms/platforms";
 import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseOutput,
@@ -195,9 +195,11 @@ export class RouteExecuteRepository {
       if (!waitResult.success) {
         // kimi-k3 (prod 2026-11-26, 34 calls) sent {toolName} with no input
         // and retried the same call: the target's "query: expected string"
-        // never said where the arguments go.
+        // never said where the arguments go. A script POSTing the arguments
+        // next to toolName instead of inside input gets the same silent strip
+        // (credits/admin-add, receivedKeys ""). CLI flags never use input.
         if (
-          platform === Platform.AI &&
+          !isCliPlatform(platform) &&
           waitResult.errorType.errorKey ===
             ErrorResponseTypes.VALIDATION_ERROR.errorKey &&
           Object.keys(input ?? {}).length === 0

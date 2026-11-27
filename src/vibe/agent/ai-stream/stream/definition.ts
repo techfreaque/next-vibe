@@ -26,7 +26,6 @@ import { z } from "zod";
 
 import { DefaultFolderId } from "../../../core/execution-context";
 import { rootFolderIdOptions } from "../../chat/config";
-import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { ChatMessageRole } from "../../chat/enum";
 import { messageHistoryTolerantSchema } from "../../chat/message-schema";
 import { turnStepLimitSchema } from "../../chat/settings/constants";
@@ -47,6 +46,7 @@ import {
 } from "../vision-models";
 import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+import { messageContentSchema } from "./message-content-schema";
 
 const AiStreamWidget = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.AiStreamWidget })),
@@ -184,7 +184,7 @@ const { POST } = createEndpoint({
         placeholder: "post.content.placeholder",
         // Allow empty content for answer-as-ai operation (AI generates its own response)
         // For other operations, content must be at least 1 skill
-        schema: z.string().max(AGENT_MESSAGE_LENGTH),
+        schema: messageContentSchema,
       }),
       role: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

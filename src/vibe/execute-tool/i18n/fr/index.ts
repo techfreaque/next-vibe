@@ -6,4 +6,12 @@ export const translations: typeof enTranslations = {
     searchEndpoints: "Rechercher des endpoints...",
     value: "{{value}}",
   },
+  errors: {
+    unknownInputKeys: {
+      noneReached:
+        "{{toolName}} n'a reçu aucun de ses arguments. Inconnus : {{unknownKeys}}. Attendus : {{expectedKeys}}.",
+      dropped:
+        "{{error}} Arguments inconnus ignorés : {{unknownKeys}}. Attendus : {{expectedKeys}}.",
+    },
+  },
 };

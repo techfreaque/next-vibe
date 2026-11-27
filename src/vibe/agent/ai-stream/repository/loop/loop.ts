@@ -34,6 +34,7 @@ import {
   APICallError,
   InvalidToolInputError,
   modelMessageSchema,
+  RetryError,
   streamText as aiStreamText,
 } from "ai";
 import { errorResponseSchema } from "next-vibe/core/route/error-response.schema";
@@ -58,6 +59,8 @@ import {
   GARBLED_REPLACE_HEADER,
   GARBLED_RETRY_MARKER_KEY,
   garbledRetryMarkerSchema,
+  MALFORMED_TOOL_CALL_RETRY_RULE,
+  PROVIDER_BUSY_RETRY_RULE,
   UPSTREAM_BODY_READ_RETRY_RULE,
 } from "../../providers/openrouter/garbled-guard";
 import { liveExecuteToolOutput } from "../context/tool-output";
@@ -378,11 +381,17 @@ export class StreamLoop implements StreamLoopState {
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });
       this.p.logger.warn("[AI Stream] Balance refused prepared model request", {
-        model: modelConfig.id,
-        inputTokens,
-        requiredCredits: cap.requiredCredits,
-        remainingCredits,
-        preparationCredits: ctx.dbWriter.totalCreditsDeducted,
+        // requiredCredits > remainingCredits proves the refusal; the model and
+        // amounts are per occurrence (outside the fingerprint).
+        refusalDetail: {
+          model: modelConfig.id,
+          inputTokens,
+          requiredCredits: cap.requiredCredits,
+          remainingCredits,
+          preparationCredits: ctx.dbWriter.totalCreditsDeducted,
+          threadId,
+        },
+        dailyLimit: dailyLimitMessage !== undefined,
       });
       await ctx.dbWriter.emitErrorMessage({
         threadId,
@@ -508,9 +517,11 @@ export class StreamLoop implements StreamLoopState {
     this.lastPromptMessages = messages;
     let nextStep: PreparedStep | null = null;
     // OpenRouter: the garbled-output guard may replace a broken attempt with
-    // a retry mid-step; its in-band marker arrives as a `raw` part.
+    // a retry mid-step; NanoGPT: a malformed-tool-call attempt is re-sent
+    // once. Either in-band marker arrives as a `raw` part.
     const garbledGuardParams =
-      modelConfig.apiProvider === ApiProvider.OPENROUTER
+      modelConfig.apiProvider === ApiProvider.OPENROUTER ||
+      modelConfig.apiProvider === ApiProvider.NANO_GPT
         ? {
             includeRawChunks: true,
             headers: { [GARBLED_REPLACE_HEADER]: "1" },
@@ -1121,7 +1132,18 @@ export class StreamLoop implements StreamLoopState {
 
     if (part.type === "error") {
       const rawError = "error" in part ? part.error : undefined;
-      const upstreamError = APICallError.isInstance(rawError) ? rawError : null;
+      // After the SDK's own request retries the part is a RetryError whose
+      // message only names the last error's class ("Last error:
+      // AI_APICallError: <none>", prod 2026-11-27 Uncensored LM): read the
+      // status and body from that last APICallError.
+      const retriedLastError = RetryError.isInstance(rawError)
+        ? rawError.lastError
+        : undefined;
+      const upstreamError = APICallError.isInstance(rawError)
+        ? rawError
+        : APICallError.isInstance(retriedLastError)
+          ? retriedLastError
+          : null;
       // The AI SDK often surfaces only the human-readable `message`, burying the
       // HTTP status and the provider's own error-type (e.g. OpenRouter's
       // `{ code: 502, metadata: { error_type: "provider_unavailable" } }`) in
@@ -1130,6 +1152,9 @@ export class StreamLoop implements StreamLoopState {
       // signal and treats the outage as the transient upstream failure it is.
       const errorText = upstreamError
         ? [
+            retriedLastError === upstreamError && rawError instanceof Error
+              ? rawError.message
+              : "",
             upstreamError.message,
             upstreamError.statusCode === undefined
               ? ""
@@ -1269,7 +1294,11 @@ export class StreamLoop implements StreamLoopState {
     logger.info(
       rule === UPSTREAM_BODY_READ_RETRY_RULE
         ? "[AI Stream] Interrupted provider attempt replaced by retry"
-        : "[AI Stream] Garbled provider attempt replaced by retry",
+        : rule === MALFORMED_TOOL_CALL_RETRY_RULE
+          ? "[AI Stream] Malformed tool-call attempt replaced by retry"
+          : rule === PROVIDER_BUSY_RETRY_RULE
+            ? "[AI Stream] Busy provider attempt replaced by retry"
+            : "[AI Stream] Garbled provider attempt replaced by retry",
       {
         messageId,
         keptChars: ctx.currentAssistantContent.length,

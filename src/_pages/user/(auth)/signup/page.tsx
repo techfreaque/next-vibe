@@ -8,6 +8,7 @@ import {
   NOINDEX_FOLLOW_ROBOTS,
 } from "next-vibe/core/i18n/core/metadata";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
@@ -93,7 +94,13 @@ export async function tanstackLoader({
   const callbackUrl = safeCallbackPath(search["callbackUrl"]);
 
   const logger = createEndpointLogger(false, locale);
-  const user = await UserRepository.getUserByAuth({}, locale, logger);
+  // PUBLIC must be allowed: guests and verified crawlers (no lead) land here,
+  // and a CUSTOMER-only lookup refused them with "Public user is not allowed".
+  const user = await UserRepository.getUserByAuth(
+    { roles: [UserRole.PUBLIC, UserRole.CUSTOMER] },
+    locale,
+    logger,
+  );
 
   // Only redirect if user is authenticated and not a public user
   if (user.success && !user.data.isPublic) {

@@ -73,6 +73,69 @@ export interface WebProxyHandle {
 }
 
 /**
+ * ioredis internals in dependency order (leaves first). One `import("ioredis")`
+ * evaluates all of them in a single synchronous require chain: 94-142 ms of
+ * main-thread CPU at 15-41 s uptime on prod (2026-11-25..27, hot frames
+ * ioredis/built/{utils/lodash,DataHandler,Redis}.js under bound require).
+ * Importing the pieces one by one with a yield in between caps each slice
+ * (~15 ms locally instead of 40-67 ms for the whole chain). Paths that a
+ * future ioredis release moves are skipped; the final import then pays for
+ * whatever is left.
+ */
+export const IOREDIS_WARM_STEPS = [
+  "ioredis/built/utils/lodash.js",
+  "ioredis/built/utils/debug.js",
+  "ioredis/built/utils/index.js",
+  "ioredis/built/Command.js",
+  "ioredis/built/errors/index.js",
+  "ioredis/built/DataHandler.js",
+  "ioredis/built/redis/event_handler.js",
+  "ioredis/built/connectors/index.js",
+  "ioredis/built/Pipeline.js",
+  "ioredis/built/transaction.js",
+  "ioredis/built/cluster/index.js",
+  "ioredis/built/Redis.js",
+  "ioredis",
+] as const;
+
+let realtimeWarmup: Promise<void> | undefined;
+
+function yieldToLoop(): Promise<void> {
+  return new Promise((resolve) => {
+    setImmediate(resolve);
+  });
+}
+
+/**
+ * Load the realtime server and its Redis client before the proxy binds its
+ * port, in slices that let the event loop run in between. Memoized: boot
+ * starts it early (overlapping the Next.js child startup) and
+ * startWebProxy awaits the same promise right before Bun.serve.
+ */
+export function warmRealtimeModules(logger: EndpointLogger): Promise<void> {
+  realtimeWarmup ??= (async (): Promise<void> => {
+    if (realtimeEnv.WS_PUBSUB_TYPE === "redis" && realtimeEnv.REDIS_URL) {
+      const skipped: string[] = [];
+      for (const step of IOREDIS_WARM_STEPS) {
+        await import(step).catch(() => {
+          skipped.push(step);
+        });
+        await yieldToLoop();
+      }
+      if (skipped.length > 0) {
+        logger.warn(
+          "[Proxy] ioredis warm-up paths not found - the remaining module load runs in one slice",
+          { skipped: skipped.join(", ") },
+        );
+      }
+    }
+    await import("../../realtime/server/server");
+    await yieldToLoop();
+  })();
+  return realtimeWarmup;
+}
+
+/**
  * Start the Bun proxy + WebSocket server on `port`.
  *
  * Returns `undefined` in a build with no realtime transport; every caller
@@ -91,11 +154,8 @@ export async function startWebProxy({
   reusePort?: boolean;
   logger: EndpointLogger;
 }): Promise<WebProxyHandle | undefined> {
+  await warmRealtimeModules(logger);
   const { startWebSocketServer } = await import("../../realtime/server/server");
-  // Pay the cold ioredis module cost before the proxy accepts traffic.
-  if (realtimeEnv.WS_PUBSUB_TYPE === "redis" && realtimeEnv.REDIS_URL) {
-    await import("ioredis");
-  }
   return startWebSocketServer({
     port,
     appPort,

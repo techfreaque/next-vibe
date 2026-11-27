@@ -42,6 +42,14 @@ interface AIStreamState {
    */
   creditRefusal: boolean | CreditPolicyReason;
   creditRefusalMessage?: string;
+  /**
+   * Request id of the LATEST send when the server refused it for credits
+   * (402), else null. Set per send by startStream, so the callers that roll
+   * the optimistic turn back can tell "designed recovery from a refusal the
+   * server logged under this id" from a real send failure.
+   */
+  lastSendCreditRefusalRequestId: string | null;
+  setLastSendCreditRefusalRequestId: (requestId: string | null) => void;
   setCreditRefusal: (
     value: boolean | CreditPolicyReason,
     message?: string,
@@ -66,6 +74,10 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   pendingThreads: new Set<string>(),
   incognitoStreams: new Set<string>(),
   creditRefusal: false,
+  lastSendCreditRefusalRequestId: null,
+
+  setLastSendCreditRefusalRequestId: (requestId): void =>
+    set({ lastSendCreditRefusalRequestId: requestId }),
 
   setCreditRefusal: (value, message): void =>
     set({
@@ -136,5 +148,6 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
       incognitoStreams: new Set<string>(),
       creditRefusal: false,
       creditRefusalMessage: undefined,
+      lastSendCreditRefusalRequestId: null,
     }),
 }));

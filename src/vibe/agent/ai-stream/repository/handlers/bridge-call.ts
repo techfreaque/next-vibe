@@ -18,11 +18,19 @@ import {
   extractLanguageModelRequestId,
   mergeProviderJobIds,
 } from "../../../shared/provider-job-id";
+import {
+  AUDIO_VISION_FALLBACK_MODEL_IDS,
+  IMAGE_VISION_FALLBACK_MODEL_IDS,
+  VIDEO_VISION_FALLBACK_MODEL_IDS,
+} from "../../constants";
 import type { ChatModelId } from "../../models";
-import type {
-  AudioVisionModelId,
-  ImageVisionModelId,
-  VideoVisionModelId,
+import {
+  type AudioVisionModelId,
+  filterAudioVisionModels,
+  filterImageVisionModels,
+  filterVideoVisionModels,
+  type ImageVisionModelId,
+  type VideoVisionModelId,
 } from "../../vision-models";
 import { attachmentIdOfPart } from "../context/bridged-attachment";
 import { ProviderFactory } from "../core/infra";
@@ -33,6 +41,14 @@ import {
   ModalityResolver,
 } from "../core/modality-resolver";
 import { readCacheUsage, TokenAccumulator } from "../loop/token-accumulator";
+import {
+  AUDIO_CONTENT_REFUSAL_FALLBACK_IDS,
+  type BridgeFailureClass,
+  IMAGE_CONTENT_REFUSAL_FALLBACK_IDS,
+  maxBridgeModels,
+  pickBridgeFallback,
+  VIDEO_CONTENT_REFUSAL_FALLBACK_IDS,
+} from "./vision-fallback";
 import { detectVisionRefusal, isModerationError } from "./vision-refusal";
 
 const BRIDGE_PROMPTS = {
@@ -170,20 +186,83 @@ export function getBridgeFailReason(result: string): string {
 /** A bridge-capable model option (any vision pool or a chat model). */
 type BridgeModelOption = ModelOptionTokenBased & { id: BridgeModelId };
 
-/** Outcome of running ONE model (with its single timeout retry). */
-type BridgeAttemptOutcome =
+/**
+ * Why one attempt ended. refusal-reply / content-filter / empty-output /
+ * provider-moderation are content refusals (deterministic, never re-sent to
+ * the same model); attempt-deadline and request-error are provider errors.
+ */
+type BridgeAttemptStage =
+  | "ok"
+  | "refusal-reply"
+  | "content-filter"
+  | "empty-output"
+  | "provider-moderation"
+  | "attempt-deadline"
+  | "request-error"
+  | "aborted";
+
+/**
+ * One model call of a bridge, kept for the single log row of the bridge's
+ * outcome. Logged under `visionAttempt` (fingerprint-ignored): the durations
+ * and raw provider errors vary per occurrence, the stages do not.
+ */
+export interface BridgeAttemptRecord {
+  modelId: string;
+  apiProvider: string;
+  /** 1 or 2: the same model gets one retry after a provider error. */
+  attempt: number;
+  stage: BridgeAttemptStage;
+  durationMs: number;
+  deadlineMs: number;
+  /** Who ended a failed call: our parent stream, our deadline, or upstream. */
+  endedBy?: "parent-stream" | "attempt-deadline" | "provider-or-sdk";
+  /** Parent stream abort reason (e.g. user_cancelled). */
+  abortReason?: string;
+  upstreamStatus?: number;
+  upstreamRetryable?: boolean;
+  finishReason?: string;
+  error?: string;
+}
+
+/** Outcome of running ONE model (with its single provider-error retry). */
+export type BridgeAttemptOutcome =
   | {
       kind: "ok";
       requestStartedAt: number;
       result: Awaited<ReturnType<typeof aiGenerateText>>;
       output: string;
     }
-  | { kind: "fail"; reason: string }
+  | { kind: "fail"; reason: string; failureClass: BridgeFailureClass }
   | { kind: "aborted" };
+
+function refusalStage(
+  reason: string,
+  finishReason: string,
+): BridgeAttemptStage {
+  if (finishReason === "content-filter") {
+    return "content-filter";
+  }
+  return reason.startsWith("empty description")
+    ? "empty-output"
+    : "refusal-reply";
+}
+
+function abortReasonOf(signal: AbortSignal): string {
+  const reason: string | Error | undefined =
+    typeof signal.reason === "string" || signal.reason instanceof Error
+      ? signal.reason
+      : undefined;
+  if (reason === undefined) {
+    return "unknown";
+  }
+  return typeof reason === "string" ? reason : parseError(reason).message;
+}
 
 /**
  * Run one bridge model: bounded attempts, moderation/refusal detection.
  * Refusals are deterministic, so they are never retried on the same model.
+ * Every call lands in `attempts`; only debug lines are logged here, the
+ * caller writes ONE row per bridge outcome.
  */
 async function attemptBridgeModel(params: {
   model: BridgeModelOption;
@@ -191,48 +270,17 @@ async function attemptBridgeModel(params: {
   contentPart: ImagePart | FilePart;
   promptText: string;
   abortSignal: AbortSignal;
-  bridgeType: "stt" | "vision" | "translation" | "tts";
-  modality: Modality;
   logger: EndpointLogger;
   errorLabel: string;
+  attempts: BridgeAttemptRecord[];
 }): Promise<BridgeAttemptOutcome> {
-  const {
-    model,
-    contentPart,
-    promptText,
-    abortSignal,
-    bridgeType,
-    modality,
-    logger,
-    errorLabel,
-  } = params;
+  const { model, contentPart, promptText, abortSignal, logger, attempts } =
+    params;
   const provider = ProviderFactory.getProviderForModel(
     model,
     logger,
     params.toolExecutionContext,
   );
-  const media =
-    contentPart.type === "file" ? contentPart.data : contentPart.image;
-  const mediaBytes =
-    media instanceof ArrayBuffer || ArrayBuffer.isView(media)
-      ? media.byteLength
-      : undefined;
-  const inputContext = {
-    bridgeType,
-    modality,
-    modelId: model.id,
-    apiProvider: model.apiProvider,
-    mediaType: contentPart.mediaType,
-    inputRepresentation:
-      media instanceof URL
-        ? "url"
-        : typeof media === "string"
-          ? "inline-text"
-          : mediaBytes === undefined
-            ? "structured"
-            : "binary",
-    bridgeInputSize: typeof media === "string" ? media.length : mediaBytes,
-  };
 
   // Bridge calls are auxiliary (a description, not the turn itself) and
   // upload large inline payloads (base64 video/audio) - a hung provider
@@ -242,6 +290,12 @@ async function attemptBridgeModel(params: {
   for (let attempt = 0; attempt < 2; attempt++) {
     const requestStartedAt = Date.now();
     const attemptDeadline = AbortSignal.timeout(BRIDGE_ATTEMPT_TIMEOUT_MS);
+    const base = {
+      modelId: model.id,
+      apiProvider: model.apiProvider,
+      attempt: attempt + 1,
+      deadlineMs: BRIDGE_ATTEMPT_TIMEOUT_MS,
+    };
     try {
       const result = await aiGenerateText({
         model: provider.chat(model.providerModel) as LanguageModel,
@@ -255,84 +309,259 @@ async function attemptBridgeModel(params: {
       });
       const output = result.text.trim();
       const refusal = detectVisionRefusal(output, result.finishReason);
+      const durationMs = Date.now() - requestStartedAt;
       if (refusal) {
-        logger.warn(`[GapFill] ${errorLabel} bridge refused`, {
-          ...inputContext,
-          reason: refusal,
+        attempts.push({
+          ...base,
+          stage: refusalStage(refusal, result.finishReason),
+          durationMs,
           finishReason: result.finishReason,
+          error: refusal,
         });
-        return { kind: "fail", reason: refusal };
+        logger.debug(`[GapFill] ${params.errorLabel} bridge model refused`, {
+          modelId: model.id,
+          reason: refusal,
+        });
+        return {
+          kind: "fail",
+          reason: refusal,
+          failureClass: "content-refusal",
+        };
       }
+      attempts.push({
+        ...base,
+        stage: "ok",
+        durationMs,
+        finishReason: result.finishReason,
+      });
       return { kind: "ok", result, output, requestStartedAt };
     } catch (attemptErr) {
       const parsedAttemptErr = parseError(attemptErr);
       const apiError = APICallError.isInstance(attemptErr) ? attemptErr : null;
-      const failureContext = {
-        ...inputContext,
+      const endedBy = abortSignal.aborted
+        ? "parent-stream"
+        : attemptDeadline.aborted
+          ? "attempt-deadline"
+          : "provider-or-sdk";
+      const record: BridgeAttemptRecord = {
+        ...base,
+        stage: "request-error",
+        durationMs: Date.now() - requestStartedAt,
+        endedBy,
         upstreamStatus: apiError?.statusCode,
         upstreamRetryable: apiError?.isRetryable,
         error: parsedAttemptErr.message,
-        visionAttempt: {
-          number: attempt + 1,
-          elapsedMs: Date.now() - requestStartedAt,
-          deadlineMs: BRIDGE_ATTEMPT_TIMEOUT_MS,
-          endedBy: abortSignal.aborted
-            ? "parent-stream"
-            : attemptDeadline.aborted
-              ? "attempt-deadline"
-              : "provider-or-sdk",
-        },
       };
       // Parent stream cancelled -> stop immediately.
       if (abortSignal.aborted) {
-        logger.warn(`[GapFill] ${errorLabel} bridge call aborted`, {
-          ...failureContext,
-          aborted: true,
+        attempts.push({
+          ...record,
+          stage: "aborted",
+          abortReason: abortReasonOf(abortSignal),
         });
         return { kind: "aborted" };
       }
       // A provider moderation block (Gemini PROHIBITED_CONTENT / SAFETY,
-      // content-filter refusals) is deterministic: retrying the same payload
-      // on the same model only bills a second refusal.
+      // Alibaba data_inspection_failed, content-filter refusals) is
+      // deterministic: retrying the same payload on the same model only
+      // bills a second refusal.
       if (isModerationError(parsedAttemptErr.message)) {
-        logger.warn(
-          `[GapFill] ${errorLabel} bridge refused by provider moderation`,
-          failureContext,
-        );
+        attempts.push({ ...record, stage: "provider-moderation" });
         return {
           kind: "fail",
           reason: `refused by provider moderation: ${parsedAttemptErr.message}`,
+          failureClass: "content-refusal",
         };
       }
+      attempts.push({
+        ...record,
+        stage:
+          endedBy === "attempt-deadline" ? "attempt-deadline" : "request-error",
+      });
+      logger.debug(`[GapFill] ${params.errorLabel} bridge attempt failed`, {
+        modelId: model.id,
+        attempt: attempt + 1,
+        error: parsedAttemptErr.message,
+      });
       if (attempt === 1) {
-        logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
-          ...failureContext,
-          errorStack: parsedAttemptErr.stack,
-        });
-        return { kind: "fail", reason: parsedAttemptErr.message };
+        return {
+          kind: "fail",
+          reason: parsedAttemptErr.message,
+          failureClass: "provider-error",
+        };
       }
-      logger.warn(
-        `[GapFill] ${errorLabel} bridge attempt failed - retrying once`,
-        {
-          ...failureContext,
-          errorStack: parsedAttemptErr.stack,
-        },
-      );
     }
   }
-  return { kind: "fail", reason: "no attempt completed" };
+  return {
+    kind: "fail",
+    reason: "no attempt completed",
+    failureClass: "provider-error",
+  };
+}
+
+/** State the fallback picker sees after a model failed. */
+interface BridgeFallbackState {
+  tried: readonly BridgeModelOption[];
+  refused: readonly BridgeModelOption[];
+  failureClass: BridgeFailureClass;
+}
+
+type BridgeFallbackResolver = (
+  state: BridgeFallbackState,
+) => BridgeModelOption | null;
+
+/** Refusal-aware fallback resolver for one modality's vision pool. */
+function bridgeFallbackResolver(
+  modality: Modality,
+  user: JwtPayloadType,
+  availability: AgentEnvAvailability,
+): BridgeFallbackResolver {
+  return (state) => {
+    if (modality === "video") {
+      return pickBridgeFallback({
+        pool: filterVideoVisionModels(null, user, availability),
+        priority: VIDEO_VISION_FALLBACK_MODEL_IDS,
+        contentRefusalPriority: VIDEO_CONTENT_REFUSAL_FALLBACK_IDS,
+        ...state,
+      });
+    }
+    if (modality === "audio") {
+      return pickBridgeFallback({
+        pool: filterAudioVisionModels(null, user, availability),
+        priority: AUDIO_VISION_FALLBACK_MODEL_IDS,
+        contentRefusalPriority: AUDIO_CONTENT_REFUSAL_FALLBACK_IDS,
+        ...state,
+      });
+    }
+    return pickBridgeFallback({
+      pool: filterImageVisionModels(null, user, availability),
+      priority: IMAGE_VISION_FALLBACK_MODEL_IDS,
+      contentRefusalPriority: IMAGE_CONTENT_REFUSAL_FALLBACK_IDS,
+      ...state,
+    });
+  };
+}
+
+/** Fingerprint-stable summary of a chain: "model:stage" per attempt. */
+function attemptStages(attempts: readonly BridgeAttemptRecord[]): string[] {
+  return attempts.map((a) => `${a.modelId}:${a.stage}`);
 }
 
 /**
- * Shared tail for all bridge calls: run the resolved model, fall back ONCE to
- * a second model when it refuses or fails, emit completion, deduct credits.
- * A failure is always returned as an explicit bridgeFail (never as text that
- * could pass for a description).
+ * Run the bridge model chain: the resolved model first, then refusal-aware
+ * fallbacks (see vision-fallback.ts) until one describes the media or the
+ * chain is exhausted. Exactly ONE warn/error row per bridge that did not
+ * succeed on its first call (recovered, failed or aborted), carrying every
+ * attempt. Returns the winning outcome and model, or a failure reason.
+ */
+export async function runBridgeChain(params: {
+  model: BridgeModelOption;
+  resolveFallback: BridgeFallbackResolver;
+  attempt: (
+    model: BridgeModelOption,
+    attempts: BridgeAttemptRecord[],
+  ) => Promise<BridgeAttemptOutcome>;
+  bridgeType: "stt" | "vision" | "translation" | "tts";
+  modality: Modality;
+  inputContext: Record<string, string | number | undefined>;
+  logger: EndpointLogger;
+  errorLabel: string;
+}): Promise<
+  | {
+      kind: "ok";
+      model: BridgeModelOption;
+      outcome: Extract<BridgeAttemptOutcome, { kind: "ok" }>;
+    }
+  | { kind: "fail"; reason: string }
+  | { kind: "aborted" }
+> {
+  const { model, resolveFallback, bridgeType, modality, logger, errorLabel } =
+    params;
+  const attempts: BridgeAttemptRecord[] = [];
+  const tried: BridgeModelOption[] = [];
+  const refused: BridgeModelOption[] = [];
+  const failureClasses: BridgeFailureClass[] = [];
+  const reasons: string[] = [];
+  let current: BridgeModelOption | null = model;
+
+  const chainContext = (): Record<
+    string,
+    string | number | string[] | undefined | { attempts: BridgeAttemptRecord[] }
+  > => ({
+    ...params.inputContext,
+    bridgeType,
+    modality,
+    requestedModelId: model.id,
+    modelsTried: tried.length,
+    attemptStages: attemptStages(attempts),
+    visionAttempt: { attempts },
+  });
+
+  while (current) {
+    tried.push(current);
+    const outcome = await params.attempt(current, attempts);
+    if (outcome.kind === "aborted") {
+      logger.warn(`[GapFill] ${errorLabel} bridge call aborted`, {
+        ...chainContext(),
+        aborted: true,
+        abortReason: attempts.at(-1)?.abortReason ?? "unknown",
+      });
+      return { kind: "aborted" };
+    }
+    if (outcome.kind === "ok") {
+      if (attempts.length > 1) {
+        logger.warn(
+          `[GapFill] ${errorLabel} bridge recovered after failed attempts`,
+          {
+            ...chainContext(),
+            outcome: "recovered",
+            modelId: current.id,
+            apiProvider: current.apiProvider,
+          },
+        );
+      }
+      return { kind: "ok", model: current, outcome };
+    }
+    reasons.push(`${current.id}: ${outcome.reason}`);
+    failureClasses.push(outcome.failureClass);
+    if (outcome.failureClass === "content-refusal") {
+      refused.push(current);
+    }
+    current =
+      tried.length < maxBridgeModels(failureClasses)
+        ? resolveFallback({
+            tried,
+            refused,
+            failureClass: outcome.failureClass,
+          })
+        : null;
+    if (current) {
+      logger.debug(`[GapFill] ${errorLabel} bridge falling back`, {
+        failedModelId: tried.at(-1)?.id,
+        fallbackModelId: current.id,
+        failureClass: outcome.failureClass,
+      });
+    }
+  }
+
+  logger.error(`[GapFill] ${errorLabel} bridge failed`, {
+    ...chainContext(),
+    outcome: failureClasses.every((c) => c === "content-refusal")
+      ? "refused"
+      : "failed",
+    failureClasses: [...new Set(failureClasses)],
+  });
+  return { kind: "fail", reason: reasons.join("; ") };
+}
+
+/**
+ * Shared tail for all bridge calls: run the model chain, emit completion,
+ * deduct credits. A failure is always returned as an explicit bridgeFail
+ * (never as text that could pass for a description).
  */
 async function runBridgeCall(params: {
   model: BridgeModelOption;
-  /** Second-chance model after `failedId` refused/failed; null = none. */
-  resolveFallback: (failedId: string) => BridgeModelOption | null;
+  resolveFallback: BridgeFallbackResolver;
   toolExecutionContext: ToolExecutionContext;
   contentPart: ImagePart | FilePart;
   promptText: string;
@@ -353,7 +582,7 @@ async function runBridgeCall(params: {
 }): Promise<BridgeCallResult> {
   const {
     model,
-    resolveFallback,
+    contentPart,
     chatMessageId,
     attachmentId,
     bridgeType,
@@ -366,57 +595,45 @@ async function runBridgeCall(params: {
     errorLabel,
   } = params;
 
+  const media =
+    contentPart.type === "file" ? contentPart.data : contentPart.image;
+  const mediaBytes =
+    media instanceof ArrayBuffer || ArrayBuffer.isView(media)
+      ? media.byteLength
+      : undefined;
+  const inputContext = {
+    mediaType: contentPart.mediaType,
+    inputRepresentation:
+      media instanceof URL
+        ? "url"
+        : typeof media === "string"
+          ? "inline-text"
+          : mediaBytes === undefined
+            ? "structured"
+            : "binary",
+    bridgeInputSize: typeof media === "string" ? media.length : mediaBytes,
+  };
+
   try {
-    let usedModel = model;
-    let outcome = await attemptBridgeModel({ ...params, model });
-    if (outcome.kind === "aborted") {
+    const chain = await runBridgeChain({
+      model,
+      resolveFallback: params.resolveFallback,
+      attempt: (candidate, attempts) =>
+        attemptBridgeModel({ ...params, model: candidate, attempts }),
+      bridgeType,
+      modality,
+      inputContext,
+      logger,
+      errorLabel,
+    });
+    if (chain.kind === "aborted") {
       return null;
     }
-    if (outcome.kind === "fail") {
-      const firstReason = outcome.reason;
-      const fallback = resolveFallback(model.id);
-      if (!fallback) {
-        logger.warn(
-          `[GapFill] ${errorLabel} bridge failed, no fallback model`,
-          {
-            modelId: model.id,
-            reason: firstReason,
-            modality,
-          },
-        );
-        return bridgeFail(firstReason);
-      }
-      logger.warn(
-        `[GapFill] ${errorLabel} bridge falling back to another model`,
-        {
-          failedModelId: model.id,
-          fallbackModelId: fallback.id,
-          reason: firstReason,
-          modality,
-          bridgeType,
-        },
-      );
-      outcome = await attemptBridgeModel({ ...params, model: fallback });
-      if (outcome.kind === "aborted") {
-        return null;
-      }
-      if (outcome.kind === "fail") {
-        logger.error(`[GapFill] ${errorLabel} bridge failed on both models`, {
-          modelId: model.id,
-          reason: firstReason,
-          fallbackModelId: fallback.id,
-          fallbackReason: outcome.reason,
-          modality,
-          bridgeType,
-        });
-        return bridgeFail(
-          `${model.id}: ${firstReason}; fallback ${fallback.id}: ${outcome.reason}`,
-        );
-      }
-      usedModel = fallback;
+    if (chain.kind === "fail") {
+      return bridgeFail(chain.reason);
     }
-
-    const { result, output, requestStartedAt } = outcome;
+    const usedModel = chain.model;
+    const { result, output, requestStartedAt } = chain.outcome;
     const cache = readCacheUsage(
       result.usage,
       result.providerMetadata,
@@ -476,10 +693,14 @@ async function runBridgeCall(params: {
 
     return output;
   } catch (err) {
+    // Not a model failure (those are caught per attempt): provider setup,
+    // the completion emit or the credit deduction threw.
     const parsed = parseError(err);
-    logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
+    logger.warn(`[GapFill] ${errorLabel} bridge threw outside the model call`, {
+      ...inputContext,
       error: parsed.message,
       errorStack: parsed.stack,
+      modelId: model.id,
       modality,
       bridgeType,
     });
@@ -636,12 +857,7 @@ export class BridgeCall {
 
     return runBridgeCall({
       model: visionModel,
-      resolveFallback: (failedId) =>
-        ModalityResolver.resolveImageVisionFallback(
-          failedId,
-          user,
-          availability,
-        ),
+      resolveFallback: bridgeFallbackResolver("image", user, availability),
       toolExecutionContext: params.toolExecutionContext,
       contentPart: {
         type: "image" as const,
@@ -718,12 +934,7 @@ export class BridgeCall {
 
     return runBridgeCall({
       model: audioVisionModel,
-      resolveFallback: (failedId) =>
-        ModalityResolver.resolveAudioVisionFallback(
-          failedId,
-          user,
-          availability,
-        ),
+      resolveFallback: bridgeFallbackResolver("audio", user, availability),
       toolExecutionContext: params.toolExecutionContext,
       contentPart: fileData,
       promptText: BRIDGE_PROMPTS.audio,
@@ -794,12 +1005,7 @@ export class BridgeCall {
 
     return runBridgeCall({
       model: videoVisionModel,
-      resolveFallback: (failedId) =>
-        ModalityResolver.resolveVideoVisionFallback(
-          failedId,
-          user,
-          availability,
-        ),
+      resolveFallback: bridgeFallbackResolver("video", user, availability),
       toolExecutionContext: params.toolExecutionContext,
       contentPart: fileData,
       promptText: BRIDGE_PROMPTS.video,
@@ -918,24 +1124,11 @@ export class BridgeCall {
       });
     }
 
-    const resolveFallback = (failedId: string): BridgeModelOption | null =>
-      modality === "video"
-        ? ModalityResolver.resolveVideoVisionFallback(
-            failedId,
-            user,
-            availability,
-          )
-        : modality === "audio"
-          ? ModalityResolver.resolveAudioVisionFallback(
-              failedId,
-              user,
-              availability,
-            )
-          : ModalityResolver.resolveImageVisionFallback(
-              failedId,
-              user,
-              availability,
-            );
+    const resolveFallback = bridgeFallbackResolver(
+      modality,
+      user,
+      availability,
+    );
 
     return runBridgeCall({
       model: visionModel,

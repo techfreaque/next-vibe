@@ -72,6 +72,10 @@ export const translations: typeof enTranslations = {
       outputAspectRatio: "Pomer strán",
     },
     errors: {
+      referenceNotImage:
+        "Odkaz z {{host}} otvára webovú stránku, nie súbor obrázka. Použi priamy odkaz na obrázok (pravý klik, kopírovať adresu obrázka) alebo obrázok nahraj.",
+      referenceUnreachable:
+        "Odkaz na obrázok z {{host}} sa nenačíta (HTTP {{status}}). Skontroluj odkaz alebo obrázok nahraj. Nič sme ti nestrhli.",
       referenceUnavailable:
         "Obrázková predloha už nie je dostupná. Mohla byť odstránená alebo môže patriť do chatu, ku ktorému nemáš prístup. Použi obrázok z tohto chatu alebo ho nahraj znova.",
       validation_failed: {

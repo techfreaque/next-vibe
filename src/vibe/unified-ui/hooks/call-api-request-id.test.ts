@@ -99,6 +99,8 @@ const sentHeaders: Array<Record<string, string>> = [];
 const queuedResponses: Response[] = [];
 let fetchFailures = 0;
 let malformedError = false;
+/** When set, answer with this 4xx envelope and echo the request id back. */
+let refusalStatus: number | null = null;
 
 describe("request id propagation", () => {
   beforeAll(() => {
@@ -119,6 +121,31 @@ describe("request id propagation", () => {
         const queued = queuedResponses.shift();
         if (queued) {
           return Promise.resolve(queued);
+        }
+        if (refusalStatus !== null) {
+          const echoed =
+            headers && !Array.isArray(headers) && !(headers instanceof Headers)
+              ? headers[REQUEST_ID_HEADER_NAME]
+              : undefined;
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                success: false,
+                message: "An account with this email already exists.",
+                errorType: {
+                  errorKey: "errorTypes.conflict",
+                  errorCode: refusalStatus,
+                },
+              }),
+              {
+                status: refusalStatus,
+                headers: {
+                  "content-type": "application/json",
+                  ...(echoed ? { [REQUEST_ID_HEADER_NAME]: echoed } : {}),
+                },
+              },
+            ),
+          );
         }
         return Promise.resolve(
           new Response(
@@ -190,7 +217,12 @@ describe("request id propagation", () => {
         roles: [],
       },
       "en-GLOBAL",
-      { page: 1, pageSize: 20 },
+      {
+        page: 1,
+        pageSize: 20,
+        dateFrom: new Date("2026-01-01T00:00:00Z"),
+        dateTo: new Date("2026-01-31T00:00:00Z"),
+      },
       { accountId: "00000000-0000-4000-8000-0000000000aa" },
     );
     expect(result.success).toBe(false);
@@ -206,6 +238,41 @@ describe("request id propagation", () => {
     expect(failure ? requestIdsOf(failure) : []).toContain(sent ?? "");
   });
 
+  it("does not re-report a 4xx refusal the server answered for this request", async () => {
+    const { callApi } = await import("./call-api");
+    const rows: LogRow[] = [];
+    refusalStatus = 409;
+    try {
+      const result = await callApi(
+        ledgerDefinition.GET,
+        recordingLogger(rows),
+        {
+          isPublic: false,
+          id: "00000000-0000-4000-8000-000000000001",
+          leadId: "00000000-0000-4000-8000-000000000002",
+          roles: [],
+        },
+        "en-GLOBAL",
+        {
+        page: 1,
+        pageSize: 20,
+        dateFrom: new Date("2026-01-01T00:00:00Z"),
+        dateTo: new Date("2026-01-31T00:00:00Z"),
+      },
+        { accountId: "00000000-0000-4000-8000-0000000000aa" },
+      );
+      expect(result.success).toBe(false);
+    } finally {
+      refusalStatus = null;
+    }
+    expect(
+      rows.filter((r) => r.level === "warn" || r.level === "error"),
+    ).toHaveLength(0);
+    expect(
+      rows.some((r) => r.message === "callApi: refusal logged by the server"),
+    ).toBe(true);
+  });
+
   it("each call gets its own id", async () => {
     const { callApi } = await import("./call-api");
     const user = {
@@ -219,7 +286,12 @@ describe("request id propagation", () => {
       recordingLogger([]),
       user,
       "en-GLOBAL",
-      { page: 1, pageSize: 20 },
+      {
+        page: 1,
+        pageSize: 20,
+        dateFrom: new Date("2026-01-01T00:00:00Z"),
+        dateTo: new Date("2026-01-31T00:00:00Z"),
+      },
       { accountId: "00000000-0000-4000-8000-0000000000aa" },
     );
     await callApi(
@@ -227,7 +299,12 @@ describe("request id propagation", () => {
       recordingLogger([]),
       user,
       "en-GLOBAL",
-      { page: 1, pageSize: 20 },
+      {
+        page: 1,
+        pageSize: 20,
+        dateFrom: new Date("2026-01-01T00:00:00Z"),
+        dateTo: new Date("2026-01-31T00:00:00Z"),
+      },
       { accountId: "00000000-0000-4000-8000-0000000000aa" },
     );
     const [a, b] = sentHeaders.slice(-2).map((h) => h[REQUEST_ID_HEADER_NAME]);
@@ -375,7 +452,12 @@ describe("request id propagation", () => {
           roles: [],
         },
         "en-GLOBAL",
-        { page: 1, pageSize: 20 },
+        {
+        page: 1,
+        pageSize: 20,
+        dateFrom: new Date("2026-01-01T00:00:00Z"),
+        dateTo: new Date("2026-01-31T00:00:00Z"),
+      },
         { accountId: "00000000-0000-0000-0000-0000000000aa" },
       );
       expect(ledgerResult.success).toBe(false);

@@ -71,6 +71,12 @@ export const translations: typeof enTranslations = {
     expired:
       "La sessione di registrazione è scaduta. Ricomincia per ricevere un nuovo codice.",
     retry: "Ricomincia la registrazione",
+    subject: "{{code}} è il tuo codice {{appName}}",
+    wrongCode: "Codice errato. Usa il codice dell’email più recente e riprova.",
+    staleLink:
+      "Questo link viene da un’email precedente. Apri la più recente o inserisci il suo codice.",
+    alreadyConfirmed: "Questa email è già confermata. Accedi per continuare.",
+    login: "Accedi",
   },
   category: "Utenti",
 

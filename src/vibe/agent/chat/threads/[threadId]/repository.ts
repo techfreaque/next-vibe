@@ -439,10 +439,15 @@ export class ThreadByIdRepository {
         });
       }
       if (deletedThread.rootFolderId) {
+        // Target the channel of the folder the thread lived in: a nested
+        // folder's viewers are on a different channel than the root view
+        // (see createFolderContentsEmitter), so a root-only emit left a
+        // deleted subfolder thread in other tabs' sidebars.
         const emitFolderContents = createFolderContentsEmitter(
           logger,
           user,
           deletedThread.rootFolderId,
+          { subFolderId: deletedThread.folderId },
         );
         emitFolderContents("thread-deleted", {
           responseData: { items: [{ id: threadId }] },

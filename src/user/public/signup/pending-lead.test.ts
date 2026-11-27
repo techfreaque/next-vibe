@@ -203,9 +203,15 @@ it("logs why a confirmation proof was refused, never what was sent", async () =>
     if (result.success) {
       return "";
     }
-    // Same answer for the person whatever the reason.
-    expect(result.message).toBe(t("confirmation.invalid"));
-    return String(warnings.at(-1)?.reason ?? "");
+    const reason = String(warnings.at(-1)?.reason ?? "");
+    // One generic answer, except a wrong code with guesses left: that one
+    // points at the newest email (a resend replaces earlier codes).
+    expect(result.message).toBe(
+      reason === SignupChallengeRejectReason.MISMATCH
+        ? t("confirmation.wrongCode")
+        : t("confirmation.invalid"),
+    );
+    return reason;
   };
 
   expect(await refuse({ token: randomUUID() })).toBe(
@@ -249,6 +255,8 @@ it("logs why a confirmation proof was refused, never what was sent", async () =>
     // Shape of a typed code, never the code itself.
     "enteredCodeShape",
     "codeDeliveryFailed",
+    // What the browser's lead has when a link matches nothing.
+    "linkState",
   ]);
   for (const warning of warnings) {
     for (const key of Object.keys(warning)) {
@@ -257,6 +265,7 @@ it("logs why a confirmation proof was refused, never what was sent", async () =>
     expect(Object.values(warning)).not.toContain("123456");
   }
   expect(warnings.at(-1)?.enteredCodeShape).toBe("six-digits");
+  expect(warnings[0]?.linkState).toBe("none");
 });
 
 it("distinguishes resend cooldown from hourly budgets without consuming more sends", async () => {

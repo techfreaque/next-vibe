@@ -14,6 +14,7 @@ import { z } from "zod";
 
 import { mediaMarkdownLink } from "../../../chat/storage/storage-url";
 import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
+import { stripInlineImageData } from "../../../fetch-url-content/inline-image-data";
 import { IMAGE_GEN_ALIAS } from "../../../image-generation/constants";
 import type { Modality } from "../../../models/enum";
 import { ApiProvider } from "../../../models/models";
@@ -38,6 +39,11 @@ function sanitizeToolResult(value: JSONValue): JSONValue {
   // Date objects from Drizzle — convert to ISO string
   if (value instanceof Date) {
     return value.toISOString();
+  }
+  if (typeof value === "string") {
+    // Stored page text from before fetch-url-content stripped inline images:
+    // NanoGPT rejects text-only models when the prompt contains one.
+    return value.includes("data:image/") ? stripInlineImageData(value) : value;
   }
   if (typeof value !== "object") {
     return value;

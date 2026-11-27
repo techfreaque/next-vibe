@@ -148,7 +148,7 @@ export class SpeechToTextRepository {
    * ~0.7 KB (iOS Safari sent 772 bytes and 0 bytes, prod 2026-11-17, both
    * rejected by Eden as "too short" / "failed to extract media metadata").
    */
-  private static readonly MIN_AUDIO_BYTES = 1024;
+  static readonly MIN_AUDIO_BYTES = 1024;
 
   /** Provider wording for an empty or sub-0.1 s recording. */
   private static readonly TOO_SHORT_PATTERN =

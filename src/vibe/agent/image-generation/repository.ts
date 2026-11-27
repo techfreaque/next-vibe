@@ -93,6 +93,7 @@ import { generateWithOpenRouter } from "./providers/openrouter";
 import { generateWithReplicate } from "./providers/replicate";
 import { generateImageWithUnbottled } from "./providers/unbottled";
 import { generateWithVenice } from "./providers/venice";
+import { findUnusableReference } from "./reference-probe";
 
 /** Plain-language size hint for token-based (headless) image models. */
 const HEADLESS_SIZE_HINT: Record<typeof ImageSizeValue, string> = {
@@ -534,6 +535,38 @@ export class ImageGenerationRepository {
       // already classified (refusal vs outage), never wrap it twice.
       if (imageModel.apiProvider === ApiProvider.UNBOTTLED) {
         return generationResult;
+      }
+      // The adapter already named the unreachable link: pass it through.
+      if (
+        generationResult.errorType?.errorKey ===
+        ErrorResponseTypes.NOT_FOUND.errorKey
+      ) {
+        return generationResult;
+      }
+      // A third-party reference link the provider could not use (a web page,
+      // a 404): name the link problem, not the provider's wording.
+      const unusable = inputMediaUrl
+        ? await findUnusableReference({
+            urls: [inputMediaUrl],
+            fetchImpl,
+            logger,
+            logTag: "ImageGen",
+            model: imageModel.id,
+            provider: imageModel.apiProvider,
+            providerError: generationResult.message,
+          })
+        : null;
+      if (unusable) {
+        return fail({
+          message:
+            unusable.reason === "notMedia"
+              ? t("post.errors.referenceNotImage", { host: unusable.host })
+              : t("post.errors.referenceUnreachable", {
+                  host: unusable.host,
+                  status: String(unusable.status ?? "-"),
+                }),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
       }
       return providerFailure(generationResult.message, t);
     }

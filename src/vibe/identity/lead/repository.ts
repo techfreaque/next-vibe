@@ -1542,7 +1542,37 @@ export class LeadsRepository {
         },
       );
     } catch (error) {
-      logger.error("Error recording engagement", parseError(error));
+      const parsed = parseError(error);
+      const cause = parsed.cause instanceof Error ? parsed.cause : parsed;
+      if ("constraint" in cause && cause.constraint === "leads_email_unique") {
+        // A lead whose email already sits on another lead: the corrupt
+        // leads_email_unique index (prod 2026-11-27, 18 duplicate groups)
+        // rejects every later update of the second row. Name the twins for
+        // the repair. lower() keeps the lookup off the broken index.
+        const twins = await db
+          .execute<{ id: string }>(
+            sql`SELECT d.id, d.created_at FROM leads d JOIN leads l
+              ON lower(d.email) = lower(l.email)
+              WHERE l.id = ${data.leadId}::uuid AND d.email IS NOT NULL
+              ORDER BY d.created_at LIMIT 5`,
+          )
+          .then(
+            ({ rows }) => rows.map((row) => row.id).join(","),
+            () => "lookup-failed",
+          );
+        logger.error(
+          "Error recording engagement: lead blocked by a duplicate email (leads_email_unique needs dedupe + REINDEX)",
+          parsed,
+          {
+            constraint: "leads_email_unique",
+            leadId: data.leadId,
+            duplicateLeadIds: twins,
+            engagementType: data.engagementType,
+          },
+        );
+      } else {
+        logger.error("Error recording engagement", parsed);
+      }
       return fail({
         message: t("leadsErrors.leadsEngagement.post.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

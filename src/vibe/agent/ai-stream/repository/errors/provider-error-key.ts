@@ -15,7 +15,7 @@ const CONTENT_FILTER_PATTERN =
   /inappropriate content|\bprohibited[ _-]content\b|content.?filter|content.?policy|moderation|flagged/i;
 
 const BUSY_PATTERN =
-  /\b(429|502|503|504|529)\b|overloaded|rate.?limit|temporarily unavailable|provider_unavailable|try again (later|after)/i;
+  /\b(429|502|503|504|529)\b|overloaded|rate.?limit|temporarily unavailable|service unavailable|timed? ?out|provider_unavailable|try again (later|after)/i;
 
 /** Our provider account, the provider's edge, or the model itself refused. */
 const UNAVAILABLE_PATTERN =

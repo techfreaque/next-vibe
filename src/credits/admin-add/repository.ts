@@ -60,7 +60,23 @@ export class AdminAddCreditsRepository {
         .limit(1);
 
       if (!recipient) {
-        logger.warn("Credit grant recipient account not found", { lookupBy });
+        // 2026-11-25: an id lookup missed with nothing to trace it. An id is
+        // not personal data; an email is never logged. A lead id pasted in
+        // place of the account id is the likely mix-up, so check for it.
+        const [asLead] =
+          lookupBy === "id"
+            ? await db
+                .select({ userId: userLeadLinks.userId })
+                .from(userLeadLinks)
+                .where(eq(userLeadLinks.leadId, targetUserId))
+                .limit(1)
+            : [undefined];
+        logger.warn("Credit grant recipient account not found", {
+          lookupBy,
+          targetUserId: lookupBy === "id" ? targetUserId : null,
+          idIsLinkedLead: asLead !== undefined,
+          linkedUserIdForLead: asLead?.userId ?? null,
+        });
         return fail({
           message: t("adminAdd.post.errors.notFound.description"),
           errorType: ErrorResponseTypes.NOT_FOUND,

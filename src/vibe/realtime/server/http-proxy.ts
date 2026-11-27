@@ -45,6 +45,60 @@ interface RecentRequest {
   method: string;
   path: string;
   ts: number;
+  /** Response body bytes streamed to the client so far */
+  bytes?: number;
+  /** Upstream Content-Length, when sent */
+  contentLength?: number;
+}
+
+/**
+ * Responses that streamed >= 1 MB, kept briefly after they end. Event-loop
+ * lag rows attach them: proxied multi-MB bodies (chat thread files) showed
+ * up only as native `#getInternalBuffer` frames with no route (prod
+ * 2026-11-26/27, 11 rows, up to 736 ms).
+ */
+const LARGE_RESPONSE_BYTES = 1024 * 1024;
+const LARGE_RESPONSE_KEEP_MS = 5_000;
+const finishedLargeResponses: (RecentRequest & { endedAt: number })[] = [];
+
+/** Route without ids or opaque tokens (the query is never stored). */
+function routeClass(path: string): string {
+  return sanitizeRoutePath(path).replaceAll(
+    /\/[\w-]{16,}(?=\/|\.|$)/g,
+    "/:seg",
+  );
+}
+
+function formatMb(bytes: number): string {
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+/**
+ * Proxied responses that streamed >= 1 MB and were active within
+ * [from - 1 s, to]: route (sanitized, no tokens or query), bytes sent of the
+ * declared length, and age. Undefined when none qualify.
+ */
+export function summarizeLargeResponses(
+  from: number,
+  to: number,
+): string | undefined {
+  const now = Date.now();
+  const describe = (entry: RecentRequest, state: string): string =>
+    `${entry.method} ${routeClass(entry.path)} ${formatMb(entry.bytes ?? 0)}${
+      entry.contentLength ? ` of ${formatMb(entry.contentLength)}` : ""
+    } ${state} (${String(now - entry.ts)}ms old)`;
+  const shown: string[] = [];
+  for (const entry of inFlightRequests.values()) {
+    if ((entry.bytes ?? 0) >= LARGE_RESPONSE_BYTES) {
+      shown.push(describe(entry, "streaming"));
+    }
+  }
+  for (const entry of finishedLargeResponses) {
+    if (entry.endedAt >= from - 1000 && entry.ts <= to) {
+      shown.push(describe(entry, "finished"));
+    }
+  }
+  return shown.length > 0 ? shown.slice(0, 6).join("; ") : undefined;
 }
 
 /** Rolling log of the last N proxied requests — dumped on first ECONNREFUSED. */
@@ -380,7 +434,22 @@ async function forwardHttpRequest(
         ts: Date.now(),
       });
       const stopTracking = (): void => {
+        const entry = inFlightRequests.get(inFlight);
         inFlightRequests.delete(inFlight);
+        if (entry && (entry.bytes ?? 0) >= LARGE_RESPONSE_BYTES) {
+          const endedAt = Date.now();
+          finishedLargeResponses.push({ ...entry, endedAt });
+          while (
+            finishedLargeResponses.length > 0 &&
+            (finishedLargeResponses[0]?.endedAt ?? endedAt) <
+              endedAt - LARGE_RESPONSE_KEEP_MS
+          ) {
+            finishedLargeResponses.shift();
+          }
+          if (finishedLargeResponses.length > 20) {
+            finishedLargeResponses.shift();
+          }
+        }
       };
       // settle() wraps resolve() with a guard so the timeout and the normal
       // response path can't both resolve the Promise.
@@ -425,6 +494,15 @@ async function forwardHttpRequest(
             return;
           }
           headersReceived = true;
+          const tracked = inFlightRequests.get(inFlight);
+          const declaredLength = Number(proxyRes.headers["content-length"]);
+          if (tracked) {
+            tracked.bytes = 0;
+            tracked.contentLength =
+              Number.isSafeInteger(declaredLength) && declaredLength > 0
+                ? declaredLength
+                : undefined;
+          }
           proxyRes.once("end", stopTracking);
           proxyRes.once("close", stopTracking);
           proxyRes.once("error", stopTracking);
@@ -533,6 +611,9 @@ async function forwardHttpRequest(
               proxyRes.on("data", (chunk: Buffer) => {
                 if (downstreamClosed || finished) {
                   return;
+                }
+                if (tracked) {
+                  tracked.bytes = (tracked.bytes ?? 0) + chunk.length;
                 }
                 controller.enqueue(chunk);
               });

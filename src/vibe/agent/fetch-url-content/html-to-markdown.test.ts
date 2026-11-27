@@ -20,3 +20,16 @@ it("resolves scraper page images against the final fetched URL", () => {
   expect(markdown).toContain("![Photo](https://cdn.example.test/photo.png)");
   expect(markdown).not.toContain("Empty");
 });
+
+it("never passes inline image payloads into the tool result", () => {
+  const markup = [
+    '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==" alt="Chart">',
+    '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">',
+    '<a href="data:image/svg+xml,%3Csvg%3E%3C/svg%3E">icon</a>',
+    '<img src="https://cdn.example.test/photo.png" alt="Photo">',
+  ].join("\n");
+  const markdown = htmlToMarkdown(markup, "https://example.test/page");
+  expect(markdown).not.toContain("data:image/");
+  expect(markdown).toContain("[image: Chart]");
+  expect(markdown).toContain("![Photo](https://cdn.example.test/photo.png)");
+});

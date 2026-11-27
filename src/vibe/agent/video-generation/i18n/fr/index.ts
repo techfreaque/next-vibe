@@ -72,6 +72,14 @@ export const translations: typeof enTranslations = {
       jobId: "ID de la tâche asynchrone",
     },
     errors: {
+      referenceNotImage:
+        "Le lien vers {{host}} ouvre une page web, pas un fichier image. Utilise un lien direct vers l'image (clic droit, copier l'adresse de l'image) ou importe l'image.",
+      referenceUnreachable:
+        "Le lien d'image vers {{host}} ne se charge pas (HTTP {{status}}). Vérifie le lien ou importe l'image. Rien ne t'a été facturé.",
+      modelDiscontinued:
+        "{{model}} a été retiré par son fournisseur et ne génère plus rien. Choisis un autre modèle vidéo. Rien ne t'a été facturé.",
+      referenceStagingFailed:
+        "Le fournisseur vidéo n'a pas pu recevoir l'image d'entrée. Réessaie ou choisis un autre modèle vidéo. Rien ne t'a été facturé.",
       referenceUnavailable:
         "L'image d'entrée n'est pas disponible. Elle a été supprimée, ou elle appartient à une discussion que vous ne pouvez pas ouvrir. Utilisez une image de cette discussion ou renvoyez-la.",
       validation_failed: {

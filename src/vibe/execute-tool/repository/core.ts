@@ -21,6 +21,7 @@ import { scopedTranslation as systemScopedTranslation } from "@/_pages/shared/i1
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { getFullPath } from "../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { GenericHandlerBase } from "../../core/route/handler";
 import type { ResponseType } from "../../core/route/response.schema";
@@ -36,7 +37,9 @@ import type { WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-import { Platform } from "../../platforms/platforms";
+import { isCliPlatform, Platform } from "../../platforms/platforms";
+import { scopedTranslation as executeToolScopedTranslation } from "../i18n";
+import { auditInputKeys, isEveryKeyUnknown } from "./input-keys";
 import {
   createPaidCallDedupe,
   paidCallKey,
@@ -164,13 +167,54 @@ export class RouteExecutionExecutor {
       let resolvedUrlPathParams: Record<string, WidgetData> =
         params.urlPathParams ?? {};
 
+      const definition =
+        await RouteExecutionExecutor.resolveDefinition(effectiveToolName);
       if (params.urlPathParams === undefined) {
-        const split = await RouteExecutionExecutor.splitArgs(
-          effectiveToolName,
-          params.data,
-        );
+        const split = RouteExecutionExecutor.splitArgs(definition, params.data);
         resolvedData = split.data;
         resolvedUrlPathParams = split.urlPathParams;
+      }
+
+      // Undeclared argument names are stripped by the target's schema before
+      // validation, so a misnamed argument surfaces only as "field: received
+      // undefined" (prod 2026-11-26: credits/admin-add got receivedKeys "").
+      // Name them, never their values.
+      const keyAudit = definition
+        ? auditInputKeys({
+            definition,
+            data: resolvedData,
+            urlPathParams: resolvedUrlPathParams,
+          })
+        : null;
+      const { t: tExecuteTool } = executeToolScopedTranslation.scopedT(
+        params.locale,
+      );
+      if (keyAudit) {
+        const unknownKeys = keyAudit.unknownKeys.join(", ");
+        const expectedKeys = keyAudit.expectedKeys.join(", ");
+        // The CLI user and the AI model read the returned error inline.
+        const logUnknown =
+          isCliPlatform(params.platform) || params.platform === Platform.AI
+            ? params.logger.debug.bind(params.logger)
+            : params.logger.warn.bind(params.logger);
+        logUnknown("[Route Execution Executor] Unknown input keys", {
+          toolName: effectiveToolName,
+          platform: params.platform,
+          unknownKeys,
+          expectedKeys,
+        });
+        // Not one argument reaches the target: running it would use defaults
+        // only. Stored cron inputs keep running (their target validates).
+        if (isEveryKeyUnknown(keyAudit) && params.platform !== Platform.CRON) {
+          return fail({
+            message: tExecuteTool("errors.unknownInputKeys.noneReached", {
+              toolName: effectiveToolName,
+              unknownKeys,
+              expectedKeys,
+            }),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
       }
 
       // Execute handler - once per identical paid call in this thread/turn.
@@ -240,6 +284,24 @@ export class RouteExecutionExecutor {
         );
       }
 
+      // A validation failure next to dropped argument names: say which names
+      // were dropped and which ones the target takes.
+      if (
+        keyAudit &&
+        result.errorType.errorKey ===
+          ErrorResponseTypes.VALIDATION_ERROR.errorKey
+      ) {
+        return fail({
+          message: tExecuteTool("errors.unknownInputKeys.dropped", {
+            error: result.message,
+            unknownKeys: keyAudit.unknownKeys.join(", "),
+            expectedKeys: keyAudit.expectedKeys.join(", "),
+          }),
+          errorType: result.errorType,
+          cause: result,
+        });
+      }
+
       // Return the original error from the handler
       return result;
     } catch (error) {
@@ -264,6 +326,16 @@ export class RouteExecutionExecutor {
   }
 
   /**
+   * Resolve toolName / alias to its endpoint definition (null when unknown).
+   */
+  private static async resolveDefinition(
+    toolName: string,
+  ): Promise<CreateApiEndpointAny | null> {
+    const path = getFullPath(toolName);
+    return path === null ? null : await getEndpoint(path);
+  }
+
+  /**
    * Split a flat merged-args object into urlPathParams + data using the
    * endpoint's requestUrlPathParamsSchema.
    *
@@ -279,19 +351,13 @@ export class RouteExecutionExecutor {
    * If the endpoint cannot be resolved the entire object is passed as data
    * (safe fallback).
    */
-  private static async splitArgs(
-    toolName: string,
+  private static splitArgs(
+    definition: CreateApiEndpointAny | null,
     mergedArgs: Record<string, WidgetData>,
-  ): Promise<{
+  ): {
     urlPathParams: Record<string, WidgetData>;
     data: Record<string, WidgetData>;
-  }> {
-    const path = getFullPath(toolName);
-    if (path === null) {
-      return { urlPathParams: {}, data: mergedArgs ?? {} };
-    }
-
-    const definition = await getEndpoint(path);
+  } {
     if (!definition) {
       return { urlPathParams: {}, data: mergedArgs ?? {} };
     }

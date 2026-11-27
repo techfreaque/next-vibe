@@ -77,6 +77,7 @@ import {
 } from "../../i18n";
 import { ThreadPermissionsDialog } from "../[threadId]/permissions/widget";
 import { ThreadShareDialog } from "../[threadId]/share-links/widget";
+import { handleThreadDeleteError } from "../[threadId]/stale-delete";
 import type definition from "../definition";
 import type { ThreadListResponseOutput } from "../definition";
 import { scopedTranslation } from "../i18n";
@@ -298,6 +299,17 @@ function ThreadRow({
         );
       } else {
         const threadDef = await import("../[threadId]/definition");
+        const deletedRow = {
+          threadId: thread.id,
+          rootFolderId: thread.rootFolderId,
+          folderId: thread.folderId ?? null,
+          list: "threads" as const,
+          createdAt: thread.createdAt,
+          updatedAt: thread.updatedAt,
+          ownerKnown: null,
+          streamingState: thread.streamingState ?? null,
+          isActive,
+        };
         await apiClient.mutate(
           threadDef.default.DELETE,
           logger,
@@ -305,6 +317,21 @@ function ThreadRow({
           { rootFolderId: thread.rootFolderId },
           { threadId: thread.id },
           locale,
+          {
+            onError: ({ error }) =>
+              handleThreadDeleteError(error, deletedRow, logger, () =>
+                apiClient.refetchEndpoint(
+                  threadsDefModule.default.GET,
+                  logger,
+                  {
+                    requestData: {
+                      rootFolderId: thread.rootFolderId,
+                      subFolderId: thread.folderId ?? null,
+                    },
+                  },
+                ),
+              ),
+          },
         );
       }
     })();

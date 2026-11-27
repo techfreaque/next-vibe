@@ -29,13 +29,22 @@ export async function sendSignupChallenge(
   logger: EndpointLogger,
 ): Promise<string | null> {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
+  // The code leads the subject: after a resend, every earlier code and link
+  // stops working, and identical subjects made people open the first email in
+  // the thread (prod 2026-11-27: old code typed 33 s after a resend).
   const delivery = await deliverChallenge(
     pending,
     challenge,
     locale,
     logger,
-    t("confirmation.link"),
+    t("confirmation.subject", {
+      code: challenge.code,
+      appName: globalT("appName"),
+    }),
     t("confirmation.hint"),
+    null,
+    t("confirmation.link"),
   );
   return delivery.messageId;
 }

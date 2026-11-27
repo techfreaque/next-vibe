@@ -72,6 +72,14 @@ export const translations: typeof enTranslations = {
       jobId: "Lavoro asincastro ID",
     },
     errors: {
+      referenceNotImage:
+        "Il link di {{host}} apre una pagina web, non un file immagine. Usa un link diretto all'immagine (tasto destro, copia indirizzo immagine) o carica l'immagine.",
+      referenceUnreachable:
+        "Il link dell'immagine su {{host}} non si carica (HTTP {{status}}). Controlla il link o carica l'immagine. Non ti è stato addebitato nulla.",
+      modelDiscontinued:
+        "{{model}} è stato ritirato dal fornitore e non genera più. Scegli un altro modello video. Non ti è stato addebitato nulla.",
+      referenceStagingFailed:
+        "Il fornitore video non è riuscito a ricevere l'immagine di partenza. Riprova o scegli un altro modello video. Non ti è stato addebitato nulla.",
       referenceUnavailable:
         "L'immagine di ingresso non è disponibile. E 'stato cancellato, o appartiene a una chat che non si può aprire. Utilizzare un'immagine da questa chat o caricarlo di nuovo.",
       validation_failed: {
