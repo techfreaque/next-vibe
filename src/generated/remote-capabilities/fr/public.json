@@ -31306,6 +31306,30 @@
           },
           "schemaType": "primitive"
         },
+        "cursor": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Curseur de page",
+          "description": "Laissez vide pour les résultats les plus récents. Pour continuer, passez le nextCursor de la page précédente.",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "items": {
           "type": "container",
           "child": {
@@ -31734,6 +31758,26 @@
           "usage": {
             "response": true
           }
+        },
+        "nextCursor": {
+          "type": "text",
+          "label": "Curseur de la page suivante",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
         },
         "paginationInfo": {
           "type": "pagination",

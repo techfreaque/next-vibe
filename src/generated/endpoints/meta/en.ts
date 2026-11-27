@@ -3496,7 +3496,11 @@ export const endpointsMeta: EndpointMeta[] = [
           },
           linkedDevices: 2,
           recentGrants: [
-            { amount: 3000, createdAt: "2026-11-17T10:00:00.000Z" },
+            {
+              amount: 3000,
+              createdAt: "2026-11-17T10:00:00.000Z",
+              reason: "enums.grantReason.tester",
+            },
           ],
         },
       },
@@ -3520,14 +3524,17 @@ export const endpointsMeta: EndpointMeta[] = [
         default: {
           targetUserId: "123e4567-e89b-12d3-a456-426614174000",
           amount: 100,
+          reason: "enums.grantReason.feedback",
         },
         exactAmount: {
           targetUserId: "123e4567-e89b-12d3-a456-426614174000",
           amount: 137,
+          reason: "enums.grantReason.compensation",
         },
         large: {
           targetUserId: "123e4567-e89b-12d3-a456-426614174000",
           amount: 500,
+          reason: "enums.grantReason.giftCreator",
         },
       },
       responses: {
@@ -26767,6 +26774,7 @@ export const endpointsMeta: EndpointMeta[] = [
               rootFolderId: null,
             },
           ],
+          nextCursor: null,
           paginationInfo: { totalCount: 1, pageCount: 1 },
         },
         images: {
@@ -26790,6 +26798,7 @@ export const endpointsMeta: EndpointMeta[] = [
               rootFolderId: null,
             },
           ],
+          nextCursor: null,
           paginationInfo: { totalCount: 1, pageCount: 1 },
         },
       },

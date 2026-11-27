@@ -72302,6 +72302,39 @@
                         },
                         "type": "transform"
                       }
+                    },
+                    "reason": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "enum",
+                            "entries": {
+                              "GIFT_CREATOR": "enums.grantReason.giftCreator",
+                              "TESTER": "enums.grantReason.tester",
+                              "COMPENSATION": "enums.grantReason.compensation",
+                              "GOODWILL": "enums.grantReason.goodwill",
+                              "FEEDBACK": "enums.grantReason.feedback"
+                            }
+                          },
+                          "type": "enum",
+                          "enum": {
+                            "GIFT_CREATOR": "enums.grantReason.giftCreator",
+                            "TESTER": "enums.grantReason.tester",
+                            "COMPENSATION": "enums.grantReason.compensation",
+                            "GOODWILL": "enums.grantReason.goodwill",
+                            "FEEDBACK": "enums.grantReason.feedback"
+                          },
+                          "options": [
+                            "enums.grantReason.giftCreator",
+                            "enums.grantReason.tester",
+                            "enums.grantReason.compensation",
+                            "enums.grantReason.goodwill",
+                            "enums.grantReason.feedback"
+                          ]
+                        }
+                      },
+                      "type": "nullable"
                     }
                   }
                 },
@@ -72442,6 +72475,39 @@
                       },
                       "type": "transform"
                     }
+                  },
+                  "reason": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "enum",
+                          "entries": {
+                            "GIFT_CREATOR": "enums.grantReason.giftCreator",
+                            "TESTER": "enums.grantReason.tester",
+                            "COMPENSATION": "enums.grantReason.compensation",
+                            "GOODWILL": "enums.grantReason.goodwill",
+                            "FEEDBACK": "enums.grantReason.feedback"
+                          }
+                        },
+                        "type": "enum",
+                        "enum": {
+                          "GIFT_CREATOR": "enums.grantReason.giftCreator",
+                          "TESTER": "enums.grantReason.tester",
+                          "COMPENSATION": "enums.grantReason.compensation",
+                          "GOODWILL": "enums.grantReason.goodwill",
+                          "FEEDBACK": "enums.grantReason.feedback"
+                        },
+                        "options": [
+                          "enums.grantReason.giftCreator",
+                          "enums.grantReason.tester",
+                          "enums.grantReason.compensation",
+                          "enums.grantReason.goodwill",
+                          "enums.grantReason.feedback"
+                        ]
+                      }
+                    },
+                    "type": "nullable"
                   }
                 }
               },
@@ -72535,6 +72601,66 @@
             },
             "type": "number",
             "isFinite": true
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "reason": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Grund",
+          "description": "Warum diese Credits vergeben werden. Reports trennen damit Erstattungen und Entschädigungen von Geschenken.",
+          "options": [
+            {
+              "value": "enums.grantReason.giftCreator",
+              "label": "enums.grantReason.giftCreator"
+            },
+            {
+              "value": "enums.grantReason.tester",
+              "label": "enums.grantReason.tester"
+            },
+            {
+              "value": "enums.grantReason.compensation",
+              "label": "enums.grantReason.compensation"
+            },
+            {
+              "value": "enums.grantReason.goodwill",
+              "label": "enums.grantReason.goodwill"
+            },
+            {
+              "value": "enums.grantReason.feedback",
+              "label": "enums.grantReason.feedback"
+            }
+          ],
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "GIFT_CREATOR": "enums.grantReason.giftCreator",
+                "TESTER": "enums.grantReason.tester",
+                "COMPENSATION": "enums.grantReason.compensation",
+                "GOODWILL": "enums.grantReason.goodwill",
+                "FEEDBACK": "enums.grantReason.feedback"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "GIFT_CREATOR": "enums.grantReason.giftCreator",
+              "TESTER": "enums.grantReason.tester",
+              "COMPENSATION": "enums.grantReason.compensation",
+              "GOODWILL": "enums.grantReason.goodwill",
+              "FEEDBACK": "enums.grantReason.feedback"
+            },
+            "options": [
+              "enums.grantReason.giftCreator",
+              "enums.grantReason.tester",
+              "enums.grantReason.compensation",
+              "enums.grantReason.goodwill",
+              "enums.grantReason.feedback"
+            ]
           },
           "usage": {
             "request": "data"
@@ -138046,6 +138172,30 @@
           },
           "schemaType": "primitive"
         },
+        "browserLanguage": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Browsersprache",
+          "description": "Hauptsprache des Browsers beim ersten Besuch, z. B. hi",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "ipPrefix": {
           "type": "form_field",
           "fieldType": "text",
@@ -139791,6 +139941,30 @@
           },
           "schemaType": "primitive"
         },
+        "browserLanguage": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Browsersprache",
+          "description": "Hauptsprache des Browsers beim ersten Besuch, z. B. hi",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "ipPrefix": {
           "type": "form_field",
           "fieldType": "text",
@@ -139898,6 +140072,10 @@
               "label": "leadAnalytics.dimension.os"
             },
             {
+              "value": "leadAnalytics.dimension.browserLanguage",
+              "label": "leadAnalytics.dimension.browserLanguage"
+            },
+            {
               "value": "leadAnalytics.dimension.botFamily",
               "label": "leadAnalytics.dimension.botFamily"
             }
@@ -139923,6 +140101,7 @@
                     "DEVICE": "leadAnalytics.dimension.device",
                     "BROWSER": "leadAnalytics.dimension.browser",
                     "OS": "leadAnalytics.dimension.os",
+                    "BROWSER_LANGUAGE": "leadAnalytics.dimension.browserLanguage",
                     "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
                   }
                 },
@@ -139941,6 +140120,7 @@
                   "DEVICE": "leadAnalytics.dimension.device",
                   "BROWSER": "leadAnalytics.dimension.browser",
                   "OS": "leadAnalytics.dimension.os",
+                  "BROWSER_LANGUAGE": "leadAnalytics.dimension.browserLanguage",
                   "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
                 },
                 "options": [
@@ -139957,6 +140137,7 @@
                   "leadAnalytics.dimension.device",
                   "leadAnalytics.dimension.browser",
                   "leadAnalytics.dimension.os",
+                  "leadAnalytics.dimension.browserLanguage",
                   "leadAnalytics.dimension.botFamily"
                 ]
               }
@@ -139988,6 +140169,7 @@
                 "DEVICE": "leadAnalytics.dimension.device",
                 "BROWSER": "leadAnalytics.dimension.browser",
                 "OS": "leadAnalytics.dimension.os",
+                "BROWSER_LANGUAGE": "leadAnalytics.dimension.browserLanguage",
                 "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
               }
             },
@@ -140006,6 +140188,7 @@
               "DEVICE": "leadAnalytics.dimension.device",
               "BROWSER": "leadAnalytics.dimension.browser",
               "OS": "leadAnalytics.dimension.os",
+              "BROWSER_LANGUAGE": "leadAnalytics.dimension.browserLanguage",
               "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
             },
             "options": [
@@ -140022,6 +140205,7 @@
               "leadAnalytics.dimension.device",
               "leadAnalytics.dimension.browser",
               "leadAnalytics.dimension.os",
+              "leadAnalytics.dimension.browserLanguage",
               "leadAnalytics.dimension.botFamily"
             ]
           },
@@ -141635,6 +141819,30 @@
           },
           "schemaType": "primitive"
         },
+        "browserLanguage": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Browsersprache",
+          "description": "Hauptsprache des Browsers beim ersten Besuch, z. B. hi",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "ipPrefix": {
           "type": "form_field",
           "fieldType": "text",
@@ -141742,6 +141950,10 @@
               "label": "leadAnalytics.dimension.os"
             },
             {
+              "value": "leadAnalytics.dimension.browserLanguage",
+              "label": "leadAnalytics.dimension.browserLanguage"
+            },
+            {
               "value": "leadAnalytics.dimension.botFamily",
               "label": "leadAnalytics.dimension.botFamily"
             }
@@ -141767,6 +141979,7 @@
                     "DEVICE": "leadAnalytics.dimension.device",
                     "BROWSER": "leadAnalytics.dimension.browser",
                     "OS": "leadAnalytics.dimension.os",
+                    "BROWSER_LANGUAGE": "leadAnalytics.dimension.browserLanguage",
                     "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
                   }
                 },
@@ -141785,6 +141998,7 @@
                   "DEVICE": "leadAnalytics.dimension.device",
                   "BROWSER": "leadAnalytics.dimension.browser",
                   "OS": "leadAnalytics.dimension.os",
+                  "BROWSER_LANGUAGE": "leadAnalytics.dimension.browserLanguage",
                   "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
                 },
                 "options": [
@@ -141801,6 +142015,7 @@
                   "leadAnalytics.dimension.device",
                   "leadAnalytics.dimension.browser",
                   "leadAnalytics.dimension.os",
+                  "leadAnalytics.dimension.browserLanguage",
                   "leadAnalytics.dimension.botFamily"
                 ]
               }
@@ -141901,6 +142116,7 @@
                 "DEVICE": "leadAnalytics.dimension.device",
                 "BROWSER": "leadAnalytics.dimension.browser",
                 "OS": "leadAnalytics.dimension.os",
+                "BROWSER_LANGUAGE": "leadAnalytics.dimension.browserLanguage",
                 "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
               }
             },
@@ -141919,6 +142135,7 @@
               "DEVICE": "leadAnalytics.dimension.device",
               "BROWSER": "leadAnalytics.dimension.browser",
               "OS": "leadAnalytics.dimension.os",
+              "BROWSER_LANGUAGE": "leadAnalytics.dimension.browserLanguage",
               "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
             },
             "options": [
@@ -141935,6 +142152,7 @@
               "leadAnalytics.dimension.device",
               "leadAnalytics.dimension.browser",
               "leadAnalytics.dimension.os",
+              "leadAnalytics.dimension.browserLanguage",
               "leadAnalytics.dimension.botFamily"
             ]
           },
@@ -193156,6 +193374,30 @@
           "fieldType": "text",
           "label": "Betriebssystem",
           "description": "Betriebssystem, z. B. Android",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "browserLanguage": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Browsersprache",
+          "description": "Hauptsprache des Browsers beim ersten Besuch, z. B. hi",
           "columns": 3,
           "schema": {
             "def": {
@@ -424668,6 +424910,30 @@
           },
           "schemaType": "primitive"
         },
+        "cursor": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Seiten-Cursor",
+          "description": "Leer lassen für die neuesten Ergebnisse. Zum Weiterblättern nextCursor der vorherigen Seite übergeben.",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "items": {
           "type": "container",
           "child": {
@@ -425096,6 +425362,26 @@
           "usage": {
             "response": true
           }
+        },
+        "nextCursor": {
+          "type": "text",
+          "label": "Cursor der nächsten Seite",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
         },
         "paginationInfo": {
           "type": "pagination",

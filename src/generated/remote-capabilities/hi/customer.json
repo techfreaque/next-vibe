@@ -1,9 +1,9 @@
 [
   {
     "toolName": "companies-list",
-    "title": "Companies",
-    "titleShort": "Company directory",
-    "description": "Browse company memberships. Platform administrators can open the full directory.",
+    "title": "कंपनियाँ",
+    "titleShort": "कंपनी डायरेक्टरी",
+    "description": "कंपनी सदस्यताएँ देखें। प्लेटफ़ॉर्म एडमिन पूरी डायरेक्टरी खोल सकते हैं।",
     "fields": {
       "usage": {
         "request": "data",
@@ -13,8 +13,8 @@
         "includeAll": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "All companies",
-          "description": "Include companies you do not belong to. Platform administrators only.",
+          "label": "सभी कंपनियाँ",
+          "description": "वे कंपनियाँ भी शामिल करें जिनके आप सदस्य नहीं हैं। सिर्फ़ प्लेटफ़ॉर्म एडमिन।",
           "hidden": true,
           "includeInCacheKey": true,
           "schema": {
@@ -37,9 +37,9 @@
         "page": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Page",
+          "label": "पेज",
           "includeInCacheKey": true,
-          "description": "Page number (starts at 1)",
+          "description": "पेज नंबर (1 से शुरू)",
           "schema": {
             "def": {
               "type": "optional",
@@ -74,9 +74,9 @@
         "pageSize": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Per Page",
+          "label": "प्रति पेज",
           "includeInCacheKey": true,
-          "description": "Results per page (max 100)",
+          "description": "प्रति पेज नतीजे (अधिकतम 100)",
           "schema": {
             "def": {
               "type": "optional",
@@ -111,7 +111,7 @@
         },
         "total": {
           "type": "text",
-          "label": "Total",
+          "label": "कुल",
           "schema": {
             "def": {
               "type": "number",
@@ -155,7 +155,7 @@
               },
               "name": {
                 "type": "text",
-                "label": "Name",
+                "label": "नाम",
                 "schema": {
                   "def": {
                     "type": "string"
@@ -275,7 +275,7 @@
               },
               "isActive": {
                 "type": "text",
-                "label": "Active",
+                "label": "सक्रिय",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -289,7 +289,7 @@
               },
               "country": {
                 "type": "text",
-                "label": "Country",
+                "label": "देश",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -309,7 +309,7 @@
               },
               "currency": {
                 "type": "text",
-                "label": "Currency",
+                "label": "करेंसी",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -329,7 +329,7 @@
               },
               "email": {
                 "type": "text",
-                "label": "Email",
+                "label": "ईमेल",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -349,7 +349,7 @@
               },
               "createdAt": {
                 "type": "text",
-                "label": "Created",
+                "label": "बनाया गया",
                 "fieldType": "datetime",
                 "schema": {
                   "def": {
@@ -379,7 +379,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "companies",
-    "tags": ["Companies", "List"],
+    "tags": ["कंपनियाँ", "सूची"],
     "aliases": ["companies-list"],
     "credits": 0
   },
@@ -2554,9 +2554,9 @@
   },
   {
     "toolName": "lead-magnet_captures_GET",
-    "title": "Captured leads",
-    "titleShort": "Captured leads",
-    "description": "Everyone who submitted your lead magnet form",
+    "title": "कैप्चर की गई लीड",
+    "titleShort": "कैप्चर की गई लीड",
+    "description": "वे सभी जिन्होंने आपका लीड मैग्नेट फ़ॉर्म भरा",
     "fields": {
       "usage": {
         "response": true
@@ -2686,7 +2686,7 @@
         },
         "total": {
           "type": "text",
-          "label": "Total",
+          "label": "कुल",
           "schema": {
             "def": {
               "type": "number",
@@ -2702,7 +2702,7 @@
         },
         "page": {
           "type": "text",
-          "label": "Page",
+          "label": "पेज",
           "schema": {
             "def": {
               "type": "number",
@@ -2718,7 +2718,7 @@
         },
         "pageSize": {
           "type": "text",
-          "label": "Page size",
+          "label": "पेज का आकार",
           "schema": {
             "def": {
               "type": "number",
@@ -2745,9 +2745,9 @@
   },
   {
     "toolName": "lead-magnet_config_GET",
-    "title": "Your email list",
-    "titleShort": "LM Config",
-    "description": "View your current lead magnet configuration",
+    "title": "आपकी ईमेल लिस्ट",
+    "titleShort": "LM कॉन्फ़िग",
+    "description": "अपना मौजूदा लीड मैग्नेट कॉन्फ़िगरेशन देखें",
     "fields": {
       "usage": {
         "response": true
@@ -2984,13 +2984,13 @@
   },
   {
     "toolName": "lead-magnet_config_DELETE",
-    "title": "Disconnect Email Platform",
-    "titleShort": "Disconnect",
-    "description": "Remove your lead magnet configuration and stop capturing leads",
+    "title": "ईमेल प्लेटफ़ॉर्म डिस्कनेक्ट करें",
+    "titleShort": "डिस्कनेक्ट करें",
+    "description": "अपना लीड मैग्नेट कॉन्फ़िगरेशन हटाएँ और लीड कैप्चर करना बंद करें",
     "fields": {
       "type": "container",
-      "title": "Disconnect Email Platform",
-      "description": "Remove your lead magnet configuration and stop capturing leads",
+      "title": "ईमेल प्लेटफ़ॉर्म डिस्कनेक्ट करें",
+      "description": "अपना लीड मैग्नेट कॉन्फ़िगरेशन हटाएँ और लीड कैप्चर करना बंद करें",
       "layoutType": "stacked",
       "usage": {
         "response": true
@@ -3022,18 +3022,18 @@
   },
   {
     "toolName": "lead-magnet_providers_acumbamail_POST",
-    "title": "Connect Acumbamail",
+    "title": "Acumbamail कनेक्ट करें",
     "titleShort": "Acumbamail",
-    "description": "Connect your Acumbamail account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Acumbamail अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Acumbamail",
+      "title": "Acumbamail कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.acumbamail.title"
       },
-      "description": "Connect your Acumbamail account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Acumbamail अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -3043,7 +3043,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -3065,9 +3065,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3094,9 +3094,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3124,9 +3124,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3154,8 +3154,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -3181,7 +3181,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -3219,18 +3219,18 @@
   },
   {
     "toolName": "lead-magnet_providers_adobecampaign_POST",
-    "title": "Connect Adobe Campaign",
+    "title": "Adobe Campaign कनेक्ट करें",
     "titleShort": "Adobe Campaign",
-    "description": "Connect your Adobe Campaign account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Adobe Campaign अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Adobe Campaign",
+      "title": "Adobe Campaign कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.adobecampaign.title"
       },
-      "description": "Connect your Adobe Campaign account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Adobe Campaign अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -3239,8 +3239,8 @@
         "adobeCampaignOrganizationId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Organization ID",
-          "description": "Your Adobe IMS Organization ID",
+          "label": "ऑर्गनाइज़ेशन ID",
+          "description": "आपकी Adobe IMS ऑर्गनाइज़ेशन ID",
           "placeholder": "XXXXXXXXXXXXXXXXXXXXXXXX@AdobeOrg",
           "schema": {
             "def": {
@@ -3257,8 +3257,8 @@
         "adobeCampaignClientId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Client ID",
-          "description": "Your Adobe Campaign API client ID",
+          "label": "क्लाइंट ID",
+          "description": "आपकी Adobe Campaign API क्लाइंट ID",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -3275,8 +3275,8 @@
         "adobeCampaignClientSecret": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "Client Secret",
-          "description": "Leave blank to keep your existing key",
+          "label": "क्लाइंट सीक्रेट",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -3299,7 +3299,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -3321,8 +3321,8 @@
         "adobeCampaignListId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List ID",
-          "description": "The Adobe Campaign profile list ID to add leads to",
+          "label": "लिस्ट ID",
+          "description": "जिस Adobe Campaign प्रोफ़ाइल लिस्ट में लीड जोड़नी हैं उसकी ID",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -3339,9 +3339,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3368,9 +3368,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3398,9 +3398,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3428,8 +3428,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -3455,7 +3455,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -3493,18 +3493,18 @@
   },
   {
     "toolName": "lead-magnet_providers_cleverreach_POST",
-    "title": "Connect CleverReach",
+    "title": "CleverReach कनेक्ट करें",
     "titleShort": "CleverReach",
-    "description": "Connect your CleverReach account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना CleverReach अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect CleverReach",
+      "title": "CleverReach कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.cleverreach.title"
       },
-      "description": "Connect your CleverReach account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना CleverReach अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -3513,8 +3513,8 @@
         "cleverreachClientId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Client ID",
-          "description": "Your CleverReach OAuth client ID",
+          "label": "क्लाइंट ID",
+          "description": "आपकी CleverReach OAuth क्लाइंट ID",
           "placeholder": "xxxxxxxx",
           "schema": {
             "def": {
@@ -3531,8 +3531,8 @@
         "cleverreachClientSecret": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "Client Secret",
-          "description": "Leave blank to keep your existing key",
+          "label": "क्लाइंट सीक्रेट",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -3554,8 +3554,8 @@
         "cleverreachListId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Group / List ID",
-          "description": "The ID of the CleverReach group to add contacts to",
+          "label": "ग्रुप / लिस्ट ID",
+          "description": "जिस CleverReach ग्रुप में कॉन्टैक्ट जोड़ने हैं उसकी ID",
           "placeholder": "123456",
           "schema": {
             "def": {
@@ -3572,8 +3572,8 @@
         "cleverreachFormId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "DOI Form ID (optional)",
-          "description": "Form ID for double opt-in. Leave blank to skip DOI.",
+          "label": "DOI फ़ॉर्म ID (वैकल्पिक)",
+          "description": "डबल ऑप्ट-इन के लिए फ़ॉर्म ID। DOI छोड़ने के लिए ख़ाली छोड़ें।",
           "placeholder": "123456",
           "schema": {
             "def": {
@@ -3601,8 +3601,8 @@
         "cleverreachSource": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Source (optional)",
-          "description": "Contact source label for tracking",
+          "label": "स्रोत (वैकल्पिक)",
+          "description": "ट्रैकिंग के लिए कॉन्टैक्ट स्रोत का लेबल",
           "placeholder": "unbottled.ai",
           "schema": {
             "def": {
@@ -3630,9 +3630,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3660,9 +3660,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3690,8 +3690,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -3717,7 +3717,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -3755,18 +3755,18 @@
   },
   {
     "toolName": "lead-magnet_providers_connectif_POST",
-    "title": "Connect Connectif",
+    "title": "Connectif कनेक्ट करें",
     "titleShort": "Connectif",
-    "description": "Connect your Connectif account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Connectif अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Connectif",
+      "title": "Connectif कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.connectif.title"
       },
-      "description": "Connect your Connectif account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Connectif अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -3776,7 +3776,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -3798,9 +3798,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3827,9 +3827,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3857,9 +3857,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3887,8 +3887,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -3914,7 +3914,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -3952,18 +3952,18 @@
   },
   {
     "toolName": "lead-magnet_providers_datanext_POST",
-    "title": "Connect DataNext",
+    "title": "DataNext कनेक्ट करें",
     "titleShort": "DataNext",
-    "description": "Connect your DataNext account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना DataNext अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect DataNext",
+      "title": "DataNext कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.datanext.title"
       },
-      "description": "Connect your DataNext account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना DataNext अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -3973,7 +3973,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -3995,8 +3995,8 @@
         "datanextApiSecret": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "API Secret",
-          "description": "Leave blank to keep your existing key",
+          "label": "API सीक्रेट",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -4018,8 +4018,8 @@
         "datanextFormId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form ID",
-          "description": "The DataNext form ID for the opt-in form",
+          "label": "फ़ॉर्म ID",
+          "description": "ऑप्ट-इन फ़ॉर्म की DataNext फ़ॉर्म ID",
           "placeholder": "123456",
           "schema": {
             "def": {
@@ -4036,8 +4036,8 @@
         "datanextCampaignId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Campaign ID",
-          "description": "The campaign ID to associate leads with",
+          "label": "कैंपेन ID",
+          "description": "जिस कैंपेन से लीड जोड़नी हैं उसकी ID",
           "placeholder": "123456",
           "schema": {
             "def": {
@@ -4054,9 +4054,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4083,9 +4083,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4113,9 +4113,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4143,8 +4143,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -4170,7 +4170,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -4208,18 +4208,18 @@
   },
   {
     "toolName": "lead-magnet_providers_edrone_POST",
-    "title": "Connect Edrone",
+    "title": "Edrone कनेक्ट करें",
     "titleShort": "Edrone",
-    "description": "Connect your Edrone account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Edrone अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Edrone",
+      "title": "Edrone कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.edrone.title"
       },
-      "description": "Connect your Edrone account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Edrone अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -4228,8 +4228,8 @@
         "edroneAppId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "App ID",
-          "description": "Your Edrone app ID",
+          "label": "ऐप ID",
+          "description": "आपकी Edrone ऐप ID",
           "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -4246,9 +4246,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4275,9 +4275,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4305,9 +4305,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4335,8 +4335,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -4362,7 +4362,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -4400,18 +4400,18 @@
   },
   {
     "toolName": "lead-magnet_providers_emarsys_POST",
-    "title": "Connect Emarsys",
+    "title": "Emarsys कनेक्ट करें",
     "titleShort": "Emarsys",
-    "description": "Connect your Emarsys account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Emarsys अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Emarsys",
+      "title": "Emarsys कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.emarsys.title"
       },
-      "description": "Connect your Emarsys account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Emarsys अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -4420,8 +4420,8 @@
         "emarsysUserName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Username",
-          "description": "Your Emarsys API username",
+          "label": "यूज़रनेम",
+          "description": "आपका Emarsys API यूज़रनेम",
           "placeholder": "account123",
           "schema": {
             "def": {
@@ -4439,7 +4439,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -4461,8 +4461,8 @@
         "emarsysSubDomain": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Subdomain",
-          "description": "Your Emarsys API subdomain (e.g. suite.emarsys.net)",
+          "label": "सबडोमेन",
+          "description": "आपका Emarsys API सबडोमेन (जैसे suite.emarsys.net)",
           "placeholder": "suite.emarsys.net",
           "schema": {
             "def": {
@@ -4479,9 +4479,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4508,9 +4508,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4538,9 +4538,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4568,8 +4568,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -4595,7 +4595,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -4633,18 +4633,18 @@
   },
   {
     "toolName": "lead-magnet_providers_expertsender_POST",
-    "title": "Connect ExpertSender",
+    "title": "ExpertSender कनेक्ट करें",
     "titleShort": "ExpertSender",
-    "description": "Connect your ExpertSender account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना ExpertSender अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect ExpertSender",
+      "title": "ExpertSender कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.expertsender.title"
       },
-      "description": "Connect your ExpertSender account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना ExpertSender अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -4653,8 +4653,8 @@
         "expertSenderApiDomain": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "API Domain",
-          "description": "Your ExpertSender API domain",
+          "label": "API डोमेन",
+          "description": "आपका ExpertSender API डोमेन",
           "placeholder": "api3.esv2.com",
           "schema": {
             "def": {
@@ -4672,7 +4672,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -4694,9 +4694,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4723,9 +4723,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4753,9 +4753,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4783,8 +4783,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -4810,7 +4810,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -4848,18 +4848,18 @@
   },
   {
     "toolName": "lead-magnet_providers_freshmail_POST",
-    "title": "Connect FreshMail",
+    "title": "FreshMail कनेक्ट करें",
     "titleShort": "FreshMail",
-    "description": "Connect your FreshMail account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना FreshMail अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect FreshMail",
+      "title": "FreshMail कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.freshmail.title"
       },
-      "description": "Connect your FreshMail account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना FreshMail अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -4869,7 +4869,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -4891,8 +4891,8 @@
         "freshmailApiSecret": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "API Secret",
-          "description": "Leave blank to keep your existing key",
+          "label": "API सीक्रेट",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -4914,8 +4914,8 @@
         "listHash": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List Hash",
-          "description": "The hash of the subscriber list to add leads to",
+          "label": "लिस्ट हैश",
+          "description": "जिस सब्सक्राइबर लिस्ट में लीड जोड़नी हैं उसका हैश",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -4932,9 +4932,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4961,9 +4961,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -4991,9 +4991,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5021,8 +5021,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -5048,7 +5048,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -5086,18 +5086,18 @@
   },
   {
     "toolName": "lead-magnet_providers_getresponse_POST",
-    "title": "Connect GetResponse",
+    "title": "GetResponse कनेक्ट करें",
     "titleShort": "GetResponse",
-    "description": "Connect your GetResponse account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना GetResponse अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect GetResponse",
+      "title": "GetResponse कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.getresponse.title"
       },
-      "description": "Connect your GetResponse account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना GetResponse अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -5107,7 +5107,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "GetResponse API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -5129,9 +5129,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5158,9 +5158,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5188,9 +5188,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5218,8 +5218,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -5245,7 +5245,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -5283,9 +5283,9 @@
   },
   {
     "toolName": "lead-magnet_providers_google-sheets_POST",
-    "title": "Connect Google Sheets",
+    "title": "Google Sheets कनेक्ट करें",
     "titleShort": "Google Sheets",
-    "description": "Append a row to your Google Spreadsheet each time a lead signs up",
+    "description": "जब भी कोई लीड साइन अप करे, अपनी Google स्प्रेडशीट में एक पंक्ति जोड़ें",
     "fields": {
       "usage": {
         "request": "data",
@@ -5295,9 +5295,9 @@
         "spreadsheetId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Spreadsheet",
-          "description": "Select the spreadsheet where leads will be added",
-          "placeholder": "Select a spreadsheet…",
+          "label": "स्प्रेडशीट",
+          "description": "वह स्प्रेडशीट चुनें जिसमें लीड जोड़ी जाएँगी",
+          "placeholder": "स्प्रेडशीट चुनें…",
           "schema": {
             "def": {
               "type": "string",
@@ -5313,9 +5313,9 @@
         "sheetTab": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Sheet tab (optional)",
-          "description": "The tab name within the spreadsheet. Leave blank to use the first tab.",
-          "placeholder": "e.g. Leads",
+          "label": "शीट टैब (वैकल्पिक)",
+          "description": "स्प्रेडशीट के भीतर टैब का नाम। पहला टैब इस्तेमाल करने के लिए ख़ाली छोड़ें।",
+          "placeholder": "जैसे Leads",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5342,9 +5342,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5372,9 +5372,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5402,8 +5402,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -5429,7 +5429,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -5468,13 +5468,13 @@
   },
   {
     "toolName": "lead-magnet_providers_google-sheets_sheets-list_GET",
-    "title": "List Spreadsheets",
-    "titleShort": "Spreadsheets",
-    "description": "Returns the list of spreadsheets accessible to the connected Google account",
+    "title": "स्प्रेडशीट की सूची",
+    "titleShort": "स्प्रेडशीट",
+    "description": "जुड़े Google अकाउंट की पहुँच वाली स्प्रेडशीट की सूची लौटाता है",
     "fields": {
       "type": "container",
-      "title": "List Spreadsheets",
-      "description": "Returns the list of spreadsheets accessible to the connected Google account",
+      "title": "स्प्रेडशीट की सूची",
+      "description": "जुड़े Google अकाउंट की पहुँच वाली स्प्रेडशीट की सूची लौटाता है",
       "layoutType": "stacked",
       "usage": {
         "response": true
@@ -5482,7 +5482,7 @@
       "children": {
         "sheets": {
           "type": "text",
-          "label": "Spreadsheets",
+          "label": "स्प्रेडशीट",
           "schema": {
             "def": {
               "type": "array",
@@ -5546,18 +5546,18 @@
   },
   {
     "toolName": "lead-magnet_providers_klaviyo_POST",
-    "title": "Connect Klaviyo",
+    "title": "Klaviyo कनेक्ट करें",
     "titleShort": "Klaviyo",
-    "description": "Connect your Klaviyo account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Klaviyo अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Klaviyo",
+      "title": "Klaviyo कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.klaviyo.title"
       },
-      "description": "Connect your Klaviyo account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Klaviyo अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -5567,7 +5567,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "Klaviyo API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "pk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -5589,9 +5589,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5618,9 +5618,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5648,9 +5648,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5678,8 +5678,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -5705,7 +5705,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -5743,18 +5743,18 @@
   },
   {
     "toolName": "lead-magnet_providers_mailup_POST",
-    "title": "Connect MailUp",
+    "title": "MailUp कनेक्ट करें",
     "titleShort": "MailUp",
-    "description": "Connect your MailUp account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना MailUp अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect MailUp",
+      "title": "MailUp कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.mailup.title"
       },
-      "description": "Connect your MailUp account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना MailUp अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -5763,8 +5763,8 @@
         "mailupClientId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Client ID",
-          "description": "Your MailUp OAuth client ID",
+          "label": "क्लाइंट ID",
+          "description": "आपकी MailUp OAuth क्लाइंट ID",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -5781,8 +5781,8 @@
         "mailupClientSecret": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "Client Secret",
-          "description": "Leave blank to keep your existing key",
+          "label": "क्लाइंट सीक्रेट",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -5804,8 +5804,8 @@
         "mailupUsername": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Username",
-          "description": "Your MailUp account username",
+          "label": "यूज़रनेम",
+          "description": "आपके MailUp अकाउंट का यूज़रनेम",
           "placeholder": "m12345",
           "schema": {
             "def": {
@@ -5822,8 +5822,8 @@
         "mailupPassword": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "Password",
-          "description": "Leave blank to keep your existing key",
+          "label": "पासवर्ड",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "••••••••",
           "schema": {
             "def": {
@@ -5845,8 +5845,8 @@
         "mailupListId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List ID",
-          "description": "The numeric ID of the list to subscribe contacts to",
+          "label": "लिस्ट ID",
+          "description": "जिस लिस्ट में कॉन्टैक्ट सब्सक्राइब करने हैं उसकी संख्यात्मक ID",
           "placeholder": "1",
           "schema": {
             "def": {
@@ -5863,9 +5863,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5892,9 +5892,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5922,9 +5922,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -5952,8 +5952,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -5979,7 +5979,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -6017,18 +6017,18 @@
   },
   {
     "toolName": "lead-magnet_providers_mapp_POST",
-    "title": "Connect Mapp",
+    "title": "Mapp कनेक्ट करें",
     "titleShort": "Mapp",
-    "description": "Connect your Mapp account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Mapp अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Mapp",
+      "title": "Mapp कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.mapp.title"
       },
-      "description": "Connect your Mapp account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Mapp अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -6037,8 +6037,8 @@
         "mappUsername": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Username",
-          "description": "Your Mapp API username",
+          "label": "यूज़रनेम",
+          "description": "आपका Mapp API यूज़रनेम",
           "placeholder": "username",
           "schema": {
             "def": {
@@ -6055,8 +6055,8 @@
         "mappPassword": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "Password",
-          "description": "Leave blank to keep your existing key",
+          "label": "पासवर्ड",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "••••••••",
           "schema": {
             "def": {
@@ -6078,8 +6078,8 @@
         "mappDomain": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Domain",
-          "description": "Your Mapp API domain",
+          "label": "डोमेन",
+          "description": "आपका Mapp API डोमेन",
           "placeholder": "api.mapp.com",
           "schema": {
             "def": {
@@ -6096,9 +6096,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6125,9 +6125,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6155,9 +6155,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6185,8 +6185,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -6212,7 +6212,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -6250,18 +6250,18 @@
   },
   {
     "toolName": "lead-magnet_providers_platform-email_POST",
-    "title": "Notify via platform email",
-    "titleShort": "Platform Email",
-    "description": "Get an email notification every time someone signs up via your lead magnet",
+    "title": "प्लेटफ़ॉर्म ईमेल से सूचित करें",
+    "titleShort": "प्लेटफ़ॉर्म ईमेल",
+    "description": "आपके लीड मैग्नेट से जब भी कोई साइन अप करे, ईमेल सूचना पाएँ",
     "fields": {
       "type": "container",
-      "title": "Notify via platform email",
+      "title": "प्लेटफ़ॉर्म ईमेल से सूचित करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.platformEmail.title"
       },
-      "description": "Get an email notification every time someone signs up via your lead magnet",
+      "description": "आपके लीड मैग्नेट से जब भी कोई साइन अप करे, ईमेल सूचना पाएँ",
       "usage": {
         "request": "data",
         "response": true
@@ -6270,8 +6270,8 @@
         "notifyEmail": {
           "type": "form_field",
           "fieldType": "email",
-          "label": "Notification email",
-          "description": "Where to send lead notifications",
+          "label": "सूचना का ईमेल",
+          "description": "लीड की सूचनाएँ कहाँ भेजनी हैं",
           "placeholder": "you@example.com",
           "schema": {
             "def": {
@@ -6291,8 +6291,8 @@
         "notifyEmailName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Your name",
-          "description": "Name shown in the notification email",
+          "label": "आपका नाम",
+          "description": "सूचना ईमेल में दिखने वाला नाम",
           "placeholder": "Jane",
           "schema": {
             "def": {
@@ -6309,9 +6309,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6339,9 +6339,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6369,8 +6369,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -6396,7 +6396,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "hidden": true,
           "schema": {
             "def": {
@@ -6435,18 +6435,18 @@
   },
   {
     "toolName": "lead-magnet_providers_sailthru_POST",
-    "title": "Connect Sailthru",
+    "title": "Sailthru कनेक्ट करें",
     "titleShort": "Sailthru",
-    "description": "Connect your Sailthru account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Sailthru अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Sailthru",
+      "title": "Sailthru कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.sailthru.title"
       },
-      "description": "Connect your Sailthru account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Sailthru अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -6456,7 +6456,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -6478,8 +6478,8 @@
         "sailthruSecret": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "API Secret",
-          "description": "Leave blank to keep your existing key",
+          "label": "API सीक्रेट",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -6501,9 +6501,9 @@
         "listName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List Name",
-          "description": "The name of the Sailthru list to subscribe contacts to",
-          "placeholder": "My Subscribers",
+          "label": "लिस्ट का नाम",
+          "description": "जिस Sailthru लिस्ट में कॉन्टैक्ट सब्सक्राइब करने हैं उसका नाम",
+          "placeholder": "मेरे सब्सक्राइबर",
           "schema": {
             "def": {
               "type": "string",
@@ -6519,9 +6519,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6548,9 +6548,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6578,9 +6578,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6608,8 +6608,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -6635,7 +6635,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -6673,18 +6673,18 @@
   },
   {
     "toolName": "lead-magnet_providers_salesmanago_POST",
-    "title": "Connect SALESmanago",
+    "title": "SALESmanago कनेक्ट करें",
     "titleShort": "SALESmanago",
-    "description": "Connect your SALESmanago account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना SALESmanago अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect SALESmanago",
+      "title": "SALESmanago कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.salesmanago.title"
       },
-      "description": "Connect your SALESmanago account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना SALESmanago अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -6693,8 +6693,8 @@
         "salesManagoClientId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Client ID",
-          "description": "Your SALESmanago client ID",
+          "label": "क्लाइंट ID",
+          "description": "आपकी SALESmanago क्लाइंट ID",
           "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -6712,7 +6712,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "API Key",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -6735,7 +6735,7 @@
           "type": "form_field",
           "fieldType": "password",
           "label": "SHA",
-          "description": "Leave blank to keep your existing key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -6757,8 +6757,8 @@
         "salesManagoDomain": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Domain",
-          "description": "Your SALESmanago API domain",
+          "label": "डोमेन",
+          "description": "आपका SALESmanago API डोमेन",
           "placeholder": "app3.salesmanago.pl",
           "schema": {
             "def": {
@@ -6775,8 +6775,8 @@
         "salesManagoOwner": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Owner Email",
-          "description": "The owner email for your SALESmanago account",
+          "label": "मालिक का ईमेल",
+          "description": "आपके SALESmanago अकाउंट के मालिक का ईमेल",
           "placeholder": "owner@example.com",
           "schema": {
             "def": {
@@ -6793,9 +6793,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6822,9 +6822,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6852,9 +6852,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -6882,8 +6882,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -6909,7 +6909,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -6947,18 +6947,18 @@
   },
   {
     "toolName": "lead-magnet_providers_shopify_POST",
-    "title": "Connect Shopify",
+    "title": "Shopify कनेक्ट करें",
     "titleShort": "Shopify",
-    "description": "Connect your Shopify store to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Shopify स्टोर कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Shopify",
+      "title": "Shopify कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.shopify.title"
       },
-      "description": "Connect your Shopify store to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Shopify स्टोर कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -6967,8 +6967,8 @@
         "shopifyDomain": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Store Domain",
-          "description": "Your Shopify store domain",
+          "label": "स्टोर डोमेन",
+          "description": "आपका Shopify स्टोर डोमेन",
           "placeholder": "mystore.myshopify.com",
           "schema": {
             "def": {
@@ -6985,8 +6985,8 @@
         "shopifyAccessToken": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "Access Token",
-          "description": "Leave blank to keep your existing key",
+          "label": "एक्सेस टोकन",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "shpat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -7008,9 +7008,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -7037,9 +7037,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -7067,9 +7067,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -7097,8 +7097,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -7124,7 +7124,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -7162,18 +7162,18 @@
   },
   {
     "toolName": "lead-magnet_providers_spotler_POST",
-    "title": "Connect Spotler",
+    "title": "Spotler कनेक्ट करें",
     "titleShort": "Spotler",
-    "description": "Connect your Spotler account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Spotler अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect Spotler",
+      "title": "Spotler कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.spotler.title"
       },
-      "description": "Connect your Spotler account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना Spotler अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -7182,8 +7182,8 @@
         "spotlerConsumerKey": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Consumer Key",
-          "description": "Your Spotler API consumer key",
+          "label": "कंज़्यूमर Key",
+          "description": "आपकी Spotler API कंज़्यूमर key",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -7200,8 +7200,8 @@
         "spotlerConsumerSecret": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "Consumer Secret",
-          "description": "Leave blank to keep your existing key",
+          "label": "कंज़्यूमर सीक्रेट",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -7223,9 +7223,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -7252,9 +7252,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -7282,9 +7282,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -7312,8 +7312,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -7339,7 +7339,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -7377,18 +7377,18 @@
   },
   {
     "toolName": "lead-magnet_providers_youlead_POST",
-    "title": "Connect YouLead",
+    "title": "YouLead कनेक्ट करें",
     "titleShort": "YouLead",
-    "description": "Connect your YouLead account to capture leads from your skill page",
+    "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना YouLead अकाउंट कनेक्ट करें",
     "fields": {
       "type": "container",
-      "title": "Connect YouLead",
+      "title": "YouLead कनेक्ट करें",
       "layoutType": "stacked",
       "adminForm": {
         "sectionTitle": "providers.shared.connectionSettings",
         "submitText": "providers.youlead.title"
       },
-      "description": "Connect your YouLead account to capture leads from your skill page",
+      "description": "अपने स्किल पेज से लीड कैप्चर करने के लिए अपना YouLead अकाउंट कनेक्ट करें",
       "usage": {
         "request": "data",
         "response": true
@@ -7397,8 +7397,8 @@
         "youLeadAppId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "App ID",
-          "description": "Your YouLead application ID",
+          "label": "ऐप ID",
+          "description": "आपकी YouLead एप्लिकेशन ID",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -7415,8 +7415,8 @@
         "youLeadClientId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Client ID",
-          "description": "Your YouLead client ID",
+          "label": "क्लाइंट ID",
+          "description": "आपकी YouLead क्लाइंट ID",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -7433,8 +7433,8 @@
         "youLeadAppSecretKey": {
           "type": "form_field",
           "fieldType": "password",
-          "label": "App Secret Key",
-          "description": "Leave blank to keep your existing key",
+          "label": "ऐप सीक्रेट Key",
+          "description": "मौजूदा key रखने के लिए ख़ाली छोड़ें",
           "placeholder": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
           "schema": {
             "def": {
@@ -7456,9 +7456,9 @@
         "listId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "List / Group ID",
-          "description": "The ID of the list or segment to add leads to",
-          "placeholder": "e.g. abc123",
+          "label": "लिस्ट / ग्रुप ID",
+          "description": "जिस लिस्ट या सेगमेंट में लीड जोड़नी हैं उसकी ID",
+          "placeholder": "जैसे abc123",
           "schema": {
             "def": {
               "type": "nullable",
@@ -7485,9 +7485,9 @@
         "headline": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Form Headline",
-          "description": "The headline shown above the lead capture form on your skill page",
-          "placeholder": "Get my AI prompt pack free",
+          "label": "फ़ॉर्म की हेडलाइन",
+          "description": "आपके स्किल पेज पर लीड कैप्चर फ़ॉर्म के ऊपर दिखने वाली हेडलाइन",
+          "placeholder": "मेरा AI प्रॉम्प्ट पैक फ़्री पाएँ",
           "schema": {
             "def": {
               "type": "nullable",
@@ -7515,9 +7515,9 @@
         "buttonText": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Button Text",
-          "description": "The text on the submit button",
-          "placeholder": "Get access →",
+          "label": "बटन का टेक्स्ट",
+          "description": "सबमिट बटन पर लिखा टेक्स्ट",
+          "placeholder": "एक्सेस पाएँ →",
           "schema": {
             "def": {
               "type": "nullable",
@@ -7545,8 +7545,8 @@
         "isActive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active",
-          "description": "Enable the lead capture form on your skill page",
+          "label": "सक्रिय",
+          "description": "अपने स्किल पेज पर लीड कैप्चर फ़ॉर्म चालू करें",
           "schema": {
             "def": {
               "type": "default",
@@ -7572,7 +7572,7 @@
         },
         "provider": {
           "type": "text",
-          "label": "Provider",
+          "label": "प्रोवाइडर",
           "schema": {
             "def": {
               "type": "string"
@@ -8669,9 +8669,9 @@
   },
   {
     "toolName": "notifications",
-    "title": "Notifications",
-    "titleShort": "Notifications",
-    "description": "Everything that finished while you were away. Unread first.",
+    "title": "नोटिफ़िकेशन",
+    "titleShort": "नोटिफ़िकेशन",
+    "description": "आपके पीछे जो भी पूरा हुआ, सब यहाँ। अनपढ़े पहले।",
     "fields": {
       "usage": {
         "request": "data",
@@ -8702,7 +8702,7 @@
               },
               "type": {
                 "type": "text",
-                "label": "Type",
+                "label": "टाइप",
                 "schema": {
                   "def": {
                     "type": "string"
@@ -8716,7 +8716,7 @@
               },
               "title": {
                 "type": "text",
-                "label": "Title",
+                "label": "शीर्षक",
                 "schema": {
                   "def": {
                     "type": "string"
@@ -8730,7 +8730,7 @@
               },
               "body": {
                 "type": "text",
-                "label": "Message",
+                "label": "मैसेज",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -8750,7 +8750,7 @@
               },
               "link": {
                 "type": "text",
-                "label": "Link",
+                "label": "लिंक",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -8770,7 +8770,7 @@
               },
               "read": {
                 "type": "text",
-                "label": "Read",
+                "label": "पढ़ा",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -8784,7 +8784,7 @@
               },
               "createdAt": {
                 "type": "text",
-                "label": "Received",
+                "label": "मिला",
                 "schema": {
                   "def": {
                     "type": "pipe",
@@ -8922,7 +8922,7 @@
         },
         "unreadCount": {
           "type": "text",
-          "label": "Unread",
+          "label": "अनपढ़े",
           "schema": {
             "def": {
               "type": "number",
@@ -9052,9 +9052,9 @@
   },
   {
     "toolName": "notifications-read",
-    "title": "Mark notifications read",
-    "titleShort": "Mark read",
-    "description": "Mark one notification, or all of them, as read. Send an id or all=true.",
+    "title": "नोटिफ़िकेशन पढ़ा हुआ करें",
+    "titleShort": "पढ़ा हुआ करें",
+    "description": "एक नोटिफ़िकेशन या सभी को पढ़ा हुआ करें। id भेजें या all=true।",
     "fields": {
       "type": "container",
       "usage": {
@@ -9065,8 +9065,8 @@
         "id": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Notification ID",
-          "description": "The notification to mark read",
+          "label": "नोटिफ़िकेशन ID",
+          "description": "जिस नोटिफ़िकेशन को पढ़ा हुआ करना है",
           "columns": 12,
           "schema": {
             "def": {
@@ -9100,8 +9100,8 @@
         "all": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Mark everything read",
-          "description": "Clear the whole unread list",
+          "label": "सब कुछ पढ़ा हुआ करें",
+          "description": "पूरी अनपढ़ी सूची साफ़ करें",
           "columns": 12,
           "schema": {
             "def": {
@@ -9122,7 +9122,7 @@
         },
         "updatedCount": {
           "type": "text",
-          "label": "Marked read",
+          "label": "पढ़ा हुआ किया",
           "schema": {
             "def": {
               "type": "number",
@@ -9162,9 +9162,9 @@
   },
   {
     "toolName": "notifications-unread",
-    "title": "Unread notification count",
-    "titleShort": "Unread count",
-    "description": "How many notifications you have not opened yet.",
+    "title": "अनपढ़े नोटिफ़िकेशन की संख्या",
+    "titleShort": "अनपढ़े की संख्या",
+    "description": "कितने नोटिफ़िकेशन आपने अभी नहीं खोले।",
     "fields": {
       "type": "container",
       "usage": {
@@ -9173,7 +9173,7 @@
       "children": {
         "unreadCount": {
           "type": "text",
-          "label": "Unread notifications",
+          "label": "अनपढ़े नोटिफ़िकेशन",
           "schema": {
             "def": {
               "type": "number",
@@ -21547,9 +21547,9 @@
   },
   {
     "toolName": "ai-run",
-    "title": "Run AI Agent",
-    "titleShort": "Run Agent",
-    "description": "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
+    "title": "AI एजेंट चलाएँ",
+    "titleShort": "एजेंट चलाएँ",
+    "description": "कोई टास्क स्पेशलिस्ट AI एजेंट को सौंपें और उसका जवाब पाएँ। AI स्किल/पर्सोना बनाने या एडिट करने के लिए हमेशा skill='skill-creator' को सौंपें, खुद कभी न करें। skill + prompt दें; बाकी सब एजेंट संभालता है। क्रेडिट मॉडल के हिसाब से लगते हैं।",
     "fields": {
       "usage": {
         "request": "data",
@@ -21560,8 +21560,8 @@
         "favoriteId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Favorite ID",
-          "description": "Slug of a saved favorite (e.g. 'thea-cheap'). Not a skill slug — use skill field for that. Loads skill, model, and tool config in one shot. Priority when multiple set: model > favoriteId > skill.",
+          "label": "पसंदीदा ID",
+          "description": "सेव किए पसंदीदा का slug (जैसे 'thea-cheap')। स्किल slug नहीं, उसके लिए skill फ़ील्ड इस्तेमाल करें। स्किल, मॉडल और टूल कॉन्फ़िग एक साथ लोड करता है। कई सेट हों तो प्राथमिकता: model > favoriteId > skill।",
           "placeholder": "thea-cheap",
           "columns": 6,
           "schema": {
@@ -21614,8 +21614,8 @@
         "model": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Model (CLI only)",
-          "description": "Override the LLM directly. CLI only — other platforms use favoriteId or skill instead. Fast: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.7. Free: qwen3_235b-free.",
+          "label": "मॉडल (सिर्फ़ CLI)",
+          "description": "LLM को सीधे बदलें। सिर्फ़ CLI पर, बाकी प्लेटफ़ॉर्म favoriteId या skill इस्तेमाल करते हैं। तेज़: claude-haiku-4.5, gemini-2.5-flash। संतुलित: claude-sonnet-4.6, gpt-5। ताकतवर: claude-opus-4.7। फ़्री: qwen3_235b-free।",
           "options": [
             {
               "value": "gpt-55",
@@ -22589,8 +22589,8 @@
         "skill": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Skill",
-          "description": "Skill slug (e.g. 'thea', 'thea__cheap-smart'). Not a favorite slug — use favoriteId for that. Defines the AI persona and system prompt. Use 'skill-creator' to create/edit skills.",
+          "label": "स्किल",
+          "description": "स्किल slug (जैसे 'thea', 'thea__cheap-smart')। पसंदीदा slug नहीं, उसके लिए favoriteId इस्तेमाल करें। AI पर्सोना और सिस्टम प्रॉम्प्ट तय करता है। स्किल बनाने/एडिट करने के लिए 'skill-creator' इस्तेमाल करें।",
           "placeholder": "default",
           "columns": 6,
           "schema": {
@@ -22643,9 +22643,9 @@
         "prompt": {
           "type": "form_field",
           "fieldType": "textarea",
-          "label": "Prompt",
-          "description": "The main instruction or question for the AI. Be specific - the AI will use preCalls results as context if provided.",
-          "placeholder": "Enter your prompt...",
+          "label": "प्रॉम्प्ट",
+          "description": "AI के लिए मुख्य निर्देश या सवाल। सटीक रहें: preCalls के नतीजे दिए हों तो AI उन्हें कॉन्टेक्स्ट की तरह इस्तेमाल करेगा।",
+          "placeholder": "अपना प्रॉम्प्ट लिखें...",
           "columns": 12,
           "schema": {
             "def": {
@@ -22662,8 +22662,8 @@
         "instructions": {
           "type": "form_field",
           "fieldType": "textarea",
-          "label": "Extra System Instructions",
-          "description": "Optional extra instructions appended to the system prompt. Use to constrain format, tone, or output length (e.g. 'Be concise. JSON only.').",
+          "label": "अतिरिक्त सिस्टम निर्देश",
+          "description": "सिस्टम प्रॉम्प्ट में जुड़ने वाले वैकल्पिक अतिरिक्त निर्देश। फ़ॉर्मेट, लहजा या आउटपुट की लंबाई तय करने के लिए (जैसे 'Be concise. JSON only.')।",
           "placeholder": "Be concise. One paragraph max.",
           "columns": 12,
           "schema": {
@@ -22687,8 +22687,8 @@
           "type": "container",
           "layoutType": "grid",
           "columns": 12,
-          "title": "Pre-Calls",
-          "description": "Tool calls to execute before the prompt. Results are injected as context. Use tool-help to discover available tools and their args.",
+          "title": "प्री-कॉल",
+          "description": "प्रॉम्प्ट से पहले चलने वाले टूल कॉल। नतीजे कॉन्टेक्स्ट के तौर पर जुड़ते हैं। उपलब्ध टूल और उनके आर्ग्युमेंट खोजने के लिए tool-help इस्तेमाल करें।",
           "schemaType": "array-optional",
           "child": {
             "type": "container",
@@ -22701,8 +22701,8 @@
               "routeId": {
                 "type": "form_field",
                 "fieldType": "text",
-                "label": "Tool ID",
-                "description": "Alias or full tool name to call (e.g. 'web-search', 'agent_skills_GET'). Use tool-help to discover tools.",
+                "label": "टूल ID",
+                "description": "बुलाने वाले टूल का alias या पूरा नाम (जैसे 'web-search', 'agent_skills_GET')। टूल खोजने के लिए tool-help इस्तेमाल करें।",
                 "placeholder": "web-search",
                 "columns": 6,
                 "schema": {
@@ -22720,8 +22720,8 @@
               "args": {
                 "type": "form_field",
                 "fieldType": "json",
-                "label": "Arguments",
-                "description": "Flat key-value args for the tool - merge urlPathParams and body fields into one object (e.g. {\"query\": \"latest news\", \"maxResults\": 5}).",
+                "label": "आर्ग्युमेंट",
+                "description": "टूल के लिए सीधे key-value आर्ग्युमेंट: urlPathParams और body फ़ील्ड को एक ऑब्जेक्ट में मिलाएँ (जैसे {\"query\": \"latest news\", \"maxResults\": 5})।",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -22775,8 +22775,8 @@
           "type": "container",
           "layoutType": "grid",
           "columns": 12,
-          "title": "Allowed to Execute",
-          "description": "Tools for this run. [] = text only: no tools, the model just writes (use it for drafting). Omit to use the skill or favorite's tools. Other lists are not applied yet.",
+          "title": "चलाने की अनुमति",
+          "description": "इस रन के टूल। [] = सिर्फ़ टेक्स्ट: कोई टूल नहीं, मॉडल बस लिखता है (ड्राफ़्ट के लिए)। स्किल या पसंदीदा के टूल इस्तेमाल करने के लिए छोड़ दें। दूसरी सूचियाँ अभी लागू नहीं।",
           "schemaType": "array-optional",
           "child": {
             "type": "container",
@@ -22789,8 +22789,8 @@
               "toolId": {
                 "type": "form_field",
                 "fieldType": "text",
-                "label": "Tool ID",
-                "description": "Tool alias or full name (e.g. 'execute-tool', 'tool-help', 'web-search')",
+                "label": "टूल ID",
+                "description": "टूल का alias या पूरा नाम (जैसे 'execute-tool', 'tool-help', 'web-search')",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -22806,8 +22806,8 @@
               "requiresConfirmation": {
                 "type": "form_field",
                 "fieldType": "boolean",
-                "label": "Requires Confirmation",
-                "description": "Pause for user confirmation before running this tool",
+                "label": "पुष्टि ज़रूरी",
+                "description": "इस टूल को चलाने से पहले यूज़र की पुष्टि के लिए रुकें",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -22837,8 +22837,8 @@
           "type": "container",
           "layoutType": "grid",
           "columns": 12,
-          "title": "In Context (model sees these)",
-          "description": "Tools loaded into model context. null = user's default set. Only affects what the model sees, not what it can execute.",
+          "title": "कॉन्टेक्स्ट में (मॉडल इन्हें देखता है)",
+          "description": "मॉडल कॉन्टेक्स्ट में लोड हुए टूल। null = यूज़र का डिफ़ॉल्ट सेट। सिर्फ़ इसे प्रभावित करता है कि मॉडल क्या देखता है, यह नहीं कि वह क्या चला सकता है।",
           "schemaType": "array-optional",
           "child": {
             "type": "container",
@@ -22851,8 +22851,8 @@
               "toolId": {
                 "type": "form_field",
                 "fieldType": "text",
-                "label": "Tool ID",
-                "description": "Tool alias or full name to load into context",
+                "label": "टूल ID",
+                "description": "कॉन्टेक्स्ट में लोड करने वाले टूल का alias या पूरा नाम",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -22868,8 +22868,8 @@
               "requiresConfirmation": {
                 "type": "form_field",
                 "fieldType": "boolean",
-                "label": "Requires Confirmation",
-                "description": "Whether this tool requires user confirmation before execution",
+                "label": "पुष्टि ज़रूरी",
+                "description": "क्या इस टूल को चलाने से पहले यूज़र की पुष्टि चाहिए",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -22898,8 +22898,8 @@
         "maxTurns": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Max Turns",
-          "description": "Maximum model steps for this run. Leave blank to use the limit in Chat Settings.",
+          "label": "अधिकतम टर्न",
+          "description": "इस रन के लिए मॉडल के अधिकतम स्टेप। चैट सेटिंग्स की सीमा इस्तेमाल करने के लिए खाली छोड़ें।",
           "columns": 6,
           "schema": {
             "def": {
@@ -22936,8 +22936,8 @@
         "appendThreadId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Thread ID (continue)",
-          "description": "UUID of an existing thread to continue. The new message is appended to that conversation. Omit to start a fresh thread.",
+          "label": "थ्रेड ID (जारी रखें)",
+          "description": "जारी रखने वाले मौजूदा थ्रेड का UUID। नया मैसेज उसी बातचीत में जुड़ता है। नया थ्रेड शुरू करने के लिए छोड़ दें।",
           "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
           "columns": 6,
           "schema": {
@@ -23102,8 +23102,8 @@
         "rootFolderId": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Storage Folder",
-          "description": "Where to store the thread. Background = all automated runs (Dreamer, Autopilot, scheduled tasks). Private = your folder. Shared = team. Incognito = no storage.",
+          "label": "स्टोरेज फ़ोल्डर",
+          "description": "थ्रेड कहाँ स्टोर हो। Background = सभी ऑटोमेटेड रन (Dreamer, Autopilot, शेड्यूल्ड टास्क)। Private = आपका फ़ोल्डर। Shared = टीम। Incognito = कोई स्टोरेज नहीं।",
           "columns": 6,
           "options": [
             {
@@ -23171,8 +23171,8 @@
         "subFolderId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Sub-folder ID",
-          "description": "Optional UUID of a sub-folder within the root folder. For manual organisation only - do NOT pass this when calling ai-run programmatically or from AI tools. Leave empty in all automated/agent contexts.",
+          "label": "सब-फ़ोल्डर ID",
+          "description": "रूट फ़ोल्डर के अंदर के सब-फ़ोल्डर का वैकल्पिक UUID। सिर्फ़ हाथ से व्यवस्थित करने के लिए: ai-run को प्रोग्राम से या AI टूल से बुलाते समय इसे न दें। सभी ऑटोमेटेड/एजेंट संदर्भों में खाली छोड़ें।",
           "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
           "columns": 6,
           "schema": {
@@ -23337,8 +23337,8 @@
         "excludeMemories": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Exclude Memories",
-          "description": "Skip injecting stored memories into context. Use for public bots or isolated tasks. Default: false.",
+          "label": "मेमोरी बाहर रखें",
+          "description": "सेव की गई मेमोरी को कॉन्टेक्स्ट में न जोड़ें। पब्लिक बॉट या अलग-थलग टास्क के लिए इस्तेमाल करें। डिफ़ॉल्ट: false।",
           "columns": 6,
           "schema": {
             "def": {
@@ -23359,7 +23359,7 @@
         },
         "text": {
           "type": "text",
-          "label": "The AI's response text (think-tags stripped). Null if the model produced no output.",
+          "label": "AI का जवाब (think-टैग हटाकर)। मॉडल ने कुछ न लिखा हो तो Null।",
           "columns": 12,
           "schema": {
             "def": {
@@ -23380,7 +23380,7 @@
         },
         "promptTokens": {
           "type": "text",
-          "label": "Prompt tokens consumed (input cost)",
+          "label": "खर्च हुए प्रॉम्प्ट टोकन (इनपुट लागत)",
           "columns": 6,
           "schema": {
             "def": {
@@ -23403,7 +23403,7 @@
         },
         "completionTokens": {
           "type": "text",
-          "label": "Completion tokens generated (output cost)",
+          "label": "बने कंप्लीशन टोकन (आउटपुट लागत)",
           "columns": 6,
           "schema": {
             "def": {
@@ -23426,7 +23426,7 @@
         },
         "creditCost": {
           "type": "text",
-          "label": "Credits charged for this run. Null for incognito runs.",
+          "label": "इस रन के लिए लगे क्रेडिट। इनकॉग्निटो रन के लिए Null।",
           "columns": 6,
           "schema": {
             "def": {
@@ -23449,7 +23449,7 @@
         },
         "threadId": {
           "type": "text",
-          "label": "Thread UUID where the run was stored. Null if rootFolderId was 'incognito'. Use this to continue the conversation via appendThreadId.",
+          "label": "वह थ्रेड UUID जिसमें रन स्टोर हुआ। rootFolderId 'incognito' था तो Null। बातचीत को appendThreadId से जारी रखने के लिए इसे इस्तेमाल करें।",
           "columns": 6,
           "schema": {
             "def": {
@@ -23482,7 +23482,7 @@
         },
         "lastAiMessageId": {
           "type": "text",
-          "label": "UUID of the final assistant message. Useful for branching or referencing the response.",
+          "label": "आख़िरी असिस्टेंट मैसेज का UUID। ब्रांचिंग या जवाब का हवाला देने के काम आता है।",
           "columns": 6,
           "schema": {
             "def": {
@@ -23515,7 +23515,7 @@
         },
         "threadTitle": {
           "type": "text",
-          "label": "Auto-generated title for this thread",
+          "label": "इस थ्रेड का अपने आप बना शीर्षक",
           "schema": {
             "def": {
               "type": "nullable",
@@ -23536,7 +23536,7 @@
         },
         "threadCreatedAt": {
           "type": "text",
-          "label": "Thread creation timestamp (ISO 8601)",
+          "label": "थ्रेड बनने का टाइमस्टैम्प (ISO 8601)",
           "schema": {
             "def": {
               "type": "nullable",
@@ -23572,7 +23572,7 @@
         "preCallResults": {
           "type": "container",
           "layoutType": "stacked",
-          "title": "Pre-call Results",
+          "title": "प्री-कॉल के नतीजे",
           "child": {
             "type": "container",
             "usage": {
@@ -23581,7 +23581,7 @@
             "children": {
               "routeId": {
                 "type": "text",
-                "label": "Tool that was called",
+                "label": "जो टूल बुलाया गया",
                 "schema": {
                   "def": {
                     "type": "string"
@@ -23595,7 +23595,7 @@
               },
               "success": {
                 "type": "text",
-                "label": "Whether the call succeeded",
+                "label": "कॉल सफल रहा या नहीं",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -23609,7 +23609,7 @@
               },
               "error": {
                 "type": "text",
-                "label": "Error message if the call failed",
+                "label": "कॉल फ़ेल होने पर एरर मैसेज",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -23641,7 +23641,7 @@
             "request": "data"
           },
           "type": "navigate_button",
-          "label": "Back",
+          "label": "वापस",
           "icon": "arrow-left",
           "variant": "outline",
           "prefillFromGet": false,
@@ -23655,15 +23655,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["AI", "Chat"],
+    "tags": ["AI", "चैट"],
     "aliases": ["ai-run", "run-ai", "agent-run"],
     "credits": 0
   },
   {
     "toolName": "system-prompt-debug",
-    "title": "System Prompt Debug",
-    "titleShort": "Debug Prompt",
-    "description": "Shows the exact system prompt the AI gets in a given context — folder, skill, thread, message.",
+    "title": "सिस्टम प्रॉम्प्ट डीबग",
+    "titleShort": "प्रॉम्प्ट डीबग",
+    "description": "किसी दिए संदर्भ (फ़ोल्डर, स्किल, थ्रेड, मैसेज) में AI को मिलने वाला सटीक सिस्टम प्रॉम्प्ट दिखाता है।",
     "fields": {
       "usage": {
         "request": "data",
@@ -23673,8 +23673,8 @@
         "rootFolderId": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Root Folder",
-          "description": "Folder context to simulate (private, public, incognito, cron, shared, remote)",
+          "label": "रूट फ़ोल्डर",
+          "description": "सिमुलेट करने के लिए फ़ोल्डर संदर्भ (private, public, incognito, cron, shared, remote)",
           "placeholder": "private",
           "options": [
             {
@@ -23746,9 +23746,9 @@
         "userMessage": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "User Message",
-          "description": "Simulated user message for cortex embedding search",
-          "placeholder": "What did we discuss last time?",
+          "label": "यूज़र मैसेज",
+          "description": "cortex एम्बेडिंग सर्च के लिए सिमुलेटेड यूज़र मैसेज",
+          "placeholder": "पिछली बार हमने क्या बात की थी?",
           "schema": {
             "def": {
               "type": "optional",
@@ -23770,8 +23770,8 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "title",
-          "label": "Thread ID",
-          "description": "Optional thread ID for context",
+          "label": "थ्रेड ID",
+          "description": "संदर्भ के लिए वैकल्पिक थ्रेड ID",
           "schema": {
             "def": {
               "type": "optional",
@@ -23806,8 +23806,8 @@
           "fieldType": "entity_picker",
           "labelField": "name",
           "valueField": "skillId",
-          "label": "Skill ID",
-          "description": "Optional skill ID to inject into system prompt",
+          "label": "स्किल ID",
+          "description": "सिस्टम प्रॉम्प्ट में डालने के लिए वैकल्पिक स्किल ID",
           "schema": {
             "def": {
               "type": "optional",
@@ -23828,9 +23828,9 @@
         "subFolderId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Sub-folder ID",
-          "description": "Optional sub-folder UUID",
-          "placeholder": "uuid or leave blank",
+          "label": "सब-फ़ोल्डर ID",
+          "description": "वैकल्पिक सब-फ़ोल्डर UUID",
+          "placeholder": "uuid या खाली छोड़ें",
           "schema": {
             "def": {
               "type": "optional",
@@ -23863,9 +23863,9 @@
         "imageGenModelSelection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Image Gen Selection",
-          "description": "Image gen model selection from the active favorite/chat UI (leave blank to use user default)",
-          "placeholder": "leave blank for user default",
+          "label": "इमेज जेन चुनाव",
+          "description": "सक्रिय फ़ेवरेट/चैट UI से इमेज जेन मॉडल का चुनाव (यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें)",
+          "placeholder": "यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें",
           "schema": {
             "def": {
               "type": "optional",
@@ -25490,9 +25490,9 @@
         "musicGenModelSelection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Music Gen Selection",
-          "description": "Music gen model selection from the active favorite/chat UI (leave blank to use user default)",
-          "placeholder": "leave blank for user default",
+          "label": "म्यूज़िक जेन चुनाव",
+          "description": "सक्रिय फ़ेवरेट/चैट UI से म्यूज़िक जेन मॉडल का चुनाव (यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें)",
+          "placeholder": "यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें",
           "schema": {
             "def": {
               "type": "optional",
@@ -26889,9 +26889,9 @@
         "videoGenModelSelection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Video Gen Selection",
-          "description": "Video gen model selection from the active favorite/chat UI (leave blank to use user default)",
-          "placeholder": "leave blank for user default",
+          "label": "वीडियो जेन चुनाव",
+          "description": "सक्रिय फ़ेवरेट/चैट UI से वीडियो जेन मॉडल का चुनाव (यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें)",
+          "placeholder": "यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें",
           "schema": {
             "def": {
               "type": "optional",
@@ -28733,7 +28733,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["Debug"],
+    "tags": ["डीबग"],
     "aliases": ["system-prompt-debug"],
     "credits": 0
   },
@@ -58364,9 +58364,9 @@
   },
   {
     "toolName": "media-history",
-    "title": "Your generations",
-    "titleShort": "Generations",
-    "description": "Images, videos, music, speech and transcripts you made in the Studio, in chat or via the API. Newest first.",
+    "title": "आपके बनाए नतीजे",
+    "titleShort": "जनरेशन",
+    "description": "स्टूडियो में, चैट में या API से आपके बनाए इमेज, वीडियो, म्यूज़िक, स्पीच और ट्रांसक्रिप्ट। सबसे नए पहले।",
     "fields": {
       "usage": {
         "request": "data",
@@ -58376,8 +58376,8 @@
         "kind": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Type",
-          "description": "image, video, music, speech or transcribe. Leave empty for everything.",
+          "label": "टाइप",
+          "description": "image, video, music, speech या transcribe। सब कुछ देखने के लिए खाली छोड़ें।",
           "options": [],
           "includeInCacheKey": true,
           "schema": {
@@ -58412,6 +58412,30 @@
           },
           "schemaType": "primitive"
         },
+        "cursor": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "पेज कर्सर",
+          "description": "सबसे नए नतीजों के लिए खाली छोड़ें। आगे बढ़ने के लिए पिछले पेज का nextCursor दें।",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "items": {
           "type": "container",
           "child": {
@@ -58436,7 +58460,7 @@
               },
               "kind": {
                 "type": "text",
-                "label": "Type",
+                "label": "टाइप",
                 "schema": {
                   "def": {
                     "type": "enum",
@@ -58465,7 +58489,7 @@
               },
               "title": {
                 "type": "text",
-                "label": "Prompt",
+                "label": "प्रॉम्प्ट",
                 "schema": {
                   "def": {
                     "type": "string"
@@ -58479,7 +58503,7 @@
               },
               "createdAt": {
                 "type": "text",
-                "label": "Created",
+                "label": "बनाया गया",
                 "schema": {
                   "def": {
                     "type": "pipe",
@@ -58609,7 +58633,7 @@
               },
               "status": {
                 "type": "text",
-                "label": "Status",
+                "label": "स्टेटस",
                 "schema": {
                   "def": {
                     "type": "enum",
@@ -58644,7 +58668,7 @@
               },
               "url": {
                 "type": "text",
-                "label": "File",
+                "label": "फ़ाइल",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -58664,7 +58688,7 @@
               },
               "transcript": {
                 "type": "text",
-                "label": "Transcript",
+                "label": "ट्रांसक्रिप्ट",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -58684,7 +58708,7 @@
               },
               "credits": {
                 "type": "text",
-                "label": "Credits",
+                "label": "क्रेडिट",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -58706,7 +58730,7 @@
               },
               "model": {
                 "type": "text",
-                "label": "Model",
+                "label": "मॉडल",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -58726,7 +58750,7 @@
               },
               "settings": {
                 "type": "text",
-                "label": "Settings",
+                "label": "सेटिंग्स",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -58770,7 +58794,7 @@
               },
               "source": {
                 "type": "text",
-                "label": "Made in",
+                "label": "कहाँ बना",
                 "schema": {
                   "def": {
                     "type": "enum",
@@ -58795,7 +58819,7 @@
               },
               "threadId": {
                 "type": "text",
-                "label": "Thread",
+                "label": "थ्रेड",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -58815,7 +58839,7 @@
               },
               "rootFolderId": {
                 "type": "text",
-                "label": "Folder",
+                "label": "फ़ोल्डर",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -58840,6 +58864,26 @@
           "usage": {
             "response": true
           }
+        },
+        "nextCursor": {
+          "type": "text",
+          "label": "अगले पेज का कर्सर",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
         },
         "paginationInfo": {
           "type": "pagination",
@@ -58950,7 +58994,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["Media Studio", "History"],
+    "tags": ["मीडिया स्टूडियो", "हिस्ट्री"],
     "aliases": ["media-history"],
     "credits": 0
   },
@@ -288374,9 +288418,9 @@
   },
   {
     "toolName": "await-task",
-    "title": "Await Task",
-    "titleShort": "Await Task",
-    "description": "Wait on a dispatched background task. Returns immediately if already done, or pauses the AI stream until the task finishes.",
+    "title": "टास्क का इंतज़ार",
+    "titleShort": "टास्क का इंतज़ार",
+    "description": "भेजे गए बैकग्राउंड टास्क का इंतज़ार करें। पहले से पूरा हो तो तुरंत लौटता है, वरना टास्क खत्म होने तक AI स्ट्रीम रोक देता है।",
     "fields": {
       "noFormElement": true,
       "usage": {
@@ -288556,15 +288600,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Await Task"],
+    "tags": ["टास्क का इंतज़ार"],
     "aliases": ["await-task", "wait-for-task"],
     "credits": 0
   },
   {
     "toolName": "cancel",
-    "title": "Cancel Tool Call",
-    "titleShort": "Cancel Tool",
-    "description": "Interrupt a single in-flight tool call by its callId while it is still running. The call stops and returns an error as its result; the turn and any sibling parallel tool calls keep running.",
+    "title": "टूल कॉल रद्द करें",
+    "titleShort": "टूल रद्द करें",
+    "description": "चल रही किसी एक टूल कॉल को उसकी callId से रोकें। कॉल रुक जाती है और रिज़ल्ट के रूप में एरर लौटाती है। टर्न और उसकी पैरेलल टूल कॉल चलती रहती हैं।",
     "fields": {
       "type": "container",
       "layoutType": "grid",
@@ -288610,15 +288654,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["tools"],
+    "tags": ["टूल"],
     "aliases": ["cancel"],
     "credits": 0
   },
   {
     "toolName": "detach",
-    "title": "Detach Tool Call",
-    "titleShort": "Detach Call",
-    "description": "Upgrade a still-running tool call to detached by its callId: it keeps running in the background, its result is discarded, and the turn is unblocked now. Use resume-when-done instead if you need the result.",
+    "title": "टूल कॉल डिटैच करें",
+    "titleShort": "कॉल डिटैच करें",
+    "description": "चल रही टूल कॉल को उसकी callId से डिटैच्ड बना दें: वह बैकग्राउंड में चलती रहती है, उसका रिज़ल्ट हटा दिया जाता है और टर्न अभी खुल जाता है। रिज़ल्ट चाहिए तो resume-when-done इस्तेमाल करें।",
     "fields": {
       "type": "container",
       "layoutType": "grid",
@@ -288664,15 +288708,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["tools"],
+    "tags": ["टूल"],
     "aliases": ["detach"],
     "credits": 0
   },
   {
     "toolName": "resume-when-done",
-    "title": "Move Tool Call to Background",
-    "titleShort": "Background Tool",
-    "description": "Let a still-running tool call finish in the background by its callId. The turn ends and the thread revives with the result when the work completes.",
+    "title": "टूल कॉल को बैकग्राउंड में भेजें",
+    "titleShort": "बैकग्राउंड टूल",
+    "description": "चल रही टूल कॉल को उसकी callId से बैकग्राउंड में पूरा होने दें। टर्न ख़त्म हो जाता है और काम पूरा होने पर थ्रेड रिज़ल्ट के साथ दोबारा चालू होता है।",
     "fields": {
       "type": "container",
       "layoutType": "grid",
@@ -288718,15 +288762,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["tools"],
+    "tags": ["टूल"],
     "aliases": ["resume-when-done"],
     "credits": 0
   },
   {
     "toolName": "execute-tool",
-    "title": "Execute Tool",
-    "titleShort": "Execute Tool",
-    "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+    "title": "टूल चलाएँ",
+    "titleShort": "टूल चलाएँ",
+    "description": "नाम से कोई भी रजिस्टर्ड एंडपॉइंट चलाएँ। टूल का नाम और उसके इनपुट पैरामीटर दें। टारगेट रूट अपना ऑथेंटिकेशन ख़ुद लागू करता है। यह एंडपॉइंट MCP, AI एजेंट और ऑटोमेशन के लिए यूनिवर्सल डिस्पैचर है।",
     "fields": {
       "noFormElement": true,
       "usage": {
@@ -288737,8 +288781,8 @@
         "toolName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Tool Name",
-          "description": "The registered tool name or alias to execute (e.g. 'vibe_agent_skills_GET'). Use tool-help to discover available tools.",
+          "label": "टूल का नाम",
+          "description": "चलाने के लिए रजिस्टर्ड टूल का नाम या अलायस (जैसे 'vibe_agent_skills_GET')। उपलब्ध टूल खोजने के लिए tool-help इस्तेमाल करें।",
           "placeholder": "vibe_agent_skills_GET",
           "columns": 12,
           "schema": {
@@ -288756,8 +288800,8 @@
         "input": {
           "type": "form_field",
           "fieldType": "json",
-          "label": "Input",
-          "description": "Input parameters for the tool as a JSON object. URL path params (e.g. id) are automatically extracted from this object.",
+          "label": "इनपुट",
+          "description": "टूल के इनपुट पैरामीटर, JSON ऑब्जेक्ट के रूप में। URL पाथ पैरामीटर (जैसे id) इसी ऑब्जेक्ट से अपने आप निकाले जाते हैं।",
           "columns": 12,
           "schema": {
             "def": {
@@ -288803,8 +288847,8 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Instance ID",
-          "description": "Optional remote instance ID. When set, creates an async task on the remote instance instead of executing locally. Result will be {taskId, status:\"pending\"}.",
+          "label": "इंस्टेंस ID",
+          "description": "वैकल्पिक रिमोट इंस्टेंस ID। सेट होने पर लोकल की जगह रिमोट इंस्टेंस पर एसिंक टास्क बनता है। रिज़ल्ट {taskId, status:\"pending\"} होगा।",
           "visibleFor": [
             "enums.userRole.customer",
             "enums.userRole.partnerAdmin",
@@ -288832,8 +288876,8 @@
         "callbackMode": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Callback Mode",
-          "description": "\"wait\": execute synchronously, return result inline (default). \"detach\": fire-and-forget, returns {taskId} immediately - use await-task later if needed. \"wakeUp\": fire-and-forget, result is automatically injected into the thread when ready - do NOT call await-task. \"endLoop\": execute normally and return the result, but stop the tool loop after this batch - no further tool calls this turn (parallel sibling calls in the same batch still run). \"approve\": require user confirmation before executing.",
+          "label": "कॉलबैक मोड",
+          "description": "\"wait\": सिंक्रोनस चलाएँ, रिज़ल्ट तुरंत लौटाएँ (डिफ़ॉल्ट)। \"detach\": चलाओ और भूल जाओ, {taskId} तुरंत लौटता है। ज़रूरत हो तो बाद में await-task इस्तेमाल करें। \"wakeUp\": चलाओ और भूल जाओ, रिज़ल्ट तैयार होते ही थ्रेड में अपने आप आ जाता है। await-task कॉल न करें। \"endLoop\": सामान्य रूप से चलाकर रिज़ल्ट लौटाएँ, पर इस बैच के बाद टूल लूप रोक दें। इस टर्न में आगे कोई टूल कॉल नहीं होगी (उसी बैच की पैरेलल कॉल फिर भी चलती हैं)। \"approve\": चलाने से पहले यूज़र की मंज़ूरी माँगें।",
           "visibleFor": [
             "enums.userRole.customer",
             "enums.userRole.partnerAdmin",
@@ -288888,7 +288932,7 @@
         "result": {
           "type": "form_field",
           "fieldType": "json",
-          "label": "The result data returned by the target route. On failure this field is absent - the response itself will be an error.",
+          "label": "टारगेट रूट से लौटा रिज़ल्ट डेटा। फ़ेल होने पर यह फ़ील्ड नहीं होता, रिस्पॉन्स ख़ुद एरर होगा।",
           "columns": 12,
           "schema": {
             "def": {
@@ -288984,15 +289028,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["tools"],
+    "tags": ["टूल"],
     "aliases": ["execute-tool"],
     "credits": 0
   },
   {
     "toolName": "tool-help",
-    "title": "Tool Help - Discover Available Tools",
-    "titleShort": "Tool Help",
-    "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 100.",
+    "title": "टूल हेल्प - उपलब्ध टूल खोजें",
+    "titleShort": "टूल हेल्प",
+    "description": "आपके लिए उपलब्ध सभी टूल सर्च करें और खोजें। बिना पैरामीटर के बुलाएँ तो सभी टूल और कैटेगरी की सूची मिलती है। नाम/विवरण/alias से सर्च करने के लिए query इस्तेमाल करें। किसी टूल का पूरा पैरामीटर स्कीमा पाने के लिए toolName इस्तेमाल करें। कैटेगरी से छाँटने के लिए category इस्तेमाल करें। page/pageSize से पेजिनेशन चलता है। AI/MCP के लिए डिफ़ॉल्ट पेज साइज़ 100 है।",
     "fields": {
       "noFormElement": true,
       "usage": {
@@ -289003,8 +289047,8 @@
         "interactive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Interactive",
-          "description": "Open the full interactive tool browser",
+          "label": "इंटरैक्टिव",
+          "description": "पूरा इंटरैक्टिव टूल ब्राउज़र खोलें",
           "schema": {
             "def": {
               "type": "optional",
@@ -289036,9 +289080,9 @@
         "query": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Search Query (optional)",
-          "description": "Filter tools by keyword. Space-separated words are all required (e.g. 'fetch url' matches tools with both words). Case-insensitive match across name, aliases, description, tags - name/alias matches rank higher. Exact name/alias match auto-shows full detail. Omit to list all tools.",
-          "placeholder": "e.g. fetch url, image gen, memory...",
+          "label": "सर्च क्वेरी (वैकल्पिक)",
+          "description": "कीवर्ड से टूल छाँटें। स्पेस से अलग किए सभी शब्द ज़रूरी हैं (जैसे 'fetch url' उन टूल से मिलता है जिनमें दोनों शब्द हों)। नाम, alias, विवरण, टैग में केस-इनसेंसिटिव मिलान, नाम/alias के मिलान ऊपर आते हैं। सटीक नाम/alias मिलने पर पूरा डिटेल अपने आप दिखता है। सभी टूल की सूची के लिए खाली छोड़ें।",
+          "placeholder": "जैसे fetch url, image gen, memory...",
           "columns": 8,
           "schema": {
             "def": {
@@ -289060,8 +289104,8 @@
         "category": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Category Filter",
-          "description": "Filter tools by category or sub-category name (case-insensitive). Accepts a parent category key (e.g. 'ai') or a sub-category name (e.g. 'Search'). Omit to see all categories.",
+          "label": "कैटेगरी फ़िल्टर",
+          "description": "कैटेगरी या सब-कैटेगरी के नाम से टूल छाँटें (केस-इनसेंसिटिव)। पैरेंट कैटेगरी की key (जैसे 'ai') या सब-कैटेगरी का नाम (जैसे 'Search') चलता है। सभी कैटेगरी देखने के लिए खाली छोड़ें।",
           "columns": 4,
           "schema": {
             "def": {
@@ -289083,8 +289127,8 @@
         "subCategory": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Category Filter",
-          "description": "Filter tools by category or sub-category name (case-insensitive). Accepts a parent category key (e.g. 'ai') or a sub-category name (e.g. 'Search'). Omit to see all categories.",
+          "label": "कैटेगरी फ़िल्टर",
+          "description": "कैटेगरी या सब-कैटेगरी के नाम से टूल छाँटें (केस-इनसेंसिटिव)। पैरेंट कैटेगरी की key (जैसे 'ai') या सब-कैटेगरी का नाम (जैसे 'Search') चलता है। सभी कैटेगरी देखने के लिए खाली छोड़ें।",
           "schema": {
             "def": {
               "type": "optional",
@@ -289106,8 +289150,8 @@
         "toolName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Tool Name (Detail)",
-          "description": "Get full parameter schema for a specific tool by its exact toolName (e.g. agent_search_brave_GET) or alias. Use this before calling an unfamiliar tool.",
+          "label": "टूल नाम (डिटेल)",
+          "description": "किसी टूल का पूरा पैरामीटर स्कीमा उसके सटीक toolName (जैसे agent_search_brave_GET) या alias से पाएँ। अनजाने टूल को बुलाने से पहले इसे इस्तेमाल करें।",
           "columns": 4,
           "schema": {
             "def": {
@@ -289129,8 +289173,8 @@
         "page": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Page",
-          "description": "Page number for paginated results (default: 1)",
+          "label": "पेज",
+          "description": "पेजिनेटेड नतीजों का पेज नंबर (डिफ़ॉल्ट: 1)",
           "columns": 3,
           "schema": {
             "def": {
@@ -289208,8 +289252,8 @@
         "pageSize": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Page Size",
-          "description": "Number of results per page. AI/MCP default: 100. Web/CLI default: 800. Max: 1000.",
+          "label": "पेज साइज़",
+          "description": "प्रति पेज नतीजों की संख्या। AI/MCP डिफ़ॉल्ट: 100। वेब/CLI डिफ़ॉल्ट: 800। अधिकतम: 1000।",
           "columns": 3,
           "schema": {
             "def": {
@@ -289289,8 +289333,8 @@
         "includeProdOnly": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Include Production-Only Tools",
-          "description": "When true, includes tools marked as production-only (admin only). Use 'all' platform filter to see tools across all platforms.",
+          "label": "सिर्फ़-प्रोडक्शन टूल शामिल करें",
+          "description": "true होने पर सिर्फ़-प्रोडक्शन चिह्नित टूल भी शामिल होते हैं (सिर्फ़ एडमिन)। सभी प्लेटफ़ॉर्म के टूल देखने के लिए 'all' प्लेटफ़ॉर्म फ़िल्टर इस्तेमाल करें।",
           "columns": 3,
           "schema": {
             "def": {
@@ -289315,8 +289359,8 @@
         "viewAsRole": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "View as Role",
-          "description": "See what tools are visible to a specific user role (admin only)",
+          "label": "भूमिका के रूप में देखें",
+          "description": "देखें कि किसी यूज़र भूमिका को कौन से टूल दिखते हैं (सिर्फ़ एडमिन)",
           "columns": 3,
           "schema": {
             "def": {
@@ -289350,8 +289394,8 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Instance ID",
-          "description": "Optional. Filter to tools from a specific remote instance only. Omit to search local tools.",
+          "label": "इंस्टेंस ID",
+          "description": "वैकल्पिक। सिर्फ़ किसी खास रिमोट इंस्टेंस के टूल तक सीमित करें। लोकल टूल सर्च करने के लिए खाली छोड़ें।",
           "columns": 4,
           "schema": {
             "def": {
@@ -289374,8 +289418,8 @@
         "statsFilter": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Tool Filter",
-          "description": "Show all tools, only pinned tools, or only allowed tools",
+          "label": "टूल फ़िल्टर",
+          "description": "सभी टूल, सिर्फ़ पिन किए, या सिर्फ़ अनुमत टूल दिखाएँ",
           "columns": 4,
           "schema": {
             "def": {
@@ -289441,7 +289485,7 @@
           "type": "form_field",
           "fieldType": "boolean",
           "hidden": true,
-          "label": "Tool Filter",
+          "label": "टूल फ़िल्टर",
           "schema": {
             "def": {
               "type": "optional",
@@ -289463,7 +289507,7 @@
           "type": "form_field",
           "fieldType": "text",
           "hidden": true,
-          "label": "Tool Filter",
+          "label": "टूल फ़िल्टर",
           "schema": {
             "def": {
               "type": "optional",
@@ -289509,7 +289553,7 @@
           "type": "form_field",
           "fieldType": "text",
           "hidden": true,
-          "label": "Tool Filter",
+          "label": "टूल फ़िल्टर",
           "schema": {
             "def": {
               "type": "optional",
@@ -289531,7 +289575,7 @@
           "type": "form_field",
           "fieldType": "text",
           "hidden": true,
-          "label": "Tool Filter",
+          "label": "टूल फ़िल्टर",
           "schema": {
             "def": {
               "type": "optional",
@@ -289551,7 +289595,7 @@
         },
         "tools": {
           "type": "text",
-          "label": "Available Tools",
+          "label": "उपलब्ध टूल",
           "schema": {
             "def": {
               "type": "array",
@@ -290393,7 +290437,7 @@
         },
         "totalCount": {
           "type": "text",
-          "label": "Total tool count",
+          "label": "कुल टूल संख्या",
           "schema": {
             "def": {
               "type": "number",
@@ -290409,7 +290453,7 @@
         },
         "matchedCount": {
           "type": "text",
-          "label": "Matched tool count",
+          "label": "मिले टूल की संख्या",
           "schema": {
             "def": {
               "type": "number",
@@ -290425,7 +290469,7 @@
         },
         "categories": {
           "type": "text",
-          "label": "Tool categories",
+          "label": "टूल कैटेगरी",
           "schema": {
             "def": {
               "type": "optional",
@@ -290601,7 +290645,7 @@
         },
         "webCategories": {
           "type": "text",
-          "label": "Tool categories",
+          "label": "टूल कैटेगरी",
           "schema": {
             "def": {
               "type": "optional",
@@ -290778,7 +290822,7 @@
         },
         "navigationCategories": {
           "type": "text",
-          "label": "Tool categories",
+          "label": "टूल कैटेगरी",
           "schema": {
             "def": {
               "type": "optional",
@@ -290954,7 +290998,7 @@
         },
         "navigationPins": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -291012,7 +291056,7 @@
         },
         "aiAvailableToolIds": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -291044,7 +291088,7 @@
         },
         "navigationScope": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -291064,7 +291108,7 @@
         },
         "adminCatalogDestinations": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -291180,7 +291224,7 @@
         },
         "adminCategoryLandings": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -292185,7 +292229,7 @@
         },
         "catalogOverview": {
           "type": "text",
-          "label": "Business overview",
+          "label": "बिज़नेस ओवरव्यू",
           "schema": {
             "def": {
               "type": "optional",
@@ -292214,7 +292258,7 @@
         },
         "recordSearchTargets": {
           "type": "text",
-          "label": "Find a record",
+          "label": "रिकॉर्ड खोजें",
           "schema": {
             "def": {
               "type": "optional",
@@ -292295,7 +292339,7 @@
         },
         "hint": {
           "type": "text",
-          "label": "Usage hint",
+          "label": "इस्तेमाल का संकेत",
           "schema": {
             "def": {
               "type": "optional",
@@ -292315,7 +292359,7 @@
         },
         "currentPlatform": {
           "type": "text",
-          "label": "Platform",
+          "label": "प्लेटफ़ॉर्म",
           "schema": {
             "def": {
               "type": "optional",
@@ -292337,7 +292381,7 @@
         },
         "currentEnv": {
           "type": "text",
-          "label": "Platform",
+          "label": "प्लेटफ़ॉर्म",
           "schema": {
             "def": {
               "type": "optional",
@@ -292368,7 +292412,7 @@
         },
         "pinnedCount": {
           "type": "text",
-          "label": "Pinned tool count",
+          "label": "पिन किए गए टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -292390,7 +292434,7 @@
         },
         "allowedCount": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -292412,7 +292456,7 @@
         },
         "allAiToolIds": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -292444,7 +292488,7 @@
         },
         "skillPinnedDefault": {
           "type": "text",
-          "label": "Pinned tool count",
+          "label": "पिन किए गए टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -292482,7 +292526,7 @@
         },
         "skillAllowedDefault": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -292520,7 +292564,7 @@
         },
         "webPinnedCount": {
           "type": "text",
-          "label": "Web-pinned tool count",
+          "label": "वेब में पिन किए टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -292542,7 +292586,7 @@
         },
         "cliAllowedCount": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -292565,7 +292609,7 @@
         },
         "mcpPinnedCount": {
           "type": "text",
-          "label": "Pinned tool count",
+          "label": "पिन किए गए टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -292588,7 +292632,7 @@
         },
         "mcpAllowedCount": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -292611,7 +292655,7 @@
         },
         "currentPage": {
           "type": "text",
-          "label": "Current page",
+          "label": "मौजूदा पेज",
           "schema": {
             "def": {
               "type": "optional",
@@ -292633,7 +292677,7 @@
         },
         "effectivePageSize": {
           "type": "text",
-          "label": "Effective page size",
+          "label": "प्रभावी पेज साइज़",
           "schema": {
             "def": {
               "type": "optional",
@@ -292655,7 +292699,7 @@
         },
         "totalPages": {
           "type": "text",
-          "label": "Total pages",
+          "label": "कुल पेज",
           "schema": {
             "def": {
               "type": "optional",
@@ -292683,7 +292727,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["tools"],
+    "tags": ["टूल"],
     "aliases": [
       "tool-help",
       "help",
@@ -292697,9 +292741,9 @@
   },
   {
     "toolName": "remote-event-bridge",
-    "title": "Remote Event Bridge",
-    "titleShort": "Event Bridge",
-    "description": "Receive and dispatch remote peer events to the target route's onRemoteEvent handler. Called via HTTP by direct-http peers or via reverse-WS onRemoteEvent.",
+    "title": "रिमोट इवेंट ब्रिज",
+    "titleShort": "इवेंट ब्रिज",
+    "description": "रिमोट पीयर के इवेंट पाकर टारगेट रूट के onRemoteEvent हैंडलर तक पहुँचाता है। direct-http पीयर HTTP से, या reverse-WS onRemoteEvent से कॉल करते हैं।",
     "fields": {
       "type": "container",
       "layoutType": "grid",
@@ -292798,15 +292842,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Remote Sync"],
+    "tags": ["रिमोट सिंक"],
     "aliases": ["remote-event-bridge"],
     "credits": 0
   },
   {
     "toolName": "remote-status",
-    "title": "Remote Connection Status",
-    "titleShort": "Connection",
-    "description": "Full status and settings for a specific remote connection",
+    "title": "रिमोट कनेक्शन स्टेटस",
+    "titleShort": "कनेक्शन",
+    "description": "किसी खास रिमोट कनेक्शन का पूरा स्टेटस और सेटिंग्स",
     "fields": {
       "noFormElement": true,
       "usage": {
@@ -292829,8 +292873,8 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Connection",
-          "description": "The connection instance to view",
+          "label": "कनेक्शन",
+          "description": "देखने के लिए कनेक्शन इंस्टेंस",
           "schema": {
             "def": {
               "type": "string",
@@ -293128,15 +293172,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Remote Connection"],
+    "tags": ["रिमोट कनेक्शन"],
     "aliases": ["remote-status", "connection-status"],
     "credits": 0
   },
   {
     "toolName": "vibe_remote-connection_instanceId_DELETE",
-    "title": "Disconnect",
-    "titleShort": "Disconnect",
-    "description": "Remove this remote connection and close the WebSocket channel",
+    "title": "डिस्कनेक्ट करें",
+    "titleShort": "डिस्कनेक्ट करें",
+    "description": "इस रिमोट कनेक्शन को हटाएँ और WebSocket चैनल बंद करें",
     "fields": {
       "usage": {
         "request": "urlPathParams",
@@ -293147,8 +293191,8 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Connection",
-          "description": "The connection instance to view",
+          "label": "कनेक्शन",
+          "description": "देखने के लिए कनेक्शन इंस्टेंस",
           "schema": {
             "def": {
               "type": "string",
@@ -293184,14 +293228,14 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Remote Connection"],
+    "tags": ["रिमोट कनेक्शन"],
     "credits": 0
   },
   {
     "toolName": "vibe_remote-connection_connect-reverse_POST",
-    "title": "Register Local Instance",
-    "titleShort": "Register Instance",
-    "description": "Called by a local instance during connect flow to register itself on the cloud",
+    "title": "लोकल इंस्टेंस रजिस्टर करें",
+    "titleShort": "इंस्टेंस रजिस्टर करें",
+    "description": "कनेक्ट फ़्लो के दौरान लोकल इंस्टेंस ख़ुद को क्लाउड पर रजिस्टर करने के लिए इसे कॉल करता है",
     "fields": {
       "usage": {
         "request": "data",
@@ -293201,8 +293245,8 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Instance name",
-          "description": "The unique identifier of the local instance",
+          "label": "इंस्टेंस का नाम",
+          "description": "लोकल इंस्टेंस की यूनिक पहचान",
           "placeholder": "hermes",
           "columns": 6,
           "schema": {
@@ -293220,8 +293264,8 @@
         "localUrl": {
           "type": "form_field",
           "fieldType": "url",
-          "label": "Local URL",
-          "description": "The app URL of the local instance",
+          "label": "लोकल URL",
+          "description": "लोकल इंस्टेंस का ऐप URL",
           "placeholder": "http://localhost:3000",
           "columns": 6,
           "schema": {
@@ -293550,14 +293594,14 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Remote Connection"],
+    "tags": ["रिमोट कनेक्शन"],
     "credits": 0
   },
   {
     "toolName": "vibe_remote-connection_connect-reverse_update_PATCH",
-    "title": "Update Reverse Connection",
-    "titleShort": "Update Reverse",
-    "description": "Called by the initiating instance to sync connection settings to the other side",
+    "title": "रिवर्स कनेक्शन अपडेट करें",
+    "titleShort": "रिवर्स अपडेट",
+    "description": "शुरू करने वाला इंस्टेंस कनेक्शन सेटिंग्स दूसरी तरफ़ सिंक करने के लिए इसे कॉल करता है",
     "fields": {
       "usage": {
         "request": "data",
@@ -293582,8 +293626,8 @@
         "syncScope": {
           "type": "form_field",
           "fieldType": "textarea",
-          "label": "Sync Scope",
-          "description": "Which data domains to sync over this connection",
+          "label": "सिंक स्कोप",
+          "description": "इस कनेक्शन पर कौन से डेटा डोमेन सिंक हों",
           "schema": {
             "def": {
               "type": "optional",
@@ -293666,8 +293710,8 @@
         "remoteTransportMode": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Sync Scope",
-          "description": "Which data domains to sync over this connection",
+          "label": "सिंक स्कोप",
+          "description": "इस कनेक्शन पर कौन से डेटा डोमेन सिंक हों",
           "schema": {
             "def": {
               "type": "optional",
@@ -293697,8 +293741,8 @@
         "transportMode": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Sync Scope",
-          "description": "Which data domains to sync over this connection",
+          "label": "सिंक स्कोप",
+          "description": "इस कनेक्शन पर कौन से डेटा डोमेन सिंक हों",
           "schema": {
             "def": {
               "type": "optional",
@@ -293728,8 +293772,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "New Instance Name",
-          "description": "The caller's new instance name — updates our label for it",
+          "label": "नए इंस्टेंस का नाम",
+          "description": "कॉल करने वाले का नया इंस्टेंस नाम: हमारे यहाँ उसका लेबल अपडेट करता है",
           "schema": {
             "def": {
               "type": "optional",
@@ -293790,14 +293834,14 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Remote Connection"],
+    "tags": ["रिमोट कनेक्शन"],
     "credits": 0
   },
   {
     "toolName": "remote-connections",
-    "title": "Remote connections",
-    "titleShort": "Connections",
-    "description": "Your linked instances. Admins also see the health of every connection on this server.",
+    "title": "रिमोट कनेक्शन",
+    "titleShort": "कनेक्शन",
+    "description": "आपके लिंक किए इंस्टेंस। एडमिन को इस सर्वर के हर कनेक्शन की हेल्थ भी दिखती है।",
     "fields": {
       "usage": {
         "request": "data",
@@ -293807,8 +293851,8 @@
         "activeOnly": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Active only",
-          "description": "Only return active connections",
+          "label": "सिर्फ़ एक्टिव",
+          "description": "सिर्फ़ सक्रिय कनेक्शन दिखाएँ",
           "hidden": true,
           "schema": {
             "def": {
@@ -293830,8 +293874,8 @@
         "range": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Period",
-          "description": "Time window for the report",
+          "label": "अवधि",
+          "description": "रिपोर्ट की समय सीमा",
           "options": [
             {
               "value": "analytics.range.last7Days",
@@ -293916,8 +293960,8 @@
         "granularity": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Group by",
-          "description": "Bucket size for charts",
+          "label": "ग्रुप करें",
+          "description": "चार्ट के लिए बकेट का आकार",
           "options": [
             {
               "value": "analytics.granularity.auto",
@@ -293981,8 +294025,8 @@
         "from": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "From",
-          "description": "Start date (custom period, inclusive)",
+          "label": "से",
+          "description": "शुरुआती तारीख़ (कस्टम अवधि, शामिल)",
           "columns": 2,
           "schema": {
             "def": {
@@ -294005,8 +294049,8 @@
         "to": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "To",
-          "description": "End date (custom period, inclusive)",
+          "label": "तक",
+          "description": "आख़िरी तारीख़ (कस्टम अवधि, शामिल)",
           "columns": 2,
           "schema": {
             "def": {
@@ -294029,8 +294073,8 @@
         "fleetStatus": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Health status",
-          "description": "Show only connections with this health status",
+          "label": "हेल्थ स्टेटस",
+          "description": "सिर्फ़ इस हेल्थ स्टेटस वाले कनेक्शन दिखाएँ",
           "options": [
             {
               "value": "enums.fleetStatus.all",
@@ -294102,8 +294146,8 @@
         "auditConnection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Connection",
-          "description": "Limit audit events to one connection.",
+          "label": "कनेक्शन",
+          "description": "ऑडिट इवेंट को एक कनेक्शन तक सीमित करें।",
           "hidden": true,
           "schema": {
             "def": {
@@ -294129,8 +294173,8 @@
         "auditOffset": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Audit offset",
-          "description": "Number of audit events to skip.",
+          "label": "ऑडिट ऑफ़सेट",
+          "description": "छोड़े जाने वाले ऑडिट इवेंट की संख्या।",
           "hidden": true,
           "schema": {
             "def": {
@@ -296306,15 +296350,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Remote Connection"],
+    "tags": ["रिमोट कनेक्शन"],
     "aliases": ["remote-connections"],
     "credits": 0
   },
   {
     "toolName": "self-instance-id",
-    "title": "This Instance's ID",
-    "titleShort": "Instance ID",
-    "description": "Read the identifier of your own instance on this machine",
+    "title": "इस इंस्टेंस की ID",
+    "titleShort": "इंस्टेंस ID",
+    "description": "इस मशीन पर अपने इंस्टेंस की पहचान पढ़ें",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -296325,8 +296369,8 @@
       "children": {
         "instanceId": {
           "type": "text",
-          "label": "Instance ID",
-          "description": "The identifier of this instance",
+          "label": "इंस्टेंस ID",
+          "description": "इस इंस्टेंस की पहचान",
           "schema": {
             "def": {
               "type": "string"
@@ -296345,15 +296389,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Remote Connection"],
+    "tags": ["रिमोट कनेक्शन"],
     "aliases": ["self-instance-id", "my-instance-id"],
     "credits": 0
   },
   {
     "toolName": "rename-self",
-    "title": "Rename this instance",
-    "titleShort": "Rename instance",
-    "description": "Update the friendly name of your own instance",
+    "title": "इस इंस्टेंस का नाम बदलें",
+    "titleShort": "इंस्टेंस का नाम बदलें",
+    "description": "अपने इंस्टेंस का आसान नाम अपडेट करें",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -296365,8 +296409,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "New instance name",
-          "description": "Connected instances see this server under this name. Must be unique, up to 32 characters.",
+          "label": "इंस्टेंस का नया नाम",
+          "description": "जुड़े हुए इंस्टेंस इस सर्वर को इसी नाम से देखते हैं। यूनिक होना चाहिए, अधिकतम 32 अक्षर।",
           "placeholder": "hermes",
           "columns": 12,
           "schema": {
@@ -296384,8 +296428,8 @@
         "propagate": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "New instance name",
-          "description": "Connected instances see this server under this name. Must be unique, up to 32 characters.",
+          "label": "इंस्टेंस का नया नाम",
+          "description": "जुड़े हुए इंस्टेंस इस सर्वर को इसी नाम से देखते हैं। यूनिक होना चाहिए, अधिकतम 32 अक्षर।",
           "hidden": true,
           "schema": {
             "def": {
@@ -296444,15 +296488,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Remote Connection"],
+    "tags": ["रिमोट कनेक्शन"],
     "aliases": ["rename-self", "rename-instance"],
     "credits": 0
   },
   {
     "toolName": "execute-task",
-    "title": "Execute task",
-    "titleShort": "Execute task",
-    "description": "Trigger a single task by ID and receive the result synchronously",
+    "title": "टास्क चलाएँ",
+    "titleShort": "टास्क चलाएँ",
+    "description": "ID से एक टास्क ट्रिगर करें और नतीजा तुरंत पाएँ",
     "fields": {
       "usage": {
         "request": "data",
@@ -296474,8 +296518,8 @@
         "taskId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Task key",
-          "description": "The ID of the task to execute",
+          "label": "टास्क key",
+          "description": "चलाए जाने वाले टास्क की ID",
           "columns": 12,
           "schema": {
             "def": {
@@ -296504,7 +296548,7 @@
         },
         "success": {
           "type": "text",
-          "label": "Success",
+          "label": "सफल",
           "schema": {
             "def": {
               "type": "boolean"
@@ -296518,7 +296562,7 @@
         },
         "message": {
           "type": "text",
-          "label": "Message",
+          "label": "संदेश",
           "schema": {
             "def": {
               "type": "optional",
@@ -296538,7 +296582,7 @@
         },
         "taskName": {
           "type": "text",
-          "label": "Task Name",
+          "label": "टास्क का नाम",
           "schema": {
             "def": {
               "type": "string"
@@ -296552,7 +296596,7 @@
         },
         "executedAt": {
           "type": "text",
-          "label": "Executed At",
+          "label": "चलाने का समय",
           "schema": {
             "def": {
               "type": "pipe",
@@ -296682,7 +296726,7 @@
         },
         "duration": {
           "type": "text",
-          "label": "Duration (ms)",
+          "label": "अवधि (ms)",
           "schema": {
             "def": {
               "type": "number",
@@ -296699,7 +296743,7 @@
         },
         "status": {
           "type": "text",
-          "label": "Status",
+          "label": "स्थिति",
           "schema": {
             "def": {
               "type": "string"
@@ -296719,7 +296763,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "devTools",
-    "tags": ["Execute"],
+    "tags": ["चलाएँ"],
     "aliases": ["execute-task", "task-execute"],
     "credits": 0
   }

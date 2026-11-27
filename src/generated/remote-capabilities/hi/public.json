@@ -9466,9 +9466,9 @@
   },
   {
     "toolName": "ai-run",
-    "title": "Run AI Agent",
-    "titleShort": "Run Agent",
-    "description": "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
+    "title": "AI एजेंट चलाएँ",
+    "titleShort": "एजेंट चलाएँ",
+    "description": "कोई टास्क स्पेशलिस्ट AI एजेंट को सौंपें और उसका जवाब पाएँ। AI स्किल/पर्सोना बनाने या एडिट करने के लिए हमेशा skill='skill-creator' को सौंपें, खुद कभी न करें। skill + prompt दें; बाकी सब एजेंट संभालता है। क्रेडिट मॉडल के हिसाब से लगते हैं।",
     "fields": {
       "usage": {
         "request": "data",
@@ -9479,8 +9479,8 @@
         "favoriteId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Favorite ID",
-          "description": "Slug of a saved favorite (e.g. 'thea-cheap'). Not a skill slug — use skill field for that. Loads skill, model, and tool config in one shot. Priority when multiple set: model > favoriteId > skill.",
+          "label": "पसंदीदा ID",
+          "description": "सेव किए पसंदीदा का slug (जैसे 'thea-cheap')। स्किल slug नहीं, उसके लिए skill फ़ील्ड इस्तेमाल करें। स्किल, मॉडल और टूल कॉन्फ़िग एक साथ लोड करता है। कई सेट हों तो प्राथमिकता: model > favoriteId > skill।",
           "placeholder": "thea-cheap",
           "columns": 6,
           "schema": {
@@ -9533,8 +9533,8 @@
         "model": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Model (CLI only)",
-          "description": "Override the LLM directly. CLI only — other platforms use favoriteId or skill instead. Fast: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.7. Free: qwen3_235b-free.",
+          "label": "मॉडल (सिर्फ़ CLI)",
+          "description": "LLM को सीधे बदलें। सिर्फ़ CLI पर, बाकी प्लेटफ़ॉर्म favoriteId या skill इस्तेमाल करते हैं। तेज़: claude-haiku-4.5, gemini-2.5-flash। संतुलित: claude-sonnet-4.6, gpt-5। ताकतवर: claude-opus-4.7। फ़्री: qwen3_235b-free।",
           "options": [
             {
               "value": "gpt-55",
@@ -10508,8 +10508,8 @@
         "skill": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Skill",
-          "description": "Skill slug (e.g. 'thea', 'thea__cheap-smart'). Not a favorite slug — use favoriteId for that. Defines the AI persona and system prompt. Use 'skill-creator' to create/edit skills.",
+          "label": "स्किल",
+          "description": "स्किल slug (जैसे 'thea', 'thea__cheap-smart')। पसंदीदा slug नहीं, उसके लिए favoriteId इस्तेमाल करें। AI पर्सोना और सिस्टम प्रॉम्प्ट तय करता है। स्किल बनाने/एडिट करने के लिए 'skill-creator' इस्तेमाल करें।",
           "placeholder": "default",
           "columns": 6,
           "schema": {
@@ -10562,9 +10562,9 @@
         "prompt": {
           "type": "form_field",
           "fieldType": "textarea",
-          "label": "Prompt",
-          "description": "The main instruction or question for the AI. Be specific - the AI will use preCalls results as context if provided.",
-          "placeholder": "Enter your prompt...",
+          "label": "प्रॉम्प्ट",
+          "description": "AI के लिए मुख्य निर्देश या सवाल। सटीक रहें: preCalls के नतीजे दिए हों तो AI उन्हें कॉन्टेक्स्ट की तरह इस्तेमाल करेगा।",
+          "placeholder": "अपना प्रॉम्प्ट लिखें...",
           "columns": 12,
           "schema": {
             "def": {
@@ -10581,8 +10581,8 @@
         "instructions": {
           "type": "form_field",
           "fieldType": "textarea",
-          "label": "Extra System Instructions",
-          "description": "Optional extra instructions appended to the system prompt. Use to constrain format, tone, or output length (e.g. 'Be concise. JSON only.').",
+          "label": "अतिरिक्त सिस्टम निर्देश",
+          "description": "सिस्टम प्रॉम्प्ट में जुड़ने वाले वैकल्पिक अतिरिक्त निर्देश। फ़ॉर्मेट, लहजा या आउटपुट की लंबाई तय करने के लिए (जैसे 'Be concise. JSON only.')।",
           "placeholder": "Be concise. One paragraph max.",
           "columns": 12,
           "schema": {
@@ -10606,8 +10606,8 @@
           "type": "container",
           "layoutType": "grid",
           "columns": 12,
-          "title": "Pre-Calls",
-          "description": "Tool calls to execute before the prompt. Results are injected as context. Use tool-help to discover available tools and their args.",
+          "title": "प्री-कॉल",
+          "description": "प्रॉम्प्ट से पहले चलने वाले टूल कॉल। नतीजे कॉन्टेक्स्ट के तौर पर जुड़ते हैं। उपलब्ध टूल और उनके आर्ग्युमेंट खोजने के लिए tool-help इस्तेमाल करें।",
           "schemaType": "array-optional",
           "child": {
             "type": "container",
@@ -10620,8 +10620,8 @@
               "routeId": {
                 "type": "form_field",
                 "fieldType": "text",
-                "label": "Tool ID",
-                "description": "Alias or full tool name to call (e.g. 'web-search', 'agent_skills_GET'). Use tool-help to discover tools.",
+                "label": "टूल ID",
+                "description": "बुलाने वाले टूल का alias या पूरा नाम (जैसे 'web-search', 'agent_skills_GET')। टूल खोजने के लिए tool-help इस्तेमाल करें।",
                 "placeholder": "web-search",
                 "columns": 6,
                 "schema": {
@@ -10639,8 +10639,8 @@
               "args": {
                 "type": "form_field",
                 "fieldType": "json",
-                "label": "Arguments",
-                "description": "Flat key-value args for the tool - merge urlPathParams and body fields into one object (e.g. {\"query\": \"latest news\", \"maxResults\": 5}).",
+                "label": "आर्ग्युमेंट",
+                "description": "टूल के लिए सीधे key-value आर्ग्युमेंट: urlPathParams और body फ़ील्ड को एक ऑब्जेक्ट में मिलाएँ (जैसे {\"query\": \"latest news\", \"maxResults\": 5})।",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -10694,8 +10694,8 @@
           "type": "container",
           "layoutType": "grid",
           "columns": 12,
-          "title": "Allowed to Execute",
-          "description": "Tools for this run. [] = text only: no tools, the model just writes (use it for drafting). Omit to use the skill or favorite's tools. Other lists are not applied yet.",
+          "title": "चलाने की अनुमति",
+          "description": "इस रन के टूल। [] = सिर्फ़ टेक्स्ट: कोई टूल नहीं, मॉडल बस लिखता है (ड्राफ़्ट के लिए)। स्किल या पसंदीदा के टूल इस्तेमाल करने के लिए छोड़ दें। दूसरी सूचियाँ अभी लागू नहीं।",
           "schemaType": "array-optional",
           "child": {
             "type": "container",
@@ -10708,8 +10708,8 @@
               "toolId": {
                 "type": "form_field",
                 "fieldType": "text",
-                "label": "Tool ID",
-                "description": "Tool alias or full name (e.g. 'execute-tool', 'tool-help', 'web-search')",
+                "label": "टूल ID",
+                "description": "टूल का alias या पूरा नाम (जैसे 'execute-tool', 'tool-help', 'web-search')",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -10725,8 +10725,8 @@
               "requiresConfirmation": {
                 "type": "form_field",
                 "fieldType": "boolean",
-                "label": "Requires Confirmation",
-                "description": "Pause for user confirmation before running this tool",
+                "label": "पुष्टि ज़रूरी",
+                "description": "इस टूल को चलाने से पहले यूज़र की पुष्टि के लिए रुकें",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -10756,8 +10756,8 @@
           "type": "container",
           "layoutType": "grid",
           "columns": 12,
-          "title": "In Context (model sees these)",
-          "description": "Tools loaded into model context. null = user's default set. Only affects what the model sees, not what it can execute.",
+          "title": "कॉन्टेक्स्ट में (मॉडल इन्हें देखता है)",
+          "description": "मॉडल कॉन्टेक्स्ट में लोड हुए टूल। null = यूज़र का डिफ़ॉल्ट सेट। सिर्फ़ इसे प्रभावित करता है कि मॉडल क्या देखता है, यह नहीं कि वह क्या चला सकता है।",
           "schemaType": "array-optional",
           "child": {
             "type": "container",
@@ -10770,8 +10770,8 @@
               "toolId": {
                 "type": "form_field",
                 "fieldType": "text",
-                "label": "Tool ID",
-                "description": "Tool alias or full name to load into context",
+                "label": "टूल ID",
+                "description": "कॉन्टेक्स्ट में लोड करने वाले टूल का alias या पूरा नाम",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -10787,8 +10787,8 @@
               "requiresConfirmation": {
                 "type": "form_field",
                 "fieldType": "boolean",
-                "label": "Requires Confirmation",
-                "description": "Whether this tool requires user confirmation before execution",
+                "label": "पुष्टि ज़रूरी",
+                "description": "क्या इस टूल को चलाने से पहले यूज़र की पुष्टि चाहिए",
                 "columns": 6,
                 "schema": {
                   "def": {
@@ -10817,8 +10817,8 @@
         "maxTurns": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Max Turns",
-          "description": "Maximum model steps for this run. Leave blank to use the limit in Chat Settings.",
+          "label": "अधिकतम टर्न",
+          "description": "इस रन के लिए मॉडल के अधिकतम स्टेप। चैट सेटिंग्स की सीमा इस्तेमाल करने के लिए खाली छोड़ें।",
           "columns": 6,
           "schema": {
             "def": {
@@ -10855,8 +10855,8 @@
         "appendThreadId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Thread ID (continue)",
-          "description": "UUID of an existing thread to continue. The new message is appended to that conversation. Omit to start a fresh thread.",
+          "label": "थ्रेड ID (जारी रखें)",
+          "description": "जारी रखने वाले मौजूदा थ्रेड का UUID। नया मैसेज उसी बातचीत में जुड़ता है। नया थ्रेड शुरू करने के लिए छोड़ दें।",
           "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
           "columns": 6,
           "schema": {
@@ -11021,8 +11021,8 @@
         "rootFolderId": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Storage Folder",
-          "description": "Where to store the thread. Background = all automated runs (Dreamer, Autopilot, scheduled tasks). Private = your folder. Shared = team. Incognito = no storage.",
+          "label": "स्टोरेज फ़ोल्डर",
+          "description": "थ्रेड कहाँ स्टोर हो। Background = सभी ऑटोमेटेड रन (Dreamer, Autopilot, शेड्यूल्ड टास्क)। Private = आपका फ़ोल्डर। Shared = टीम। Incognito = कोई स्टोरेज नहीं।",
           "columns": 6,
           "options": [
             {
@@ -11090,8 +11090,8 @@
         "subFolderId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Sub-folder ID",
-          "description": "Optional UUID of a sub-folder within the root folder. For manual organisation only - do NOT pass this when calling ai-run programmatically or from AI tools. Leave empty in all automated/agent contexts.",
+          "label": "सब-फ़ोल्डर ID",
+          "description": "रूट फ़ोल्डर के अंदर के सब-फ़ोल्डर का वैकल्पिक UUID। सिर्फ़ हाथ से व्यवस्थित करने के लिए: ai-run को प्रोग्राम से या AI टूल से बुलाते समय इसे न दें। सभी ऑटोमेटेड/एजेंट संदर्भों में खाली छोड़ें।",
           "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
           "columns": 6,
           "schema": {
@@ -11256,8 +11256,8 @@
         "excludeMemories": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Exclude Memories",
-          "description": "Skip injecting stored memories into context. Use for public bots or isolated tasks. Default: false.",
+          "label": "मेमोरी बाहर रखें",
+          "description": "सेव की गई मेमोरी को कॉन्टेक्स्ट में न जोड़ें। पब्लिक बॉट या अलग-थलग टास्क के लिए इस्तेमाल करें। डिफ़ॉल्ट: false।",
           "columns": 6,
           "schema": {
             "def": {
@@ -11278,7 +11278,7 @@
         },
         "text": {
           "type": "text",
-          "label": "The AI's response text (think-tags stripped). Null if the model produced no output.",
+          "label": "AI का जवाब (think-टैग हटाकर)। मॉडल ने कुछ न लिखा हो तो Null।",
           "columns": 12,
           "schema": {
             "def": {
@@ -11299,7 +11299,7 @@
         },
         "promptTokens": {
           "type": "text",
-          "label": "Prompt tokens consumed (input cost)",
+          "label": "खर्च हुए प्रॉम्प्ट टोकन (इनपुट लागत)",
           "columns": 6,
           "schema": {
             "def": {
@@ -11322,7 +11322,7 @@
         },
         "completionTokens": {
           "type": "text",
-          "label": "Completion tokens generated (output cost)",
+          "label": "बने कंप्लीशन टोकन (आउटपुट लागत)",
           "columns": 6,
           "schema": {
             "def": {
@@ -11345,7 +11345,7 @@
         },
         "creditCost": {
           "type": "text",
-          "label": "Credits charged for this run. Null for incognito runs.",
+          "label": "इस रन के लिए लगे क्रेडिट। इनकॉग्निटो रन के लिए Null।",
           "columns": 6,
           "schema": {
             "def": {
@@ -11368,7 +11368,7 @@
         },
         "threadId": {
           "type": "text",
-          "label": "Thread UUID where the run was stored. Null if rootFolderId was 'incognito'. Use this to continue the conversation via appendThreadId.",
+          "label": "वह थ्रेड UUID जिसमें रन स्टोर हुआ। rootFolderId 'incognito' था तो Null। बातचीत को appendThreadId से जारी रखने के लिए इसे इस्तेमाल करें।",
           "columns": 6,
           "schema": {
             "def": {
@@ -11401,7 +11401,7 @@
         },
         "lastAiMessageId": {
           "type": "text",
-          "label": "UUID of the final assistant message. Useful for branching or referencing the response.",
+          "label": "आख़िरी असिस्टेंट मैसेज का UUID। ब्रांचिंग या जवाब का हवाला देने के काम आता है।",
           "columns": 6,
           "schema": {
             "def": {
@@ -11434,7 +11434,7 @@
         },
         "threadTitle": {
           "type": "text",
-          "label": "Auto-generated title for this thread",
+          "label": "इस थ्रेड का अपने आप बना शीर्षक",
           "schema": {
             "def": {
               "type": "nullable",
@@ -11455,7 +11455,7 @@
         },
         "threadCreatedAt": {
           "type": "text",
-          "label": "Thread creation timestamp (ISO 8601)",
+          "label": "थ्रेड बनने का टाइमस्टैम्प (ISO 8601)",
           "schema": {
             "def": {
               "type": "nullable",
@@ -11491,7 +11491,7 @@
         "preCallResults": {
           "type": "container",
           "layoutType": "stacked",
-          "title": "Pre-call Results",
+          "title": "प्री-कॉल के नतीजे",
           "child": {
             "type": "container",
             "usage": {
@@ -11500,7 +11500,7 @@
             "children": {
               "routeId": {
                 "type": "text",
-                "label": "Tool that was called",
+                "label": "जो टूल बुलाया गया",
                 "schema": {
                   "def": {
                     "type": "string"
@@ -11514,7 +11514,7 @@
               },
               "success": {
                 "type": "text",
-                "label": "Whether the call succeeded",
+                "label": "कॉल सफल रहा या नहीं",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -11528,7 +11528,7 @@
               },
               "error": {
                 "type": "text",
-                "label": "Error message if the call failed",
+                "label": "कॉल फ़ेल होने पर एरर मैसेज",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -11560,7 +11560,7 @@
             "request": "data"
           },
           "type": "navigate_button",
-          "label": "Back",
+          "label": "वापस",
           "icon": "arrow-left",
           "variant": "outline",
           "prefillFromGet": false,
@@ -11574,15 +11574,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["AI", "Chat"],
+    "tags": ["AI", "चैट"],
     "aliases": ["ai-run", "run-ai", "agent-run"],
     "credits": 0
   },
   {
     "toolName": "system-prompt-debug",
-    "title": "System Prompt Debug",
-    "titleShort": "Debug Prompt",
-    "description": "Shows the exact system prompt the AI gets in a given context — folder, skill, thread, message.",
+    "title": "सिस्टम प्रॉम्प्ट डीबग",
+    "titleShort": "प्रॉम्प्ट डीबग",
+    "description": "किसी दिए संदर्भ (फ़ोल्डर, स्किल, थ्रेड, मैसेज) में AI को मिलने वाला सटीक सिस्टम प्रॉम्प्ट दिखाता है।",
     "fields": {
       "usage": {
         "request": "data",
@@ -11592,8 +11592,8 @@
         "rootFolderId": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Root Folder",
-          "description": "Folder context to simulate (private, public, incognito, cron, shared, remote)",
+          "label": "रूट फ़ोल्डर",
+          "description": "सिमुलेट करने के लिए फ़ोल्डर संदर्भ (private, public, incognito, cron, shared, remote)",
           "placeholder": "private",
           "options": [
             {
@@ -11665,9 +11665,9 @@
         "userMessage": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "User Message",
-          "description": "Simulated user message for cortex embedding search",
-          "placeholder": "What did we discuss last time?",
+          "label": "यूज़र मैसेज",
+          "description": "cortex एम्बेडिंग सर्च के लिए सिमुलेटेड यूज़र मैसेज",
+          "placeholder": "पिछली बार हमने क्या बात की थी?",
           "schema": {
             "def": {
               "type": "optional",
@@ -11689,8 +11689,8 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "title",
-          "label": "Thread ID",
-          "description": "Optional thread ID for context",
+          "label": "थ्रेड ID",
+          "description": "संदर्भ के लिए वैकल्पिक थ्रेड ID",
           "schema": {
             "def": {
               "type": "optional",
@@ -11725,8 +11725,8 @@
           "fieldType": "entity_picker",
           "labelField": "name",
           "valueField": "skillId",
-          "label": "Skill ID",
-          "description": "Optional skill ID to inject into system prompt",
+          "label": "स्किल ID",
+          "description": "सिस्टम प्रॉम्प्ट में डालने के लिए वैकल्पिक स्किल ID",
           "schema": {
             "def": {
               "type": "optional",
@@ -11747,9 +11747,9 @@
         "subFolderId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Sub-folder ID",
-          "description": "Optional sub-folder UUID",
-          "placeholder": "uuid or leave blank",
+          "label": "सब-फ़ोल्डर ID",
+          "description": "वैकल्पिक सब-फ़ोल्डर UUID",
+          "placeholder": "uuid या खाली छोड़ें",
           "schema": {
             "def": {
               "type": "optional",
@@ -11782,9 +11782,9 @@
         "imageGenModelSelection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Image Gen Selection",
-          "description": "Image gen model selection from the active favorite/chat UI (leave blank to use user default)",
-          "placeholder": "leave blank for user default",
+          "label": "इमेज जेन चुनाव",
+          "description": "सक्रिय फ़ेवरेट/चैट UI से इमेज जेन मॉडल का चुनाव (यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें)",
+          "placeholder": "यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें",
           "schema": {
             "def": {
               "type": "optional",
@@ -13409,9 +13409,9 @@
         "musicGenModelSelection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Music Gen Selection",
-          "description": "Music gen model selection from the active favorite/chat UI (leave blank to use user default)",
-          "placeholder": "leave blank for user default",
+          "label": "म्यूज़िक जेन चुनाव",
+          "description": "सक्रिय फ़ेवरेट/चैट UI से म्यूज़िक जेन मॉडल का चुनाव (यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें)",
+          "placeholder": "यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें",
           "schema": {
             "def": {
               "type": "optional",
@@ -14808,9 +14808,9 @@
         "videoGenModelSelection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Video Gen Selection",
-          "description": "Video gen model selection from the active favorite/chat UI (leave blank to use user default)",
-          "placeholder": "leave blank for user default",
+          "label": "वीडियो जेन चुनाव",
+          "description": "सक्रिय फ़ेवरेट/चैट UI से वीडियो जेन मॉडल का चुनाव (यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें)",
+          "placeholder": "यूज़र डिफ़ॉल्ट के लिए खाली छोड़ें",
           "schema": {
             "def": {
               "type": "optional",
@@ -16652,7 +16652,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["Debug"],
+    "tags": ["डीबग"],
     "aliases": ["system-prompt-debug"],
     "credits": 0
   },
@@ -31258,9 +31258,9 @@
   },
   {
     "toolName": "media-history",
-    "title": "Your generations",
-    "titleShort": "Generations",
-    "description": "Images, videos, music, speech and transcripts you made in the Studio, in chat or via the API. Newest first.",
+    "title": "आपके बनाए नतीजे",
+    "titleShort": "जनरेशन",
+    "description": "स्टूडियो में, चैट में या API से आपके बनाए इमेज, वीडियो, म्यूज़िक, स्पीच और ट्रांसक्रिप्ट। सबसे नए पहले।",
     "fields": {
       "usage": {
         "request": "data",
@@ -31270,8 +31270,8 @@
         "kind": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Type",
-          "description": "image, video, music, speech or transcribe. Leave empty for everything.",
+          "label": "टाइप",
+          "description": "image, video, music, speech या transcribe। सब कुछ देखने के लिए खाली छोड़ें।",
           "options": [],
           "includeInCacheKey": true,
           "schema": {
@@ -31306,6 +31306,30 @@
           },
           "schemaType": "primitive"
         },
+        "cursor": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "पेज कर्सर",
+          "description": "सबसे नए नतीजों के लिए खाली छोड़ें। आगे बढ़ने के लिए पिछले पेज का nextCursor दें।",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "items": {
           "type": "container",
           "child": {
@@ -31330,7 +31354,7 @@
               },
               "kind": {
                 "type": "text",
-                "label": "Type",
+                "label": "टाइप",
                 "schema": {
                   "def": {
                     "type": "enum",
@@ -31359,7 +31383,7 @@
               },
               "title": {
                 "type": "text",
-                "label": "Prompt",
+                "label": "प्रॉम्प्ट",
                 "schema": {
                   "def": {
                     "type": "string"
@@ -31373,7 +31397,7 @@
               },
               "createdAt": {
                 "type": "text",
-                "label": "Created",
+                "label": "बनाया गया",
                 "schema": {
                   "def": {
                     "type": "pipe",
@@ -31503,7 +31527,7 @@
               },
               "status": {
                 "type": "text",
-                "label": "Status",
+                "label": "स्टेटस",
                 "schema": {
                   "def": {
                     "type": "enum",
@@ -31538,7 +31562,7 @@
               },
               "url": {
                 "type": "text",
-                "label": "File",
+                "label": "फ़ाइल",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -31558,7 +31582,7 @@
               },
               "transcript": {
                 "type": "text",
-                "label": "Transcript",
+                "label": "ट्रांसक्रिप्ट",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -31578,7 +31602,7 @@
               },
               "credits": {
                 "type": "text",
-                "label": "Credits",
+                "label": "क्रेडिट",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -31600,7 +31624,7 @@
               },
               "model": {
                 "type": "text",
-                "label": "Model",
+                "label": "मॉडल",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -31620,7 +31644,7 @@
               },
               "settings": {
                 "type": "text",
-                "label": "Settings",
+                "label": "सेटिंग्स",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -31664,7 +31688,7 @@
               },
               "source": {
                 "type": "text",
-                "label": "Made in",
+                "label": "कहाँ बना",
                 "schema": {
                   "def": {
                     "type": "enum",
@@ -31689,7 +31713,7 @@
               },
               "threadId": {
                 "type": "text",
-                "label": "Thread",
+                "label": "थ्रेड",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -31709,7 +31733,7 @@
               },
               "rootFolderId": {
                 "type": "text",
-                "label": "Folder",
+                "label": "फ़ोल्डर",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -31734,6 +31758,26 @@
           "usage": {
             "response": true
           }
+        },
+        "nextCursor": {
+          "type": "text",
+          "label": "अगले पेज का कर्सर",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
         },
         "paginationInfo": {
           "type": "pagination",
@@ -31844,7 +31888,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["Media Studio", "History"],
+    "tags": ["मीडिया स्टूडियो", "हिस्ट्री"],
     "aliases": ["media-history"],
     "credits": 0
   },
@@ -75042,9 +75086,9 @@
   },
   {
     "toolName": "execute-tool",
-    "title": "Execute Tool",
-    "titleShort": "Execute Tool",
-    "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+    "title": "टूल चलाएँ",
+    "titleShort": "टूल चलाएँ",
+    "description": "नाम से कोई भी रजिस्टर्ड एंडपॉइंट चलाएँ। टूल का नाम और उसके इनपुट पैरामीटर दें। टारगेट रूट अपना ऑथेंटिकेशन ख़ुद लागू करता है। यह एंडपॉइंट MCP, AI एजेंट और ऑटोमेशन के लिए यूनिवर्सल डिस्पैचर है।",
     "fields": {
       "noFormElement": true,
       "usage": {
@@ -75055,8 +75099,8 @@
         "toolName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Tool Name",
-          "description": "The registered tool name or alias to execute (e.g. 'vibe_agent_skills_GET'). Use tool-help to discover available tools.",
+          "label": "टूल का नाम",
+          "description": "चलाने के लिए रजिस्टर्ड टूल का नाम या अलायस (जैसे 'vibe_agent_skills_GET')। उपलब्ध टूल खोजने के लिए tool-help इस्तेमाल करें।",
           "placeholder": "vibe_agent_skills_GET",
           "columns": 12,
           "schema": {
@@ -75074,8 +75118,8 @@
         "input": {
           "type": "form_field",
           "fieldType": "json",
-          "label": "Input",
-          "description": "Input parameters for the tool as a JSON object. URL path params (e.g. id) are automatically extracted from this object.",
+          "label": "इनपुट",
+          "description": "टूल के इनपुट पैरामीटर, JSON ऑब्जेक्ट के रूप में। URL पाथ पैरामीटर (जैसे id) इसी ऑब्जेक्ट से अपने आप निकाले जाते हैं।",
           "columns": 12,
           "schema": {
             "def": {
@@ -75121,8 +75165,8 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Instance ID",
-          "description": "Optional remote instance ID. When set, creates an async task on the remote instance instead of executing locally. Result will be {taskId, status:\"pending\"}.",
+          "label": "इंस्टेंस ID",
+          "description": "वैकल्पिक रिमोट इंस्टेंस ID। सेट होने पर लोकल की जगह रिमोट इंस्टेंस पर एसिंक टास्क बनता है। रिज़ल्ट {taskId, status:\"pending\"} होगा।",
           "visibleFor": [
             "enums.userRole.customer",
             "enums.userRole.partnerAdmin",
@@ -75150,8 +75194,8 @@
         "callbackMode": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Callback Mode",
-          "description": "\"wait\": execute synchronously, return result inline (default). \"detach\": fire-and-forget, returns {taskId} immediately - use await-task later if needed. \"wakeUp\": fire-and-forget, result is automatically injected into the thread when ready - do NOT call await-task. \"endLoop\": execute normally and return the result, but stop the tool loop after this batch - no further tool calls this turn (parallel sibling calls in the same batch still run). \"approve\": require user confirmation before executing.",
+          "label": "कॉलबैक मोड",
+          "description": "\"wait\": सिंक्रोनस चलाएँ, रिज़ल्ट तुरंत लौटाएँ (डिफ़ॉल्ट)। \"detach\": चलाओ और भूल जाओ, {taskId} तुरंत लौटता है। ज़रूरत हो तो बाद में await-task इस्तेमाल करें। \"wakeUp\": चलाओ और भूल जाओ, रिज़ल्ट तैयार होते ही थ्रेड में अपने आप आ जाता है। await-task कॉल न करें। \"endLoop\": सामान्य रूप से चलाकर रिज़ल्ट लौटाएँ, पर इस बैच के बाद टूल लूप रोक दें। इस टर्न में आगे कोई टूल कॉल नहीं होगी (उसी बैच की पैरेलल कॉल फिर भी चलती हैं)। \"approve\": चलाने से पहले यूज़र की मंज़ूरी माँगें।",
           "visibleFor": [
             "enums.userRole.customer",
             "enums.userRole.partnerAdmin",
@@ -75206,7 +75250,7 @@
         "result": {
           "type": "form_field",
           "fieldType": "json",
-          "label": "The result data returned by the target route. On failure this field is absent - the response itself will be an error.",
+          "label": "टारगेट रूट से लौटा रिज़ल्ट डेटा। फ़ेल होने पर यह फ़ील्ड नहीं होता, रिस्पॉन्स ख़ुद एरर होगा।",
           "columns": 12,
           "schema": {
             "def": {
@@ -75302,15 +75346,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["tools"],
+    "tags": ["टूल"],
     "aliases": ["execute-tool"],
     "credits": 0
   },
   {
     "toolName": "tool-help",
-    "title": "Tool Help - Discover Available Tools",
-    "titleShort": "Tool Help",
-    "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 100.",
+    "title": "टूल हेल्प - उपलब्ध टूल खोजें",
+    "titleShort": "टूल हेल्प",
+    "description": "आपके लिए उपलब्ध सभी टूल सर्च करें और खोजें। बिना पैरामीटर के बुलाएँ तो सभी टूल और कैटेगरी की सूची मिलती है। नाम/विवरण/alias से सर्च करने के लिए query इस्तेमाल करें। किसी टूल का पूरा पैरामीटर स्कीमा पाने के लिए toolName इस्तेमाल करें। कैटेगरी से छाँटने के लिए category इस्तेमाल करें। page/pageSize से पेजिनेशन चलता है। AI/MCP के लिए डिफ़ॉल्ट पेज साइज़ 100 है।",
     "fields": {
       "noFormElement": true,
       "usage": {
@@ -75321,8 +75365,8 @@
         "interactive": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Interactive",
-          "description": "Open the full interactive tool browser",
+          "label": "इंटरैक्टिव",
+          "description": "पूरा इंटरैक्टिव टूल ब्राउज़र खोलें",
           "schema": {
             "def": {
               "type": "optional",
@@ -75354,9 +75398,9 @@
         "query": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Search Query (optional)",
-          "description": "Filter tools by keyword. Space-separated words are all required (e.g. 'fetch url' matches tools with both words). Case-insensitive match across name, aliases, description, tags - name/alias matches rank higher. Exact name/alias match auto-shows full detail. Omit to list all tools.",
-          "placeholder": "e.g. fetch url, image gen, memory...",
+          "label": "सर्च क्वेरी (वैकल्पिक)",
+          "description": "कीवर्ड से टूल छाँटें। स्पेस से अलग किए सभी शब्द ज़रूरी हैं (जैसे 'fetch url' उन टूल से मिलता है जिनमें दोनों शब्द हों)। नाम, alias, विवरण, टैग में केस-इनसेंसिटिव मिलान, नाम/alias के मिलान ऊपर आते हैं। सटीक नाम/alias मिलने पर पूरा डिटेल अपने आप दिखता है। सभी टूल की सूची के लिए खाली छोड़ें।",
+          "placeholder": "जैसे fetch url, image gen, memory...",
           "columns": 8,
           "schema": {
             "def": {
@@ -75378,8 +75422,8 @@
         "category": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Category Filter",
-          "description": "Filter tools by category or sub-category name (case-insensitive). Accepts a parent category key (e.g. 'ai') or a sub-category name (e.g. 'Search'). Omit to see all categories.",
+          "label": "कैटेगरी फ़िल्टर",
+          "description": "कैटेगरी या सब-कैटेगरी के नाम से टूल छाँटें (केस-इनसेंसिटिव)। पैरेंट कैटेगरी की key (जैसे 'ai') या सब-कैटेगरी का नाम (जैसे 'Search') चलता है। सभी कैटेगरी देखने के लिए खाली छोड़ें।",
           "columns": 4,
           "schema": {
             "def": {
@@ -75401,8 +75445,8 @@
         "subCategory": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Category Filter",
-          "description": "Filter tools by category or sub-category name (case-insensitive). Accepts a parent category key (e.g. 'ai') or a sub-category name (e.g. 'Search'). Omit to see all categories.",
+          "label": "कैटेगरी फ़िल्टर",
+          "description": "कैटेगरी या सब-कैटेगरी के नाम से टूल छाँटें (केस-इनसेंसिटिव)। पैरेंट कैटेगरी की key (जैसे 'ai') या सब-कैटेगरी का नाम (जैसे 'Search') चलता है। सभी कैटेगरी देखने के लिए खाली छोड़ें।",
           "schema": {
             "def": {
               "type": "optional",
@@ -75424,8 +75468,8 @@
         "toolName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Tool Name (Detail)",
-          "description": "Get full parameter schema for a specific tool by its exact toolName (e.g. agent_search_brave_GET) or alias. Use this before calling an unfamiliar tool.",
+          "label": "टूल नाम (डिटेल)",
+          "description": "किसी टूल का पूरा पैरामीटर स्कीमा उसके सटीक toolName (जैसे agent_search_brave_GET) या alias से पाएँ। अनजाने टूल को बुलाने से पहले इसे इस्तेमाल करें।",
           "columns": 4,
           "schema": {
             "def": {
@@ -75447,8 +75491,8 @@
         "page": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Page",
-          "description": "Page number for paginated results (default: 1)",
+          "label": "पेज",
+          "description": "पेजिनेटेड नतीजों का पेज नंबर (डिफ़ॉल्ट: 1)",
           "columns": 3,
           "schema": {
             "def": {
@@ -75526,8 +75570,8 @@
         "pageSize": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Page Size",
-          "description": "Number of results per page. AI/MCP default: 100. Web/CLI default: 800. Max: 1000.",
+          "label": "पेज साइज़",
+          "description": "प्रति पेज नतीजों की संख्या। AI/MCP डिफ़ॉल्ट: 100। वेब/CLI डिफ़ॉल्ट: 800। अधिकतम: 1000।",
           "columns": 3,
           "schema": {
             "def": {
@@ -75607,8 +75651,8 @@
         "includeProdOnly": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Include Production-Only Tools",
-          "description": "When true, includes tools marked as production-only (admin only). Use 'all' platform filter to see tools across all platforms.",
+          "label": "सिर्फ़-प्रोडक्शन टूल शामिल करें",
+          "description": "true होने पर सिर्फ़-प्रोडक्शन चिह्नित टूल भी शामिल होते हैं (सिर्फ़ एडमिन)। सभी प्लेटफ़ॉर्म के टूल देखने के लिए 'all' प्लेटफ़ॉर्म फ़िल्टर इस्तेमाल करें।",
           "columns": 3,
           "schema": {
             "def": {
@@ -75633,8 +75677,8 @@
         "viewAsRole": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "View as Role",
-          "description": "See what tools are visible to a specific user role (admin only)",
+          "label": "भूमिका के रूप में देखें",
+          "description": "देखें कि किसी यूज़र भूमिका को कौन से टूल दिखते हैं (सिर्फ़ एडमिन)",
           "columns": 3,
           "schema": {
             "def": {
@@ -75668,8 +75712,8 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Instance ID",
-          "description": "Optional. Filter to tools from a specific remote instance only. Omit to search local tools.",
+          "label": "इंस्टेंस ID",
+          "description": "वैकल्पिक। सिर्फ़ किसी खास रिमोट इंस्टेंस के टूल तक सीमित करें। लोकल टूल सर्च करने के लिए खाली छोड़ें।",
           "columns": 4,
           "schema": {
             "def": {
@@ -75692,8 +75736,8 @@
         "statsFilter": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Tool Filter",
-          "description": "Show all tools, only pinned tools, or only allowed tools",
+          "label": "टूल फ़िल्टर",
+          "description": "सभी टूल, सिर्फ़ पिन किए, या सिर्फ़ अनुमत टूल दिखाएँ",
           "columns": 4,
           "schema": {
             "def": {
@@ -75759,7 +75803,7 @@
           "type": "form_field",
           "fieldType": "boolean",
           "hidden": true,
-          "label": "Tool Filter",
+          "label": "टूल फ़िल्टर",
           "schema": {
             "def": {
               "type": "optional",
@@ -75781,7 +75825,7 @@
           "type": "form_field",
           "fieldType": "text",
           "hidden": true,
-          "label": "Tool Filter",
+          "label": "टूल फ़िल्टर",
           "schema": {
             "def": {
               "type": "optional",
@@ -75827,7 +75871,7 @@
           "type": "form_field",
           "fieldType": "text",
           "hidden": true,
-          "label": "Tool Filter",
+          "label": "टूल फ़िल्टर",
           "schema": {
             "def": {
               "type": "optional",
@@ -75849,7 +75893,7 @@
           "type": "form_field",
           "fieldType": "text",
           "hidden": true,
-          "label": "Tool Filter",
+          "label": "टूल फ़िल्टर",
           "schema": {
             "def": {
               "type": "optional",
@@ -75869,7 +75913,7 @@
         },
         "tools": {
           "type": "text",
-          "label": "Available Tools",
+          "label": "उपलब्ध टूल",
           "schema": {
             "def": {
               "type": "array",
@@ -76711,7 +76755,7 @@
         },
         "totalCount": {
           "type": "text",
-          "label": "Total tool count",
+          "label": "कुल टूल संख्या",
           "schema": {
             "def": {
               "type": "number",
@@ -76727,7 +76771,7 @@
         },
         "matchedCount": {
           "type": "text",
-          "label": "Matched tool count",
+          "label": "मिले टूल की संख्या",
           "schema": {
             "def": {
               "type": "number",
@@ -76743,7 +76787,7 @@
         },
         "categories": {
           "type": "text",
-          "label": "Tool categories",
+          "label": "टूल कैटेगरी",
           "schema": {
             "def": {
               "type": "optional",
@@ -76919,7 +76963,7 @@
         },
         "webCategories": {
           "type": "text",
-          "label": "Tool categories",
+          "label": "टूल कैटेगरी",
           "schema": {
             "def": {
               "type": "optional",
@@ -77096,7 +77140,7 @@
         },
         "navigationCategories": {
           "type": "text",
-          "label": "Tool categories",
+          "label": "टूल कैटेगरी",
           "schema": {
             "def": {
               "type": "optional",
@@ -77272,7 +77316,7 @@
         },
         "navigationPins": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -77330,7 +77374,7 @@
         },
         "aiAvailableToolIds": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -77362,7 +77406,7 @@
         },
         "navigationScope": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -77382,7 +77426,7 @@
         },
         "adminCatalogDestinations": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -77498,7 +77542,7 @@
         },
         "adminCategoryLandings": {
           "type": "text",
-          "label": "Workspaces",
+          "label": "वर्कस्पेस",
           "schema": {
             "def": {
               "type": "optional",
@@ -78503,7 +78547,7 @@
         },
         "catalogOverview": {
           "type": "text",
-          "label": "Business overview",
+          "label": "बिज़नेस ओवरव्यू",
           "schema": {
             "def": {
               "type": "optional",
@@ -78532,7 +78576,7 @@
         },
         "recordSearchTargets": {
           "type": "text",
-          "label": "Find a record",
+          "label": "रिकॉर्ड खोजें",
           "schema": {
             "def": {
               "type": "optional",
@@ -78613,7 +78657,7 @@
         },
         "hint": {
           "type": "text",
-          "label": "Usage hint",
+          "label": "इस्तेमाल का संकेत",
           "schema": {
             "def": {
               "type": "optional",
@@ -78633,7 +78677,7 @@
         },
         "currentPlatform": {
           "type": "text",
-          "label": "Platform",
+          "label": "प्लेटफ़ॉर्म",
           "schema": {
             "def": {
               "type": "optional",
@@ -78655,7 +78699,7 @@
         },
         "currentEnv": {
           "type": "text",
-          "label": "Platform",
+          "label": "प्लेटफ़ॉर्म",
           "schema": {
             "def": {
               "type": "optional",
@@ -78686,7 +78730,7 @@
         },
         "pinnedCount": {
           "type": "text",
-          "label": "Pinned tool count",
+          "label": "पिन किए गए टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -78708,7 +78752,7 @@
         },
         "allowedCount": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -78730,7 +78774,7 @@
         },
         "allAiToolIds": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -78762,7 +78806,7 @@
         },
         "skillPinnedDefault": {
           "type": "text",
-          "label": "Pinned tool count",
+          "label": "पिन किए गए टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -78800,7 +78844,7 @@
         },
         "skillAllowedDefault": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -78838,7 +78882,7 @@
         },
         "webPinnedCount": {
           "type": "text",
-          "label": "Web-pinned tool count",
+          "label": "वेब में पिन किए टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -78860,7 +78904,7 @@
         },
         "cliAllowedCount": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -78883,7 +78927,7 @@
         },
         "mcpPinnedCount": {
           "type": "text",
-          "label": "Pinned tool count",
+          "label": "पिन किए गए टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -78906,7 +78950,7 @@
         },
         "mcpAllowedCount": {
           "type": "text",
-          "label": "Allowed tool count",
+          "label": "अनुमत टूल की संख्या",
           "schema": {
             "def": {
               "type": "optional",
@@ -78929,7 +78973,7 @@
         },
         "currentPage": {
           "type": "text",
-          "label": "Current page",
+          "label": "मौजूदा पेज",
           "schema": {
             "def": {
               "type": "optional",
@@ -78951,7 +78995,7 @@
         },
         "effectivePageSize": {
           "type": "text",
-          "label": "Effective page size",
+          "label": "प्रभावी पेज साइज़",
           "schema": {
             "def": {
               "type": "optional",
@@ -78973,7 +79017,7 @@
         },
         "totalPages": {
           "type": "text",
-          "label": "Total pages",
+          "label": "कुल पेज",
           "schema": {
             "def": {
               "type": "optional",
@@ -79001,7 +79045,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["tools"],
+    "tags": ["टूल"],
     "aliases": [
       "tool-help",
       "help",

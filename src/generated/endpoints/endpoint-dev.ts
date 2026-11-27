@@ -41,6 +41,13 @@ export async function getEndpoint(
     if (again !== undefined) {
       return again;
     }
+    // A cold import evaluates a whole module graph synchronously. Give
+    // timers and I/O one turn first so queued cold imports never run back to
+    // back (prod boot 2026-11-26: importEndpoint x36-x59 samples in one
+    // 78-676 ms stall while the first pulse loaded its task routes).
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 0);
+    });
     const loaded = await importEndpoint(path);
     endpointCache.set(path, loaded);
     return loaded;
