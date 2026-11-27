@@ -55,7 +55,7 @@ export const translations: typeof enTranslations = {
     confirmDelete: {
       title: "¿Desconectar {{provider}}?",
       description:
-        "Los nuevos suscriptores dejan de aterrizar en su lista. Los contactos ya capturados permanecen donde están.",
+        "Al desconectar, se detienen las nuevas suscripciones y se borra el historial de esta página. Los contactos ya enviados permanecen en el proveedor.",
       cancel: "Mantenga la conexión",
       proceed: "Desconexión",
     },

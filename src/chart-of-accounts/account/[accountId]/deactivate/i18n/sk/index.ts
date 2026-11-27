@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     description:
       "Deaktivovať účet a zachovať jeho údaje. Systémové účty ani účty so zaúčtovanými zápismi nemožno deaktivovať.",
     accountId: {
-      label: "ID účtu",
+      label: "Účet",
       description: "Účet na deaktiváciu",
-      placeholder: "UUID účtu",
+      placeholder: "Vyberte účet",
     },
     errors: {
       unauthorized: {

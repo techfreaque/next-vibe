@@ -3,7 +3,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { DefaultValues, UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
@@ -88,8 +88,15 @@ export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
     defaultValues,
   });
 
-  // Reset form when autoPrefillData changes
+  // Callers can rebuild the prefill object while a form is open. Keep the
+  // operator's choices until the actual prefill values change.
+  const prefillKey = JSON.stringify(autoPrefillData);
+  const previousPrefillKey = useRef(prefillKey);
   useEffect(() => {
+    if (previousPrefillKey.current === prefillKey) {
+      return;
+    }
+    previousPrefillKey.current = prefillKey;
     if (autoPrefillData) {
       logger.debug("useEndpointDelete: Resetting form with autoPrefillData", {
         autoPrefillData,
@@ -98,7 +105,7 @@ export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
         autoPrefillData as DefaultValues<TEndpoint["types"]["FormValues"]>,
       );
     }
-  }, [autoPrefillData, form, logger]);
+  }, [autoPrefillData, form, logger, prefillKey]);
 
   // Merge endpoint-level mutation options with hook-level options
   // Hook-level options take priority

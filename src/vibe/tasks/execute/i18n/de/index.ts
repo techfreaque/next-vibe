@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       taskId: {
-        label: "Aufgaben-ID",
+        label: "Aufgabenschlüssel",
         description: "Die ID der auszuführenden Aufgabe",
       },
       success: {

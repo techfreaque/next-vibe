@@ -11,14 +11,13 @@ export const translations: typeof enTranslations = {
     titleShort: "Lead-Skill",
     description: "Skill-Attribution für diesen Lead erfassen (First-Touch)",
     skillId: {
-      label: "Skill-ID",
-      description:
-        "UUID des Custom-Skills, der diesem Lead zugeordnet werden soll",
+      label: "Skill",
+      description: "Wähle einen veröffentlichten Community-Skill.",
     },
     errors: {
       validation: {
-        title: "Ungültige Skill-ID",
-        description: "Muss eine gültige UUID eines Custom-Skills sein",
+        title: "Skill auswählen",
+        description: "Wähle einen veröffentlichten Community-Skill.",
       },
       network: {
         title: "Netzwerkfehler",
@@ -62,7 +61,7 @@ export const translations: typeof enTranslations = {
     skipped: {
       title: "Nicht erfasst",
       description:
-        "Keine Besucher-Sitzung zum Zuordnen. Erst eine Seite öffnen, dann erneut versuchen.",
+        "Der erste Skill dieses Besuchers bleibt gespeichert. Prüfe einen anderen Skill in einer neuen Sitzung.",
     },
     submit: "Skill zuordnen",
   },

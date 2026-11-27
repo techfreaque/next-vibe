@@ -21,12 +21,12 @@ import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { Pre } from "next-vibe/ui/components/pre";
 import { Span } from "next-vibe/ui/components/span";
 import { Textarea } from "next-vibe/ui/components/textarea";
-import { H2, P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import type { JSX } from "react";
 import { useCallback } from "react";
 
 import { getDefaultTimezone } from "../../../core/i18n/core/localization-utils";
-import type { WidgetData } from "../../../core/utils/json";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -47,6 +47,7 @@ import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-al
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "../../../unified-ui/widgets/interactive/submit-button/widget";
 import { formatCronScheduleShort } from "../../cron-formatter";
+import { formatTaskInput } from "../task-input-schema";
 import type endpoints from "./definition";
 import type { CronTaskCreateResponseOutput } from "./definition";
 
@@ -54,19 +55,6 @@ type CreatedTask = CronTaskCreateResponseOutput["task"];
 
 interface CreateWidgetProps {
   field: (typeof endpoints.POST)["fields"];
-}
-
-/** Form value -> editor text. Objects (prefill, AI) are pretty-printed. */
-function toJsonText(
-  value: string | Record<string, WidgetData> | undefined,
-): string {
-  if (value === undefined) {
-    return "";
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  return JSON.stringify(value, null, 2);
 }
 
 function TaskInputField(): JSX.Element {
@@ -85,7 +73,7 @@ function TaskInputField(): JSX.Element {
           </FormLabel>
           <FormControl>
             <Textarea
-              value={toJsonText(formField.value)}
+              value={formatTaskInput(formField.value)}
               onChange={(e) => formField.onChange(e.target.value)}
               onBlur={formField.onBlur}
               name={formField.name}
@@ -113,9 +101,7 @@ function SummaryRow({
 }): JSX.Element {
   return (
     <Div className="flex flex-col gap-0.5">
-      <Span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {label}
-      </Span>
+      <Span className="text-xs font-medium text-muted-foreground">{label}</Span>
       <Div className="min-w-0 text-sm text-foreground break-words">
         {children}
       </Div>
@@ -233,24 +219,26 @@ export function CronTaskCreateContainer({
   }
 
   return (
-    <Div className="flex flex-col gap-5 p-4">
-      <Div className="flex items-start gap-2">
-        <NavigateButtonWidget field={{}} />
-        <Div className="flex min-w-0 flex-col gap-0.5">
-          <H2 className="text-xl font-semibold">{t("post.container.title")}</H2>
-          <P className="m-0 text-sm text-muted-foreground">
-            {t("post.container.description")}
-          </P>
-        </Div>
-      </Div>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("post.container.title")}
+        subtitle={t("post.container.description")}
+        backButton={<NavigateButtonWidget field={{}} />}
+        actions={
+          <SubmitButtonWidget<typeof endpoints.POST>
+            field={{ className: "h-10 w-full @lg:w-auto" }}
+          />
+        }
+      />
 
       {created ? <CreatedTaskSummary task={created} /> : null}
 
-      <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Div className="sm:col-span-2">
+      <Div className="grid min-w-0 grid-cols-1 gap-4 rounded-lg border bg-card p-4 @md:grid-cols-2">
+        <Div className="@md:col-span-2">
           <TextFieldWidget field={children.routeId} fieldName="routeId" />
         </Div>
-        <Div className="sm:col-span-2">
+        <Div className="@md:col-span-2">
           <TextFieldWidget
             field={children.displayName}
             fieldName="displayName"
@@ -258,7 +246,7 @@ export function CronTaskCreateContainer({
         </Div>
         <TextFieldWidget field={children.id} fieldName="id" />
         <TextFieldWidget field={children.schedule} fieldName="schedule" />
-        <Div className="sm:col-span-2">
+        <Div className="@md:col-span-2">
           <TextareaFieldWidget
             field={children.description}
             fieldName="description"
@@ -271,7 +259,7 @@ export function CronTaskCreateContainer({
           field={children.targetInstance}
           fieldName="targetInstance"
         />
-        <Div className="sm:col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Div className="grid grid-cols-1 gap-4 @md:col-span-2 @md:grid-cols-3">
           <NumberFieldWidget field={children.timeout} fieldName="timeout" />
           <NumberFieldWidget field={children.retries} fieldName="retries" />
           <NumberFieldWidget
@@ -279,20 +267,17 @@ export function CronTaskCreateContainer({
             fieldName="retryDelay"
           />
         </Div>
-        <Div className="sm:col-span-2 flex flex-wrap gap-x-6 gap-y-3">
+        <Div className="flex flex-wrap gap-x-6 gap-y-3 @md:col-span-2">
           <BooleanFieldWidget field={children.enabled} fieldName="enabled" />
           <BooleanFieldWidget field={children.hidden} fieldName="hidden" />
           <BooleanFieldWidget field={children.runOnce} fieldName="runOnce" />
         </Div>
-        <Div className="sm:col-span-2">
+        <Div className="@md:col-span-2">
           <TaskInputField />
         </Div>
       </Div>
 
       <FormAlertWidget field={{}} />
-      <Div className="flex justify-end">
-        <SubmitButtonWidget<typeof endpoints.POST> field={{}} />
-      </Div>
-    </Div>
+    </WidgetShell>
   );
 }

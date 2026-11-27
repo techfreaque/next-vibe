@@ -87,6 +87,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    unnamedLead: "Kontakt bez mena",
     previous: "Predchádzajúca",
     next: "Nasledujúci",
     page: "Strana {{page}} z {{pages}}",

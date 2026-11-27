@@ -173,6 +173,10 @@ export const translations: typeof enTranslations = {
       taskInput: {
         label: "Dane wejściowe zadania",
         description: "Dane wejściowe JSON dla zadania",
+        invalidJson:
+          "To nie jest poprawny JSON. Sprawdź cudzysłowy, przecinki i nawiasy.",
+        notObject:
+          'Dane wejściowe muszą być obiektem JSON, np. { "key": "value" }.',
       },
       hidden: {
         label: "Ukryte",
@@ -297,7 +301,7 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "ID zadania",
+        label: "Klucz zadania",
         description: "Unikalny identyfikator zadania do usunięcia",
       },
     },

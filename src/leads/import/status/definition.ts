@@ -18,6 +18,7 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
   objectField,
+  objectOptionalField,
   requestField,
   responseArrayField,
   responseField,
@@ -76,7 +77,7 @@ const { GET } = createEndpoint({
       }),
 
       // === QUERY PARAMETERS ===
-      filters: objectField(scopedTranslation, {
+      filters: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "status.get.filters.title",
         description: "status.get.filters.description",

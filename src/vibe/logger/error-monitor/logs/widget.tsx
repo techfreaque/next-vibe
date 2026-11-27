@@ -608,6 +608,7 @@ export function ErrorLogsContainer(): JSX.Element {
     label: string | null;
     resolved: boolean;
     settled: boolean;
+    group?: boolean;
   } | null>(null);
   /** Row of the last resolve attempt (shows its error if it failed). */
   const [failedFingerprint, setFailedFingerprint] = useState<string | null>(
@@ -643,28 +644,34 @@ export function ErrorLogsContainer(): JSX.Element {
   // Server-confirmed result of the last resolve/reopen: shown on the row at
   // once, before the list refetch lands (and drops it from "Active").
   const lastPatch = patchEndpoint.update?.response;
+  const changedFingerprints =
+    lastAction?.group && lastPatch?.success
+      ? (lastPatch.data.affectedFingerprints ?? lastAction.fingerprints)
+      : lastAction?.fingerprints;
   const withConfirmed = (log: ErrorLog): ErrorLog =>
     lastAction?.settled &&
     lastPatch?.success !== false &&
-    lastAction.fingerprints.includes(log.fingerprint)
+    changedFingerprints?.includes(log.fingerprint)
       ? { ...log, resolved: lastAction.resolved }
       : log;
 
   const toggleResolved = (log: ErrorLog): void => {
     const submit = patchEndpoint.update?.submit;
-    if (!submit) {
+    if (!submit || pendingFingerprint || patchEndpoint.update?.isSubmitting) {
       return;
     }
+    const group = grouped && log.similar > 0;
     const action = {
       fingerprints: [log.fingerprint],
       label: clip(log.message.replace(CLIENT_PREFIX, ""), 80),
       resolved: !log.resolved,
+      group,
     };
     setLastAction({ ...action, settled: false });
     setPendingFingerprint(log.fingerprint);
     setFailedFingerprint(log.fingerprint);
     void submit(
-      grouped && log.similar > 0
+      group
         ? { similarTo: log.fingerprint, resolved: !log.resolved }
         : { fingerprint: log.fingerprint, resolved: !log.resolved },
     ).finally(() => {
@@ -690,11 +697,11 @@ export function ErrorLogsContainer(): JSX.Element {
 
   const undoLastAction = (): void => {
     const submit = patchEndpoint.update?.submit;
-    if (!submit || !lastAction) {
+    if (!submit || !lastAction || !changedFingerprints?.length) {
       return;
     }
     const next = {
-      fingerprints: lastAction.fingerprints,
+      fingerprints: changedFingerprints,
       label: lastAction.label,
       resolved: !lastAction.resolved,
     };
@@ -1265,16 +1272,20 @@ export function ErrorLogsContainer(): JSX.Element {
                         { count: lastAction.fingerprints.length },
                       )}
                 </Span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 px-2.5 text-xs"
-                  disabled={patchEndpoint.update?.isSubmitting}
-                  onClick={undoLastAction}
-                >
-                  {t("widget.list.undo")}
-                </Button>
+                {changedFingerprints &&
+                  changedFingerprints.length > 0 &&
+                  changedFingerprints.length <= 200 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2.5 text-xs"
+                      disabled={patchEndpoint.update?.isSubmitting}
+                      onClick={undoLastAction}
+                    >
+                      {t("widget.list.undo")}
+                    </Button>
+                  )}
                 <Button
                   type="button"
                   variant="ghost"

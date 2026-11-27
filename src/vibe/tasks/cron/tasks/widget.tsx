@@ -51,7 +51,6 @@ import React, {
 } from "react";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
-import { getDefaultTimezone } from "../../../core/i18n/core/localization-utils";
 import type { EndpointLogger } from "../../../logger/types";
 import { cn } from "../../../unified-ui/_shared/cn";
 import { useRelatedEntityNavigation } from "../../../unified-ui/_shared/related-entities";
@@ -71,7 +70,7 @@ import { useApiMutation } from "../../../unified-ui/hooks/use-api-mutation";
 import { useApiQuery } from "../../../unified-ui/hooks/use-api-query";
 import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
-import { formatCronScheduleShort } from "../../cron-formatter";
+import { formatCronSchedule } from "../../cron-formatter";
 import type {
   CronTaskPriorityDB,
   CronTaskPriorityFilterValue,
@@ -217,6 +216,12 @@ function TaskRow({
 }): React.JSX.Element {
   const lastRunText = formatDate(task.lastExecutedAt, locale);
   const nextRunText = formatDate(task.nextExecutionAt, locale);
+  const schedule = formatCronSchedule(
+    task.schedule,
+    task.timezone ?? "UTC",
+    locale,
+    logger,
+  );
   return (
     <Div
       className={cn(
@@ -293,13 +298,11 @@ function TaskRow({
           </Span>
         )}
 
-        <Span className="text-xs text-muted-foreground">
-          {formatCronScheduleShort(
-            task.schedule,
-            getDefaultTimezone(locale),
-            locale,
-            logger,
-          )}
+        <Span
+          className="line-clamp-2 text-xs text-muted-foreground"
+          title={schedule}
+        >
+          {schedule}
         </Span>
 
         <Div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">

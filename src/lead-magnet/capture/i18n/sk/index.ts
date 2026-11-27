@@ -79,6 +79,7 @@ export const translations: typeof enTranslations = {
     },
   },
   form: {
+    signUp: "Vytvor si účet",
     headline: "Dostávaj novinky",
     namePlaceholder: "Tvoje krstné meno",
     emailPlaceholder: "Tvoj e-mail",

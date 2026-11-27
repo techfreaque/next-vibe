@@ -232,13 +232,13 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "Task-ID",
+        label: "Aufgabenschlüssel",
         description:
           "Eindeutiger, stabiler Bezeichner für diese Aufgabe (z.B. 'db-health')",
         placeholder: "Task-ID eingeben...",
       },
       routeId: {
-        label: "Route-ID",
+        label: "Endpunkt-Alias",
         description:
           "Handler-Bezeichner: Aufgabenname, Endpunktalias oder 'cron-steps'",
         placeholder: "Route-ID eingeben...",

@@ -207,6 +207,7 @@ export const translations: typeof enTranslations = {
     bulk: {
       selected: "Vybraté: {count}",
       selectAll: "Vybrať všetko",
+      selectTask: "Vybrať {{name}}",
       clearSelection: "Zrušiť výber",
       enable: "Zapnúť",
       disable: "Vypnúť",
@@ -216,7 +217,7 @@ export const translations: typeof enTranslations = {
       confirmDelete:
         "Natrvalo odstrániť vybraté úlohy ({count})? Odstránenie sa nedá vrátiť.",
       cancel: "Zrušiť",
-      success: "Úspešné: {succeeded}. Neúspešné: {failed}.",
+      success: "Úspešné: {{succeeded}}. Neúspešné: {{failed}}.",
     },
     empty: {
       noTasks: "Rad úloh je prázdny",

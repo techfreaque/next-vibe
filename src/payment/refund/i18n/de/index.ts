@@ -51,8 +51,10 @@ export const translations: typeof enTranslations = {
     customerEmail: "Kunden-E-Mail",
     customerId: "Kunden-ID",
     originalAmount: "Ursprünglicher Zahlbetrag",
+    chooseTransaction: "Zahlung suchen",
     enterTransaction:
-      "Gib die Transaktions-ID ein, um die Zahlungsdaten zu laden.",
+      "Öffne eine Zahlung in der Transaktionsliste, um den Betrag und die Erstattung zu prüfen.",
+    transactionDate: "Belastet am",
     lookupLoading: "Gespeicherte Transaktion wird geladen",
     transactionMissing: "Transaktion nicht gefunden",
     lookupFailed: "Transaktion konnte nicht geladen werden",
@@ -66,7 +68,7 @@ export const translations: typeof enTranslations = {
     review: "Betrag prüfen",
     confirmTitle: "Stripe-Erstattung bestätigen",
     confirmDescription:
-      "Stripe erstattet für {{email}} die Transaktion {{transactionId}}. Dadurch wird Geld zurückgezahlt.",
+      "Stripe erstattet die Zahlung für {{email}}. Dabei wird Geld zurückgezahlt.",
     confirm: "Erstattung auslösen",
     cancel: "Abbrechen",
   },

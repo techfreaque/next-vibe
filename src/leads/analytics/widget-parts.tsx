@@ -300,7 +300,10 @@ export function CompactSelect<TValue extends string>({
     <Div className="flex items-center gap-1.5">
       <Span className="text-xs text-muted-foreground">{label}</Span>
       <Select<TValue> value={value} onValueChange={onChange}>
-        <SelectTrigger className="h-8 w-auto min-w-24 gap-2 text-xs">
+        <SelectTrigger
+          aria-label={label}
+          className="h-10 w-auto min-w-24 gap-2 text-xs"
+        >
           <SelectValue placeholder={label} />
         </SelectTrigger>
         <SelectContent>

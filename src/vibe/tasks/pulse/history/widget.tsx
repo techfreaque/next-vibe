@@ -19,17 +19,22 @@ import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Span } from "next-vibe/ui/components/span";
+import { H1 } from "next-vibe/ui/components/typography";
 import React, { useCallback, useMemo, useState } from "react";
 
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { toIntlLocale } from "../../../core/i18n/core/language-utils";
 import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
+import { formatDuration } from "../../../unified-ui/analytics/format";
 import { DateFieldWidget } from "../../../unified-ui/widgets/form-fields/date-field/widget";
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import { PulseExecutionStatus } from "../../enum";
@@ -84,21 +89,11 @@ const DEFAULT_STATUS_CLASS =
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDate(s: string | null | undefined): string {
-  return s ? s.slice(0, 16).replace("T", " ") : "—";
-}
-
-function formatDuration(ms: number | null | undefined): string {
-  if (ms === null || ms === undefined) {
-    return "—";
-  }
-  if (ms < 1000) {
-    return `${ms}ms`;
-  }
-  if (ms < 60000) {
-    return `${(ms / 1000).toFixed(1)}s`;
-  }
-  return `${Math.floor(ms / 60000)}m ${Math.round((ms % 60000) / 1000)}s`;
+function formatDate(value: string, locale: CountryLanguage): string {
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
 }
 
 function getStatusClass(status: string): string {
@@ -154,6 +149,7 @@ function StatusChip({
       type="button"
       variant="ghost"
       size="sm"
+      aria-pressed={isActive}
       onClick={onClick}
       className={cn(
         "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-colors border",
@@ -205,12 +201,12 @@ function TaskList({
         {label}
       </Span>
       <Div className="flex flex-wrap gap-1">
-        {tasks.map((t) => (
+        {tasks.map((name, position) => (
           <Span
-            key={t}
+            key={`${position}:${name}`}
             className="text-[10px] font-mono bg-muted px-1.5 py-0.5 rounded"
           >
-            {t}
+            {name}
           </Span>
         ))}
       </Div>
@@ -223,11 +219,13 @@ function ExecutionCard({
   isExpanded,
   onToggle,
   t,
+  locale,
 }: {
   execution: Execution;
   isExpanded: boolean;
   onToggle: () => void;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
+  locale: CountryLanguage;
 }): React.JSX.Element {
   const hasDetail =
     execution.tasksExecuted.length > 0 ||
@@ -236,11 +234,11 @@ function ExecutionCard({
 
   return (
     <Div className="rounded-lg border bg-card overflow-hidden">
-      <Div className="flex items-start gap-3 p-3">
+      <Div className="grid grid-cols-[1fr_auto] items-start gap-2 p-3 @md:flex @md:gap-3">
         {/* Status badge */}
         <Span
           className={cn(
-            "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5",
+            "mt-0.5 inline-flex shrink-0 items-center justify-self-start rounded-full px-2 py-0.5 text-xs font-medium",
             getStatusClass(execution.status),
           )}
         >
@@ -248,16 +246,16 @@ function ExecutionCard({
         </Span>
 
         {/* Meta */}
-        <Div className="flex flex-col gap-0.5 flex-1 min-w-0">
-          <Div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground font-mono">
-            <Span>{formatDate(execution.startedAt)}</Span>
+        <Div className="col-span-2 row-start-2 flex min-w-0 flex-1 flex-col gap-0.5">
+          <Div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs tabular-nums text-muted-foreground">
+            <Span>{formatDate(execution.startedAt, locale)}</Span>
             {execution.completedAt && (
               // eslint-disable-next-line i18next/no-literal-string
-              <Span>{`→ ${formatDate(execution.completedAt)}`}</Span>
+              <Span>{`→ ${formatDate(execution.completedAt, locale)}`}</Span>
             )}
-            <Span className="font-sans tabular-nums">
-              {formatDuration(execution.durationMs)}
-            </Span>
+            {execution.durationMs !== null && (
+              <Span>{formatDuration(execution.durationMs, locale)}</Span>
+            )}
           </Div>
           <Div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
             <Span>
@@ -292,7 +290,8 @@ function ExecutionCard({
             variant="ghost"
             size="sm"
             onClick={onToggle}
-            className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground flex-shrink-0"
+            aria-expanded={isExpanded}
+            className="col-start-2 row-start-1 h-10 shrink-0 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
           >
             {t("widget.details")}
             {isExpanded ? (
@@ -341,6 +340,7 @@ export function PulseHistoryContainer({
   field,
 }: WidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
+  const locale = useWidgetLocale();
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
@@ -349,7 +349,7 @@ export function PulseHistoryContainer({
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const statusFilter = form.watch("status") ?? "ALL";
+  const statusFilter = form.watch("status") ?? "";
   const offset = form.watch("offset") ?? 0;
 
   const data = useWidgetValue<typeof endpoints.GET>();
@@ -417,33 +417,34 @@ export function PulseHistoryContainer({
         filter === "widget.filter.all"
           ? ""
           : (FILTER_TO_PULSE_STATUS[filter] ?? "");
-      form.setValue("status", statusValue);
+      form.setValue("status", statusValue, { shouldDirty: true });
+      form.setValue("offset", 0, { shouldDirty: true });
       setExpandedId(null);
-      endpointMutations?.read?.refetch?.();
     },
-    [form, endpointMutations],
+    [form],
   );
 
   return (
-    <Div className="flex flex-col gap-0">
+    <Div className="@container flex min-w-0 flex-col gap-0">
       {/* ── Header ── */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
 
-        <Span className="font-semibold text-base mr-auto">
+        <H1 className="mr-auto text-2xl font-semibold tracking-tight">
           {t("widget.title")}
           {totalCount > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({totalCount})
             </Span>
           )}
-        </Span>
+        </H1>
 
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleViewHistory}
+          aria-label={t("widget.header.cronHistory")}
           className="gap-1.5"
         >
           <Clock className="h-4 w-4" />
@@ -457,6 +458,7 @@ export function PulseHistoryContainer({
           variant="ghost"
           size="sm"
           onClick={handleViewStats}
+          aria-label={t("widget.header.stats")}
           className="gap-1.5"
         >
           <BarChart3 className="h-4 w-4" />
@@ -496,13 +498,19 @@ export function PulseHistoryContainer({
           />
           <SummaryCard
             label={t("widget.summary.successRate")}
-            value={`${Math.round(summary.successRate)}%`}
-            icon={<TrendingUp className="h-3.5 w-3.5 text-success" />}
-            variant="success"
+            value={new Intl.NumberFormat(toIntlLocale(locale), {
+              style: "percent",
+              maximumFractionDigits: 1,
+            }).format(summary.successRate / 100)}
+            icon={<TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />}
           />
           <SummaryCard
             label={t("widget.summary.avgDuration")}
-            value={formatDuration(summary.averageDuration)}
+            value={
+              summary.averageDuration === null
+                ? "–"
+                : formatDuration(summary.averageDuration, locale)
+            }
             icon={<Clock className="h-3.5 w-3.5 text-muted-foreground" />}
           />
         </Div>
@@ -562,6 +570,7 @@ export function PulseHistoryContainer({
                   )
                 }
                 t={t}
+                locale={locale}
               />
             ))
           )}
@@ -583,6 +592,7 @@ export function PulseHistoryContainer({
             variant="ghost"
             size="sm"
             disabled={offset <= 0}
+            aria-label={t("widget.pagination.prev")}
             onClick={() => handlePageChange(Math.max(0, offset - LIMIT))}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -595,6 +605,7 @@ export function PulseHistoryContainer({
             variant="ghost"
             size="sm"
             disabled={currentPage >= totalPages}
+            aria-label={t("widget.pagination.next")}
             onClick={() => handlePageChange(offset + LIMIT)}
           >
             <Span className="hidden sm:inline mr-1">

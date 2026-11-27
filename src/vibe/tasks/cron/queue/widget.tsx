@@ -34,6 +34,7 @@ import { Search } from "next-vibe/ui/components/icons/Search";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Input } from "next-vibe/ui/components/input";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import {
   Select,
   SelectContent,
@@ -52,6 +53,7 @@ import React, {
 } from "react";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { toIntlLocale } from "../../../core/i18n/core/language-utils";
 import { getDefaultTimezone } from "../../../core/i18n/core/localization-utils";
 import type { EndpointLogger } from "../../../logger/types";
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -126,11 +128,14 @@ const PRIORITY_COLORS: Record<string, string> = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDate(s: string | null): string {
-  if (!s) {
-    return "";
-  }
-  return s.slice(0, 16).replace("T", " ");
+function formatDate(value: string | null, locale: CountryLanguage): string {
+  const date = value ? new Date(value) : null;
+  return date && Number.isFinite(date.getTime())
+    ? new Intl.DateTimeFormat(toIntlLocale(locale), {
+        dateStyle: "short",
+        timeStyle: "short",
+      }).format(date)
+    : "";
 }
 
 function formatDuration(ms: number | null): string {
@@ -304,8 +309,8 @@ function QueueRow({
   locale: CountryLanguage;
   logger: EndpointLogger;
 }): React.JSX.Element {
-  const nextRunText = formatDate(task.nextExecutionAt);
-  const lastRunText = formatDate(task.lastExecutedAt);
+  const nextRunText = formatDate(task.nextExecutionAt, locale);
+  const lastRunText = formatDate(task.lastExecutedAt, locale);
 
   const hasFailures =
     task.consecutiveFailures > 0 ||
@@ -315,28 +320,28 @@ function QueueRow({
   return (
     <Div
       className={cn(
-        "group flex items-start gap-3 px-4 py-3 hover:bg-muted/40 transition-colors border-b last:border-b-0",
+        "group grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 gap-y-1 border-b px-4 py-3 transition-colors last:border-b-0 hover:bg-muted/40 @md:flex @md:gap-3",
         selected && "bg-primary/5",
       )}
     >
       {/* Checkbox */}
-      <Div className="flex-shrink-0 mt-1">
+      <Div className="col-start-1 row-start-1 mt-1 shrink-0">
         <Checkbox
           checked={selected}
           onCheckedChange={() => onToggleSelect(task.id)}
-          aria-label={`Select ${task.displayName}`}
+          aria-label={t("widget.bulk.selectTask", { name: task.displayName })}
         />
       </Div>
 
       {/* Position number */}
-      <Div className="flex-shrink-0 w-6 text-center mt-0.5">
+      <Div className="mt-0.5 hidden w-6 shrink-0 text-center @md:block">
         <Span className="text-xs text-muted-foreground font-mono">
           {position}
         </Span>
       </Div>
 
       {/* Countdown - most important info */}
-      <Div className="flex-shrink-0 flex flex-col items-end gap-0.5 min-w-[90px]">
+      <Div className="col-start-2 row-start-2 flex min-w-0 shrink-0 flex-wrap items-center gap-x-2 @md:min-w-[90px] @md:flex-col @md:items-end @md:gap-0.5">
         <CountdownCell
           nextExecutionAt={task.nextExecutionAt}
           inLabel={t("widget.queue.in")}
@@ -345,20 +350,22 @@ function QueueRow({
           overdueLabel={t("widget.queue.overdue")}
           notScheduledLabel={t("widget.queue.notScheduled")}
         />
-        <Span className="text-xs text-muted-foreground font-mono">
-          {nextRunText || "—"}
-        </Span>
+        {nextRunText && (
+          <Span className="text-xs tabular-nums text-muted-foreground">
+            {nextRunText}
+          </Span>
+        )}
       </Div>
 
       {/* Main content */}
-      <Div className="flex-1 min-w-0">
+      <Div className="col-start-2 row-start-1 min-w-0 flex-1">
         <Div className="flex flex-wrap items-center gap-1.5 mb-0.5">
-          <Span className="font-semibold text-sm truncate">
+          <Span className="min-w-0 break-words text-sm font-semibold">
             {task.displayName}
           </Span>
           <Span
             className={cn(
-              "px-1.5 py-0.5 rounded text-xs font-mono",
+              "hidden min-w-0 break-all rounded px-1.5 py-0.5 font-mono text-xs @xl:inline",
               "bg-muted text-muted-foreground",
             )}
           >
@@ -406,7 +413,7 @@ function QueueRow({
         </Span>
 
         {/* Stats */}
-        <Div className="hidden sm:flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
+        <Div className="mt-0.5 hidden flex-wrap items-center gap-3 text-xs text-muted-foreground @md:flex">
           <Span>
             {t("widget.queue.lastRun")}
             {` `}
@@ -442,17 +449,17 @@ function QueueRow({
       {/* Action buttons */}
       <Div
         className={cn(
-          "flex-shrink-0 flex items-center gap-1",
+          "col-start-2 row-start-3 flex shrink-0 items-center gap-1",
           isTouch
             ? "opacity-100"
-            : "opacity-0 group-hover:opacity-100 transition-opacity",
+            : "transition-opacity @md:opacity-0 @md:group-hover:opacity-100 @md:focus-within:opacity-100",
         )}
       >
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="h-7 w-7 p-0 text-success hover:text-success/80"
+          className="h-10 w-10 p-0 text-success hover:text-success/80"
           onClick={() => onRun(task)}
           title={t("widget.action.run")}
         >
@@ -462,7 +469,7 @@ function QueueRow({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-7 w-7 p-0"
+          className="h-10 w-10 p-0"
           onClick={() => onHistory(task)}
           title={t("widget.action.history")}
         >
@@ -472,7 +479,7 @@ function QueueRow({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-7 w-7 p-0"
+          className="h-10 w-10 p-0"
           onClick={() => onEdit(task)}
           title={t("widget.action.edit")}
         >
@@ -767,92 +774,21 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
             return undefined;
           }
           handleClearSelection();
-          // Update caches optimistically - no refetch needed
           const { apiClient } = await import("../../../unified-ui/hooks/store");
-          const tasksDef = await import("../tasks/definition");
-          const queueDef = await import("./definition");
-          if (action === "delete") {
-            apiClient.updateEndpointData(
-              tasksDef.default.GET,
-              logger,
-              (old) => {
-                if (!old?.success) {
-                  return old;
-                }
-                return {
-                  success: true as const,
-                  data: {
-                    ...old.data,
-                    tasks: old.data.tasks.filter(
-                      (task) => !ids.includes(task.id),
-                    ),
-                    totalTasks: Math.max(0, old.data.totalTasks - ids.length),
-                  },
-                };
-              },
-            );
-            apiClient.updateEndpointData(
-              queueDef.default.GET,
-              logger,
-              (old) => {
-                if (!old?.success) {
-                  return old;
-                }
-                return {
-                  success: true as const,
-                  data: {
-                    ...old.data,
-                    tasks: old.data.tasks.filter(
-                      (task) => !ids.includes(task.id),
-                    ),
-                    totalTasks: Math.max(0, old.data.totalTasks - ids.length),
-                  },
-                };
-              },
-            );
-          } else if (action === "enable" || action === "disable") {
-            const enabled = action === "enable";
-            apiClient.updateEndpointData(
-              tasksDef.default.GET,
-              logger,
-              (old) => {
-                if (!old?.success) {
-                  return old;
-                }
-                return {
-                  success: true as const,
-                  data: {
-                    ...old.data,
-                    tasks: old.data.tasks.map((task) =>
-                      ids.includes(task.id) ? { ...task, enabled } : task,
-                    ),
-                  },
-                };
-              },
-            );
-            apiClient.updateEndpointData(
-              queueDef.default.GET,
-              logger,
-              (old) => {
-                if (!old?.success) {
-                  return old;
-                }
-                return {
-                  success: true as const,
-                  data: {
-                    ...old.data,
-                    tasks: old.data.tasks.map((task) =>
-                      ids.includes(task.id) ? { ...task, enabled } : task,
-                    ),
-                  },
-                };
-              },
-            );
-          }
+          await Promise.all([
+            apiClient.refetchEndpoint(cronTasksDefinition.GET, logger),
+            endpointMutations?.read?.refetch(),
+          ]);
           return undefined;
         });
     },
-    [selectedIds, bulkMutation, handleClearSelection, logger],
+    [
+      selectedIds,
+      bulkMutation,
+      handleClearSelection,
+      logger,
+      endpointMutations,
+    ],
   );
 
   // ── Navigation handlers ───────────────────────────────────────────────────
@@ -940,9 +876,9 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <Div className="flex flex-col gap-0">
+    <Div className="@container flex min-w-0 flex-col gap-0">
       {/* ── Header ──────────────────────────────────────────────────── */}
-      <Div className="flex items-center gap-2 px-4 py-3 border-b">
+      <Div className="flex flex-wrap items-center gap-2 border-b px-4 py-3">
         <NavigateButtonWidget field={children.backButton} />
 
         <Div className="flex items-center gap-2 mr-auto min-w-0">
@@ -1029,11 +965,30 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
         />
       )}
 
+      {bulkMutation.error && (
+        <ResultBanner
+          className="mx-4 my-2"
+          variant="danger"
+          title={bulkMutation.error.message}
+        />
+      )}
+      {bulkMutation.data?.success && (
+        <ResultBanner
+          className="mx-4 my-2"
+          variant={bulkMutation.data.data.failed > 0 ? "warning" : "success"}
+          title={t("widget.bulk.success", {
+            succeeded: bulkMutation.data.data.succeeded,
+            failed: bulkMutation.data.data.failed,
+          })}
+        />
+      )}
+
       {/* ── Filters row ─────────────────────────────────────────────── */}
       <Div className="flex items-center gap-2 px-4 py-2 border-b flex-wrap">
         {/* Select-all checkbox */}
         <Checkbox
           checked={allFilteredSelected}
+          aria-label={t("widget.bulk.selectAll")}
           onCheckedChange={
             allFilteredSelected ? handleClearSelection : handleSelectAll
           }
@@ -1055,6 +1010,7 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
               })
             }
             placeholder={t("widget.search.placeholder")}
+            aria-label={t("get.fields.search.label")}
             className="pl-8 h-8 text-sm"
           />
         </Div>
@@ -1069,7 +1025,10 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
             })
           }
         >
-          <SelectTrigger className="h-8 w-auto min-w-[100px] text-xs">
+          <SelectTrigger
+            className="h-8 w-auto min-w-[100px] text-xs"
+            aria-label={t("get.fields.hidden.label")}
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -1094,7 +1053,10 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
             )
           }
         >
-          <SelectTrigger className="h-8 w-auto min-w-[110px] text-xs">
+          <SelectTrigger
+            className="h-8 w-auto min-w-[110px] text-xs"
+            aria-label={t("get.fields.priority.label")}
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -1114,11 +1076,14 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
           value={activeCategory}
           onValueChange={(v) => handleCategoryChange(v === "all" ? "" : v)}
         >
-          <SelectTrigger className="h-8 w-auto min-w-[110px] text-xs">
+          <SelectTrigger
+            className="h-8 w-auto min-w-[110px] text-xs"
+            aria-label={t("get.fields.category.label")}
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL">
+            <SelectItem value="all">
               {t("widget.filter.allCategories")}
             </SelectItem>
             {TaskCategoryOptions.map((opt) => (

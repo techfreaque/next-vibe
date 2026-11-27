@@ -74,6 +74,8 @@ export class SubscriptionAdminReferralsRepository {
         sortingOptions,
         paginationInfo: { page, limit },
       } = data;
+      const sortBy = sortingOptions?.sortBy ?? ReferralSortField.CREATED_AT;
+      const sortOrder = sortingOptions?.sortOrder ?? SortOrder.DESC;
 
       // === CODES QUERY ===
       const codeConditions: SQL[] = [];
@@ -118,10 +120,9 @@ export class SubscriptionAdminReferralsRepository {
         [ReferralSortField.CREATED_AT]: referralCodes.createdAt,
         [ReferralSortField.SIGNUPS]: creditedSignups,
         [ReferralSortField.EARNINGS]: earnedByCode,
-      }[sortingOptions.sortBy];
+      }[sortBy];
 
-      const orderDirection =
-        sortingOptions.sortOrder === SortOrder.ASC ? asc : desc;
+      const orderDirection = sortOrder === SortOrder.ASC ? asc : desc;
 
       // Count total codes
       const [codeCountResult] = await db
@@ -315,6 +316,7 @@ export class SubscriptionAdminReferralsRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<ReferralsPostResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
@@ -352,11 +354,10 @@ export class SubscriptionAdminReferralsRepository {
 
       return success({
         success: true,
-        message: "Action completed successfully",
+        message: t("post.success.description"),
       });
     } catch (error) {
       logger.error("Failed to process payout action", parseError(error));
-      const { t } = scopedTranslation.scopedT(locale);
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

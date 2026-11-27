@@ -6,9 +6,9 @@ export const translations: typeof enTranslations = {
     titleShort: "Nuevo período",
     description: "Crear un nuevo período de contabilidad para una empresa",
     companyId: {
-      label: "Company ID",
+      label: "Empresa",
       description: "Empresa para abrir el período",
-      placeholder: "Company UUID",
+      placeholder: "Selecciona una empresa",
     },
     name: {
       label: "Nombre del período",

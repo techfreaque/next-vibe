@@ -26,9 +26,8 @@ export const translations: typeof enTranslations = {
     peppol: "Peppol-XML herunterladen",
     slovak: "eFaktúra-XML herunterladen",
     xrechnung: "XRechnung als XML",
-    send: "Über Peppol senden",
-    providerNeeded:
-      "Verbinden Sie einen zertifizierten Peppol-Zugangspunkt und registrieren Sie die Peppol-ID des Rechnungsausstellers.",
+    sendHint:
+      "Senden Sie die heruntergeladene XML-Datei über Ihren E-Rechnungsanbieter.",
     back: "Zurück",
     submit: "E-Rechnung erstellen",
     invoice: "Rechnung {{number}}",

@@ -165,8 +165,8 @@ export function AbuseReportWidget(): JSX.Element {
   );
   if (!value) {
     return (
-      <WidgetShell>
-        <WidgetHeader title={t("get.title")} />
+      <WidgetShell layout="page">
+        <WidgetHeader size="page" title={t("get.title")} />
         {toolbar}
         <LoadingBlock message={t("widget.loading")} />
       </WidgetShell>
@@ -186,8 +186,8 @@ export function AbuseReportWidget(): JSX.Element {
     );
 
   return (
-    <WidgetShell>
-      <WidgetHeader title={t("get.title")} />
+    <WidgetShell layout="page">
+      <WidgetHeader size="page" title={t("get.title")} />
       {toolbar}
       <SectionGroup
         title={t("widget.filtersTitle")}

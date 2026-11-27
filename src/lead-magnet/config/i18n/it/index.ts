@@ -59,7 +59,7 @@ export const translations: typeof enTranslations = {
     confirmDelete: {
       title: "Scollegare {{provider}}?",
       description:
-        "I nuovi abbonati smettono di atterrare nella tua lista. Contatti già catturati soggiorno dove sono.",
+        "Lo scollegamento interrompe le nuove iscrizioni e cancella la cronologia qui. I contatti già inviati restano presso il tuo fornitore.",
       cancel: "Mantenere il collegamento",
       proceed: "Scollegamento",
     },

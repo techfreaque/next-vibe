@@ -10,17 +10,17 @@ export const translations = {
     notFound: "Task {{taskId}} not found",
   },
   post: {
-    title: "Execute Task",
-    titleShort: "Execute Task",
+    title: "Execute task",
+    titleShort: "Execute task",
     description:
       "Trigger a single task by ID and receive the result synchronously",
     container: {
-      title: "Task Execution",
+      title: "Task execution",
       description: "Execute a specific task and wait for its result",
     },
     fields: {
       taskId: {
-        label: "Task ID",
+        label: "Task key",
         description: "The ID of the task to execute",
       },
       success: {
@@ -77,7 +77,7 @@ export const translations = {
       },
     },
     submitButton: {
-      label: "Run Task",
+      label: "Run task",
       loadingText: "Running...",
     },
     success: {

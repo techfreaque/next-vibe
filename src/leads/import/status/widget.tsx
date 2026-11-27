@@ -4,27 +4,34 @@
  */
 
 "use client";
+import { formatTimestamp } from "next-vibe/core/i18n/core/localization-utils";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Activity } from "next-vibe/ui/components/icons/Activity";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { ProgressBlock } from "next-vibe/ui/components/progress-block";
 import { Span } from "next-vibe/ui/components/span";
 import { Strong } from "next-vibe/ui/components/strong";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React from "react";
 
 import { CsvImportJobStatus, type CsvImportJobStatusValue } from "../enum";
@@ -94,20 +101,6 @@ const STATUS_FILTER_VALUES = [
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDate(dateStr: Date | null | undefined): string {
-  if (!dateStr) {
-    return "—";
-  }
-  try {
-    return new Date(dateStr).toLocaleString(undefined, {
-      dateStyle: "short",
-      timeStyle: "short",
-    });
-  } catch {
-    return new Date(dateStr).toISOString();
-  }
-}
-
 function StatusBadge({
   status,
   t,
@@ -133,42 +126,6 @@ function StatusBadge({
   );
 }
 
-function ProgressBar({
-  processed,
-  total,
-  t,
-}: {
-  processed: number;
-  total: number | null;
-  t: TFunc;
-}): React.JSX.Element | null {
-  if (!total || total === 0) {
-    return null;
-  }
-  const pct = Math.min(100, Math.round((processed / total) * 100));
-  return (
-    <Div className="mt-1.5">
-      <Div className="flex justify-between text-xs text-muted-foreground mb-0.5">
-        <Span>
-          {processed} / {total} {t("widget.progress.rows")}
-        </Span>
-        <Span>{pct}%</Span>
-      </Div>
-      <Div className="h-1.5 bg-muted rounded-full overflow-hidden">
-        <Div
-          style={{
-            width: `${pct}%`,
-            height: "100%",
-            borderRadius: "9999px",
-            backgroundColor: "#3b82f6",
-            transition: "all",
-          }}
-        />
-      </Div>
-    </Div>
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Job row
 // ---------------------------------------------------------------------------
@@ -183,71 +140,60 @@ function JobRow({
   t: TFunc;
 }): React.JSX.Element {
   const isRunning = job.status === CsvImportJobStatus.PROCESSING;
+  const locale = useWidgetLocale();
 
   return (
-    <Div
-      className="flex flex-col gap-1 px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
-      onClick={() => {
-        onViewJob(job.id);
-      }}
-    >
-      <Div className="flex items-center gap-3 flex-wrap">
-        {/* Job ID */}
-        <Span className="font-mono text-xs text-muted-foreground truncate max-w-[200px]">
-          {job.id}
-        </Span>
-
-        {/* Status badge */}
-        <StatusBadge status={job.status} t={t} />
-
-        <Div className="flex items-center gap-4 ml-auto flex-shrink-0">
+    <ListItem
+      title={job.fileName}
+      badges={<StatusBadge status={job.status} t={t} />}
+      className="min-h-14 bg-card"
+      onClick={() => onViewJob(job.id)}
+      meta={
+        <Div className="flex w-full min-w-0 flex-col gap-2">
           {/* Row counts */}
-          <Div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <Span title="Total rows">
+          <Div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <Span>
               {t("widget.job.total")}{" "}
               <Strong className="text-foreground">
                 {job.totalRows ?? "?"}
               </Strong>
             </Span>
-            <Span title="Processed rows" className="text-info">
+            <Span className="text-info">
               {t("widget.job.processed")} <Strong>{job.processedRows}</Strong>
             </Span>
-            <Span title="Successful imports" className="text-success">
+            <Span className="text-success">
               {t("widget.job.ok")} <Strong>{job.successfulImports}</Strong>
             </Span>
-            <Span title="Failed imports" className="text-destructive">
+            <Span className="text-destructive">
               {t("widget.job.fail")} <Strong>{job.failedImports}</Strong>
             </Span>
           </Div>
 
           {/* Timestamps */}
-          <Div className="hidden sm:flex flex-col text-xs text-muted-foreground text-right">
+          <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
             <Span>
-              {t("widget.job.created")} {formatDate(job.createdAt)}
+              {t("widget.job.created")} {formatTimestamp(job.createdAt, locale)}
             </Span>
             {job.completedAt && (
               <Span>
-                {t("widget.job.done")} {formatDate(job.completedAt)}
+                {t("widget.job.done")}{" "}
+                {formatTimestamp(job.completedAt, locale)}
               </Span>
             )}
           </Div>
+          {isRunning && job.totalRows && (
+            <ProgressBlock
+              value={job.processedRows}
+              max={job.totalRows}
+              label={`${job.processedRows.toLocaleString(locale)} / ${job.totalRows.toLocaleString(locale)} ${t("widget.progress.rows")}`}
+            />
+          )}
+          {job.error && (
+            <Span className="text-xs text-destructive">{job.error}</Span>
+          )}
         </Div>
-      </Div>
-
-      {/* Progress bar for running jobs */}
-      {isRunning && (
-        <ProgressBar
-          processed={job.processedRows}
-          total={job.totalRows}
-          t={t}
-        />
-      )}
-
-      {/* Error message */}
-      {job.error && (
-        <Span className="text-xs text-destructive mt-0.5">{job.error}</Span>
-      )}
-    </Div>
+      }
+    />
   );
 }
 
@@ -273,12 +219,21 @@ export function ImportStatusContainer({
     form.watch("filters.status") ?? null;
 
   const allJobs: Job[] = data?.jobs?.items ?? [];
+  const onPick = usePickerCallback<Job>();
 
   // ---------------------------------------------------------------------------
   // Navigation handlers
   // ---------------------------------------------------------------------------
 
   const handleViewJob = (jobId: string): void => {
+    if (onPick) {
+      const job = allJobs.find((item) => item.id === jobId);
+      if (job) {
+        onPick(job);
+      }
+      return;
+    }
+
     void (async (): Promise<void> => {
       const jobDef = await import("@/leads/import/jobs/[jobId]/definition");
       navigate(jobDef.default.GET, { urlPathParams: { jobId } });
@@ -293,36 +248,26 @@ export function ImportStatusContainer({
   };
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Header */}
-      <Div className="flex items-center gap-2 pb-2 border-b">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex items-center gap-2 mr-auto">
-          <Activity className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">
-            {t("widget.header.title")}
-          </Span>
-          {allJobs.length > 0 && (
-            <Span className="text-xs text-muted-foreground">
-              ({allJobs.length})
-            </Span>
-          )}
-        </Div>
-
-        {/* Refresh button */}
-        <NavigateButtonWidget field={children.submitButton} />
-
-        {/* New Import button */}
-        <Button
-          size="sm"
-          variant="default"
-          className="gap-1.5"
-          onClick={handleNewImport}
-        >
-          <Plus className="h-4 w-4" />
-          {t("widget.header.newImport")}
-        </Button>
-      </Div>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("widget.header.title")}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+        actions={
+          <Div className="flex flex-wrap gap-2">
+            <SubmitButtonWidget field={children.submitButton} />
+            <Button
+              type="button"
+              size="sm"
+              className="min-h-10 gap-1.5"
+              onClick={handleNewImport}
+            >
+              <Plus className="size-4" />
+              {t("widget.header.newImport")}
+            </Button>
+          </Div>
+        }
+      />
 
       {/* Status filter chips */}
       <Div className="flex items-center gap-2 flex-wrap">
@@ -332,13 +277,15 @@ export function ImportStatusContainer({
             variant="ghost"
             size="sm"
             onClick={() => {
-              form.setValue("filters.status", tab.value ?? undefined);
+              form.setValue("filters.status", tab.value ?? undefined, {
+                shouldDirty: true,
+              });
               if (onSubmit) {
                 onSubmit();
               }
             }}
             className={cn(
-              "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
+              "min-h-10 px-3 py-1 rounded-full text-xs font-medium border transition-colors",
               activeFilter === tab.value
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-muted text-muted-foreground border-transparent hover:border-border",
@@ -366,7 +313,7 @@ export function ImportStatusContainer({
 
       {/* Job list */}
       {!isLoading && (
-        <Div className="rounded-lg border overflow-hidden divide-y">
+        <Div className="grid gap-2">
           {allJobs.length === 0 ? (
             <Div className="flex flex-col items-center justify-center gap-3 py-10 text-center px-4">
               <RefreshCw className="h-8 w-8 text-muted-foreground" />
@@ -397,6 +344,6 @@ export function ImportStatusContainer({
           )}
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

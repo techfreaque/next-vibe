@@ -9,17 +9,20 @@ import { z } from "zod";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import {
-  objectField,
-  responseField,
-} from "../../../unified-ui/_shared/utils-i18n";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
+import { responseField } from "../../../unified-ui/_shared/utils-i18n";
+import { PulseHealthStatus } from "../../enum";
 import { PULSE_STATUS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const PulseStatusWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({ default: module.PulseStatusWidget })),
+);
 
 /**
  * GET endpoint definition - Get pulse status
@@ -40,12 +43,8 @@ const pulseStatusEndpoint = createEndpoint({
   aliases: [PULSE_STATUS_ALIAS, "pulse:status"],
   tags: ["tags.status"],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "get.container.title",
-    description: "get.container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
+    render: PulseStatusWidget,
     usage: { response: true },
     children: {
       // === RESPONSE FIELDS ===
@@ -78,15 +77,15 @@ const pulseStatusEndpoint = createEndpoint({
   examples: {
     responses: {
       basic: {
-        status: "HEALTHY",
+        status: PulseHealthStatus.HEALTHY,
         lastPulseAt: "2023-07-21T12:00:00Z",
-        successRate: 95.0,
+        successRate: 9500,
         totalExecutions: 1000,
       },
       success: {
-        status: "HEALTHY",
+        status: PulseHealthStatus.HEALTHY,
         lastPulseAt: "2023-07-21T12:00:00Z",
-        successRate: 95.0,
+        successRate: 9500,
         totalExecutions: 1000,
       },
     },

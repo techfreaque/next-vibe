@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     description:
       "Konto soft-deaktivieren. Systemkonten oder Konten mit gebuchten Buchungszeilen können nicht deaktiviert werden.",
     accountId: {
-      label: "Konto-ID",
+      label: "Konto",
       description: "Das zu deaktivierende Konto",
-      placeholder: "Konto-UUID",
+      placeholder: "Konto auswählen",
     },
     errors: {
       unauthorized: {

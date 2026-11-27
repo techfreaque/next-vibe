@@ -173,6 +173,8 @@ export const translations = {
       taskInput: {
         label: "Task Input",
         description: "JSON input data for the task",
+        invalidJson: "Not valid JSON. Check quotes, commas and brackets.",
+        notObject: 'Task input must be a JSON object, like { "key": "value" }.',
       },
       hidden: {
         label: "Hidden",
@@ -288,16 +290,16 @@ export const translations = {
     },
   },
   delete: {
-    title: "Delete Cron Task",
-    titleShort: "Delete Task",
+    title: "Delete cron task",
+    titleShort: "Delete task",
     description: "Delete a cron task",
     container: {
-      title: "Delete Cron Task",
+      title: "Delete cron task",
       description: "Remove a task from the system",
     },
     fields: {
       id: {
-        label: "Task ID",
+        label: "Task key",
         description: "Unique identifier of the task to delete",
       },
     },

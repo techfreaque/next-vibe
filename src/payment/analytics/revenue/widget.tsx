@@ -758,6 +758,7 @@ export function RevenueReportWidget({
             />
             <KpiTile
               label={t("widget.kpi.failedPayments")}
+              wrapLabel
               value={kpis.failedPayments.value}
               previous={kpis.failedPayments.previous}
               format="number"

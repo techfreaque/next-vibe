@@ -3,29 +3,58 @@ export const translations = {
 
   tag: "Health",
   get: {
-    title: "Health Check",
-    titleShort: "Health Check",
+    title: "Health check",
+    titleShort: "Health check",
     description: "Get server health status and diagnostics",
     form: {
-      title: "Health Check Options",
+      title: "Health check options",
       description: "Configure health check parameters",
     },
     fields: {
       detailed: {
-        title: "Detailed Report",
+        title: "Detailed report",
         description: "Include detailed system information",
       },
       includeDatabase: {
-        title: "Include Database",
+        title: "Include database",
         description: "Include database health checks",
       },
       includeTasks: {
-        title: "Include Tasks",
+        title: "Include tasks",
         description: "Include task runner health checks",
       },
       includeSystem: {
-        title: "Include System",
+        title: "Include system",
         description: "Include system resource information",
+      },
+    },
+    widget: {
+      refresh: "Run health check",
+      health: {
+        healthy: "Healthy",
+        warning: "Warning",
+        critical: "Critical",
+        unknown: "Unknown",
+      },
+      results: {
+        pass: "Passed",
+        warn: "Warning",
+        fail: "Failed",
+      },
+      checks: {
+        traffic: "Traffic readiness",
+        process: "Server process",
+      },
+      messages: {
+        draining: "Draining. {{count}} streams still active.",
+        accepting: "Accepting traffic. {{count}} active streams.",
+        memory: "High memory use ({{usage}}).",
+        processOk: "Server is running normally.",
+        databaseOk: "Database connection succeeded.",
+        databaseFailed: "Database connection failed.",
+        tasksDisabled: "The task runner is disabled in this environment.",
+        tasksOk: "The task runner is available.",
+        systemOk: "System resources are healthy.",
       },
     },
     response: {
@@ -34,24 +63,24 @@ export const translations = {
         description: "Overall health status",
       },
       timestamp: {
-        title: "Timestamp",
+        title: "Checked at",
         description: "Time of health check",
       },
       uptime: {
         title: "Uptime",
-        description: "Server uptime in seconds",
+        description: "Time since the server process started",
       },
       revision: {
-        title: "Build Commit",
+        title: "Build commit",
       },
       environment: {
         title: "Environment",
         description: "Server environment information",
         name: {
-          title: "Environment Name",
+          title: "Environment name",
         },
         nodeEnv: {
-          title: "Node Environment",
+          title: "Node environment",
         },
         platform: {
           title: "Platform",
@@ -93,7 +122,7 @@ export const translations = {
         },
       },
       system: {
-        title: "System Info",
+        title: "System info",
         description: "System resource information",
         memory: {
           title: "Memory Usage",
@@ -105,7 +134,7 @@ export const translations = {
             title: "Total Memory",
           },
           percentage: {
-            title: "Memory Usage %",
+            title: "Memory usage %",
           },
         },
         cpu: {
@@ -115,7 +144,7 @@ export const translations = {
             title: "CPU Usage %",
           },
           loadAverage: {
-            title: "Load Average",
+            title: "Load average",
           },
         },
         disk: {
@@ -133,10 +162,10 @@ export const translations = {
         },
       },
       checks: {
-        title: "Health Checks",
+        title: "Health checks",
         description: "Individual component health checks",
         item: {
-          title: "Health Check",
+          title: "Health check",
           description: "Individual health check result",
           name: {
             title: "Check Name",

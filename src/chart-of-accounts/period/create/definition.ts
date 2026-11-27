@@ -50,6 +50,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.ENTITY_PICKER,
         label: "post.companyId.label" as const,
         description: "post.companyId.description" as const,
+        placeholder: "post.companyId.placeholder" as const,
         columns: 12,
         schema: z.string().uuid(),
         listEndpoint: async () =>

@@ -84,6 +84,7 @@ export const translations = {
     },
   },
   widget: {
+    unnamedLead: "Unnamed lead",
     previous: "Previous",
     next: "Next",
     page: "Page {{page}} of {{pages}}",

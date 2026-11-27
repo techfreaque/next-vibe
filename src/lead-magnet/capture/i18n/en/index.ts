@@ -76,6 +76,7 @@ export const translations = {
     },
   },
   form: {
+    signUp: "Sign up",
     headline: "Stay in the loop",
     namePlaceholder: "Your first name",
     emailPlaceholder: "Your email",

@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     description:
       "Désactive un compte sans le supprimer. Impossible pour les comptes système et les comptes ayant des lignes d'écriture comptabilisées.",
     accountId: {
-      label: "ID du compte",
+      label: "Compte",
       description: "Le compte à désactiver",
-      placeholder: "UUID du compte",
+      placeholder: "Choisir un compte",
     },
     errors: {
       unauthorized: {

@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     confirmDelete: {
       title: "{{provider}} trennen?",
       description:
-        "Neue Abonnenten landen nicht mehr in deiner Liste. Bereits erfasste Kontakte bleiben erhalten.",
+        "Neue Anmeldungen werden gestoppt und der Verlauf hier gelöscht. Bereits übermittelte Kontakte bleiben beim Anbieter.",
       cancel: "Verbunden lassen",
       proceed: "Trennen",
     },

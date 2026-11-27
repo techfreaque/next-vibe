@@ -23,8 +23,9 @@ export const translations: typeof enTranslations = {
           "Wykonaj próbny przebieg bez wprowadzania rzeczywistych zmian",
       },
       taskNames: {
-        label: "Nazwy zadań",
-        description: "Konkretne nazwy zadań do wykonania (opcjonalne)",
+        label: "Aliasy zadań",
+        description:
+          "Wpisz alias punktu końcowego i naciśnij Enter. Puste pole uwzględnia wszystkie pasujące zadania.",
       },
       force: {
         label: "Wymuś wykonanie",

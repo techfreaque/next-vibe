@@ -51,8 +51,10 @@ export const translations: typeof enTranslations = {
     customerEmail: "E-mail klienta",
     customerId: "Identyfikator klienta",
     originalAmount: "Pierwotna kwota",
+    chooseTransaction: "Znajdź płatność",
     enterTransaction:
-      "Wpisz identyfikator transakcji, aby wczytać dane płatności.",
+      "Otwórz płatność na liście transakcji, aby sprawdzić obciążenie i kwotę zwrotu.",
+    transactionDate: "Data obciążenia",
     lookupLoading: "Wczytywanie zapisanej transakcji",
     transactionMissing: "Nie znaleziono transakcji",
     lookupFailed: "Nie udało się wczytać transakcji",
@@ -66,7 +68,7 @@ export const translations: typeof enTranslations = {
     review: "Sprawdź kwotę",
     confirmTitle: "Potwierdź zwrot przez Stripe",
     confirmDescription:
-      "Stripe zwróci klientowi {{email}} środki z transakcji {{transactionId}}. Ta operacja zwraca pieniądze klientowi.",
+      "Stripe zwróci płatność dla {{email}}. Spowoduje to zwrot środków.",
     confirm: "Zleć zwrot",
     cancel: "Anuluj",
   },

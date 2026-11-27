@@ -1,6 +1,5 @@
 "use client";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
@@ -9,6 +8,7 @@ import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Table } from "next-vibe/ui/components/icons/Table";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import {
   Select,
   SelectContent,
@@ -25,41 +25,64 @@ import {
 } from "next-vibe/ui/lib/location";
 import {
   useWidgetContext,
+  useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 
 import type endpoints from "./definition";
-
-interface SpreadsheetOption {
-  id: string;
-  name: string;
-}
+import sheetsList from "./sheets-list/definition";
 
 export function GoogleSheetsWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof endpoints.POST>();
+  const form = useWidgetForm<typeof endpoints.POST>();
+  const response = useWidgetValue<typeof endpoints.POST>();
+  const submit = useWidgetOnSubmit();
   const { endpointMutations } = useWidgetContext();
   const searchParams = useSearchParams();
+  const sheetLabelId = useId();
+  const tabId = useId();
 
-  // Connected via URL param after OAuth redirect
-  const [isConnected, setIsConnected] = useState(
+  const [returnedFromOAuth] = useState(
     () => searchParams.get("gs_connected") === "1",
   );
-
-  const [sheets, setSheets] = useState<SpreadsheetOption[]>([]);
-  // Sheets auto-load right away when connected on mount
-  const [loadingSheets, setLoadingSheets] = useState(isConnected);
-  const [selectedSheetId, setSelectedSheetId] = useState("");
-  const [sheetTab, setSheetTab] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState("");
+  const selectedSheetId = form.watch("spreadsheetId") ?? "";
+  const isConnected = returnedFromOAuth || Boolean(selectedSheetId);
+  const sheetTab = form.watch("sheetTab") ?? "";
+  const { read } = useEndpoint(
+    sheetsList,
+    {
+      read: {
+        queryOptions: {
+          enabled: isConnected && !user.isPublic,
+          queryKey: `google-sheets-list:${user.id}:${locale}`,
+        },
+      },
+    },
+    logger,
+    user,
+  );
+  const sheets = read?.data?.sheets;
+  const loadingSheets = read?.isLoading || read?.isLoadingFresh;
+  const loadError =
+    user.isPublic || loadingSheets
+      ? null
+      : (read?.error?.message ??
+        (read?.isError
+          ? t("providers.shared.errors.network.description")
+          : null));
+  const saving = endpointMutations?.create?.isSubmitting ?? false;
 
   // Clean OAuth redirect params from the URL
   useEffect(() => {
@@ -83,87 +106,17 @@ export function GoogleSheetsWidget(): JSX.Element {
     }
   }, [logger]);
 
-  const fetchSheets = useCallback((): void => {
-    void (async (): Promise<void> => {
-      try {
-        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-        const sheetsListDef = await import("./sheets-list/definition");
-        if (!user) {
-          return;
-        }
-        const result = await apiClient.fetch(
-          sheetsListDef.GET,
-          logger,
-          user,
-          undefined,
-          undefined,
-          locale,
-        );
-        if (result.success && result.data) {
-          setSheets(result.data.sheets);
-          setIsConnected(true);
-        }
-      } finally {
-        setLoadingSheets(false);
-      }
-    })();
-  }, [user, locale, logger]);
-
-  const loadSheets = useCallback((): void => {
-    setLoadingSheets(true);
-    fetchSheets();
-  }, [fetchSheets]);
-
-  useEffect(() => {
-    if (isConnected && sheets.length === 0) {
-      fetchSheets();
-    }
-  }, [isConnected, sheets.length, fetchSheets]);
-
   const handleConnectGoogle = useCallback((): void => {
-    assignUrl(
-      `/api/${locale.split("-")[0]}/lead-magnet/providers/google-sheets/oauth/start`,
-    );
+    assignUrl(`/api/${locale}/lead-magnet/providers/google-sheets/oauth/start`);
   }, [locale]);
 
-  const handleSave = useCallback((): void => {
+  const handleSave = (): void => {
     if (!selectedSheetId) {
-      setSaveError(t("providers.googleSheets.widget.selectRequired"));
       return;
     }
-    setSaving(true);
-    setSaveError("");
-    void (async (): Promise<void> => {
-      try {
-        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-        const def = await import("./definition");
-        if (!user) {
-          return;
-        }
-        await apiClient.mutate(
-          def.POST,
-          logger,
-          user,
-          {
-            spreadsheetId: selectedSheetId,
-            sheetTab: sheetTab || undefined,
-            isActive: true,
-          },
-          undefined,
-          locale,
-        );
-        endpointMutations?.read?.refetch?.();
-      } catch (error) {
-        logger.error("Google Sheets save threw", parseError(error), {
-          component: "GoogleSheetsWidget",
-          operation: "saveSheetConfig",
-        });
-        setSaveError(t("providers.googleSheets.widget.saveFailed"));
-      } finally {
-        setSaving(false);
-      }
-    })();
-  }, [selectedSheetId, sheetTab, user, locale, logger, endpointMutations, t]);
+    form.setValue("isActive", true, { shouldDirty: true });
+    submit?.();
+  };
 
   if (!isConnected) {
     return (
@@ -193,15 +146,15 @@ export function GoogleSheetsWidget(): JSX.Element {
   return (
     <Div className="flex flex-col gap-6 p-4">
       {/* Connected badge */}
-      <Div className="flex items-center gap-3 rounded-lg border border-success/30 bg-success/10 px-4 py-3">
+      <Div className="flex flex-wrap items-center gap-3 rounded-lg border border-success/30 bg-success/10 px-4 py-3">
         <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
-        <Span className="text-sm font-medium text-success-foreground">
+        <Span className="min-w-0 flex-1 text-sm font-medium text-success">
           {t("providers.googleSheets.connected.description")}
         </Span>
         <Button
           variant="ghost"
           size="sm"
-          className="ml-auto gap-1 text-xs text-muted-foreground"
+          className="ml-auto min-h-10 gap-1 text-xs text-muted-foreground"
           onClick={handleConnectGoogle}
         >
           <RefreshCw className="h-3 w-3" />
@@ -211,7 +164,7 @@ export function GoogleSheetsWidget(): JSX.Element {
 
       {/* Sheet selector */}
       <Div className="flex flex-col gap-2">
-        <Label className="text-sm font-medium">
+        <Label htmlFor={sheetLabelId} className="text-sm font-medium">
           {t("providers.googleSheets.spreadsheetId.label")}
         </Label>
         <Span className="text-xs text-muted-foreground">
@@ -223,8 +176,13 @@ export function GoogleSheetsWidget(): JSX.Element {
             {t("providers.googleSheets.widget.loading")}
           </Div>
         ) : (
-          <Select value={selectedSheetId} onValueChange={setSelectedSheetId}>
-            <SelectTrigger>
+          <Select
+            value={selectedSheetId}
+            onValueChange={(id) => {
+              form.setValue("spreadsheetId", id, { shouldDirty: true });
+            }}
+          >
+            <SelectTrigger id={sheetLabelId} className="min-h-10">
               <SelectValue
                 placeholder={t(
                   "providers.googleSheets.spreadsheetId.placeholder",
@@ -232,16 +190,16 @@ export function GoogleSheetsWidget(): JSX.Element {
               />
             </SelectTrigger>
             <SelectContent>
-              {sheets.length === 0 ? (
+              {!user.isPublic && sheets?.length ? (
+                sheets.map((sheet) => (
+                  <SelectItem key={sheet.id} value={sheet.id}>
+                    {sheet.name}
+                  </SelectItem>
+                ))
+              ) : (
                 <Div className="px-3 py-2 text-sm text-muted-foreground">
                   {t("providers.googleSheets.widget.noSheets")}
                 </Div>
-              ) : (
-                sheets.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.name}
-                  </SelectItem>
-                ))
               )}
             </SelectContent>
           </Select>
@@ -249,37 +207,49 @@ export function GoogleSheetsWidget(): JSX.Element {
         <Button
           variant="ghost"
           size="sm"
-          className="w-fit text-xs"
-          onClick={loadSheets}
-          disabled={loadingSheets}
+          className="min-h-10 w-fit text-xs"
+          onClick={() => void read?.refetch()}
+          disabled={user.isPublic || loadingSheets}
         >
           <RefreshCw className="mr-1 h-3 w-3" />
           {t("providers.googleSheets.widget.refresh")}
         </Button>
+        {loadError && <ResultBanner variant="danger" title={loadError} />}
       </Div>
 
       {/* Tab name */}
       <Div className="flex flex-col gap-2">
-        <Label className="text-sm font-medium">
+        <Label htmlFor={tabId} className="text-sm font-medium">
           {t("providers.googleSheets.sheetTab.label")}
         </Label>
         <Span className="text-xs text-muted-foreground">
           {t("providers.googleSheets.sheetTab.description")}
         </Span>
         <Input
+          id={tabId}
           value={sheetTab}
           onChange={(e) => {
-            setSheetTab(e.target.value);
+            form.setValue("sheetTab", e.target.value, { shouldDirty: true });
           }}
           placeholder={t("providers.googleSheets.sheetTab.placeholder")}
+          className="min-h-10"
         />
       </Div>
 
-      {saveError && (
-        <Span className="text-sm text-destructive">{saveError}</Span>
+      <FormAlertWidget field={{}} />
+      {response?.isActiveResponse && (
+        <ResultBanner
+          variant="success"
+          title={t("providers.shared.saveSuccess.title")}
+        />
       )}
 
-      <Button onClick={handleSave} disabled={saving || !selectedSheetId}>
+      <Button
+        type="button"
+        className="min-h-10 self-stretch @md:self-end"
+        onClick={handleSave}
+        disabled={saving || !selectedSheetId}
+      >
         {saving
           ? t("providers.googleSheets.widget.saving")
           : t("providers.googleSheets.saveTitle")}

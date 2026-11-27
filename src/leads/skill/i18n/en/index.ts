@@ -6,18 +6,18 @@ export const translations = {
   },
 
   patch: {
-    title: "Set Lead Skill",
-    titleShort: "Lead Skill",
+    title: "Attribute a skill",
+    titleShort: "Skill attribution",
     description:
       "Record which skill brought this lead (first-touch attribution)",
     skillId: {
-      label: "Skill ID",
-      description: "UUID of the custom skill to attribute to this lead",
+      label: "Skill",
+      description: "Choose a published community skill.",
     },
     errors: {
       validation: {
-        title: "Invalid skill ID",
-        description: "Must be a valid UUID of a custom skill",
+        title: "Choose a skill",
+        description: "Choose a published skill from the community.",
       },
       network: {
         title: "Network error",
@@ -59,7 +59,7 @@ export const translations = {
     skipped: {
       title: "Not recorded",
       description:
-        "No visitor session to attribute. Open a page first, then retry.",
+        "The visitor’s first skill stays recorded. Start a new session if you need to verify a different skill.",
     },
     submit: "Attribute skill",
   },

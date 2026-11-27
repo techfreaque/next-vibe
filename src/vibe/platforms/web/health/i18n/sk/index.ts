@@ -30,6 +30,35 @@ export const translations: typeof enTranslations = {
         description: "Zahrnúť informácie o systémových zdrojoch",
       },
     },
+    widget: {
+      refresh: "Skontrolovať stav",
+      health: {
+        healthy: "V poriadku",
+        warning: "Upozornenie",
+        critical: "Kritický",
+        unknown: "Neznámy",
+      },
+      results: {
+        pass: "V poriadku",
+        warn: "Upozornenie",
+        fail: "Zlyhalo",
+      },
+      checks: {
+        traffic: "Prijímanie požiadaviek",
+        process: "Proces servera",
+      },
+      messages: {
+        draining: "Inštancia sa vypína. Aktívne prenosy: {{count}}.",
+        accepting: "Inštancia prijíma požiadavky. Aktívne prenosy: {{count}}.",
+        memory: "Vysoké využitie pamäte ({{usage}}).",
+        processOk: "Server funguje normálne.",
+        databaseOk: "Pripojenie k databáze funguje.",
+        databaseFailed: "Pripojenie k databáze zlyhalo.",
+        tasksDisabled: "Spracovanie úloh je v tomto prostredí vypnuté.",
+        tasksOk: "Spracovanie úloh je dostupné.",
+        systemOk: "Systémové zdroje sú v poriadku.",
+      },
+    },
     response: {
       status: {
         title: "Stav",

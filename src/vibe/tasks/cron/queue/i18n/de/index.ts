@@ -212,6 +212,7 @@ export const translations: typeof enTranslations = {
     bulk: {
       selected: "{count} ausgewählt",
       selectAll: "Alle auswählen",
+      selectTask: "{{name}} auswählen",
       clearSelection: "Auswahl aufheben",
       enable: "Aktivieren",
       disable: "Deaktivieren",
@@ -221,7 +222,7 @@ export const translations: typeof enTranslations = {
       confirmDelete:
         "{count} Aufgabe(n) löschen? Dies kann nicht rückgängig gemacht werden.",
       cancel: "Abbrechen",
-      success: "{succeeded} erfolgreich, {failed} fehlgeschlagen",
+      success: "{{succeeded}} erfolgreich, {{failed}} fehlgeschlagen",
     },
     empty: {
       noTasks: "Warteschlange ist leer",

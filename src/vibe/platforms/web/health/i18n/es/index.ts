@@ -30,6 +30,36 @@ export const translations: typeof enTranslations = {
         description: "Incluir información sobre los recursos del sistema",
       },
     },
+    widget: {
+      refresh: "Comprobar estado",
+      health: {
+        healthy: "Correcto",
+        warning: "Advertencia",
+        critical: "Crítico",
+        unknown: "Desconocido",
+      },
+      results: {
+        pass: "Correcto",
+        warn: "Advertencia",
+        fail: "Fallido",
+      },
+      checks: {
+        traffic: "Admisión de tráfico",
+        process: "Proceso del servidor",
+      },
+      messages: {
+        draining: "Cierre en curso. Quedan {{count}} transmisiones activas.",
+        accepting: "Se acepta tráfico. Hay {{count}} transmisiones activas.",
+        memory: "Uso elevado de memoria ({{usage}}).",
+        processOk: "El servidor funciona con normalidad.",
+        databaseOk: "Conexión a la base de datos establecida.",
+        databaseFailed: "Error al conectar con la base de datos.",
+        tasksDisabled:
+          "El ejecutor de tareas está desactivado en este entorno.",
+        tasksOk: "El ejecutor de tareas está disponible.",
+        systemOk: "Los recursos del sistema están en buen estado.",
+      },
+    },
     response: {
       status: {
         title: "Situación",

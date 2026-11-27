@@ -18,9 +18,10 @@ import {
   AdminForm,
   AdminFormSection,
 } from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
+import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
@@ -94,7 +95,7 @@ export function PaymentInvoiceWidget({
         </ResultBanner>
       ) : (
         <AdminFormSection title={t("post.form.title")}>
-          <TextFieldWidget
+          <EntityPickerFieldWidget
             fieldName="customerId"
             field={withValue(field.children.customerId, undefined, null)}
           />
@@ -113,9 +114,10 @@ export function PaymentInvoiceWidget({
             fieldName="description"
             field={withValue(field.children.description, undefined, null)}
           />
-          <TextFieldWidget
+          <DateFieldWidget
             fieldName="dueDate"
             field={withValue(field.children.dueDate, undefined, null)}
+            utcCalendarDay
           />
         </AdminFormSection>
       )}

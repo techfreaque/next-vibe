@@ -13,13 +13,13 @@ export const translations: typeof enTranslations = {
     description:
       "Zaznamenať, ktorá zručnosť priviedla kontakt pri prvej návšteve",
     skillId: {
-      label: "ID zručnosti",
-      description: "UUID vlastnej zručnosti, ktorá sa priradí ku kontaktu",
+      label: "Zručnosť",
+      description: "Vyber zverejnenú zručnosť komunity.",
     },
     errors: {
       validation: {
-        title: "Neplatné ID zručnosti",
-        description: "Zadajte platné UUID vlastnej zručnosti",
+        title: "Vyber zručnosť",
+        description: "Vyber zverejnenú zručnosť komunity.",
       },
       network: {
         title: "Chyba siete",
@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
     skipped: {
       title: "Nezaznamenané",
       description:
-        "Chýba relácia návštevníka na priradenie. Najprv otvorte stránku a skúste to znova.",
+        "Prvá zručnosť návštevníka zostane zaznamenaná. Ďalšiu zručnosť over v novej relácii.",
     },
     submit: "Priradiť zručnosť",
   },

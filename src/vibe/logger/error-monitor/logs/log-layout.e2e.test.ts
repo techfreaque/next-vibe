@@ -3,6 +3,7 @@ import { mkdir } from "node:fs/promises";
 
 import { inArray } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { saveAdminReviewScreenshots } from "next-vibe/tooling/testing/e2e/admin-review-screenshots";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import type { Page } from "playwright";
@@ -12,6 +13,7 @@ import { authAtlas } from "@/chart-of-accounts/tests/atlas-workflow-fixture";
 
 import { scopedTranslation as operationsTranslation } from "../../operations-summary/i18n";
 import { errorLogs } from "../db";
+import endpoint from "./definition";
 import { ErrorLogLevelFilter, ErrorLogSourceFilter, ErrorLogStatusFilter } from "./enum";
 import { scopedTranslation } from "./i18n";
 
@@ -70,12 +72,12 @@ describe("Error log filters and System health on Atlas", () => {
         { fingerprint: warningId, message: `[client] ${marker} browser warning`, level: "warn" },
         { fingerprint: resolvedId, message: `[client] ${marker} resolved warning`, level: "warn", resolved: true },
       ]);
-      const logsPath = `${baseUrl}/${locale}/tools/error-logs?arg.search=${encodeURIComponent(marker)}`;
+      const logsPath = `/tools/error-logs?arg.search=${encodeURIComponent(marker)}`;
       const warning = page.getByText(`${marker} browser warning`, { exact: true }).first();
       const server = page.getByText(`${marker} server error`, { exact: true }).first();
 
       await page.setViewportSize({ width: 390, height: 844 });
-      await page.goto(logsPath, { waitUntil: "domcontentloaded" });
+      await fixture.goto(logsPath, locale);
       await warning.waitFor({ timeout: 60_000 });
       await server.waitFor();
       await page.getByText(t("widget.kpi.unresolvedInScope"), { exact: true }).waitFor();
@@ -83,19 +85,20 @@ describe("Error log filters and System health on Atlas", () => {
       expect(await page.getByText(t("widget.chart.endpointTitle"), { exact: true }).count()).toBe(0);
       const button = page.getByRole("button", { name: t("widget.filter.more"), exact: true });
       expect(await button.isVisible()).toBe(true);
-      expect(await page.getByRole("button", { name: t(ErrorLogLevelFilter.WARN), exact: true }).count()).toBe(0);
+      expect(await page.getByRole("radio", { name: t(ErrorLogLevelFilter.WARN), exact: true }).count()).toBe(0);
       await save(page, `error-logs-populated-${short}-phone`);
       await button.click();
       const sheet = page.getByRole("dialog");
       await sheet.waitFor();
-      await sheet.getByRole("button", { name: t(ErrorLogStatusFilter.ALL), exact: true }).first().click();
-      await sheet.getByRole("button", { name: t(ErrorLogLevelFilter.WARN), exact: true }).click();
-      const sources = sheet.getByRole("group", { name: t("get.fields.source.label") });
-      const clientSource = sources.getByRole("button", { name: t(ErrorLogSourceFilter.CLIENT), exact: true });
+      const statuses = sheet.getByRole("radiogroup", { name: t("get.fields.status.label") });
+      await statuses.getByRole("radio", { name: t(ErrorLogStatusFilter.ALL), exact: true }).click();
+      await sheet.getByRole("radio", { name: t(ErrorLogLevelFilter.WARN), exact: true }).click();
+      const sources = sheet.getByRole("radiogroup", { name: t("get.fields.source.label") });
+      const clientSource = sources.getByRole("radio", { name: t(ErrorLogSourceFilter.CLIENT), exact: true });
       await clientSource.click();
-      expect(await sources.locator('[aria-pressed="true"]').count()).toBe(1);
-      expect(await clientSource.getAttribute("aria-pressed")).toBe("true");
-      expect(await sources.getByRole("button", { name: t(ErrorLogSourceFilter.ALL), exact: true }).getAttribute("aria-pressed")).toBe("false");
+      expect(await sources.getByRole("radio", { checked: true }).count()).toBe(1);
+      expect(await clientSource.getAttribute("aria-checked")).toBe("true");
+      expect(await sources.getByRole("radio", { name: t(ErrorLogSourceFilter.ALL), exact: true }).getAttribute("aria-checked")).toBe("false");
       await save(page, `error-logs-filters-${short}-phone`, async () => {
         const contrast = await sheet.evaluate((element) => {
           const title = element.querySelector("h2");
@@ -139,8 +142,9 @@ describe("Error log filters and System health on Atlas", () => {
       await page.getByText(`${marker} resolved warning`, { exact: true }).first().waitFor();
 
       await page.setViewportSize({ width: 1440, height: 900 });
-      await page.goto(logsPath, { waitUntil: "domcontentloaded" });
+      await fixture.goto(logsPath, locale);
       await server.waitFor({ timeout: 60_000 });
+      await saveAdminReviewScreenshots(page, "error-logs", locale);
       await save(page, `error-logs-populated-${short}-desktop`);
 
       if (short === "en") {
@@ -152,7 +156,7 @@ describe("Error log filters and System health on Atlas", () => {
             await route.continue();
           }
         });
-        await page.goto(logsPath, { waitUntil: "domcontentloaded" });
+        await fixture.goto(logsPath, locale);
         const error = page.getByText(t("get.errors.server.title"), { exact: true }).last();
         await error.waitFor({ timeout: 45_000 });
         await save(page, "error-logs-transport-error-en-desktop");
@@ -176,4 +180,46 @@ describe("Error log filters and System health on Atlas", () => {
       }
     });
   }
+
+  e2e.it("resolves a matching group and restores only the classes it changed", async (fixture) => {
+    const locale = "en-US";
+    const { capture, cleanup, page } = fixture;
+    const { t } = scopedTranslation.scopedT(locale);
+    const marker = `Sample error group ${randomUUID().slice(0, 8)}`;
+    const open = [randomUUID(), randomUUID()];
+    const alreadyResolved = randomUUID();
+    const fingerprints = [...open, alreadyResolved];
+    cleanup(async () => {
+      await db.delete(errorLogs).where(inArray(errorLogs.fingerprint, fingerprints));
+    });
+    await db.insert(errorLogs).values(fingerprints.map((fingerprint): typeof errorLogs.$inferInsert => ({
+      fingerprint,
+      message: marker,
+      level: "error",
+      resolved: fingerprint === alreadyResolved,
+    })));
+
+    await authAtlas(fixture, await resolveTestAdminUser());
+    await fixture.goto(`/tools/error-logs?arg.search=${encodeURIComponent(marker)}`, locale);
+    const tool = page.locator("#admin-tool-error-logs");
+    const resolve = tool.getByRole("button", { name: t("widget.list.resolveGroup", { count: 2 }), exact: true });
+    await resolve.waitFor({ timeout: 60_000 });
+    await saveAdminReviewScreenshots(page, "update-error-log", locale);
+    const resolved = await capture(endpoint.PATCH, () => resolve.click());
+    expect(resolved.response.success).toBe(true);
+    if (!resolved.response.success) {
+      return;
+    }
+    expect(resolved.response.data.affectedFingerprints?.toSorted()).toEqual(open.toSorted());
+
+    const undo = tool.getByRole("button", { name: t("widget.list.undo"), exact: true });
+    const undone = await capture(endpoint.PATCH, () => undo.click());
+    expect(undone.response.success).toBe(true);
+    const rows = await db.select({
+      fingerprint: errorLogs.fingerprint,
+      resolved: errorLogs.resolved,
+    }).from(errorLogs).where(inArray(errorLogs.fingerprint, fingerprints));
+    expect(rows.filter(({ resolved: value }) => value).map(({ fingerprint }) => fingerprint))
+      .toEqual([alreadyResolved]);
+  });
 });

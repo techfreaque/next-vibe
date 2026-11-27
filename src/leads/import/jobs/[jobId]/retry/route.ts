@@ -13,12 +13,12 @@ import definitions from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ user, urlPathParams, logger, locale }) =>
+    handler: ({ user, urlPathParams, logger, t }) =>
       LeadsImportJobRepository.retryJob(
         user.id,
         urlPathParams.jobId,
         logger,
-        locale,
+        t,
       ),
   },
 });

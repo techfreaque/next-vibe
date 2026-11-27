@@ -213,33 +213,33 @@ export const translations = {
     },
   },
   post: {
-    title: "Create Cron Task",
-    titleShort: "Create Task",
+    title: "Create cron task",
+    titleShort: "Create task",
     description: "Create a new cron task",
     container: {
-      title: "Create Task",
+      title: "Create task",
       description: "Configure a new cron task",
     },
     fields: {
       id: {
-        label: "Task ID",
+        label: "Task key",
         description:
           "Unique, stable identifier for this task (e.g. 'db-health')",
         placeholder: "Enter task ID...",
       },
       routeId: {
-        label: "Route ID",
+        label: "Endpoint alias",
         description:
           "Handler identifier: task name, endpoint alias, or 'cron-steps'",
         placeholder: "Enter route ID...",
       },
       displayName: {
-        label: "Display Name",
+        label: "Display name",
         description: "Human-readable label for this task",
         placeholder: "Enter display name...",
       },
       outputMode: {
-        label: "Output Mode",
+        label: "Output mode",
         description: "When to send notifications after execution",
         placeholder: "Select output mode...",
       },
@@ -279,22 +279,22 @@ export const translations = {
         description: "Number of retry attempts",
       },
       retryDelay: {
-        label: "Retry Delay (ms)",
+        label: "Retry delay (ms)",
         description: "Delay between retries in milliseconds",
       },
       taskInput: {
-        label: "Task Input",
+        label: "Task input",
         description: "JSON input data for the task",
         placeholder: '{ "dryRun": false }',
         invalidJson: "Not valid JSON. Check quotes, commas and brackets.",
         notObject: 'Task input must be a JSON object, like { "key": "value" }.',
       },
       runOnce: {
-        label: "Run Once",
+        label: "Run once",
         description: "Run this task only once and then disable it",
       },
       targetInstance: {
-        label: "Target Instance",
+        label: "Target instance",
         description:
           "Instance ID this task should run on (e.g. 'hermes', 'thea-prod'). Leave empty to run only on the host instance.",
         placeholder: "Leave empty for host only",
@@ -317,10 +317,10 @@ export const translations = {
         priority: "Priority",
         timeout: "Timeout (ms)",
         retries: "Retries",
-        retryDelay: "Retry Delay (ms)",
-        taskInput: "Task Input",
-        runOnce: "Run Once",
-        outputMode: "Output Mode",
+        retryDelay: "Retry delay (ms)",
+        taskInput: "Task input",
+        runOnce: "Run once",
+        outputMode: "Output mode",
         notificationTargets: "Notification Targets",
         lastExecutedAt: "Last Executed At",
         lastExecutionStatus: "Last Execution Status",
@@ -332,7 +332,7 @@ export const translations = {
         errorCount: "Error Count",
         averageExecutionTime: "Average Execution Time (ms)",
         consecutiveFailures: "Consecutive Failures",
-        targetInstance: "Target Instance",
+        targetInstance: "Target instance",
         tags: "Tags",
         owner: "Owner",
         createdAt: "Created At",

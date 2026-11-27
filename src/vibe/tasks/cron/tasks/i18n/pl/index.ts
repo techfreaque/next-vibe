@@ -226,19 +226,19 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "ID zadania",
+        label: "Klucz zadania",
         description:
           "Unikalny, stały identyfikator tego zadania (np. 'db-health')",
         placeholder: "Wprowadź ID zadania...",
       },
       routeId: {
-        label: "ID trasy",
+        label: "Alias punktu końcowego",
         description:
           "Identyfikator obsługi: nazwa zadania, alias endpointu lub 'cron-steps'",
         placeholder: "Wprowadź ID trasy...",
       },
       displayName: {
-        label: "Wyświetlana nazwa",
+        label: "Nazwa wyświetlana",
         description: "Czytelna dla człowieka etykieta tego zadania",
         placeholder: "Wprowadź wyświetlaną nazwę...",
       },

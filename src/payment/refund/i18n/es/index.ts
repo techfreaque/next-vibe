@@ -52,8 +52,10 @@ export const translations: typeof enTranslations = {
     customerEmail: "Email del cliente",
     customerId: "Cliente ID",
     originalAmount: "Cargo original",
+    chooseTransaction: "Buscar un pago",
     enterTransaction:
-      "Introduce el ID de la transacción para ver los detalles del pago.",
+      "Abre un pago en Transacciones para revisar el cargo y el importe del reembolso.",
+    transactionDate: "Fecha del cargo",
     lookupLoading: "Cargando la transacción guardada",
     transactionMissing: "Transacción no encontrada",
     lookupFailed: "No se pudo cargar la transacción",
@@ -68,7 +70,7 @@ export const translations: typeof enTranslations = {
     review: "Monto de examen",
     confirmTitle: "Confirme el reembolso de Stripe",
     confirmDescription:
-      "Stripe reembolsará la transacción {{transactionId}} de {{email}}. Esta operación transfiere dinero.",
+      "Stripe reembolsará el pago de {{email}}. Esta acción devuelve fondos.",
     confirm: "Reembolso de emisión",
     cancel: "Cancelar",
   },

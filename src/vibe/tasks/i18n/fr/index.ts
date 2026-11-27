@@ -121,7 +121,7 @@ export const translations: typeof enTranslations = {
         "toutes les {{interval}} heures à partir de {{start}} h",
       atHours: "à {{hours}} h",
       fromHourToHour: "de {{from}} h à {{to}} h",
-      atHour: "à {{hour}} h",
+      atHour: "à {{hour}}",
     },
     calendar: {
       onDays: "les jours {{days}}",

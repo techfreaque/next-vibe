@@ -45,10 +45,13 @@ const { PATCH } = createEndpoint({
     children: {
       skillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: async () =>
+          (await import("next-vibe/agent/skills/definition")).default.GET,
+        labelField: "name",
         label: "patch.skillId.label" as const,
         description: "patch.skillId.description" as const,
-        schema: z.uuid(),
+        schema: z.string().trim().min(1).max(255),
       }),
 
       // === RESPONSE ===

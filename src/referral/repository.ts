@@ -1967,7 +1967,7 @@ export class ReferralRepository {
           and(
             eq(payoutRequests.id, requestId),
             eq(payoutRequests.status, PayoutStatus.PENDING),
-            ne(payoutRequests.currency, PayoutCurrency.CREDITS),
+            eq(payoutRequests.currency, request.currency),
           ),
         )
         .returning({ id: payoutRequests.id });

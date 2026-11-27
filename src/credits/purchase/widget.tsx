@@ -271,6 +271,7 @@ export function CreditsPurchaseContainer({
                     type="button"
                     variant="ghost"
                     size="lg"
+                    aria-label={t("post.pack.removePack")}
                     className="h-14 w-14 rounded-none border-r border-border text-xl font-light flex-shrink-0"
                     onClick={() => setQuantity(quantity - 1)}
                     disabled={quantity <= MIN_QTY}
@@ -291,6 +292,7 @@ export function CreditsPurchaseContainer({
                     type="button"
                     variant="ghost"
                     size="lg"
+                    aria-label={t("post.pack.addPack")}
                     className="h-14 w-14 rounded-none border-l border-border text-xl font-light flex-shrink-0"
                     onClick={() => setQuantity(quantity + 1)}
                   >

@@ -1,11 +1,12 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 import {
   formatDocDate,
   formatMoney,
@@ -26,6 +27,7 @@ import type { JSX } from "react";
 
 import { ReportAsOfControl } from "@/finance/report-period-control";
 
+import { AccountSubtype } from "../../enum";
 import { formatAccountingDateInput } from "../../shared/calendar-date";
 import { reportAmountClass } from "../report-amount-class";
 import type definition from "./definition";
@@ -52,7 +54,7 @@ function AccountLine({
 }: {
   formatAmount: (value: number) => string;
   item: BalanceSheetItem;
-  subtypeLabel: string;
+  subtypeLabel?: string;
   onDrill: (accountId: string) => () => void;
 }): JSX.Element {
   return (
@@ -62,14 +64,21 @@ function AccountLine({
         variant="ghost"
         size="sm"
         onClick={onDrill(item.accountId)}
-        className="text-left hover:underline cursor-pointer font-mono text-xs text-muted-foreground w-16 shrink-0 h-auto p-0"
+        className="h-auto min-h-10 w-16 shrink-0 p-0 text-left font-mono text-xs text-muted-foreground hover:underline @md:min-h-0"
       >
-        {item.code ?? item.accountId}
+        {item.code}
       </Button>
-      <Span className="flex-1 truncate">{item.name}</Span>
-      <Span className="text-xs text-muted-foreground hidden sm:block">
-        {subtypeLabel}
+      <Span className="min-w-0 flex-1 truncate" title={item.name}>
+        {item.name}
       </Span>
+      {subtypeLabel && (
+        <Span
+          className="hidden max-w-32 truncate text-xs text-muted-foreground @md:block"
+          title={subtypeLabel}
+        >
+          {subtypeLabel}
+        </Span>
+      )}
       <Span
         className={`shrink-0 text-right ${reportAmountClass(item.balance)}`}
       >
@@ -97,7 +106,7 @@ function Section({
   total: number;
   totalLabel: string;
   noEntriesLabel: string;
-  getSubtypeLabel: (subtype: string) => string;
+  getSubtypeLabel: (subtype: string) => string | undefined;
   onDrill: (accountId: string) => () => void;
 }): JSX.Element {
   return (
@@ -109,7 +118,7 @@ function Section({
         items.map((item) => (
           <AccountLine
             formatAmount={formatAmount}
-            key={item.code}
+            key={item.accountId}
             item={item}
             subtypeLabel={getSubtypeLabel(item.subtype)}
             onDrill={onDrill}
@@ -161,6 +170,8 @@ export function BalanceSheetWidget(
         (!requestedCurrency || data?.reportCurrency === requestedCurrency)));
   const formatAmount = (value: number): string =>
     formatMoney(value, data?.reportCurrency, locale);
+  const getSubtypeLabel = (subtype: string): string | undefined =>
+    isValidEnumValue(AccountSubtype, subtype) ? t(subtype) : undefined;
 
   const handleAccountDrill = (accountId: string): (() => void) => {
     return (): void => {
@@ -235,19 +246,20 @@ export function BalanceSheetWidget(
                 {formatDocDate(data.asOfDateResponse, locale)}
               </Span>
               {data.isBalanced !== undefined && (
-                <Badge
-                  variant={data.isBalanced ? "default" : "destructive"}
-                  className="text-xs"
-                >
-                  {data.isBalanced
-                    ? t("balanceSheet.widget.balanced")
-                    : t("balanceSheet.widget.unbalanced")}
-                </Badge>
+                <StatusPill
+                  status={data.isBalanced ? "balanced" : "unbalanced"}
+                  variant={data.isBalanced ? "success" : "danger"}
+                  label={t(
+                    data.isBalanced
+                      ? "balanceSheet.widget.balanced"
+                      : "balanceSheet.widget.unbalanced",
+                  )}
+                />
               )}
             </Div>
           )}
 
-          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Div className="grid grid-cols-1 items-start gap-4 @3xl:grid-cols-2">
             <Section
               formatAmount={formatAmount}
               title={t("balanceSheet.response.assets")}
@@ -255,9 +267,7 @@ export function BalanceSheetWidget(
               total={data.totalAssets ?? 0}
               totalLabel={t("balanceSheet.response.totalAssets")}
               noEntriesLabel={t("balanceSheet.widget.noEntries")}
-              getSubtypeLabel={(s) =>
-                t(`enums.accountSubtype.${s}` as Parameters<typeof t>[0])
-              }
+              getSubtypeLabel={getSubtypeLabel}
               onDrill={handleAccountDrill}
             />
 
@@ -269,9 +279,7 @@ export function BalanceSheetWidget(
                 total={data.totalLiabilities ?? 0}
                 totalLabel={t("balanceSheet.response.totalLiabilities")}
                 noEntriesLabel={t("balanceSheet.widget.noEntries")}
-                getSubtypeLabel={(s) =>
-                  t(`enums.accountSubtype.${s}` as Parameters<typeof t>[0])
-                }
+                getSubtypeLabel={getSubtypeLabel}
                 onDrill={handleAccountDrill}
               />
               <Section
@@ -289,9 +297,7 @@ export function BalanceSheetWidget(
                 total={data.totalEquity ?? 0}
                 totalLabel={t("balanceSheet.response.totalEquity")}
                 noEntriesLabel={t("balanceSheet.widget.noEntries")}
-                getSubtypeLabel={(s) =>
-                  t(`enums.accountSubtype.${s}` as Parameters<typeof t>[0])
-                }
+                getSubtypeLabel={getSubtypeLabel}
                 onDrill={handleAccountDrill}
               />
               <Div className="rounded-md border px-3 py-2 flex items-center justify-between text-sm font-semibold bg-muted/30">

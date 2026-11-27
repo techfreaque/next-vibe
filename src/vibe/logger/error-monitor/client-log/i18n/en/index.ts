@@ -9,9 +9,9 @@ export const translations = {
   },
 
   post: {
-    title: "Report Client Error",
-    titleShort: "Log Error",
-    description: "Persist a client-side error or warning to the error log",
+    title: "Report client error",
+    titleShort: "Log error",
+    description: "Save a browser error or warning in the error log.",
     tags: {
       monitoring: "Monitoring",
     },

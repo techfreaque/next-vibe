@@ -13,14 +13,13 @@ export const translations: typeof enTranslations = {
     description:
       "Registrare quale abilità ha portato questo vantaggio (attribuzione del primo tocco)",
     skillId: {
-      label: "ID della skill",
-      description:
-        "UUID dell'abilità personalizzata da attribuire a questo contatto",
+      label: "Competenza",
+      description: "Scegli una competenza pubblicata dalla community.",
     },
     errors: {
       validation: {
-        title: "Abilità non valida ID",
-        description: "Deve essere una valida UUID di un'abilità personalizzata",
+        title: "Scegli una competenza",
+        description: "Scegli una competenza pubblicata dalla community.",
       },
       network: {
         title: "Errore di rete",
@@ -64,7 +63,7 @@ export const translations: typeof enTranslations = {
     skipped: {
       title: "Non registrato",
       description:
-        "Nessuna sessione di visitatori da attribuire. Aprire prima una pagina, poi riprovare.",
+        "La prima competenza del visitatore resta registrata. Apri una nuova sessione per provarne un’altra.",
     },
     submit: "Attribuire abilità",
   },

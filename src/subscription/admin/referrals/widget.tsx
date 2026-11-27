@@ -47,6 +47,7 @@ import React, { useCallback, useState } from "react";
 import { scopedTranslation as growthTranslation } from "@/leads/growth/i18n";
 import { PayoutCurrency, PayoutStatus } from "@/referral/enum";
 import { scopedTranslation as referralTranslation } from "@/referral/i18n";
+import { getAdminPayoutActions } from "@/referral/payout-actions";
 
 import { PayoutAction } from "../enum";
 import type definition from "./definition";
@@ -182,6 +183,10 @@ function PayoutRow({
   );
   const statusLabel = statusKey ? referralT(statusKey) : payout.status;
   const currencyLabel = currencyKey ? referralT(currencyKey) : payout.currency;
+  const actions =
+    statusKey && currencyKey
+      ? getAdminPayoutActions({ status: statusKey, currency: currencyKey })
+      : [];
 
   return (
     <Div className="flex items-start justify-between gap-3 py-4">
@@ -198,9 +203,8 @@ function PayoutRow({
         </Div>
         <Div className="text-sm text-muted-foreground">
           <Span className="tabular-nums">
-            {payout.amountCents.toLocaleString(locale)}
-          </Span>{" "}
-          {currencyLabel}
+            {`${formatCurrency(payout.amountCents / 100, "USD", locale)} · ${currencyLabel}`}
+          </Span>
         </Div>
         {payout.walletAddress ? (
           <Div className="text-xs text-muted-foreground truncate max-w-xs">
@@ -217,29 +221,29 @@ function PayoutRow({
         </Div>
       </Div>
       <Div className="flex flex-col gap-1 shrink-0">
-        {payout.status === PayoutStatus.PENDING ? (
-          <>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="text-xs"
-              onClick={(): void => onAction(payout.id, PayoutAction.APPROVE)}
-            >
-              {t("widget.approve")}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="text-xs text-destructive"
-              onClick={(): void => onAction(payout.id, PayoutAction.REJECT)}
-            >
-              {t("widget.reject")}
-            </Button>
-          </>
-        ) : null}
-        {payout.status === PayoutStatus.APPROVED ? (
+        {actions.includes("approve") && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="text-xs"
+            onClick={(): void => onAction(payout.id, PayoutAction.APPROVE)}
+          >
+            {t("widget.approve")}
+          </Button>
+        )}
+        {actions.includes("reject") && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="text-xs text-destructive"
+            onClick={(): void => onAction(payout.id, PayoutAction.REJECT)}
+          >
+            {t("widget.reject")}
+          </Button>
+        )}
+        {actions.includes("complete") && (
           <Button
             type="button"
             size="sm"
@@ -249,7 +253,7 @@ function PayoutRow({
           >
             {t("widget.complete")}
           </Button>
-        ) : null}
+        )}
       </Div>
     </Div>
   );

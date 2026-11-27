@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     description:
       "Miękka dezaktywacja konta. Nie można dezaktywować kont systemowych ani kont z zaksięgowanymi wierszami.",
     accountId: {
-      label: "ID konta",
+      label: "Konto",
       description: "Konto do dezaktywacji",
-      placeholder: "UUID konta",
+      placeholder: "Wybierz konto",
     },
     errors: {
       unauthorized: {

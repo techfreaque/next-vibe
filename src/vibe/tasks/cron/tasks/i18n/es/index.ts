@@ -226,19 +226,19 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "Task ID",
+        label: "Clave de la tarea",
         description:
           "Identificador único y estable para esta tarea (por ejemplo, 'db-salud')",
         placeholder: "Ingrese la tarea ID...",
       },
       routeId: {
-        label: "Ruta ID",
+        label: "Alias del endpoint",
         description:
           "Identificador de Handler: nombre de tarea, alias de endpoint o 'cron-steps'",
         placeholder: "Ingrese la ruta ID...",
       },
       displayName: {
-        label: "Nombre de pantalla",
+        label: "Nombre visible",
         description: "Etiquetas legibles para esta tarea",
         placeholder: "Introduzca el nombre de la pantalla...",
       },

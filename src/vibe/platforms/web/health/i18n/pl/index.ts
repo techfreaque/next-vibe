@@ -30,6 +30,35 @@ export const translations: typeof enTranslations = {
         description: "Dołącz informacje o zasobach systemowych",
       },
     },
+    widget: {
+      refresh: "Sprawdź stan",
+      health: {
+        healthy: "Prawidłowy",
+        warning: "Ostrzeżenie",
+        critical: "Krytyczny",
+        unknown: "Nieznany",
+      },
+      results: {
+        pass: "Zaliczono",
+        warn: "Ostrzeżenie",
+        fail: "Błąd",
+      },
+      checks: {
+        traffic: "Obsługa ruchu",
+        process: "Proces serwera",
+      },
+      messages: {
+        draining: "Trwa zamykanie. Wciąż aktywne strumienie: {{count}}.",
+        accepting: "Serwer przyjmuje ruch. Aktywne strumienie: {{count}}.",
+        memory: "Wysokie użycie pamięci ({{usage}}).",
+        processOk: "Serwer działa prawidłowo.",
+        databaseOk: "Połączono z bazą danych.",
+        databaseFailed: "Nie udało się połączyć z bazą danych.",
+        tasksDisabled: "Moduł zadań jest wyłączony w tym środowisku.",
+        tasksOk: "Moduł zadań jest dostępny.",
+        systemOk: "Zasoby systemowe są w dobrym stanie.",
+      },
+    },
     response: {
       status: {
         title: "Status",

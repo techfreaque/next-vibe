@@ -51,15 +51,15 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     empty:
-      "Todavía no hay suscriptores. Comparte tu página de habilidad - cada visita es una oportunidad para crecer tu lista.",
+      "Todavía no hay suscriptores. Comparte la página de tu habilidad para ampliar tu lista.",
     exportCsv: "Exportar CSV",
     columns: {
       date: "Fecha",
       name: "Nombre",
       email: "Correo electrónico",
-      status: "Situación",
+      status: "Estado",
     },
-    statusSuccess: "Captured",
-    statusFailed: "Failed",
+    statusSuccess: "Registrado",
+    statusFailed: "Fallido",
   },
 };

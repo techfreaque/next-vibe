@@ -14,12 +14,10 @@ import {
 import { KpiGrid, KpiTile } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Minus } from "next-vibe/ui/components/icons/Minus";
-import { Plus } from "next-vibe/ui/components/icons/Plus";
-import { Input } from "next-vibe/ui/components/input";
 import { ListItem } from "next-vibe/ui/components/list-item";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Progress, ProgressIndicator } from "next-vibe/ui/components/progress";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
@@ -27,16 +25,24 @@ import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetForm,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
-  useWidgetOnSubmit,
   useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import type { JSX } from "react";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+import { type JSX, useEffect, useRef } from "react";
 
-import type definition from "./definition";
+import definition from "./definition";
 
 type CapT = ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 
@@ -239,111 +245,92 @@ export function PublicCapContainer(): JSX.Element {
   );
 }
 
-export function PublicCapUpdateContainer(): JSX.Element {
+export function PublicCapUpdateContainer({
+  field: { children },
+}: {
+  field: (typeof definition.POST)["fields"];
+}): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
-  const locale = useWidgetLocale();
-  const form = useWidgetForm();
-  const onSubmit = useWidgetOnSubmit();
-  const postValue = useWidgetValue<typeof definition.POST>();
+  const form = useWidgetForm<typeof definition.POST>();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const responseOnly = useWidgetResponseOnly();
+  const result = useWidgetValue<typeof definition.POST>();
   const { pop, canGoBack } = useWidgetNavigation();
-  const credits = new Intl.NumberFormat(locale);
+  const initialized = useRef(false);
+  const current = useEndpoint(
+    { GET: definition.GET },
+    { read: { queryOptions: { enabled: !responseOnly } } },
+    logger,
+    user,
+  ).read;
 
-  const capAmount = Number(form.watch("capAmount") ?? 500);
+  useEffect((): void => {
+    if (!current.data || initialized.current) {
+      return;
+    }
+    initialized.current = true;
+    const draft = form.getValues();
+    const cap = children.capAmount.schema.safeParse(draft.capAmount);
+    const perLead = children.perLeadCap.schema.safeParse(draft.perLeadCap);
+    const perIp = children.perIpCap.schema.safeParse(draft.perIpCap);
+    form.reset({
+      capAmount: cap.success ? cap.data : current.data.capAmount,
+      perLeadCap:
+        (perLead.success ? perLead.data : undefined) ?? current.data.perLeadCap,
+      perIpCap:
+        (perIp.success ? perIp.data : undefined) ?? current.data.perIpCap,
+    });
+  }, [children, current.data, form]);
 
-  function setCap(next: number): void {
-    form.setValue("capAmount", Math.max(1, next), { shouldValidate: true });
+  const resultBanner = result?.message ? (
+    <ResultBanner variant="success" title={result.message} />
+  ) : null;
+  if (responseOnly) {
+    return <WidgetShell>{resultBanner}</WidgetShell>;
+  }
+
+  const title = t("post.title");
+  const backButton = canGoBack ? (
+    <Button type="button" variant="ghost" size="sm" onClick={() => pop()}>
+      {t("post.back")}
+    </Button>
+  ) : undefined;
+  if (!current.data) {
+    return (
+      <WidgetShell layout="page">
+        <WidgetHeader size="page" title={title} backButton={backButton} />
+        {current.response?.success === false ? (
+          <Alert variant="destructive">
+            <AlertTitle>{t("get.errors.server.title")}</AlertTitle>
+            <AlertDescription>{current.response.message}</AlertDescription>
+          </Alert>
+        ) : (
+          <LoadingBlock />
+        )}
+      </WidgetShell>
+    );
   }
 
   return (
-    <WidgetShell layout="page">
-      <WidgetHeader
-        size="page"
-        title={t("post.title")}
-        subtitle={t("post.description")}
-        backButton={
-          canGoBack ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => pop()}
-            >
-              {t("post.back")}
-            </Button>
-          ) : undefined
-        }
-      />
-      <Div className="flex max-w-2xl flex-col gap-4 rounded-xl border bg-card p-4 @md:p-6">
-        <FormAlertWidget field={{}} />
-        {postValue?.message ? (
-          <Alert variant="success">
-            <AlertDescription>{postValue.message}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        <Div className="flex flex-col gap-2">
-          <Span className="text-sm font-medium">
-            {t("post.capAmount.label")}
-          </Span>
-          <Div className="flex items-center overflow-hidden rounded-lg border">
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-12 w-12 shrink-0 rounded-none border-r"
-              aria-label={t("post.decrease")}
-              onClick={() => setCap(capAmount - 100)}
-              disabled={capAmount <= 1}
-            >
-              <Minus className="size-5" aria-hidden="true" />
-            </Button>
-            <Div className="flex h-12 flex-1 flex-col items-center justify-center select-none">
-              <Span className="text-xl font-semibold tabular-nums">
-                {credits.format(capAmount)}
-              </Span>
-              <Span className="text-xs text-muted-foreground">
-                {t("post.perDayUnit")}
-              </Span>
-            </Div>
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-12 w-12 shrink-0 rounded-none border-l"
-              aria-label={t("post.increase")}
-              onClick={() => setCap(capAmount + 100)}
-            >
-              <Plus className="size-5" aria-hidden="true" />
-            </Button>
-          </Div>
+    <AdminForm
+      title={title}
+      description={t("post.description")}
+      backButton={backButton}
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "post.titleShort" }}
+        />
+      }
+      result={resultBanner}
+    >
+      <AdminFormSection title={t("get.limits")} columns={2}>
+        <Div className="@lg:col-span-2">
+          <NumberFieldWidget field={children.capAmount} fieldName="capAmount" />
         </Div>
-
-        <Div className="grid grid-cols-1 gap-4 @md:grid-cols-2">
-          {(["perLeadCap", "perIpCap"] as const).map((name) => (
-            <Div key={name} className="flex flex-col gap-1">
-              <Span className="text-sm font-medium">
-                {t(`post.${name}.label`)}
-              </Span>
-              <Input
-                type="number"
-                min={1}
-                aria-label={t(`post.${name}.label`)}
-                defaultValue={form.getValues(name) ?? undefined}
-                placeholder={t(`post.${name}.placeholder`)}
-                onChangeText={(v) =>
-                  form.setValue(name, v === "" ? undefined : Number(v), {
-                    shouldValidate: true,
-                  })
-                }
-              />
-            </Div>
-          ))}
-        </Div>
-
-        <Div className="flex justify-end">
-          <Button type="button" className="min-h-10" onClick={onSubmit}>
-            {t("post.titleShort")}
-          </Button>
-        </Div>
-      </Div>
-    </WidgetShell>
+        <NumberFieldWidget field={children.perLeadCap} fieldName="perLeadCap" />
+        <NumberFieldWidget field={children.perIpCap} fieldName="perIpCap" />
+      </AdminFormSection>
+    </AdminForm>
   );
 }

@@ -51,7 +51,10 @@ export const translations: typeof enTranslations = {
     customerEmail: "Zákaznícka pošta",
     customerId: "ID zákazníka",
     originalAmount: "Pôvodný náboj",
-    enterTransaction: "Zadajte ID transakcie pre načítanie platobných údajov.",
+    chooseTransaction: "Vyhľadať platbu",
+    enterTransaction:
+      "Otvor platbu v zozname transakcií a skontroluj účtovanú sumu a výšku refundácie.",
+    transactionDate: "Dátum zaúčtovania",
     lookupLoading: "Načítavam uloženú transakciu",
     transactionMissing: "Transakcia nebola nájdená",
     lookupFailed: "Nepodarilo sa načítať transakciu",
@@ -65,7 +68,7 @@ export const translations: typeof enTranslations = {
     review: "Suma na preskúmanie",
     confirmTitle: "Potvrdiť vrátenie platby cez Stripe",
     confirmDescription:
-      "Stripe vráti peniaze z transakcie {{transactionId}} pre adresu {{email}}. Touto akciou sa prevedú peniaze.",
+      "Stripe vráti platbu pre {{email}}. Touto akciou sa vrátia peniaze.",
     confirm: "Vydané náhrady",
     cancel: "Zrušiť",
   },

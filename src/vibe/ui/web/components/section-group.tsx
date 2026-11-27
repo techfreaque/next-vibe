@@ -52,6 +52,7 @@ export function SectionGroup({
                 }
               },
               role: "button" as const,
+              "aria-expanded": open,
               tabIndex: 0,
             }
           : {})}
@@ -68,6 +69,7 @@ export function SectionGroup({
         </div>
         {collapsible ? (
           <span
+            aria-hidden="true"
             className={cn(
               "text-muted-foreground transition-transform text-xs",
               open && "rotate-180",

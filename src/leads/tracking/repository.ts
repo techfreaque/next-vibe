@@ -748,7 +748,7 @@ export class LeadTrackingRepository {
       const currentUserId = user.isPublic
         ? undefined
         : isAdmin
-          ? (data.userId ?? user.id)
+          ? (data.userId ?? (leadId === user.leadId ? user.id : undefined))
           : user.id;
       if (currentUserId && (isAdmin || leadId === user.leadId)) {
         try {
@@ -969,12 +969,18 @@ export class LeadTrackingRepository {
       const redirectUrl = resolveSafeRedirect(url, sig, locale);
       const isLoggedIn = !user.isPublic;
       const currentLeadId = user.leadId;
+      // An operator can record a lead's click without claiming the lead as their own.
+      const canAttributeIdentity =
+        !isLoggedIn ||
+        !user.roles.includes(UserPermissionRole.ADMIN) ||
+        !trackingLeadId ||
+        trackingLeadId === currentLeadId;
       let engagementRecorded = false;
       let leadStatusUpdated = false;
       let leadsLinked = false;
 
       // Handle referral code linking to current user's lead
-      if (ref && currentLeadId) {
+      if (ref && currentLeadId && canAttributeIdentity) {
         try {
           const referralResult = await ReferralRepository.linkReferralToLead(
             currentLeadId,
@@ -1001,7 +1007,7 @@ export class LeadTrackingRepository {
       }
 
       // Extract skillId from destination URL if visiting a skill page (first-touch only)
-      if (url && currentLeadId) {
+      if (url && currentLeadId && canAttributeIdentity) {
         const skillIdFromUrl = extractSkillIdFromUrl(url);
         if (skillIdFromUrl) {
           void LeadsRepository.updateLeadSkillId(
@@ -1039,7 +1045,11 @@ export class LeadTrackingRepository {
       };
 
       // Link tracking leadId with current user's leadId (lead-to-lead or lead-to-user tracking)
-      if (trackingLeadId !== currentLeadId && currentLeadId) {
+      if (
+        canAttributeIdentity &&
+        trackingLeadId !== currentLeadId &&
+        currentLeadId
+      ) {
         try {
           if (isLoggedIn && user.id) {
             await LeadAuthRepository.linkLeadToUser(
@@ -1100,21 +1110,24 @@ export class LeadTrackingRepository {
       }
 
       // Update lead status if user is logged in
-      if (isLoggedIn) {
+      if (isLoggedIn && canAttributeIdentity) {
         try {
           const leadResult = await LeadsRepository.getLeadByIdInternal(
             trackingLeadId,
             logger,
             t,
           );
-          if (leadResult.success) {
-            await LeadsRepository.updateLeadInternal(
+          if (
+            leadResult.success &&
+            leadResult.data.lead.basicInfo.status !== LeadStatus.SIGNED_UP
+          ) {
+            const updated = await LeadsRepository.updateLeadInternal(
               trackingLeadId,
               { status: LeadStatus.SIGNED_UP },
               logger,
               t,
             );
-            leadStatusUpdated = true;
+            leadStatusUpdated = updated.success;
           }
         } catch (error) {
           logger.error(

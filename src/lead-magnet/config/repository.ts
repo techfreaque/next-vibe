@@ -20,7 +20,7 @@ type LeadMagnetProviderKey = (typeof LeadMagnetProviderDB)[number];
 
 /**
  * Credential keys that are sensitive and must never be returned to the client.
- * Matched by exact key name - all use FieldDataType.PASSWORD in their definitions.
+ * Includes credentials entered in password fields and tokens issued by OAuth.
  */
 const SENSITIVE_CREDENTIAL_KEYS = new Set([
   "klaviyoApiKey",
@@ -36,6 +36,8 @@ const SENSITIVE_CREDENTIAL_KEYS = new Set([
   "expertSenderApiKey",
   "freshmailApiKey",
   "freshmailApiSecret",
+  "googleAccessToken",
+  "googleRefreshToken",
   "mailupClientSecret",
   "mailupPassword",
   "mappPassword",

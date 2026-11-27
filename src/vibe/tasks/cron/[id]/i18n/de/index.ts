@@ -174,6 +174,10 @@ export const translations: typeof enTranslations = {
       taskInput: {
         label: "Aufgabeneingabe",
         description: "JSON-Eingabedaten für die Aufgabe",
+        invalidJson:
+          "Kein gültiges JSON. Prüfen Sie Anführungszeichen, Kommas und Klammern.",
+        notObject:
+          'Die Aufgabeneingabe muss ein JSON-Objekt sein, z. B. { "key": "value" }.',
       },
       hidden: {
         label: "Versteckt",
@@ -303,7 +307,7 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "Aufgaben-ID",
+        label: "Aufgabenschlüssel",
         description: "Eindeutige Kennung der zu löschenden Aufgabe",
       },
     },

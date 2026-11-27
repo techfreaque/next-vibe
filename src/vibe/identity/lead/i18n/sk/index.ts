@@ -5302,6 +5302,8 @@ export const translations: typeof enTranslations = {
       },
       patch: {
         error: {
+          invalidStatusTransition:
+            "Stav tohto kontaktu nemožno zmeniť z {{current}} na {{next}}.",
           not_found: {
             title: "Kontakt sa nenašiel",
           },

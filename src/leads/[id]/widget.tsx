@@ -89,8 +89,6 @@ import {
 } from "next-vibe/ui/components/tabs";
 import { Textarea } from "next-vibe/ui/components/textarea";
 import { P } from "next-vibe/ui/components/typography";
-import { WidgetHeader } from "next-vibe/ui/components/widget-header";
-import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { AdminRecordDetail } from "next-vibe/unified-ui/_shared/admin-record-detail";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
@@ -108,12 +106,15 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { AdminForm } from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
+import { parseFormDate } from "next-vibe/unified-ui/widgets/form-fields/_shared/date-value";
+import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 import leadsListDefinitions from "@/leads/list/definition";
@@ -1460,7 +1461,7 @@ export function LeadDetailContainer(): React.JSX.Element {
     navigation.push(definition.DELETE, {
       urlPathParams: { id: leadId },
       renderInModal: true,
-      popNavigationOnSuccess: 1,
+      popNavigationOnSuccess: 2,
     });
   }, [navigation, leadId]);
 
@@ -1750,15 +1751,17 @@ export function LeadDetailContainer(): React.JSX.Element {
 // ─── FormField helper ─────────────────────────────────────────────────────────
 
 function FormField({
+  id,
   label,
   children,
 }: {
+  id: string;
   label: string;
   children: React.ReactNode;
 }): React.JSX.Element {
   return (
     <Div className="flex flex-col gap-1.5">
-      <Label className="text-xs font-medium text-muted-foreground">
+      <Label htmlFor={id} className="text-xs font-medium text-muted-foreground">
         {label}
       </Label>
       {children}
@@ -1778,35 +1781,32 @@ export function LeadEditContainer(): React.JSX.Element {
   const form = useWidgetForm<typeof definition.PATCH>();
   const onSubmit = useWidgetOnSubmit();
   const isSubmitting = useWidgetIsSubmitting();
-  const patchValue = useWidgetValue<typeof definition.PATCH>();
+  const response = useWidgetResponse();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
-  const [submittedSuccessfully, setSubmittedSuccessfully] = useState(false);
+  const fieldId = useId();
+  const [submission, setSubmission] = useState<{ previous: typeof response }>();
+  const [metadataDraft, setMetadataDraft] = useState<{
+    text: string;
+    valid: boolean;
+  }>();
 
   const leadId = form.watch("id");
 
-  // Prefill flat form fields from GET response data.
-  // When navigated with prefillFromGet: true, the GET response is passed as field.value
-  // (typed as LeadPatchResponseOutput but at runtime contains { lead: { basicInfo: {...} } }).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- patchValue contains GET response data at runtime when prefillFromGet: true
-  const prefilledLead = (patchValue as Record<string, any>)
-    ?.lead as LeadGetResponseOutput["lead"];
-  // Opened directly (URL, palette): no GET data was handed over, load it here
-  // so the form never shows empty fields for an existing lead.
   const currentId = navigation.current?.params?.urlPathParams?.id;
-  const targetId = leadId ?? currentId;
+  const targetId = currentId ?? leadId;
   const leadRead = useEndpoint(
-    definition,
+    { GET: definition.GET },
     {
       read: {
         urlPathParams: { id: targetId ?? "" },
-        queryOptions: { enabled: !prefilledLead && Boolean(targetId) },
+        queryOptions: { enabled: Boolean(targetId) },
       },
     },
     logger,
     user,
   ).read;
-  const fieldLead = prefilledLead ?? leadRead?.data?.lead;
+  const fieldLead = leadRead?.data?.lead;
   const leadName =
     fieldLead?.basicInfo.businessName?.trim() ||
     fieldLead?.basicInfo.contactName?.trim() ||
@@ -1902,358 +1902,435 @@ export function LeadEditContainer(): React.JSX.Element {
     }
   }, [navigation]);
 
-  const wasSubmittingRef = useRef(false);
-
   const handleSubmit = useCallback((): void => {
-    setSubmittedSuccessfully(false);
-    wasSubmittingRef.current = true;
-    if (onSubmit) {
-      onSubmit();
+    setSubmission({ previous: response });
+    onSubmit?.();
+  }, [onSubmit, response]);
+
+  const showSuccess =
+    submission &&
+    response?.success === true &&
+    response !== submission.previous;
+  const rawConfirmedAt = form.watch("subscriptionConfirmedAt");
+  const confirmedAt = parseFormDate(
+    rawConfirmedAt instanceof Date || typeof rawConfirmedAt === "string"
+      ? rawConfirmedAt
+      : undefined,
+  );
+  const confirmedAtValue = confirmedAt
+    ? formatDate(confirmedAt, locale, "yyyy-MM-dd'T'HH:mm")
+    : "";
+  const savedMetadata = form.watch("metadata");
+  const metadataValue =
+    metadataDraft?.text ??
+    (savedMetadata ? JSON.stringify(savedMetadata, null, 2) : "");
+  const metadataInvalid = metadataDraft?.valid === false;
+
+  const updateMetadata = (text: string): void => {
+    try {
+      const parsed = definition.PATCH.fields.children.metadata.schema.safeParse(
+        text.trim() ? JSON.parse(text) : {},
+      );
+      setMetadataDraft({ text, valid: parsed.success });
+      if (parsed.success) {
+        form.setValue("metadata", parsed.data);
+      }
+    } catch {
+      setMetadataDraft({ text, valid: false });
     }
-  }, [onSubmit]);
+  };
 
-  // Detect when submit transitions from in-progress to done
-  useEffect(() => {
-    if (wasSubmittingRef.current && !isSubmitting) {
-      wasSubmittingRef.current = false;
-      setSubmittedSuccessfully(true);
-    }
-  }, [isSubmitting]);
-
-  // Show success only after an actual submit (not from GET prefill data populating field.value)
-  const showSuccess = submittedSuccessfully && !isSubmitting;
-
-  const headerActions = (
-    <Div className="flex items-center gap-2">
-      <Button
-        type="button"
-        variant="default"
-        size="sm"
-        onClick={handleSubmit}
-        disabled={isSubmitting}
-        className="gap-1"
-      >
-        {isSubmitting ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Save className="h-4 w-4" />
-        )}
-        {isSubmitting
-          ? t("patch.submitButton.loadingText")
-          : t("patch.submitButton.label")}
-      </Button>
-    </Div>
+  const backButton = (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={handleBack}
+      className="-ms-2 gap-1 text-muted-foreground"
+    >
+      <ChevronLeft className="size-4" />
+      {t("widget.back")}
+    </Button>
   );
 
-  return (
-    <WidgetShell layout="page">
-      {/* Top action bar */}
-      <Div>
-        <WidgetHeader
-          size="page"
-          title={t("patch.form.title")}
-          subtitle={leadName}
-          backButton={
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleBack}
-              className="-ms-2 gap-1 text-muted-foreground"
-            >
-              <ChevronLeft className="size-4" />
-              {t("widget.back")}
-            </Button>
-          }
-          actions={headerActions}
-        />
-      </Div>
+  if (!targetId) {
+    return (
+      <AdminRecordDetail
+        title={t("patch.form.title")}
+        backButton={backButton}
+        state={{
+          kind: "empty",
+          title: t("widget.selectLead"),
+          icon: <Search className="size-8" />,
+          action: {
+            label: t("widget.selectLead"),
+            onClick: () =>
+              navigation.push(leadsSearchDefinitions.GET, {
+                renderInModal: true,
+                pickerCallback: (picked) => {
+                  if (
+                    typeof picked === "object" &&
+                    picked !== null &&
+                    "id" in picked &&
+                    typeof picked.id === "string"
+                  ) {
+                    navigation.replace(definition.PATCH, {
+                      urlPathParams: { id: picked.id },
+                    });
+                  }
+                },
+              }),
+          },
+        }}
+      />
+    );
+  }
 
-      <Div className="flex flex-col gap-4 pb-6">
-        {/* Success: show after actual PATCH submission completes */}
-        {showSuccess && (
+  if (!fieldLead) {
+    const error =
+      leadRead?.response?.success === false ? leadRead.response : undefined;
+    return (
+      <AdminRecordDetail
+        title={t("patch.form.title")}
+        backButton={backButton}
+        state={
+          error
+            ? {
+                kind: "error",
+                title: t("widget.loadFailed"),
+                message: error.message,
+                action: {
+                  label: t("widget.retryLoad"),
+                  onClick: () => void leadRead?.refetch(),
+                },
+              }
+            : { kind: "loading", label: t("widget.loading"), skeleton: "form" }
+        }
+      />
+    );
+  }
+
+  return (
+    <AdminForm
+      title={t("patch.form.title")}
+      description={leadName}
+      backButton={backButton}
+      primaryAction={
+        <Button
+          type="button"
+          data-testid="endpoint-submit"
+          onClick={handleSubmit}
+          disabled={isSubmitting || metadataInvalid}
+          className="min-h-10 gap-2"
+        >
+          {isSubmitting ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Save className="size-4" />
+          )}
+          {isSubmitting
+            ? t("patch.submitButton.loadingText")
+            : t("patch.submitButton.label")}
+        </Button>
+      }
+      result={
+        showSuccess && (
           <ResultBanner
             variant="success"
-            icon={<CheckCircle className="h-4 w-4" />}
+            icon={<CheckCircle className="size-4" />}
             title={t("patch.success.description")}
-          />
-        )}
-
-        <Div className="flex flex-col gap-4">
-          {/* Basic Info tab */}
-          <Div>
-            <SectionGroup title={t("widget.tabBasic")}>
-              <Div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
-                <FormField label={t("patch.email.label")}>
-                  <Input
-                    type="email"
-                    placeholder={t("patch.email.placeholder")}
-                    value={form.watch("email") ?? ""}
-                    onChangeText={(v) => form.setValue("email", v)}
-                  />
-                </FormField>
-                <FormField label={t("patch.businessName.label")}>
-                  <Input
-                    placeholder={t("patch.businessName.placeholder")}
-                    value={form.watch("businessName") ?? ""}
-                    onChangeText={(v) => form.setValue("businessName", v)}
-                  />
-                </FormField>
-                <FormField label={t("patch.contactName.label")}>
-                  <Input
-                    placeholder={t("patch.contactName.placeholder")}
-                    value={form.watch("contactName") ?? ""}
-                    onChangeText={(v) => form.setValue("contactName", v)}
-                  />
-                </FormField>
-                <FormField label={t("patch.status.label")}>
-                  <Select
-                    value={form.watch("status") ?? ""}
-                    onValueChange={(v) => {
-                      const parsed = asLeadStatus(v);
-                      if (parsed !== undefined) {
-                        form.setValue("status", parsed);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("patch.status.placeholder")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {LeadStatusOptions.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {leadsT(opt.label)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-                <FormField label={t("patch.phone.label")}>
-                  <Input
-                    type="tel"
-                    placeholder={t("patch.phone.placeholder")}
-                    value={form.watch("phone") ?? ""}
-                    onChangeText={(v) => form.setValue("phone", v)}
-                  />
-                </FormField>
-                <FormField label={t("patch.website.label")}>
-                  <Input
-                    type="url"
-                    placeholder={t("patch.website.placeholder")}
-                    value={form.watch("website") ?? ""}
-                    onChangeText={(v) => form.setValue("website", v)}
-                  />
-                </FormField>
-                <FormField label={t("patch.country.label")}>
-                  <Select
-                    value={form.watch("country") ?? ""}
-                    onValueChange={(v) => {
-                      const parsed = asCountry(v);
-                      if (parsed !== undefined) {
-                        form.setValue("country", parsed);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("patch.country.placeholder")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CountriesOptions.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {tGlobal(opt.label)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-                <FormField label={t("patch.language.label")}>
-                  <Select
-                    value={form.watch("language") ?? ""}
-                    onValueChange={(v) => {
-                      const parsed = asLanguage(v);
-                      if (parsed !== undefined) {
-                        form.setValue("language", parsed);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("patch.language.placeholder")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {LanguagesOptions.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {tGlobal(opt.label)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-              </Div>
-            </SectionGroup>
-          </Div>
-
-          {/* Campaign tab */}
-          <Div>
-            <SectionGroup title={t("widget.tabCampaign")}>
-              <Div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
-                <FormField label={t("patch.source.label")}>
-                  <Select
-                    value={form.watch("source") ?? ""}
-                    onValueChange={(v) => {
-                      const parsed = asLeadSource(v);
-                      if (parsed !== undefined) {
-                        form.setValue("source", parsed);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("patch.source.placeholder")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {LeadSourceOptions.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {leadsT(opt.label)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-                <FormField label={t("patch.currentCampaignStage.label")}>
-                  <Select
-                    value={form.watch("currentCampaignStage") ?? ""}
-                    onValueChange={(v) => {
-                      const parsed = asEmailCampaignStage(v);
-                      if (parsed !== undefined) {
-                        form.setValue("currentCampaignStage", parsed);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t(
-                          "patch.currentCampaignStage.placeholder",
-                        )}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {EmailCampaignStageOptions.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {leadsT(opt.label)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-              </Div>
-              <Div className="mt-4" />
-              <FormField label={t("patch.notes.label")}>
-                <Textarea
-                  className="min-h-[80px]"
-                  placeholder={t("patch.notes.placeholder")}
-                  value={form.watch("notes") ?? ""}
-                  onChange={(e) => form.setValue("notes", e.target.value)}
-                />
-              </FormField>
-            </SectionGroup>
-          </Div>
-
-          {/* Advanced tab */}
-          <Div>
-            <SectionGroup
-              title={t("widget.tabAdvanced")}
-              collapsible
-              defaultOpen={false}
-            >
-              <Div className="flex flex-col gap-4">
-                <FormField label={t("patch.convertedUserId.label")}>
-                  <Input
-                    placeholder={t("patch.convertedUserId.placeholder")}
-                    value={form.watch("convertedUserId") ?? ""}
-                    onChangeText={(v) =>
-                      form.setValue("convertedUserId", v || null)
-                    }
-                  />
-                </FormField>
-                <FormField label={t("patch.subscriptionConfirmedAt.label")}>
-                  <Input
-                    type="datetime-local"
-                    value={
-                      (form.watch("subscriptionConfirmedAt") as
-                        | string
-                        | undefined) ?? ""
-                    }
-                    onChangeText={(v) =>
-                      form.setValue(
-                        "subscriptionConfirmedAt",
-                        v ? new Date(v) : null,
-                      )
-                    }
-                  />
-                </FormField>
-                <FormField label={t("patch.metadata.label")}>
-                  <Textarea
-                    className="min-h-[100px] font-mono"
-                    placeholder={t("patch.metadata.placeholder")}
-                    value={(() => {
-                      const v = form.watch("metadata");
-                      if (!v) {
-                        return "";
-                      }
-                      try {
-                        return JSON.stringify(v, null, 2);
-                      } catch {
-                        return "";
-                      }
-                    })()}
-                    onChange={(e) => {
-                      try {
-                        const parsed = JSON.parse(e.target.value) as Record<
-                          string,
-                          string | number | boolean
-                        >;
-                        form.setValue("metadata", parsed);
-                      } catch {
-                        // ignore parse errors while typing
-                      }
-                    }}
-                  />
-                </FormField>
-              </Div>
-            </SectionGroup>
-          </Div>
-        </Div>
-
-        {/* Save button at bottom */}
-        <Div className="flex justify-end gap-2 pt-2">
-          <Button type="button" variant="outline" onClick={handleBack}>
-            {t("widget.back")}
-          </Button>
-          <Button
-            type="button"
-            variant="default"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="gap-2"
           >
-            {isSubmitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
-            {isSubmitting
-              ? t("patch.submitButton.loadingText")
-              : t("patch.submitButton.label")}
-          </Button>
-        </Div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                void (async (): Promise<void> => {
+                  await leadRead?.refetch();
+                  navigation.replace(definition.GET, {
+                    urlPathParams: { id: targetId },
+                  });
+                })();
+              }}
+            >
+              {t("get.titleShort")}
+            </Button>
+          </ResultBanner>
+        )
+      }
+    >
+      {/* Basic Info tab */}
+      <Div>
+        <SectionGroup title={t("widget.tabBasic")}>
+          <Div className="grid grid-cols-1 gap-4 @lg:grid-cols-2">
+            <FormField id={`${fieldId}-email`} label={t("patch.email.label")}>
+              <Input
+                id={`${fieldId}-email`}
+                name="email"
+                type="email"
+                placeholder={t("patch.email.placeholder")}
+                value={form.watch("email") ?? ""}
+                onChangeText={(v) => form.setValue("email", v)}
+              />
+            </FormField>
+            <FormField
+              id={`${fieldId}-businessName`}
+              label={t("patch.businessName.label")}
+            >
+              <Input
+                id={`${fieldId}-businessName`}
+                name="businessName"
+                placeholder={t("patch.businessName.placeholder")}
+                value={form.watch("businessName") ?? ""}
+                onChangeText={(v) => form.setValue("businessName", v)}
+              />
+            </FormField>
+            <FormField
+              id={`${fieldId}-contactName`}
+              label={t("patch.contactName.label")}
+            >
+              <Input
+                id={`${fieldId}-contactName`}
+                name="contactName"
+                placeholder={t("patch.contactName.placeholder")}
+                value={form.watch("contactName") ?? ""}
+                onChangeText={(v) => form.setValue("contactName", v)}
+              />
+            </FormField>
+            <FormField id={`${fieldId}-status`} label={t("patch.status.label")}>
+              <Select
+                value={form.watch("status") ?? ""}
+                onValueChange={(v) => {
+                  const parsed = asLeadStatus(v);
+                  if (parsed !== undefined) {
+                    form.setValue("status", parsed);
+                  }
+                }}
+              >
+                <SelectTrigger id={`${fieldId}-status`}>
+                  <SelectValue placeholder={t("patch.status.placeholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {LeadStatusOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {leadsT(opt.label)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+            <FormField id={`${fieldId}-phone`} label={t("patch.phone.label")}>
+              <Input
+                id={`${fieldId}-phone`}
+                name="phone"
+                type="tel"
+                placeholder={t("patch.phone.placeholder")}
+                value={form.watch("phone") ?? ""}
+                onChangeText={(v) => form.setValue("phone", v)}
+              />
+            </FormField>
+            <FormField
+              id={`${fieldId}-website`}
+              label={t("patch.website.label")}
+            >
+              <Input
+                id={`${fieldId}-website`}
+                name="website"
+                type="url"
+                placeholder={t("patch.website.placeholder")}
+                value={form.watch("website") ?? ""}
+                onChangeText={(v) => form.setValue("website", v)}
+              />
+            </FormField>
+            <FormField
+              id={`${fieldId}-country`}
+              label={t("patch.country.label")}
+            >
+              <Select
+                value={form.watch("country") ?? ""}
+                onValueChange={(v) => {
+                  const parsed = asCountry(v);
+                  if (parsed !== undefined) {
+                    form.setValue("country", parsed);
+                  }
+                }}
+              >
+                <SelectTrigger id={`${fieldId}-country`}>
+                  <SelectValue placeholder={t("patch.country.placeholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {CountriesOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {tGlobal(opt.label)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+            <FormField
+              id={`${fieldId}-language`}
+              label={t("patch.language.label")}
+            >
+              <Select
+                value={form.watch("language") ?? ""}
+                onValueChange={(v) => {
+                  const parsed = asLanguage(v);
+                  if (parsed !== undefined) {
+                    form.setValue("language", parsed);
+                  }
+                }}
+              >
+                <SelectTrigger id={`${fieldId}-language`}>
+                  <SelectValue placeholder={t("patch.language.placeholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {LanguagesOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {tGlobal(opt.label)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+          </Div>
+        </SectionGroup>
       </Div>
-    </WidgetShell>
+
+      {/* Campaign tab */}
+      <Div>
+        <SectionGroup title={t("widget.tabCampaign")}>
+          <Div className="grid grid-cols-1 gap-4 @lg:grid-cols-2">
+            <FormField id={`${fieldId}-source`} label={t("patch.source.label")}>
+              <Select
+                value={form.watch("source") ?? ""}
+                onValueChange={(v) => {
+                  const parsed = asLeadSource(v);
+                  if (parsed !== undefined) {
+                    form.setValue("source", parsed);
+                  }
+                }}
+              >
+                <SelectTrigger id={`${fieldId}-source`}>
+                  <SelectValue placeholder={t("patch.source.placeholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {LeadSourceOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {leadsT(opt.label)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+            <FormField
+              id={`${fieldId}-currentCampaignStage`}
+              label={t("patch.currentCampaignStage.label")}
+            >
+              <Select
+                value={form.watch("currentCampaignStage") ?? ""}
+                onValueChange={(v) => {
+                  const parsed = asEmailCampaignStage(v);
+                  if (parsed !== undefined) {
+                    form.setValue("currentCampaignStage", parsed);
+                  }
+                }}
+              >
+                <SelectTrigger id={`${fieldId}-currentCampaignStage`}>
+                  <SelectValue
+                    placeholder={t("patch.currentCampaignStage.placeholder")}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {EmailCampaignStageOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {leadsT(opt.label)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+          </Div>
+          <Div className="mt-4" />
+          <FormField id={`${fieldId}-notes`} label={t("patch.notes.label")}>
+            <Textarea
+              id={`${fieldId}-notes`}
+              name="notes"
+              className="min-h-[80px]"
+              placeholder={t("patch.notes.placeholder")}
+              value={form.watch("notes") ?? ""}
+              onChange={(e) => form.setValue("notes", e.target.value)}
+            />
+          </FormField>
+        </SectionGroup>
+      </Div>
+
+      {/* Advanced tab */}
+      <Div>
+        <SectionGroup
+          title={t("widget.tabAdvanced")}
+          collapsible
+          defaultOpen={false}
+        >
+          <Div className="flex flex-col gap-4">
+            <FormField
+              id={`${fieldId}-convertedUserId`}
+              label={t("patch.convertedUserId.label")}
+            >
+              <Input
+                id={`${fieldId}-convertedUserId`}
+                name="convertedUserId"
+                placeholder={t("patch.convertedUserId.placeholder")}
+                value={form.watch("convertedUserId") ?? ""}
+                onChangeText={(v) =>
+                  form.setValue("convertedUserId", v || null)
+                }
+              />
+            </FormField>
+            <FormField
+              id={`${fieldId}-subscriptionConfirmedAt`}
+              label={t("patch.subscriptionConfirmedAt.label")}
+            >
+              <Input
+                id={`${fieldId}-subscriptionConfirmedAt`}
+                name="subscriptionConfirmedAt"
+                type="datetime-local"
+                value={confirmedAtValue}
+                onChangeText={(v) =>
+                  form.setValue(
+                    "subscriptionConfirmedAt",
+                    v ? new Date(v) : null,
+                  )
+                }
+              />
+            </FormField>
+            <FormField
+              id={`${fieldId}-metadata`}
+              label={t("patch.metadata.label")}
+            >
+              <Textarea
+                id={`${fieldId}-metadata`}
+                name="metadata"
+                className="min-h-[100px] font-mono"
+                placeholder={t("patch.metadata.placeholder")}
+                value={metadataValue}
+                aria-invalid={metadataInvalid}
+                aria-describedby={
+                  metadataInvalid ? `${fieldId}-metadata-error` : undefined
+                }
+                onChange={(e) => updateMetadata(e.target.value)}
+              />
+              {metadataInvalid && (
+                <P
+                  id={`${fieldId}-metadata-error`}
+                  className="text-sm text-destructive"
+                >
+                  {t("patch.metadata.description")}
+                </P>
+              )}
+            </FormField>
+          </Div>
+        </SectionGroup>
+      </Div>
+    </AdminForm>
   );
 }

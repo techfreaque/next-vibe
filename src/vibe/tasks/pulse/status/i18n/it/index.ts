@@ -14,6 +14,10 @@ export const translations: typeof enTranslations = {
       description:
         "Monitorare la salute e le statistiche dell'esecuzione del polso",
     },
+    widget: {
+      refresh: "Aggiorna",
+      noData: "Nessuna esecuzione",
+    },
     fields: {
       status: {
         title: "Stato",

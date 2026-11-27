@@ -88,6 +88,31 @@ export interface AcquisitionCore {
   trend: TimeSeries;
 }
 
+interface AcquisitionTotals {
+  humanLeads: number;
+  botLeads: number;
+  unknownLeads: number;
+  signups: number;
+  firstChats: number;
+  payers: number;
+  prevHumanLeads: number;
+  prevBotLeads: number;
+  prevUnknownLeads: number;
+  prevSignups: number;
+  prevFirstChats: number;
+  prevPayers: number;
+  visits: number;
+  visitors: number;
+  prevVisits: number;
+  prevVisitors: number;
+  humanVisits: number;
+  prevHumanVisits: number;
+  botVisits: number;
+  prevBotVisits: number;
+  unknownVisits: number;
+  prevUnknownVisits: number;
+}
+
 /** `WITH seg AS (...)`: lead facts restricted to the win and the segment. */
 function segmentCte(
   win: AnalyticsWindow,
@@ -192,40 +217,21 @@ export async function computeAcquisitionCore(
   const visited = sql`v.visited_at`;
   const crawlerFilter = crawlerVisitsCondition(filters);
   const crawlerBucket = sql`cv.bucket_hour`;
-  // Both reports reuse this CTE several times. Carry only the fields the
-  // aggregates need, while still applying all requested filters to lead facts.
+  // Totals and time buckets share the same filtered lead facts and snapshot.
+  // Carry only the fields both aggregates need.
   const segment = segmentCte(
     win,
     filters,
     sql`f.id, f.user_id, f.created_at, f.signed_up_at, f.first_chat_at, f.first_paid_at, f.bot_family`,
   );
 
+  const bucket = win.bucket;
   const {
-    rows: [totals],
+    rows: [{ totals, series }],
   } = await db.execute<
     QueryResultRow & {
-      humanLeads: number;
-      botLeads: number;
-      signups: number;
-      firstChats: number;
-      payers: number;
-      prevHumanLeads: number;
-      prevBotLeads: number;
-      prevSignups: number;
-      prevFirstChats: number;
-      prevPayers: number;
-      visits: number;
-      visitors: number;
-      prevVisits: number;
-      prevVisitors: number;
-      humanVisits: number;
-      prevHumanVisits: number;
-      botVisits: number;
-      prevBotVisits: number;
-      unknownLeads: number;
-      prevUnknownLeads: number;
-      unknownVisits: number;
-      prevUnknownVisits: number;
+      totals: AcquisitionTotals;
+      series: { key: string; bucket: string; value: number }[];
     }
   >(sql`
     WITH ${segment},
@@ -250,38 +256,33 @@ export async function computeAcquisitionCore(
         coalesce(sum(cv.visit_count) FILTER (WHERE ${p(crawlerBucket)}), 0)::int AS "prevVisits"
       FROM crawler_visits cv
       WHERE (${crawlerFilter}) AND (${w(crawlerBucket)} OR ${p(crawlerBucket)})
-    )
-    SELECT
-      count(*) FILTER (WHERE ${w(created)} AND bot_family = ${HUMAN})::int AS "humanLeads",
-      count(*) FILTER (WHERE ${w(created)} AND ${isBot(sql`bot_family`)})::int AS "botLeads",
-      count(*) FILTER (WHERE ${w(created)} AND bot_family = ${NO_UA})::int AS "unknownLeads",
-      (SELECT count(*)::int FROM seg_users WHERE ${w(signed)}) AS signups,
-      count(DISTINCT ${PERSON}) FILTER (WHERE ${w(chat)})::int AS "firstChats",
-      (SELECT count(*)::int FROM seg_users WHERE ${w(paid)}) AS payers,
-      count(*) FILTER (WHERE ${p(created)} AND bot_family = ${HUMAN})::int AS "prevHumanLeads",
-      count(*) FILTER (WHERE ${p(created)} AND ${isBot(sql`bot_family`)})::int AS "prevBotLeads",
-      count(*) FILTER (WHERE ${p(created)} AND bot_family = ${NO_UA})::int AS "prevUnknownLeads",
-      (SELECT count(*)::int FROM seg_users WHERE ${p(signed)}) AS "prevSignups",
-      count(DISTINCT ${PERSON}) FILTER (WHERE ${p(chat)})::int AS "prevFirstChats",
-      (SELECT count(*)::int FROM seg_users WHERE ${p(paid)}) AS "prevPayers",
-      ((SELECT visits FROM visit_totals) + (SELECT visits FROM crawler_visit_totals))::int AS visits,
-      (SELECT visitors FROM visit_totals) AS visitors,
-      ((SELECT "prevVisits" FROM visit_totals) + (SELECT "prevVisits" FROM crawler_visit_totals))::int AS "prevVisits",
-      (SELECT "prevVisitors" FROM visit_totals) AS "prevVisitors",
-      (SELECT "humanVisits" FROM visit_totals) AS "humanVisits",
-      (SELECT "prevHumanVisits" FROM visit_totals) AS "prevHumanVisits",
-      ((SELECT "botVisits" FROM visit_totals) + (SELECT visits FROM crawler_visit_totals))::int AS "botVisits",
-      ((SELECT "prevBotVisits" FROM visit_totals) + (SELECT "prevVisits" FROM crawler_visit_totals))::int AS "prevBotVisits",
-      (SELECT "unknownVisits" FROM visit_totals) AS "unknownVisits",
-      (SELECT "prevUnknownVisits" FROM visit_totals) AS "prevUnknownVisits"
-    FROM seg
-  `);
-
-  const bucket = win.bucket;
-  const { rows: series } = await db.execute<
-    QueryResultRow & { key: string; bucket: string; value: number }
-  >(sql`
-    WITH ${segment},
+    ),
+    totals AS (
+      SELECT
+        count(*) FILTER (WHERE ${w(created)} AND bot_family = ${HUMAN})::int AS "humanLeads",
+        count(*) FILTER (WHERE ${w(created)} AND ${isBot(sql`bot_family`)})::int AS "botLeads",
+        count(*) FILTER (WHERE ${w(created)} AND bot_family = ${NO_UA})::int AS "unknownLeads",
+        (SELECT count(*)::int FROM seg_users WHERE ${w(signed)}) AS signups,
+        count(DISTINCT ${PERSON}) FILTER (WHERE ${w(chat)})::int AS "firstChats",
+        (SELECT count(*)::int FROM seg_users WHERE ${w(paid)}) AS payers,
+        count(*) FILTER (WHERE ${p(created)} AND bot_family = ${HUMAN})::int AS "prevHumanLeads",
+        count(*) FILTER (WHERE ${p(created)} AND ${isBot(sql`bot_family`)})::int AS "prevBotLeads",
+        count(*) FILTER (WHERE ${p(created)} AND bot_family = ${NO_UA})::int AS "prevUnknownLeads",
+        (SELECT count(*)::int FROM seg_users WHERE ${p(signed)}) AS "prevSignups",
+        count(DISTINCT ${PERSON}) FILTER (WHERE ${p(chat)})::int AS "prevFirstChats",
+        (SELECT count(*)::int FROM seg_users WHERE ${p(paid)}) AS "prevPayers",
+        ((SELECT visits FROM visit_totals) + (SELECT visits FROM crawler_visit_totals))::int AS visits,
+        (SELECT visitors FROM visit_totals) AS visitors,
+        ((SELECT "prevVisits" FROM visit_totals) + (SELECT "prevVisits" FROM crawler_visit_totals))::int AS "prevVisits",
+        (SELECT "prevVisitors" FROM visit_totals) AS "prevVisitors",
+        (SELECT "humanVisits" FROM visit_totals) AS "humanVisits",
+        (SELECT "prevHumanVisits" FROM visit_totals) AS "prevHumanVisits",
+        ((SELECT "botVisits" FROM visit_totals) + (SELECT visits FROM crawler_visit_totals))::int AS "botVisits",
+        ((SELECT "prevBotVisits" FROM visit_totals) + (SELECT "prevVisits" FROM crawler_visit_totals))::int AS "prevBotVisits",
+        (SELECT "unknownVisits" FROM visit_totals) AS "unknownVisits",
+        (SELECT "prevUnknownVisits" FROM visit_totals) AS "prevUnknownVisits"
+      FROM seg
+    ),
     visits_by_bucket AS (
       SELECT bucket,
         sum(visits)::int AS visits,
@@ -308,30 +309,35 @@ export async function computeAcquisitionCore(
         GROUP BY 1
       ) combined_visits
       GROUP BY 1
+    ),
+    series AS (
+      SELECT 'humanLeads' AS key, ${bucketSql(created, bucket)} AS bucket, count(*)::int AS value
+        FROM seg WHERE ${w(created)} AND bot_family = ${HUMAN} GROUP BY 2
+      UNION ALL
+      SELECT 'botLeads', ${bucketSql(created, bucket)}, count(*)::int
+        FROM seg WHERE ${w(created)} AND ${isBot(sql`bot_family`)} GROUP BY 2
+      UNION ALL
+      SELECT 'signups', ${bucketSql(signed, bucket)}, count(*)::int
+        FROM seg_users WHERE ${w(signed)} GROUP BY 2
+      UNION ALL
+      SELECT 'firstChats', ${bucketSql(chat, bucket)}, count(DISTINCT ${PERSON})::int
+        FROM seg WHERE ${w(chat)} GROUP BY 2
+      UNION ALL
+      SELECT 'payers', ${bucketSql(paid, bucket)}, count(*)::int
+        FROM seg_users WHERE ${w(paid)} GROUP BY 2
+      UNION ALL
+      SELECT metric.key, v.bucket, metric.value
+        FROM visits_by_bucket v
+        CROSS JOIN LATERAL (VALUES
+          ('visits', v.visits),
+          ('humanVisits', v.human_visits),
+          ('botVisits', v.bot_visits),
+          ('visitors', v.visitors)
+        ) AS metric(key, value)
     )
-    SELECT 'humanLeads' AS key, ${bucketSql(created, bucket)} AS bucket, count(*)::int AS value
-      FROM seg WHERE ${w(created)} AND bot_family = ${HUMAN} GROUP BY 2
-    UNION ALL
-    SELECT 'botLeads', ${bucketSql(created, bucket)}, count(*)::int
-      FROM seg WHERE ${w(created)} AND ${isBot(sql`bot_family`)} GROUP BY 2
-    UNION ALL
-    SELECT 'signups', ${bucketSql(signed, bucket)}, count(*)::int
-      FROM seg_users WHERE ${w(signed)} GROUP BY 2
-    UNION ALL
-    SELECT 'firstChats', ${bucketSql(chat, bucket)}, count(DISTINCT ${PERSON})::int
-      FROM seg WHERE ${w(chat)} GROUP BY 2
-    UNION ALL
-    SELECT 'payers', ${bucketSql(paid, bucket)}, count(*)::int
-      FROM seg_users WHERE ${w(paid)} GROUP BY 2
-    UNION ALL
-    SELECT metric.key, v.bucket, metric.value
-      FROM visits_by_bucket v
-      CROSS JOIN LATERAL (VALUES
-        ('visits', v.visits),
-        ('humanVisits', v.human_visits),
-        ('botVisits', v.bot_visits),
-        ('visitors', v.visitors)
-      ) AS metric(key, value)
+    SELECT to_jsonb(totals) AS totals,
+      coalesce((SELECT jsonb_agg(to_jsonb(series)) FROM series), '[]'::jsonb) AS series
+    FROM totals
   `);
 
   // Unfiltered signups include accounts without any lead (UNATTRIBUTED).
@@ -458,22 +464,15 @@ export async function computeAcquisitionBreakdown(
       GROUP BY 1
     ),
     rows AS (
-      SELECT key,
-        sum(visits)::int AS visits,
-        sum(leads)::int AS leads,
-        sum("humanLeads")::int AS "humanLeads",
-        sum("botLeads")::int AS "botLeads",
-        sum(signups)::int AS signups,
-        sum(payers)::int AS payers
-      FROM (
-        SELECT key, visits, leads, "humanLeads", "botLeads", signups, payers
-        FROM lead_rows
-        UNION ALL
-        SELECT key, visits, 0::int AS leads, 0::int AS "humanLeads",
-          0::int AS "botLeads", 0::int AS signups, 0::int AS payers
-        FROM crawler_rows
-      ) combined
-      GROUP BY key
+      SELECT coalesce(lr.key, cr.key) AS key,
+        (coalesce(lr.visits, 0) + coalesce(cr.visits, 0))::int AS visits,
+        coalesce(lr.leads, 0)::int AS leads,
+        coalesce(lr."humanLeads", 0)::int AS "humanLeads",
+        coalesce(lr."botLeads", 0)::int AS "botLeads",
+        coalesce(lr.signups, 0)::int AS signups,
+        coalesce(lr.payers, 0)::int AS payers
+      FROM lead_rows lr
+      FULL OUTER JOIN crawler_rows cr ON lr.key = cr.key
     )
     SELECT rows.*, coalesce(rr.usd, 0)::float8 AS "revenueUsd"
     FROM rows LEFT JOIN row_revenue rr ON rr.key IS NOT DISTINCT FROM rows.key

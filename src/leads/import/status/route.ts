@@ -18,9 +18,9 @@ export const { GET, tools } = endpointsHandler({
       LeadsImportRepository.listImportJobsFormatted(
         user.id,
         {
-          status: data.filters.status,
-          limit: data.filters.limit || 50,
-          offset: data.filters.offset || 0,
+          status: data.filters?.status,
+          limit: data.filters?.limit ?? 50,
+          offset: data.filters?.offset ?? 0,
         },
         logger,
         t,

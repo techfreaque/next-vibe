@@ -90,9 +90,9 @@ export const translations: typeof enTranslations = {
     },
   },
   customerId: {
-    label: "Kunden-ID",
-    description: "Stripe-Kundenkennung",
-    placeholder: "Kunden-ID eingeben",
+    label: "Kunde",
+    description: "Wähle das Konto, das mit dem Stripe-Kunden verknüpft ist.",
+    placeholder: "Kunden suchen",
   },
   amount: {
     label: "Betrag",

@@ -5259,6 +5259,8 @@ export const translations = {
       },
       patch: {
         error: {
+          invalidStatusTransition:
+            "This lead cannot move from {{current}} to {{next}}.",
           not_found: {
             title: "Lead not found",
           },

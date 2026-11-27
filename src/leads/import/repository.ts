@@ -53,6 +53,7 @@ import type { CsvImportJobStatus, CsvImportJobStatusValue } from "./enum";
 import { CsvImportJobStatus as CsvImportJobStatusEnum } from "./enum";
 import type { ImportT } from "./i18n";
 import { scopedTranslation } from "./i18n";
+import { scopedTranslation as jobTranslation } from "./jobs/[jobId]/i18n";
 import type { ImportJobsStatusGetResponseOutput } from "./status/definition";
 
 interface CsvImportConfig {
@@ -527,7 +528,12 @@ export class LeadsImportRepository {
       const [updated] = await db
         .update(csvImportJobs)
         .set(updateData)
-        .where(eq(csvImportJobs.id, updates.jobId))
+        .where(
+          and(
+            eq(csvImportJobs.id, updates.jobId),
+            eq(csvImportJobs.uploadedBy, userId),
+          ),
+        )
         .returning();
 
       if (!updated) {
@@ -688,40 +694,59 @@ export class LeadsImportRepository {
       };
     }>
   > {
-    const { t } = scopedTranslation.scopedT(locale);
+    const { t } = jobTranslation.scopedT(locale);
     try {
-      const [existing] = await db
-        .select({ id: csvImportJobs.id })
-        .from(csvImportJobs)
-        .where(
-          and(
-            eq(csvImportJobs.id, jobId),
-            eq(csvImportJobs.uploadedBy, userId),
-          ),
-        )
-        .limit(1);
+      const ownerMatch = and(
+        eq(csvImportJobs.id, jobId),
+        eq(csvImportJobs.uploadedBy, userId),
+      );
+      const outcome = await db.transaction(async (tx) => {
+        const [job] = await tx
+          .select({ status: csvImportJobs.status })
+          .from(csvImportJobs)
+          .where(ownerMatch)
+          .for("update")
+          .limit(1);
+        if (!job) {
+          return "missing";
+        }
+        if (job.status === CsvImportJobStatusEnum.PROCESSING) {
+          return "running";
+        }
 
-      if (!existing) {
+        await tx.delete(csvImportJobs).where(ownerMatch);
+        await tx
+          .update(cronTasks)
+          .set({ enabled: false, updatedAt: new Date() })
+          .where(eq(cronTasks.id, `leads-import-${jobId}`));
+        return "deleted";
+      });
+
+      if (outcome === "missing") {
         return fail({
-          message: t("errors.delete.server"),
+          message: t("delete.errors.notFound.description"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-
-      await db.delete(csvImportJobs).where(eq(csvImportJobs.id, jobId));
+      if (outcome === "running") {
+        return fail({
+          message: t("delete.errors.conflict.description"),
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
+      }
 
       logger.info("Deleted import job", { jobId, userId });
 
       return success({
         result: {
           success: true,
-          message: t("errors.delete.server"),
+          message: t("delete.success.description"),
         },
       });
     } catch (error) {
       logger.error("Error deleting import job", parseError(error));
       return fail({
-        message: t("errors.delete.server"),
+        message: t("delete.errors.server.description"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -737,11 +762,21 @@ export class LeadsImportRepository {
     t: ImportT,
   ): Promise<ResponseType<{ processed: number }>> {
     try {
+      const now = new Date();
       const [job] = await db
-        .select()
-        .from(csvImportJobs)
-        .where(eq(csvImportJobs.id, jobId))
-        .limit(1);
+        .update(csvImportJobs)
+        .set({
+          status: CsvImportJobStatusEnum.PROCESSING,
+          startedAt: sql`coalesce(${csvImportJobs.startedAt}, ${now})`,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(csvImportJobs.id, jobId),
+            eq(csvImportJobs.status, CsvImportJobStatusEnum.PENDING),
+          ),
+        )
+        .returning();
 
       if (!job) {
         return fail({
@@ -749,16 +784,6 @@ export class LeadsImportRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-
-      // Mark as processing
-      await db
-        .update(csvImportJobs)
-        .set({
-          status: CsvImportJobStatusEnum.PROCESSING,
-          startedAt: job.startedAt ?? new Date(),
-          updatedAt: new Date(),
-        })
-        .where(eq(csvImportJobs.id, jobId));
 
       // Decode CSV content
       const csvContent = Buffer.from(job.fileContent, "base64").toString(
@@ -774,7 +799,12 @@ export class LeadsImportRepository {
             completedAt: new Date(),
             updatedAt: new Date(),
           })
-          .where(eq(csvImportJobs.id, jobId));
+          .where(
+            and(
+              eq(csvImportJobs.id, jobId),
+              eq(csvImportJobs.status, CsvImportJobStatusEnum.PROCESSING),
+            ),
+          );
         return success({ processed: 0 });
       }
 
@@ -872,7 +902,12 @@ export class LeadsImportRepository {
           completedAt: isComplete ? new Date() : null,
           updatedAt: new Date(),
         })
-        .where(eq(csvImportJobs.id, jobId));
+        .where(
+          and(
+            eq(csvImportJobs.id, jobId),
+            eq(csvImportJobs.status, CsvImportJobStatusEnum.PROCESSING),
+          ),
+        );
 
       logger.info("Processed batch", {
         jobId,

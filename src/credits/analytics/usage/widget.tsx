@@ -593,6 +593,7 @@ export function CreditUsageReportWidget({
             {creditKind === UsageCreditKind.ALL && (
               <KpiTile
                 label={t("widget.extra.freeCost")}
+                wrapLabel
                 value={kpis.freeCostUsd.value}
                 previous={kpis.freeCostUsd.previous}
                 format="currency"

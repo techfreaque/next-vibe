@@ -265,13 +265,14 @@ export class PulseHealthRepository {
 
       // Resolve admin user for system tasks (cached for entire pulse cycle)
       const adminEmail = identityEnv.VIBE_ADMIN_USER_EMAIL;
-      const adminAuthResult = adminEmail
-        ? await AuthRepository.authenticateUserByEmail(
-            adminEmail,
-            options.systemLocale,
-            logger,
-          )
-        : null;
+      const adminAuthResult =
+        adminEmail && !options.dryRun
+          ? await AuthRepository.authenticateUserByEmail(
+              adminEmail,
+              options.systemLocale,
+              logger,
+            )
+          : null;
 
       // All tasks live in the DB (system tasks have no userId, user tasks have one)
       const whereConditions = [eq(cronTasksTable.enabled, true)];
@@ -1061,14 +1062,15 @@ export class PulseHealthRepository {
         totalExecutionTimeMs: Date.now() - startTime,
       };
 
-      // Record pulse execution for health tracking
-      await PulseHealthRepository.recordPulseExecution(
-        tasksFailed.length === 0,
-        summary.totalExecutionTimeMs,
-        logger,
-        options.systemLocale,
-        summary,
-      );
+      if (!options.dryRun) {
+        await PulseHealthRepository.recordPulseExecution(
+          tasksFailed.length === 0,
+          summary.totalExecutionTimeMs,
+          logger,
+          options.systemLocale,
+          summary,
+        );
+      }
 
       return success({
         success: true,

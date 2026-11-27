@@ -176,6 +176,10 @@ export const translations: typeof enTranslations = {
       taskInput: {
         label: "Input di attività",
         description: "Dati di input JSON per l'attività",
+        invalidJson:
+          "Non valido JSON. Controllare le citazioni, le virgole e le parentesi.",
+        notObject:
+          'L\'ingresso del compito deve essere un oggetto JSON, come { "chiave": "valore" }.',
       },
       hidden: {
         label: "Nascosto",
@@ -303,7 +307,7 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "Task ID",
+        label: "Chiave dell’attività",
         description: "Identificatore unico dell'attività da eliminare",
       },
     },

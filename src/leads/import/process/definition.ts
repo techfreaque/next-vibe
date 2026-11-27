@@ -35,10 +35,14 @@ const { POST } = createEndpoint({
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
-    title: "import.process.post.container.title",
-    description: "import.process.post.container.description",
+    title: "import.process.post.title",
+    description: "import.process.post.description",
     layoutType: LayoutType.GRID,
     columns: 12,
+    adminForm: {
+      sectionTitle: "import.process.post.container.title",
+      submitText: "import.process.post.title",
+    },
     usage: { request: "data", response: true },
     children: {
       maxJobsPerRun: requestField(scopedTranslation, {
@@ -74,6 +78,7 @@ const { POST } = createEndpoint({
         label: "import.process.post.fields.selfTaskId.label",
         description: "import.process.post.fields.selfTaskId.description",
         columns: 6,
+        hidden: true,
         schema: z.string().optional(),
       }),
 

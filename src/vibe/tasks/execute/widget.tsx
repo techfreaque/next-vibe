@@ -1,7 +1,6 @@
 /**
  * Task Execute Widget
- * Loads the task's endpoint UI by routeId so the user can review/edit
- * inputs before running. On success, renders the tool's result inline.
+ * Identifies the task and shows its saved inputs before the manual run.
  */
 
 "use client";
@@ -13,6 +12,8 @@ import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -25,6 +26,7 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetNavigation,
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
@@ -34,6 +36,7 @@ import { type UseEndpointOptions } from "../../unified-ui/hooks/endpoint-types";
 import { useEndpoint } from "../../unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
 import { TextFieldWidget } from "../../unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
 import { endpoints as cronTaskEndpoints } from "../cron/[id]/definition";
@@ -108,6 +111,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
   const user = useWidgetUser();
   const platform = useWidgetPlatform();
   const logger = useWidgetLogger();
+  const { canGoBack } = useWidgetNavigation();
   const children = field.children;
 
   const isSubmitting = endpointMutations?.create?.isSubmitting;
@@ -187,7 +191,12 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
       return undefined;
     }
     if (toolMethod === "GET") {
-      return { read: { urlPathParams: taskInput as never } };
+      return {
+        read: {
+          urlPathParams: taskInput as never,
+          queryOptions: { enabled: false },
+        },
+      };
     }
     if (toolMethod === "POST") {
       return { create: { autoPrefillData: taskInput as never } };
@@ -320,7 +329,12 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
             disabled={true}
             endpointOptions={
               toolMethod === "GET"
-                ? { read: { initialData: taskInput as never } }
+                ? {
+                    read: {
+                      initialData: taskInput as never,
+                      queryOptions: { enabled: false },
+                    },
+                  }
                 : toolMethod === "DELETE"
                   ? {
                       delete: {
@@ -338,57 +352,50 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
     );
   }
 
-  // ── Input state (before submit) ──
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Header with back button */}
-      <Div className="flex items-center gap-2">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex flex-col gap-0.5">
-          <Div className="font-semibold text-base">
-            {t("post.container.title")}
-          </Div>
-          <Div className="text-sm text-muted-foreground">
-            {t("post.container.description")}
-          </Div>
-        </Div>
-      </Div>
-
-      {/* Task ID input */}
-      <TextFieldWidget field={children.taskId} fieldName="taskId" />
-
-      {/* Task loading indicator */}
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
+      <WidgetHeader
+        size="page"
+        title={t("post.container.title")}
+        subtitle={t("post.container.description")}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+        actions={
+          <SubmitButtonWidget<typeof endpoints.POST>
+            field={children.submitButton}
+          />
+        }
+      />
+      <FormAlertWidget field={{}} />
+      {(!canGoBack || !taskData) && (
+        <TextFieldWidget field={children.taskId} fieldName="taskId" />
+      )}
       {taskId && taskState?.read?.isLoading && (
         <Div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           <Span>{t("post.container.description")}</Span>
         </Div>
       )}
-
-      {/* Tool endpoint UI - editable input form */}
-      {taskId && taskData && toolEndpoint && toolMethod && (
-        <Div className="rounded-lg border p-4 flex flex-col gap-3">
-          <Div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pb-1 border-b">
-            {taskData.displayName}
-            <Span className="ml-2 font-mono text-xs normal-case font-normal">
+      {taskData && (
+        <Div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
+          <Div className="break-words text-sm font-semibold">
+            <Span>{taskData.displayName}</Span>
+            <Span className="ml-2 font-mono text-xs font-normal text-muted-foreground">
               {routeId}
             </Span>
           </Div>
-          <EndpointsPage
-            logger={logger}
-            endpoint={{ [toolMethod]: toolEndpoint } as EndpointMethods}
-            locale={locale}
-            user={user}
-            platform={platform}
-            endpointOptions={toolEndpointOptions}
-          />
+          {toolEndpoint && toolMethod && Object.keys(taskInput).length > 0 && (
+            <EndpointsPage
+              logger={logger}
+              endpoint={{ [toolMethod]: toolEndpoint } as EndpointMethods}
+              locale={locale}
+              user={user}
+              platform={platform}
+              endpointOptions={toolEndpointOptions}
+              disabled
+            />
+          )}
         </Div>
       )}
-
-      {/* Submit button */}
-      <SubmitButtonWidget<typeof endpoints.POST>
-        field={children.submitButton}
-      />
-    </Div>
+    </WidgetShell>
   );
 }

@@ -6,11 +6,23 @@
 
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "next-vibe/ui/components/alert-dialog";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
@@ -19,11 +31,13 @@ import {
   useWidgetEndpointMutations,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
 import cancelDefinitions from "../cancel/definition";
@@ -89,17 +103,40 @@ function RunningRow({
               : ""}
           </Span>
         </Div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={busy}
-          onClick={() => onCancel(task.id)}
-        >
-          {busy
-            ? t("health.get.widget.cancelling")
-            : t("health.get.widget.cancel")}
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="min-h-10"
+              disabled={busy}
+            >
+              {busy
+                ? t("health.get.widget.cancelling")
+                : t("health.get.widget.cancel")}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t("health.get.widget.cancel")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>{task.name}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>
+                {t("budgetCaps.post.widget.back")}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={() => onCancel(task.id)}
+              >
+                {t("health.get.widget.cancel")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </Div>
       <Span className="text-xs text-muted-foreground tabular-nums">
         {[
@@ -122,17 +159,19 @@ function IncidentRow({
   incident,
   t,
   busy,
+  locale,
   onResolve,
 }: {
   incident: Incident;
   t: HealthT;
   busy: boolean;
+  locale: ReturnType<typeof useWidgetLocale>;
   onResolve: (incidentId: string) => void;
 }): JSX.Element {
   return (
     <Div className="flex items-start justify-between gap-3 px-4 py-3">
       <Div className="flex flex-col gap-1 min-w-0">
-        <Div className="flex items-center gap-2">
+        <Div className="flex flex-wrap items-center gap-2">
           <Badge variant="destructive">{t(incident.type)}</Badge>
           <Span className="text-sm font-semibold truncate">
             {incident.taskName}
@@ -140,13 +179,14 @@ function IncidentRow({
         </Div>
         <Span className="text-xs text-muted-foreground">{incident.reason}</Span>
         <Span className="text-xs text-muted-foreground tabular-nums">
-          {new Date(incident.createdAt).toLocaleString()}
+          {new Date(incident.createdAt).toLocaleString(locale)}
         </Span>
       </Div>
       <Button
         type="button"
         variant="ghost"
         size="sm"
+        className="min-h-10"
         disabled={busy}
         onClick={() => onResolve(incident.id)}
       >
@@ -163,6 +203,7 @@ export function TaskHealthWidget(): JSX.Element {
   const logger = useWidgetLogger();
   const user = useWidgetUser();
   const mutations = useWidgetEndpointMutations();
+  const response = useWidgetResponse();
   const cancelMutation = useApiMutation(cancelDefinitions.POST, logger, user);
   const numberFormat = new Intl.NumberFormat(locale, {
     maximumFractionDigits: 1,
@@ -186,15 +227,18 @@ export function TaskHealthWidget(): JSX.Element {
     : null;
 
   return (
-    <WidgetShell>
+    <WidgetShell layout="page">
       <Div className="flex flex-col gap-4">
         <WidgetHeader
+          size="page"
           title={t("health.get.widget.title")}
+          subtitle={t("health.get.widget.subtitle")}
           actions={
             <Button
               type="button"
               variant="ghost"
               size="sm"
+              className="min-h-10 min-w-10"
               onClick={refetch}
               aria-label={t("health.get.widget.refresh")}
             >
@@ -202,12 +246,19 @@ export function TaskHealthWidget(): JSX.Element {
             </Button>
           }
         />
-        <P className="text-sm text-muted-foreground">
-          {t("health.get.widget.subtitle")}
-        </P>
+        <FormAlertWidget field={{}} />
+        {cancelMutation.error && (
+          <ResultBanner
+            variant="danger"
+            title={t("errors.server.title")}
+            message={cancelMutation.error.message}
+          />
+        )}
 
         {!data ? (
-          <LoadingBlock message={t("health.get.widget.loading")} />
+          response?.success !== false && (
+            <LoadingBlock message={t("health.get.widget.loading")} />
+          )
         ) : (
           <>
             <P className="text-sm font-medium tabular-nums">
@@ -259,6 +310,7 @@ export function TaskHealthWidget(): JSX.Element {
                       incident={incident}
                       t={t}
                       busy={busyId === incident.id}
+                      locale={locale}
                       onResolve={(incidentId) => run({ incidentId })}
                     />
                   ))}

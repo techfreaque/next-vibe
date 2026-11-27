@@ -207,6 +207,7 @@ export const translations: typeof enTranslations = {
     bulk: {
       selected: "{count} zaznaczono",
       selectAll: "Zaznacz wszystkie",
+      selectTask: "Zaznacz {{name}}",
       clearSelection: "Wyczyść zaznaczenie",
       enable: "Włącz",
       disable: "Wyłącz",
@@ -216,7 +217,7 @@ export const translations: typeof enTranslations = {
       confirmDelete:
         "Usunąć {count} zadanie(a)? Tej operacji nie można cofnąć.",
       cancel: "Anuluj",
-      success: "{succeeded} udanych, {failed} nieudanych",
+      success: "{{succeeded}} udanych, {{failed}} nieudanych",
     },
     empty: {
       noTasks: "Kolejka jest pusta",

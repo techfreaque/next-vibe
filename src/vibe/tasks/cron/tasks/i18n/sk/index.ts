@@ -226,13 +226,13 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "ID úlohy",
+        label: "Kľúč úlohy",
         description:
           'Jedinečný, stabilný identifikátor pre túto úlohu (napr. "db-health")',
         placeholder: "Zadajte ID úlohy…",
       },
       routeId: {
-        label: "ID trasy",
+        label: "Alias koncového bodu",
         description:
           "Identifikátor obslužnej funkcie: názov úlohy, alias koncového bodu alebo cron-steps.",
         placeholder: "Zadajte ID trasy…",

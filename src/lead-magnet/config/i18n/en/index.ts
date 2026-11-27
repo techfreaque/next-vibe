@@ -50,7 +50,7 @@ export const translations = {
     confirmDelete: {
       title: "Disconnect {{provider}}?",
       description:
-        "New subscribers stop landing in your list. Contacts already captured stay where they are.",
+        "Disconnecting stops new signups and clears the capture history here. Contacts already sent to your provider stay there.",
       cancel: "Keep connected",
       proceed: "Disconnect",
     },

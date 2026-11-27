@@ -142,6 +142,7 @@ export function TagsFieldWidget<
                 disabled={isDisabled || field.disabled || field.readonly}
                 className={styleClassName.inputClassName}
                 name={formField.name}
+                inputLabel={field.label ? tField(field.label) : undefined}
                 t={tField}
               />
             </FormControl>

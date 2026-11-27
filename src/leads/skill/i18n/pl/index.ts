@@ -11,13 +11,13 @@ export const translations: typeof enTranslations = {
     titleShort: "Skill leada",
     description: "Zapisz atrybucję skillu dla tego leada (first-touch)",
     skillId: {
-      label: "ID Skillu",
-      description: "UUID niestandardowego skillu do przypisania temu leadowi",
+      label: "Umiejętność",
+      description: "Wybierz opublikowaną umiejętność społeczności.",
     },
     errors: {
       validation: {
-        title: "Nieprawidłowe ID skillu",
-        description: "Musi być prawidłowym UUID niestandardowego skillu",
+        title: "Wybierz umiejętność",
+        description: "Wybierz opublikowaną umiejętność społeczności.",
       },
       network: {
         title: "Błąd sieci",
@@ -59,7 +59,7 @@ export const translations: typeof enTranslations = {
     skipped: {
       title: "Nie zapisano",
       description:
-        "Brak sesji odwiedzającego do przypisania. Otwórz najpierw stronę, potem spróbuj ponownie.",
+        "Pierwsza umiejętność tego użytkownika pozostaje zapisana. Sprawdź inną w nowej sesji.",
     },
     submit: "Przypisz skill",
   },

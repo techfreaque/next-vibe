@@ -4,10 +4,11 @@
  */
 
 import { readFile } from "node:fs/promises";
-import { loadavg } from "node:os";
+import { freemem, loadavg, totalmem } from "node:os";
 import { performance } from "node:perf_hooks";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { toIntlLocale } from "../../../core/i18n/core/language-utils";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -15,6 +16,7 @@ import {
   success,
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
+import { readProcMeminfo } from "../../../database/health/repository";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
 import type { EndpointLogger } from "../../../logger/types";
 import { getCurrentEnvironmentInfo } from "../environment";
@@ -29,8 +31,6 @@ import type { ServerHealthT } from "./i18n";
  * Health Check Repository
  */
 export class HealthCheckRepository {
-  private static startTime = Date.now();
-
   static async checkHealth(
     data: HealthCheckRequestOutput,
     logger: EndpointLogger,
@@ -55,17 +55,27 @@ export class HealthCheckRepository {
 
       // Get environment information
       const envInfo = getCurrentEnvironmentInfo();
+      const memoryInfo = HealthCheckRepository.getMemoryInfo();
+      const formatPercent = new Intl.NumberFormat(toIntlLocale(locale), {
+        style: "percent",
+        maximumFractionDigits: 1,
+      });
+      const memoryUsage = formatPercent.format(memoryInfo.percentage / 100);
 
       // Graceful-shutdown drain: once SIGTERM has started draining in-flight AI
       // streams, report the node UNHEALTHY so a health-checking load balancer
       // (Caddy reverse_proxy health_uri) stops routing NEW requests here while
       // existing streams finish. This is the belt-and-suspenders signal that
       // complements the rolling-deploy script's explicit LB deregistration.
-      const drainCheck = await HealthCheckRepository.performDrainCheck();
+      const drainCheck = await HealthCheckRepository.performDrainCheck(t);
       checks.push(drainCheck);
 
       // Basic health check
-      const basicCheck = await HealthCheckRepository.performBasicCheck();
+      const basicCheck = await HealthCheckRepository.performBasicCheck(
+        t,
+        memoryInfo.percentage > 90,
+        memoryUsage,
+      );
       checks.push(basicCheck);
 
       // Database health check
@@ -74,6 +84,7 @@ export class HealthCheckRepository {
         const dbCheck = await HealthCheckRepository.performDatabaseCheck(
           logger,
           locale,
+          t,
         );
         checks.push(dbCheck);
         databaseStatus = {
@@ -91,7 +102,7 @@ export class HealthCheckRepository {
       // Task runner health check
       let tasksStatus;
       if (data.includeTasks) {
-        const taskCheck = await HealthCheckRepository.performTaskCheck();
+        const taskCheck = await HealthCheckRepository.performTaskCheck(t);
         checks.push(taskCheck);
         tasksStatus = {
           runnerStatus:
@@ -111,10 +122,14 @@ export class HealthCheckRepository {
       // System health check
       let systemStatus;
       if (data.includeSystem) {
-        const sysCheck = await HealthCheckRepository.performSystemCheck();
+        const sysCheck = await HealthCheckRepository.performSystemCheck(
+          t,
+          memoryInfo.percentage > 90,
+          memoryUsage,
+        );
         checks.push(sysCheck);
         systemStatus = {
-          memory: HealthCheckRepository.getMemoryInfo(),
+          memory: memoryInfo,
           cpu: HealthCheckRepository.getCpuInfo(),
           disk: HealthCheckRepository.getDiskInfo(),
         };
@@ -134,7 +149,7 @@ export class HealthCheckRepository {
       const response: HealthCheckResponseOutput = {
         status: overallStatus,
         timestamp: new Date(),
-        uptime: Date.now() - HealthCheckRepository.startTime,
+        uptime: process.uptime() * 1000,
         revision,
         environment: {
           name: envInfo.environment,
@@ -190,7 +205,7 @@ export class HealthCheckRepository {
    * has begun graceful shutdown, so a health-checking LB deregisters this node.
    * Also reports the in-flight AI-stream count for observability.
    */
-  private static async performDrainCheck(): Promise<{
+  private static async performDrainCheck(t: ServerHealthT): Promise<{
     name: string;
     status: "pass" | "fail" | "warn";
     message?: string;
@@ -204,14 +219,18 @@ export class HealthCheckRepository {
         return {
           name: "drain",
           status: "fail",
-          message: `Node is draining (${activeLoopCount()} in-flight stream(s))`, // eslint-disable-line i18next/no-literal-string
+          message: t("get.widget.messages.draining", {
+            count: activeLoopCount(),
+          }),
           duration: performance.now() - start,
         };
       }
       return {
         name: "drain",
         status: "pass",
-        message: `Accepting traffic (${activeLoopCount()} in-flight stream(s))`, // eslint-disable-line i18next/no-literal-string
+        message: t("get.widget.messages.accepting", {
+          count: activeLoopCount(),
+        }),
         duration: performance.now() - start,
       };
     } catch (error) {
@@ -228,7 +247,11 @@ export class HealthCheckRepository {
   /**
    * Perform basic health check
    */
-  private static performBasicCheck(): Promise<{
+  private static performBasicCheck(
+    t: ServerHealthT,
+    memoryPressure: boolean,
+    memoryUsage: string,
+  ): Promise<{
     name: string;
     status: "pass" | "fail" | "warn";
     message?: string;
@@ -237,16 +260,11 @@ export class HealthCheckRepository {
     const start = performance.now();
 
     try {
-      // Basic checks: process is running, memory not exhausted, etc.
-      const memoryUsage = process.memoryUsage();
-      const memoryUsagePercent =
-        (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
-
-      if (memoryUsagePercent > 90) {
+      if (memoryPressure) {
         return Promise.resolve({
           name: "basic",
           status: "warn",
-          message: `High memory usage: ${memoryUsagePercent.toFixed(1)}%`, // eslint-disable-line i18next/no-literal-string
+          message: t("get.widget.messages.memory", { usage: memoryUsage }),
           duration: performance.now() - start,
         });
       }
@@ -254,7 +272,7 @@ export class HealthCheckRepository {
       return Promise.resolve({
         name: "basic",
         status: "pass",
-        message: "Server is running normally", // eslint-disable-line i18next/no-literal-string
+        message: t("get.widget.messages.processOk"),
         duration: performance.now() - start,
       });
     } catch (error) {
@@ -273,6 +291,7 @@ export class HealthCheckRepository {
   private static async performDatabaseCheck(
     logger: EndpointLogger,
     locale: CountryLanguage,
+    t: ServerHealthT,
   ): Promise<{
     name: string;
     status: "pass" | "fail" | "warn";
@@ -297,14 +316,14 @@ export class HealthCheckRepository {
         return {
           name: "database",
           status: "pass",
-          message: "Database connection successful", // eslint-disable-line i18next/no-literal-string
+          message: t("get.widget.messages.databaseOk"),
           duration: performance.now() - start,
         };
       }
       return {
         name: "database",
         status: "fail",
-        message: "Database connection failed", // eslint-disable-line i18next/no-literal-string
+        message: t("get.widget.messages.databaseFailed"),
         duration: performance.now() - start,
       };
     } catch (error) {
@@ -320,7 +339,7 @@ export class HealthCheckRepository {
   /**
    * Perform task runner health check
    */
-  private static performTaskCheck(): Promise<{
+  private static performTaskCheck(t: ServerHealthT): Promise<{
     name: string;
     status: "pass" | "fail" | "warn";
     message?: string;
@@ -337,7 +356,7 @@ export class HealthCheckRepository {
         return Promise.resolve({
           name: "tasks",
           status: "warn",
-          message: "Task runner disabled in current environment", // eslint-disable-line i18next/no-literal-string
+          message: t("get.widget.messages.tasksDisabled"),
           duration: performance.now() - start,
         });
       }
@@ -345,7 +364,7 @@ export class HealthCheckRepository {
       return Promise.resolve({
         name: "tasks",
         status: "pass",
-        message: "Task runner is available", // eslint-disable-line i18next/no-literal-string
+        message: t("get.widget.messages.tasksOk"),
         duration: performance.now() - start,
       });
     } catch (error) {
@@ -361,7 +380,11 @@ export class HealthCheckRepository {
   /**
    * Perform system health check
    */
-  private static performSystemCheck(): Promise<{
+  private static performSystemCheck(
+    t: ServerHealthT,
+    memoryPressure: boolean,
+    memoryUsage: string,
+  ): Promise<{
     name: string;
     status: "pass" | "fail" | "warn";
     message?: string;
@@ -370,13 +393,11 @@ export class HealthCheckRepository {
     const start = performance.now();
 
     try {
-      const memoryInfo = HealthCheckRepository.getMemoryInfo();
-
-      if (memoryInfo.percentage > 90) {
+      if (memoryPressure) {
         return Promise.resolve({
           name: "system",
           status: "warn",
-          message: `High memory usage: ${memoryInfo.percentage.toFixed(1)}%`, // eslint-disable-line i18next/no-literal-string
+          message: t("get.widget.messages.memory", { usage: memoryUsage }),
           duration: performance.now() - start,
         });
       }
@@ -384,7 +405,7 @@ export class HealthCheckRepository {
       return Promise.resolve({
         name: "system",
         status: "pass",
-        message: "System resources are healthy", // eslint-disable-line i18next/no-literal-string
+        message: t("get.widget.messages.systemOk"),
         duration: performance.now() - start,
       });
     } catch (error) {
@@ -405,11 +426,14 @@ export class HealthCheckRepository {
     total: number;
     percentage: number;
   } {
-    const memoryUsage = process.memoryUsage();
+    const procMem = readProcMeminfo();
+    const total = procMem ? procMem.totalKb * 1024 : totalmem();
+    const available = procMem ? procMem.availableKb * 1024 : freemem();
+    const used = Math.max(0, total - available);
     return {
-      used: memoryUsage.heapUsed,
-      total: memoryUsage.heapTotal,
-      percentage: (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100,
+      used,
+      total,
+      percentage: total > 0 ? (used / total) * 100 : 0,
     };
   }
 

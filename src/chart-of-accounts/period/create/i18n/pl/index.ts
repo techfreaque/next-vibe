@@ -6,9 +6,9 @@ export const translations: typeof enTranslations = {
     titleShort: "Nowy okres",
     description: "Utwórz nowy okres księgowy dla firmy",
     companyId: {
-      label: "ID firmy",
+      label: "Firma",
       description: "Firma, dla której otwierany jest okres",
-      placeholder: "UUID firmy",
+      placeholder: "Wybierz firmę",
     },
     name: {
       label: "Nazwa okresu",

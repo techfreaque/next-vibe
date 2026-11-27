@@ -4,9 +4,9 @@ export const translations = {
     titleShort: "New period",
     description: "Create a new accounting period for a company",
     companyId: {
-      label: "Company ID",
+      label: "Company",
       description: "Company to open the period for",
-      placeholder: "Company UUID",
+      placeholder: "Choose a company",
     },
     name: {
       label: "Period name",

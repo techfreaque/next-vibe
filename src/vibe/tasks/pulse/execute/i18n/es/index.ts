@@ -24,8 +24,9 @@ export const translations: typeof enTranslations = {
         description: "Realizar una carrera seca sin hacer cambios reales",
       },
       taskNames: {
-        label: "Nombres de la tarea",
-        description: "Nombres de tareas específicos para ejecutar (opcional)",
+        label: "Alias de tareas",
+        description:
+          "Escribe un alias de endpoint y pulsa Intro. Deja el campo vacío para incluir todas las tareas aplicables.",
       },
       force: {
         label: "Ejecución de la fuerza",

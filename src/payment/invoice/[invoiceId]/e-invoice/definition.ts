@@ -66,6 +66,7 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "buyerReference.label",
         description: "buyerReference.description",
+        includeInCacheKey: true,
         schema: z.string().trim().min(1).max(100).optional(),
       }),
       jurisdiction: responseField(scopedTranslation, {

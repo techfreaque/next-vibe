@@ -48,13 +48,15 @@ function PeriodRow({
       : "muted";
 
   return (
-    <Div
-      className="flex items-center gap-3 py-3 px-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors cursor-pointer"
+    <Button
+      type="button"
+      variant="ghost"
+      className="h-auto min-h-11 w-full justify-start gap-3 rounded-none border-b px-4 py-3 text-start font-normal last:border-b-0 hover:bg-muted/30"
       onClick={() => {
         onView(period.id);
       }}
     >
-      <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
+      <Span className="flex min-w-0 flex-1 flex-col gap-0.5 whitespace-normal">
         <Span
           className={`text-sm font-medium ${isOpen ? "text-foreground" : "text-muted-foreground"}`}
         >
@@ -63,13 +65,13 @@ function PeriodRow({
         <Span className="text-xs text-muted-foreground tabular-nums">
           {`${formatDocDate(period.startDate, locale)} – ${formatDocDate(period.endDate, locale)}`}
         </Span>
-      </Div>
+      </Span>
       <StatusPill
         status={period.status}
         label={statusLabel}
         variant={statusVariant}
       />
-    </Div>
+    </Button>
   );
 }
 
@@ -142,7 +144,6 @@ export function CoaPeriodListWidget(
       <WidgetHeader
         size="page"
         title={t("get.title")}
-        subtitle={new Intl.NumberFormat(locale).format(periods.length)}
         actions={
           !isPickerMode ? (
             <Button

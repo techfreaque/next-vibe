@@ -40,12 +40,18 @@ import {
   TaskOutputModeDB,
 } from "../../enum";
 import { taskInputSchema, taskOwnerSchema } from "../db";
+import { makeTaskInputRequestSchema } from "../task-input-schema";
 import {
   CRON_DELETE_ALIAS,
   CRON_GET_ALIAS,
   CRON_UPDATE_ALIAS,
 } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const taskInputRequestSchema = makeTaskInputRequestSchema({
+  invalidJson: "put.fields.taskInput.invalidJson",
+  notObject: "put.fields.taskInput.notObject",
+});
 
 const CronTaskDetailContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({
@@ -56,6 +62,12 @@ const CronTaskDetailContainer = lazyWidget(() =>
 const CronTaskEditContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({
     default: m.CronTaskEditContainer,
+  })),
+);
+
+const CronTaskDeleteContainer = lazyWidget(() =>
+  import("./widget/widget").then((module) => ({
+    default: module.CronTaskDeleteContainer,
   })),
 );
 
@@ -458,7 +470,7 @@ const { PUT } = createEndpoint({
         description: "put.fields.description.description",
         placeholder: "put.fields.description.placeholder",
         columns: 12,
-        schema: z.string().optional(),
+        schema: z.string().nullable().optional(),
       }),
 
       schedule: requestField(scopedTranslation, {
@@ -538,7 +550,7 @@ const { PUT } = createEndpoint({
         description: "put.fields.taskInput.description",
         columns: 12,
         hidden: true,
-        schema: taskInputSchema.optional(),
+        schema: taskInputRequestSchema.optional(),
       }),
 
       hidden: requestField(scopedTranslation, {
@@ -957,12 +969,8 @@ const { DELETE } = createEndpoint({
     UserRole.ADMIN,
   ],
   tags: ["tags.cron" as const, "tags.scheduling" as const],
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "delete.container.title",
-    description: "delete.container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
+    render: CronTaskDeleteContainer,
     usage: { request: "urlPathParams", response: true },
     children: {
       // URL parameter

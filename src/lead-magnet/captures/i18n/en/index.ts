@@ -1,7 +1,7 @@
 export const translations = {
   list: {
-    title: "Captured Leads",
-    titleShort: "Captured Leads",
+    title: "Captured leads",
+    titleShort: "Captured leads",
     description: "Everyone who submitted your lead magnet form",
     tag: "lead-magnet-captures",
     response: {
@@ -45,8 +45,7 @@ export const translations = {
     },
   },
   widget: {
-    empty:
-      "No subscribers yet. Share your skill page - every visit is a chance to grow your list.",
+    empty: "No subscribers yet. Share your skill page to grow your list.",
     exportCsv: "Export CSV",
     columns: {
       date: "Date",

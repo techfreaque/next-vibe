@@ -14,12 +14,12 @@ export const reportAnalyticsWindowFields = {
     ...analyticsWindowFields.from,
     schema: z.iso
       .date()
-      .prefault(() => reportDay(reportPeriodRange("thisMonth").from)),
+      .default(() => reportDay(reportPeriodRange("thisMonth").from)),
   },
   to: {
     ...analyticsWindowFields.to,
     schema: z.iso
       .date()
-      .prefault(() => reportDay(reportPeriodRange("thisMonth").to)),
+      .default(() => reportDay(reportPeriodRange("thisMonth").to)),
   },
 };

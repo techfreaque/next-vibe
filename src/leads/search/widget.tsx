@@ -6,6 +6,7 @@
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
+import { scopedTranslation as leadTranslation } from "next-vibe/identity/lead/i18n";
 import type { ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -20,6 +21,8 @@ import { X } from "next-vibe/ui/components/icons/X";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
@@ -88,18 +91,6 @@ const STATUS_LABEL_KEYS: Record<string, SearchTranslationKey> = {
   [LeadStatus.BOUNCED]: "widget.statusBounced",
   [LeadStatus.INVALID]: "widget.statusInvalid",
 };
-
-// ─── Format enum i18n key to readable label ───────────────────────────────────
-// e.g. "enums.leadSource.csvImport" → "CSV Import"
-
-function formatEnumKey(key: string): string {
-  const parts = key.split(".");
-  const last = parts[parts.length - 1] ?? key;
-  return last
-    .replaceAll(/([A-Z])/g, " $1")
-    .replace(/^\s/, "")
-    .replaceAll(/\b\w/g, (c) => c.toUpperCase());
-}
 
 // ─── Bar colour helper ─────────────────────────────────────────────────────────
 
@@ -230,6 +221,7 @@ export function LeadsSearchContainer({
   const submit = useWidgetOnSubmit();
 
   const t = useWidgetTranslation<typeof definition.GET>();
+  const { t: leadT } = leadTranslation.scopedT(locale);
 
   const onPick = usePickerCallback<Omit<Lead, "metadata">>();
   const isPickerMode = !!onPick;
@@ -302,32 +294,26 @@ export function LeadsSearchContainer({
     changePage(0);
   };
   return (
-    <Div className="flex flex-col gap-0">
-      {/* ── Header ── */}
-      <Div className="flex items-center gap-2 p-4 border-b">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex items-center gap-2 mr-auto">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <Span className="font-semibold text-base">{t("widget.title")}</Span>
-          {total > 0 && (
-            <Span className="text-sm text-muted-foreground font-normal">
-              ({total})
-            </Span>
-          )}
-        </Div>
-        {isFetching && (
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        )}
-      </Div>
+    <WidgetShell layout={isPickerMode ? "compact" : "page"}>
+      <WidgetHeader
+        title={t("get.title")}
+        size={isPickerMode ? undefined : "page"}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+        actions={
+          isFetching ? (
+            <Loader2 className="size-4 animate-spin text-muted-foreground" />
+          ) : undefined
+        }
+      />
 
-      {/* ── Search form ── */}
-      <Div className="px-4 pt-3 pb-2 flex items-end gap-2">
+      <Div className="flex flex-wrap items-end gap-3">
         <Div className="flex min-w-0 flex-1 flex-col gap-1">
           <Label htmlFor="lead-search-query">{t("get.search.label")}</Label>
           <Input
             id="lead-search-query"
             value={search ?? ""}
             placeholder={t("get.search.placeholder")}
+            className="min-h-10"
             onChange={(event) => {
               form.setValue("search", event.target.value, {
                 shouldDirty: true,
@@ -342,13 +328,14 @@ export function LeadsSearchContainer({
             loadingText: "get.search.label",
             icon: "search",
             variant: "primary",
+            className: "min-h-10",
           }}
         />
       </Div>
       <FormAlertWidget field={{}} />
 
       {/* ── Results ── */}
-      <Div className="px-4 pb-2 overflow-y-auto @md:max-h-[min(700px,calc(100dvh-260px))]">
+      <Div className="flex min-w-0 flex-col gap-3">
         {/* Status filter chips — full mode only */}
         {!isPickerMode && (
           <Div className="flex flex-wrap items-center gap-1.5 pt-3 pb-1">
@@ -376,7 +363,7 @@ export function LeadsSearchContainer({
                 >
                   {STATUS_LABEL_KEYS[status]
                     ? t(STATUS_LABEL_KEYS[status])
-                    : status.replaceAll("_", " ")}
+                    : leadT(status)}
                   {isActive && <X className="h-2.5 w-2.5" />}
                 </Button>
               );
@@ -467,7 +454,9 @@ export function LeadsSearchContainer({
                         className="h-auto min-w-0 p-0 font-semibold text-sm hover:bg-transparent hover:underline before:absolute before:inset-0 before:rounded-lg focus-visible:before:ring-2 focus-visible:before:ring-ring"
                       >
                         <Span className="truncate">
-                          {lead.businessName || lead.email || lead.id}
+                          {lead.businessName ||
+                            lead.email ||
+                            t("widget.unnamedLead")}
                         </Span>
                       </Button>
 
@@ -482,7 +471,7 @@ export function LeadsSearchContainer({
                         >
                           {lead.status && STATUS_LABEL_KEYS[lead.status]
                             ? t(STATUS_LABEL_KEYS[lead.status])
-                            : formatEnumKey(lead.status)}
+                            : leadT(lead.status)}
                         </Span>
                       )}
 
@@ -497,7 +486,7 @@ export function LeadsSearchContainer({
                       {/* Campaign stage chip */}
                       {lead.currentCampaignStage && (
                         <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
-                          {formatEnumKey(lead.currentCampaignStage)}
+                          {leadT(lead.currentCampaignStage)}
                         </Span>
                       )}
                     </Div>
@@ -511,7 +500,7 @@ export function LeadsSearchContainer({
                         />
                       )}
                       {lead.country && <Span>{lead.country}</Span>}
-                      {lead.source && <Span>{formatEnumKey(lead.source)}</Span>}
+                      {lead.source && <Span>{leadT(lead.source)}</Span>}
                     </Div>
 
                     {/* Row 3 - created date */}
@@ -621,6 +610,6 @@ export function LeadsSearchContainer({
           </Div>
         )}
       </Div>
-    </Div>
+    </WidgetShell>
   );
 }

@@ -14,12 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ user, urlPathParams, logger, locale }) =>
-      LeadsImportJobRepository.stopJob(
-        user.id,
-        urlPathParams.jobId,
-        logger,
-        locale,
-      ),
+    handler: ({ user, urlPathParams, logger, t }) =>
+      LeadsImportJobRepository.stopJob(user.id, urlPathParams.jobId, logger, t),
   },
 });

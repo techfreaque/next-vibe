@@ -210,6 +210,7 @@ export const translations: typeof enTranslations = {
     bulk: {
       selected: "{count} sélectionnée(s)",
       selectAll: "Tout sélectionner",
+      selectTask: "Sélectionner {{name}}",
       clearSelection: "Effacer la sélection",
       enable: "Activer",
       disable: "Désactiver",
@@ -219,7 +220,7 @@ export const translations: typeof enTranslations = {
       confirmDelete:
         "Supprimer {count} tâche(s) ? Cette action est irréversible.",
       cancel: "Annuler",
-      success: "{succeeded} réussie(s), {failed} échouée(s)",
+      success: "{{succeeded}} réussie(s), {{failed}} échouée(s)",
     },
     empty: {
       noTasks: "La file est vide",

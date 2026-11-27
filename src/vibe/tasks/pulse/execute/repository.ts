@@ -82,7 +82,11 @@ export class PulseExecuteRepository {
 
       const response: PulseExecuteResponseOutput = {
         success: summary.tasksFailed.length === 0,
-        message: isDryRun ? "Dry run completed" : "Pulse execution completed",
+        message: t(
+          isDryRun
+            ? "post.response.dryRunSuccess"
+            : "post.response.executionSuccess",
+        ),
         executedAt: new Date(summary.executedAt),
         tasksExecuted: summary.tasksExecuted.length,
         results,

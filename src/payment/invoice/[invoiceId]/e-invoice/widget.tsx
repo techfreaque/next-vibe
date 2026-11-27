@@ -23,34 +23,77 @@ import { Ul } from "next-vibe/ui/components/ul";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  useWidgetForm,
   useWidgetIsInteractive,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetPlatform,
   useWidgetResponseOnly,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useMemo, useState } from "react";
 
 import { DocumentTextExportButton } from "@/finance/document-text-export";
 
-import type definition from "./definition";
+import definition from "./definition";
 
 export function InvoiceEInvoiceWidget({
   field,
 }: {
   field: (typeof definition.GET)["fields"];
 }): JSX.Element {
-  const data = useWidgetValue<typeof definition.GET>();
+  const initial = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const interactive = useWidgetIsInteractive() && !responseOnly;
   const { pop, canGoBack } = useWidgetNavigation();
+  const invoiceId = form?.watch("invoiceId") ?? "";
+  const [preparation, setPreparation] = useState<{
+    invoiceId: string;
+    buyerReference: string;
+  }>();
+  const request =
+    preparation?.invoiceId === invoiceId ? preparation : undefined;
+  const options = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { invoiceId },
+        initialState: { buyerReference: request?.buyerReference },
+        formOptions: { autoSubmit: false, persistForm: false },
+        queryOptions: { enabled: interactive && Boolean(request) },
+      },
+    }),
+    [invoiceId, interactive, request],
+  );
+  const { read } = useEndpoint(definition, options, logger, user);
+  const prepared = request ? read?.response : undefined;
+  const preparing =
+    Boolean(request) && (!prepared || Boolean(read?.isFetching));
+  const data = prepared?.success ? prepared.data : initial;
+  const canDownload = !preparing && prepared?.success !== false;
+
+  const prepareReference = (): void => {
+    void form?.handleSubmit(({ invoiceId: id, buyerReference }) => {
+      if (buyerReference) {
+        if (buyerReference === request?.buyerReference) {
+          void read?.refetch();
+        } else {
+          setPreparation({ invoiceId: id, buyerReference });
+        }
+      }
+    })();
+  };
 
   if (responseOnly && (isCliPlatform(platform) || platform === Platform.MCP)) {
     return (
@@ -113,7 +156,7 @@ export function InvoiceEInvoiceWidget({
         subtitle={t("title")}
         backButton={backButton}
         actions={
-          interactive && data.ready ? (
+          interactive && canDownload && data.ready ? (
             <DocumentTextExportButton
               filename={data.fileName}
               content={data.xml}
@@ -163,38 +206,48 @@ export function InvoiceEInvoiceWidget({
             fieldName="buyerReference"
             field={field.children.buyerReference}
           />
-          <SubmitButtonWidget<typeof definition.GET>
-            field={{ text: "widget.submit" }}
-          />
-          {data.xrechnung.missingFields.length > 0 ? (
-            <ResultBanner variant="warning" title={t("widget.xrechnung")}>
-              <Ul className="flex flex-col gap-1 text-sm">
-                {data.xrechnung.missingFields.map((missing) => (
-                  <Li key={missing.field}>{missing.label}</Li>
-                ))}
-              </Ul>
-            </ResultBanner>
-          ) : (
-            <DocumentTextExportButton
-              filename={data.xrechnung.fileName}
-              content={data.xrechnung.xml}
-              mimeType="application/xml;charset=utf-8"
-              downloadLabel={t("widget.xrechnung")}
-              copyLabel={t("widget.copy")}
-              copiedLabel={t("widget.copied")}
-              copyErrorLabel={t("widget.copyFailed")}
+          <Button
+            type="button"
+            className="self-start"
+            disabled={preparing || !form?.watch("buyerReference")?.trim()}
+            onClick={prepareReference}
+          >
+            {t("widget.submit")}
+          </Button>
+          {prepared?.success === false && (
+            <ResultBanner
+              variant="danger"
+              title={t("errors.server.title")}
+              message={prepared.message}
             />
           )}
+          {canDownload &&
+            (data.xrechnung.missingFields.length > 0 ? (
+              <ResultBanner variant="warning" title={t("widget.xrechnung")}>
+                <Ul className="flex flex-col gap-1 text-sm">
+                  {data.xrechnung.missingFields.map((missing) => (
+                    <Li key={missing.field}>{missing.label}</Li>
+                  ))}
+                </Ul>
+              </ResultBanner>
+            ) : (
+              <DocumentTextExportButton
+                filename={data.xrechnung.fileName}
+                content={data.xrechnung.xml}
+                mimeType="application/xml;charset=utf-8"
+                downloadLabel={t("widget.xrechnung")}
+                copyLabel={t("widget.copy")}
+                copiedLabel={t("widget.copied")}
+                copyErrorLabel={t("widget.copyFailed")}
+              />
+            ))}
         </Div>
       )}
-      <Div className="flex flex-col items-start gap-2 border-t pt-4">
-        <Button type="button" variant="outline" disabled>
-          {t("widget.send")}
-        </Button>
-        <P className="text-sm text-muted-foreground">
-          {t("widget.providerNeeded")}
+      {data.ready && (
+        <P className="border-t pt-4 text-sm text-muted-foreground">
+          {t("widget.sendHint")}
         </P>
-      </Div>
+      )}
     </WidgetShell>
   );
 }

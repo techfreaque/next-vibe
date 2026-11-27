@@ -50,6 +50,8 @@ export const translations: typeof enTranslations = {
       content: "Kredity spolu",
     },
     pack: {
+      addPack: "Pridať jeden balík",
+      removePack: "Odobrať jeden balík",
       qtyCredits: "Počet kreditov: {{count}}",
       title: "Balík kreditov",
       description:

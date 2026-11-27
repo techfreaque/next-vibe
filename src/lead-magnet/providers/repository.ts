@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -34,37 +34,16 @@ export async function saveProviderConfig(
 ): Promise<ResponseType<SaveProviderResponse>> {
   const now = new Date();
 
-  const existing = await db
-    .select({
-      id: leadMagnetConfigs.id,
-      credentials: leadMagnetConfigs.credentials,
-    })
-    .from(leadMagnetConfigs)
-    .where(eq(leadMagnetConfigs.userId, userId))
-    .limit(1);
-
-  // Merge credentials: keep existing value for any key submitted as empty/undefined
-  // This preserves stored API keys/secrets when user edits non-sensitive fields only
-  const mergedCredentials: Record<string, string> = {};
-  const existingCredentials = existing[0]?.credentials ?? {};
+  const submittedCredentials: Record<string, string> = {};
   for (const [key, value] of Object.entries(credentials)) {
     if (value !== undefined && value !== "") {
-      mergedCredentials[key] = value;
-    } else if (existingCredentials[key]) {
-      mergedCredentials[key] = existingCredentials[key];
-    }
-  }
-  // Also carry over any credential keys from existing that aren't in the submitted set
-  // (e.g. switching providers doesn't apply here, but defensive for edge cases)
-  for (const [key, value] of Object.entries(existingCredentials)) {
-    if (!(key in mergedCredentials)) {
-      mergedCredentials[key] = value;
+      submittedCredentials[key] = value;
     }
   }
 
   const values = {
     provider,
-    credentials: mergedCredentials,
+    credentials: submittedCredentials,
     listId: shared.listId,
     headline: shared.headline,
     buttonText: shared.buttonText,
@@ -72,16 +51,20 @@ export async function saveProviderConfig(
     updatedAt: now,
   };
 
-  if (existing.length > 0) {
-    await db
-      .update(leadMagnetConfigs)
-      .set(values)
-      .where(eq(leadMagnetConfigs.userId, userId));
-  } else {
-    await db
-      .insert(leadMagnetConfigs)
-      .values({ ...values, userId, createdAt: now });
-  }
+  await db
+    .insert(leadMagnetConfigs)
+    .values({ ...values, userId, createdAt: now })
+    .onConflictDoUpdate({
+      target: leadMagnetConfigs.userId,
+      set: {
+        ...values,
+        credentials: sql`case
+          when ${leadMagnetConfigs.provider} = excluded.provider
+          then ${leadMagnetConfigs.credentials} || excluded.credentials
+          else excluded.credentials
+        end`,
+      },
+    });
 
   return success({
     provider,

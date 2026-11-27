@@ -91,6 +91,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    unnamedLead: "Contatto senza nome",
     previous: "Precedente",
     next: "Avanti",
     page: "Pagina {{page}} di {{pages}}",

@@ -212,6 +212,7 @@ export const translations: typeof enTranslations = {
     bulk: {
       selected: "{count} selezionato",
       selectAll: "Seleziona tutto",
+      selectTask: "Seleziona {{name}}",
       clearSelection: "Selezione chiara",
       enable: "Abilita'",
       disable: "Disattivare",
@@ -221,7 +222,7 @@ export const translations: typeof enTranslations = {
       confirmDelete:
         "Eliminare le attività di {count}(s)? Questo non può essere annullato.",
       cancel: "Annulla",
-      success: "{succeeded} è riuscito, {failed} ha fallito",
+      success: "{{succeeded}} è riuscito, {{failed}} ha fallito",
     },
     empty: {
       noTasks: "La coda è vuota",

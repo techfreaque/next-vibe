@@ -60,6 +60,30 @@ const ROW_CLASS: Record<StatementLine["kind"], string> = {
   item: "",
 };
 
+function StatementLineLabel({
+  line,
+  showOfficial,
+}: {
+  line: StatementLine;
+  showOfficial: boolean;
+}): JSX.Element {
+  return (
+    <>
+      <Span>
+        {line.marker && (
+          <Span className="mr-1.5 text-muted-foreground">{line.marker}</Span>
+        )}
+        {line.label}
+      </Span>
+      {showOfficial && (
+        <Span className="block text-xs font-normal text-muted-foreground">
+          {line.officialLabel}
+        </Span>
+      )}
+    </>
+  );
+}
+
 function StatementTable({
   title,
   lines,
@@ -87,54 +111,80 @@ function StatementTable({
       <Div className="border-b bg-muted/50 px-4 py-2 text-xs font-semibold text-muted-foreground">
         {title}
       </Div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-12 text-left">{labels.row}</TableHead>
-            <TableHead className="text-left">{labels.item}</TableHead>
-            <TableHead className="w-32 text-right">{labels.current}</TableHead>
-            <TableHead className="w-32 text-right">{labels.previous}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {visible.map((line) => (
-            <TableRow key={line.id} className={ROW_CLASS[line.kind]}>
-              <TableCell className="align-top font-mono text-xs text-muted-foreground tabular-nums">
-                {String(line.row).padStart(2, "0")}
-              </TableCell>
-              <TableCell
-                className={`min-w-0 whitespace-normal text-left [overflow-wrap:anywhere] ${
-                  line.kind === "item" ? "pl-6" : ""
-                }`}
-              >
-                <Span>
-                  {line.marker && (
-                    <Span className="mr-1.5 text-muted-foreground">
-                      {line.marker}
-                    </Span>
-                  )}
-                  {line.label}
-                </Span>
-                {showOfficial && (
-                  <Span className="block text-xs font-normal text-muted-foreground">
-                    {line.officialLabel}
-                  </Span>
-                )}
-              </TableCell>
-              <TableCell
-                className={`align-top text-right tabular-nums ${reportAmountClass(line.current)}`}
-              >
-                {formatAmount(line.current)}
-              </TableCell>
-              <TableCell
-                className={`align-top text-right tabular-nums ${reportAmountClass(line.previous)}`}
-              >
-                {formatAmount(line.previous)}
-              </TableCell>
+      <Div className="hidden @lg:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12 text-left">{labels.row}</TableHead>
+              <TableHead className="text-left">{labels.item}</TableHead>
+              <TableHead className="w-32 text-right">
+                {labels.current}
+              </TableHead>
+              <TableHead className="w-32 text-right">
+                {labels.previous}
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {visible.map((line) => (
+              <TableRow key={line.id} className={ROW_CLASS[line.kind]}>
+                <TableCell className="align-top font-mono text-xs text-muted-foreground tabular-nums">
+                  {String(line.row).padStart(2, "0")}
+                </TableCell>
+                <TableCell
+                  className={`min-w-0 whitespace-normal text-left [overflow-wrap:anywhere] ${
+                    line.kind === "item" ? "pl-6" : ""
+                  }`}
+                >
+                  <StatementLineLabel line={line} showOfficial={showOfficial} />
+                </TableCell>
+                <TableCell
+                  className={`align-top text-right tabular-nums ${reportAmountClass(line.current)}`}
+                >
+                  {formatAmount(line.current)}
+                </TableCell>
+                <TableCell
+                  className={`align-top text-right tabular-nums ${reportAmountClass(line.previous)}`}
+                >
+                  {formatAmount(line.previous)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Div>
+      <Div className="divide-y @lg:hidden">
+        {visible.map((line) => (
+          <Div
+            key={line.id}
+            className={`grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-2 px-3 py-2.5 text-sm ${ROW_CLASS[line.kind]}`}
+          >
+            <Span className="font-mono text-xs text-muted-foreground tabular-nums">
+              {String(line.row).padStart(2, "0")}
+            </Span>
+            <Div className="min-w-0 [overflow-wrap:anywhere]">
+              <StatementLineLabel line={line} showOfficial={showOfficial} />
+              <Div className="mt-1.5 grid grid-cols-2 gap-3 text-right">
+                {[
+                  { label: labels.current, amount: line.current },
+                  { label: labels.previous, amount: line.previous },
+                ].map(({ label, amount }) => (
+                  <Div key={label} className="min-w-0">
+                    <Span className="block text-xs font-normal text-muted-foreground">
+                      {label}
+                    </Span>
+                    <Span
+                      className={`tabular-nums ${reportAmountClass(amount)}`}
+                    >
+                      {formatAmount(amount)}
+                    </Span>
+                  </Div>
+                ))}
+              </Div>
+            </Div>
+          </Div>
+        ))}
+      </Div>
     </Div>
   );
 }

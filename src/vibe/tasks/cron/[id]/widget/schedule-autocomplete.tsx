@@ -302,6 +302,7 @@ interface ScheduleAutocompleteProps {
   className?: string;
   name?: string;
   locale: CountryLanguage;
+  timezone?: string;
   // Legacy props (ignored in new implementation)
   searchPlaceholder?: string;
   allowCustom?: boolean;
@@ -322,10 +323,11 @@ export function ScheduleAutocomplete({
   className,
   name,
   locale,
+  timezone: taskTimezone,
 }: ScheduleAutocompleteProps): JSX.Element {
   const { t } = cronIdScopedTranslation.scopedT(locale);
   const logger = useLogger();
-  const timezone = getDefaultTimezone(locale);
+  const timezone = taskTimezone ?? getDefaultTimezone(locale);
   const [open, setOpen] = useState(false);
 
   // Determine if current value matches a preset

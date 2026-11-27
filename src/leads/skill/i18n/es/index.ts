@@ -13,14 +13,13 @@ export const translations: typeof enTranslations = {
     description:
       "Recordar qué habilidad trajo este contacto (atribución de primer contacto)",
     skillId: {
-      label: "ID de la habilidad",
-      description:
-        "UUID de la habilidad personalizada para atribuir a este contacto",
+      label: "Habilidad",
+      description: "Elige una habilidad publicada por la comunidad.",
     },
     errors: {
       validation: {
-        title: "habilidad inválida ID",
-        description: "Debe ser un UUID válido de una habilidad personalizada",
+        title: "Elige una habilidad",
+        description: "Elige una habilidad publicada por la comunidad.",
       },
       network: {
         title: "Error de red",
@@ -64,7 +63,7 @@ export const translations: typeof enTranslations = {
     skipped: {
       title: "No se registró",
       description:
-        "No hay sesión de visitantes que atribuya. Abre una página primero, luego vuelve a entrar.",
+        "La primera habilidad del visitante sigue registrada. Prueba otra habilidad en una sesión nueva.",
     },
     submit: "Attribute habilidad",
   },

@@ -28,11 +28,25 @@ import {
 import { z } from "zod";
 
 import { CsvImportJobStatus } from "../../enum";
+import type importStatusDefinition from "../../status/definition";
 import { scopedTranslation } from "./i18n";
 
 const ImportJobStatusContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ImportJobStatusContainer })),
 );
+const ImportJobSettingsContainer = lazyWidget(() =>
+  import("./settings-widget").then((m) => ({
+    default: m.ImportJobSettingsContainer,
+  })),
+);
+const ImportJobRemoveContainer = lazyWidget(() =>
+  import("./settings-widget").then((m) => ({
+    default: m.ImportJobRemoveContainer,
+  })),
+);
+
+const importJobsList = async (): Promise<typeof importStatusDefinition.GET> =>
+  (await import("../../status/definition")).default.GET;
 
 /**
  * Get Import Job Status Endpoint (GET)
@@ -311,17 +325,19 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "upload",
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "patch.form.title",
-    description: "patch.form.description",
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data&urlPathParams", response: true },
+  fields: customWidgetObject({
+    render: ImportJobSettingsContainer,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // === URL PARAMETERS ===
       jobId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: importJobsList,
+        labelField: "fileName",
         label: "patch.jobId.label",
         description: "patch.jobId.description",
         columns: 12,
@@ -339,21 +355,21 @@ const { PATCH } = createEndpoint({
         children: {
           batchSize: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.NUMBER,
+            fieldType: FieldDataType.INT,
             label: "patch.batchSize.label",
             description: "patch.batchSize.description",
             placeholder: "patch.batchSize.placeholder",
             columns: 6,
-            schema: z.coerce.number().min(10).max(1000).optional(),
+            schema: z.coerce.number().int().min(10).max(1000).optional(),
           }),
           maxRetries: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.NUMBER,
+            fieldType: FieldDataType.INT,
             label: "patch.maxRetries.label",
             description: "patch.maxRetries.description",
             placeholder: "patch.maxRetries.placeholder",
             columns: 6,
-            schema: z.coerce.number().min(0).max(10).optional(),
+            schema: z.coerce.number().int().min(0).max(10).optional(),
           }),
         },
       }),
@@ -601,17 +617,19 @@ const { DELETE } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "upload",
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "delete.form.title",
-    description: "delete.form.description",
-    layoutType: LayoutType.STACKED,
-    usage: { request: "urlPathParams", response: true },
+  fields: customWidgetObject({
+    render: ImportJobRemoveContainer,
+    usage: { request: "urlPathParams", response: true } as const,
     children: {
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // === URL PARAMETERS ===
       jobId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: importJobsList,
+        labelField: "fileName",
         label: "delete.jobId.label",
         description: "delete.jobId.description",
         columns: 12,

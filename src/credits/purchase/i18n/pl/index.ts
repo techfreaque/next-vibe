@@ -48,6 +48,8 @@ export const translations: typeof enTranslations = {
       content: "Całkowita liczba kredytów",
     },
     pack: {
+      addPack: "Dodaj jeden pakiet",
+      removePack: "Odejmij jeden pakiet",
       qtyCredits: "{{count}} kredytów",
       title: "Pakiet kredytów",
       description: "Doładowanie do planu. Kredyty nigdy nie wygasają.",

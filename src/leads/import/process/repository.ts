@@ -16,6 +16,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { csvImportJobs } from "../db";
 import { CsvImportJobStatus } from "../enum";
@@ -34,6 +35,15 @@ export class LeadsImportProcessRepository {
   ): Promise<ResponseType<ImportProcessPostResponseOutput>> {
     const { maxJobsPerRun, maxRetriesPerJob, dryRun } = data;
     const { t } = scopedTranslation.scopedT(locale);
+    const scheduledJob = data.selfTaskId
+      ? z.uuid().safeParse(data.selfTaskId.replace(/^leads-import-/u, ""))
+      : undefined;
+    if (scheduledJob && !scheduledJob.success) {
+      return fail({
+        message: t("process.post.errors.validation.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
 
     let jobsProcessed = 0;
     let totalRowsProcessed = 0;
@@ -47,10 +57,22 @@ export class LeadsImportProcessRepository {
         .where(
           and(
             eq(csvImportJobs.status, CsvImportJobStatus.PENDING),
-            sql`${csvImportJobs.retryCount} <= ${maxRetriesPerJob}`,
+            scheduledJob
+              ? sql`${csvImportJobs.retryCount} <= ${csvImportJobs.maxRetries}`
+              : sql`${csvImportJobs.retryCount} <= ${maxRetriesPerJob}`,
+            scheduledJob ? eq(csvImportJobs.id, scheduledJob.data) : undefined,
           ),
         )
         .limit(maxJobsPerRun);
+
+      if (dryRun) {
+        return success({
+          jobsProcessed: pendingJobs.length,
+          totalRowsProcessed: 0,
+          successfulImports: 0,
+          failedImports: 0,
+        });
+      }
 
       for (const job of pendingJobs) {
         try {
@@ -83,23 +105,21 @@ export class LeadsImportProcessRepository {
             error: errorMessage,
           });
 
-          if (!dryRun) {
-            try {
-              await db
-                .update(csvImportJobs)
-                .set({
-                  status: CsvImportJobStatus.FAILED,
-                  error: errorMessage,
-                  retryCount: job.retryCount + 1,
-                  updatedAt: new Date(),
-                })
-                .where(eq(csvImportJobs.id, job.id));
-            } catch (updateError) {
-              logger.error("tasks.csv_processor.update_error", {
-                jobId: job.id,
-                error: parseError(updateError).message,
-              });
-            }
+          try {
+            await db
+              .update(csvImportJobs)
+              .set({
+                status: CsvImportJobStatus.FAILED,
+                error: errorMessage,
+                retryCount: job.retryCount + 1,
+                updatedAt: new Date(),
+              })
+              .where(eq(csvImportJobs.id, job.id));
+          } catch (updateError) {
+            logger.error("tasks.csv_processor.update_error", {
+              jobId: job.id,
+              error: parseError(updateError).message,
+            });
           }
         }
       }
@@ -108,8 +128,8 @@ export class LeadsImportProcessRepository {
       // re-enable it for the next batch if the job is still pending.
       // runOnce disables the task after each execution - re-enabling lets Pulse pick it
       // up again next minute without creating duplicate tasks.
-      if (!dryRun && data.selfTaskId) {
-        const jobId = data.selfTaskId.replace(/^leads-import-/, "");
+      if (scheduledJob && data.selfTaskId) {
+        const jobId = scheduledJob.data;
         const [stillPending] = await db
           .select({ id: csvImportJobs.id })
           .from(csvImportJobs)

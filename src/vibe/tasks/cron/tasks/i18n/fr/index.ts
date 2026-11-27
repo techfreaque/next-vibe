@@ -229,13 +229,13 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "ID de la tâche",
+        label: "Clé de la tâche",
         description:
           "Identifiant unique et stable de cette tâche (ex. 'db-health')",
         placeholder: "Saisir l'ID de la tâche...",
       },
       routeId: {
-        label: "ID de route",
+        label: "Alias du point d’accès",
         description:
           "Identifiant du gestionnaire : nom de tâche, alias d'endpoint ou 'cron-steps'",
         placeholder: "Saisir l'ID de route...",

@@ -15,6 +15,8 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
@@ -23,6 +25,10 @@ import {
 } from "../../../unified-ui/_shared/utils-i18n";
 import { HEALTH_ALIAS, healthRevisionSchema } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const HealthCheckWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({ default: module.HealthCheckWidget })),
+);
 
 /**
  * GET endpoint definition - Basic health check
@@ -41,12 +47,8 @@ const { GET } = createEndpoint({
   icon: "activity",
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "get.form.title",
-    description: "get.form.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
+    render: HealthCheckWidget,
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===

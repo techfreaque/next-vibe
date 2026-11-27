@@ -232,19 +232,19 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "Task ID",
+        label: "Chiave dell’attività",
         description:
           "Unico e stabile identificatore per questo compito (ad esempio 'db-health')",
         placeholder: "Inserire l'attività ID...",
       },
       routeId: {
-        label: "Route ID",
+        label: "Alias dell’endpoint",
         description:
           "Identificazione del manubrio: nome dell'attività, alias endpoint o 'cron-steps'",
         placeholder: "Inserire il percorso ID...",
       },
       displayName: {
-        label: "Nome dell'esposizione",
+        label: "Nome visualizzato",
         description: "Etichetta leggibile umana per questo compito",
         placeholder: "Inserisci il nome del display...",
       },

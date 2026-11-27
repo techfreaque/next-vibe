@@ -36,6 +36,7 @@ export interface TagsFieldProps<TKey extends string> {
   allowCustom?: boolean;
   disabled?: boolean;
   name?: string;
+  inputLabel?: string;
   t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType;
   className?: string;
 }
@@ -51,6 +52,7 @@ export function TagsField<TKey extends string>({
   disabled = false,
   className,
   name,
+  inputLabel,
   t,
 }: TagsFieldProps<TKey>): JSX.Element {
   const { locale } = useTranslation();
@@ -162,9 +164,13 @@ export function TagsField<TKey extends string>({
             <span className="text-xs">{getTagLabel(tag)}</span>
             {!disabled && (
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 className="h-3 w-3 p-0 hover:bg-transparent"
+                aria-label={globalT("ui.multiSelect.remove", {
+                  label: getTagLabel(tag),
+                })}
                 onClick={() => removeTag(tag)}
               >
                 <X className="h-2 w-2" />
@@ -179,6 +185,7 @@ export function TagsField<TKey extends string>({
             <PopoverTrigger asChild>
               <div className="flex-1 min-w-[120px]">
                 <Input
+                  aria-label={inputLabel}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -207,6 +214,7 @@ export function TagsField<TKey extends string>({
                           {categorySuggestions.map((suggestion) => (
                             <Button
                               key={suggestion.value}
+                              type="button"
                               variant="ghost"
                               size="sm"
                               className="w-full justify-start h-8 px-2"
@@ -228,6 +236,7 @@ export function TagsField<TKey extends string>({
                     ) && (
                       <div className="p-2 border-t">
                         <Button
+                          type="button"
                           variant="ghost"
                           size="sm"
                           className="w-full justify-start h-8 px-2"

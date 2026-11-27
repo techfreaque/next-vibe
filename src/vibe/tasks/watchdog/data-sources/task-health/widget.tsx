@@ -15,7 +15,7 @@ export function TaskHealthSeriesWidget(): React.JSX.Element {
   return (
     <DataSourceChartWidget
       definition={definitions}
-      label={t("dataSources.taskHealth.post.fields.result.label")}
+      label={t("dataSources.taskHealth.post.title")}
     />
   );
 }

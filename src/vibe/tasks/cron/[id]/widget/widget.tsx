@@ -7,7 +7,14 @@
 "use client";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Form } from "next-vibe/ui/components/form/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "next-vibe/ui/components/form/form";
 import { Activity } from "next-vibe/ui/components/icons/Activity";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
@@ -18,7 +25,12 @@ import { Play } from "next-vibe/ui/components/icons/Play";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
+import { Textarea } from "next-vibe/ui/components/textarea";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import React, { useCallback, useEffect, useState } from "react";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
@@ -32,28 +44,32 @@ import { cn } from "../../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetPlatform,
-  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "../../../../unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "../../../../unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "../../../../unified-ui/renderers/web/EndpointsPage";
 import { BooleanFieldWidget } from "../../../../unified-ui/widgets/form-fields/boolean-field/widget";
 import { NumberFieldWidget } from "../../../../unified-ui/widgets/form-fields/number-field/widget";
 import { SelectFieldWidget } from "../../../../unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "../../../../unified-ui/widgets/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "../../../../unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "../../../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../../../unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "../../../../unified-ui/widgets/interactive/submit-button/widget";
 import { formatCronScheduleShort } from "../../../cron-formatter";
 import { CronTaskPriority, CronTaskStatus } from "../../../enum";
-import type endpoints from "../definition";
+import { formatTaskInput } from "../../task-input-schema";
 import type { CronTaskGetResponseOutput } from "../definition";
+import endpoints from "../definition";
 import { ScheduleAutocomplete } from "./schedule-autocomplete";
 
 // ---------------------------------------------------------------------------
@@ -355,101 +371,39 @@ function TaskInputViewSection({
   );
 }
 
-// ---------------------------------------------------------------------------
-// TaskInputEditWidget - editable widget for PUT form (custom widget render)
-// Loads endpoint definition by routeId from GET response, renders its fields,
-// and propagates changes back to the parent form's taskInput field.
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// TaskInputEditSection - dynamic task input section for PUT form
-// Loads endpoint definition by routeId, renders its fields,
-// and propagates changes back to the parent form's taskInput field.
-// ---------------------------------------------------------------------------
-
-function TaskInputEditSection({
-  t,
-}: {
-  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.PUT>>;
-}): React.JSX.Element {
-  const logger = useWidgetLogger();
-  const locale = useWidgetLocale();
-  const user = useWidgetUser();
-  const platform = useWidgetPlatform();
-  const response = useWidgetResponse();
-
-  // Get routeId and taskInput from GET response (via prefillFromGet)
-  const responseData = response?.success === true ? response.data : undefined;
-  const routeId =
-    responseData &&
-    typeof responseData === "object" &&
-    !Array.isArray(responseData) &&
-    "task" in responseData
-      ? (responseData as { task?: { routeId?: string } }).task?.routeId
-      : undefined;
-
-  const taskInput =
-    responseData &&
-    typeof responseData === "object" &&
-    !Array.isArray(responseData) &&
-    "task" in responseData
-      ? (responseData as { task?: { taskInput?: Record<string, WidgetData> } })
-          .task?.taskInput
-      : undefined;
-
-  const { definition, isLoading, error } = useResolvedEndpoint(routeId);
-
-  const method = definition?.method as
-    | "GET"
-    | "POST"
-    | "PUT"
-    | "PATCH"
-    | "DELETE"
-    | undefined;
-
-  if (!routeId) {
-    return <></>;
-  }
-
-  if (isLoading) {
-    return (
-      <Div className="rounded-lg border p-4 flex items-center gap-2">
-        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        <Span className="text-sm text-muted-foreground">
-          {t("widget.taskInput.loading")}
-        </Span>
-      </Div>
-    );
-  }
-
-  if (error || !definition || !method) {
-    return (
-      <Div className="rounded-lg border p-4 text-sm text-muted-foreground">
-        {t("widget.taskInput.notFound")}
-      </Div>
-    );
-  }
-
+function TaskInputEditSection(): React.JSX.Element {
+  const t = useWidgetTranslation<typeof endpoints.PUT>();
+  const { t: tField } = useWidgetContext();
+  const form = useWidgetForm<typeof endpoints.PUT>();
   return (
-    <Div className="rounded-lg border p-4 flex flex-col gap-3">
-      <Div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pb-1 border-b">
-        {t("widget.taskInput.editTitle")}
+    <SectionGroup title={t("widget.taskInput.editTitle")}>
+      <Div className="p-4">
+        <FormField
+          control={form.control}
+          name="taskInput"
+          render={({ field }) => (
+            <FormItem className="flex flex-col gap-2">
+              <FormLabel>{t("put.fields.taskInput.label")}</FormLabel>
+              <FormControl>
+                <Textarea
+                  name={field.name}
+                  ref={field.ref}
+                  rows={4}
+                  value={formatTaskInput(field.value)}
+                  onChange={(event) => field.onChange(event.target.value)}
+                  onBlur={field.onBlur}
+                  className="font-mono text-sm"
+                />
+              </FormControl>
+              <Span className="text-xs text-muted-foreground">
+                {t("put.fields.taskInput.description")}
+              </Span>
+              <FormMessage t={tField} />
+            </FormItem>
+          )}
+        />
       </Div>
-      <EndpointsPage
-        logger={logger}
-        endpoint={{ [method]: definition }}
-        locale={locale}
-        user={user}
-        platform={platform}
-        endpointOptions={
-          taskInput && Object.keys(taskInput).length > 0
-            ? method === "GET"
-              ? { read: { urlPathParams: taskInput as never } }
-              : { create: { autoPrefillData: taskInput as never } }
-            : undefined
-        }
-      />
-    </Div>
+    </SectionGroup>
   );
 }
 
@@ -465,6 +419,7 @@ function ScheduleField({
   const locale = useWidgetLocale();
   const form = useWidgetForm<typeof endpoints.PUT>();
   const t = useWidgetTranslation<typeof endpoints.PUT>();
+  const data = useWidgetValue<typeof endpoints.PUT>();
 
   const value = form.watch("schedule");
 
@@ -494,6 +449,7 @@ function ScheduleField({
         onBlur={handleBlur}
         placeholder={t(field.placeholder as Parameters<typeof t>[0])}
         locale={locale}
+        timezone={data?.task?.timezone ?? "UTC"}
       />
       {field.description && (
         <Div className="text-xs text-muted-foreground">
@@ -506,7 +462,7 @@ function ScheduleField({
 
 // ---------------------------------------------------------------------------
 // CronTaskEditContainer - root custom widget for PUT form
-// Renders all form fields + dynamic task input section
+// Renders task settings and the saved input editor
 // ---------------------------------------------------------------------------
 
 interface EditWidgetProps {
@@ -525,17 +481,26 @@ export function CronTaskEditContainer({
 
   return (
     <Form form={form} onSubmit={onSubmit}>
-      <Div className="flex flex-col gap-4 p-4">
-        {/* Actions bar: back + submit */}
-        <Div className="flex items-center gap-2">
-          <NavigateButtonWidget field={children.actions.children.backButton} />
-          <SubmitButtonWidget<typeof endpoints.PUT>
-            field={children.actions.children.submitButton}
-          />
-        </Div>
+      <WidgetShell layout="page">
+        <WidgetHeader
+          size="page"
+          title={t("put.title")}
+          subtitle={t("put.description")}
+          backButton={
+            <NavigateButtonWidget
+              field={children.actions.children.backButton}
+            />
+          }
+          actions={
+            <SubmitButtonWidget<typeof endpoints.PUT>
+              field={children.actions.children.submitButton}
+            />
+          }
+        />
+        <FormAlertWidget field={{}} />
 
         {/* Form fields in a grid */}
-        <Div className="grid grid-cols-12 gap-4">
+        <Div className="grid grid-cols-12 gap-4 rounded-lg border bg-card p-4">
           <Div className="col-span-12">
             <TextFieldWidget
               field={children.displayName}
@@ -548,40 +513,40 @@ export function CronTaskEditContainer({
               fieldName="description"
             />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <ScheduleField field={children.schedule} />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <BooleanFieldWidget field={children.enabled} fieldName="enabled" />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <SelectFieldWidget field={children.priority} fieldName="priority" />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <SelectFieldWidget
               field={children.outputMode}
               fieldName="outputMode"
             />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <NumberFieldWidget field={children.timeout} fieldName="timeout" />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <NumberFieldWidget field={children.retries} fieldName="retries" />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <NumberFieldWidget
               field={children.retryDelay}
               fieldName="retryDelay"
             />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <BooleanFieldWidget field={children.hidden} fieldName="hidden" />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <BooleanFieldWidget field={children.runOnce} fieldName="runOnce" />
           </Div>
-          <Div className="col-span-6">
+          <Div className="col-span-12 @md:col-span-6">
             <TextFieldWidget
               field={children.targetInstance}
               fieldName="targetInstance"
@@ -589,10 +554,77 @@ export function CronTaskEditContainer({
           </Div>
         </Div>
 
-        {/* Dynamic task input section */}
-        <TaskInputEditSection t={t} />
-      </Div>
+        {/* Saved task input */}
+        <TaskInputEditSection />
+      </WidgetShell>
     </Form>
+  );
+}
+
+export function CronTaskDeleteContainer({
+  field,
+}: {
+  field: (typeof endpoints.DELETE)["fields"];
+}): React.JSX.Element {
+  const t = useWidgetTranslation<typeof endpoints.DELETE>();
+  const value = useWidgetValue<typeof endpoints.DELETE>();
+  const form = useWidgetForm<typeof endpoints.DELETE>();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const { canGoBack } = useWidgetNavigation();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const id = form?.watch("id") ?? "";
+  const editable = interactive && !responseOnly;
+  const contextual = editable && canGoBack && Boolean(id);
+  const { read } = useEndpoint(
+    { GET: endpoints.GET },
+    { read: { urlPathParams: { id }, queryOptions: { enabled: contextual } } },
+    logger,
+    user,
+  );
+  const task = read?.response?.success ? read.response.data.task : null;
+
+  return (
+    <WidgetShell layout="page" className="mx-auto max-w-2xl">
+      <WidgetHeader
+        size="page"
+        title={t("delete.title")}
+        subtitle={t("delete.container.description")}
+        actions={
+          editable &&
+          (!contextual || task) && (
+            <SubmitButtonWidget<typeof endpoints.DELETE>
+              field={{
+                text: "delete.titleShort",
+                className: "h-10 w-full @lg:w-auto",
+              }}
+              variant="destructive"
+            />
+          )
+        }
+      />
+      <FormAlertWidget field={{}} />
+      {editable && (
+        <Div className="rounded-lg border bg-card p-4">
+          {contextual ? (
+            <Span className="break-words text-sm font-medium">
+              {task?.displayName ??
+                t(
+                  read?.response?.success === false
+                    ? "widget.notFound"
+                    : "widget.refreshing",
+                )}
+            </Span>
+          ) : (
+            <TextFieldWidget fieldName="id" field={field.children.id} />
+          )}
+        </Div>
+      )}
+      {value?.message && (
+        <ResultBanner variant="success" title={value.message} />
+      )}
+    </WidgetShell>
   );
 }
 

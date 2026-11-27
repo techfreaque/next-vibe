@@ -24,9 +24,7 @@ export const translations = {
     peppol: "Download Peppol XML",
     slovak: "Download eFaktúra XML",
     xrechnung: "XRechnung XML",
-    send: "Send via Peppol",
-    providerNeeded:
-      "Connect a certified Peppol access point and register the issuer’s Peppol ID to enable sending.",
+    sendHint: "Send the downloaded XML through your e-invoicing provider.",
     back: "Back",
     submit: "Prepare e-invoice",
     invoice: "Invoice {{number}}",

@@ -68,6 +68,7 @@ export const translations: typeof enTranslations = {
     },
   },
   form: {
+    signUp: "Załóż konto",
     headline: "Bądź na bieżąco",
     namePlaceholder: "Twoje imię",
     emailPlaceholder: "Twój e-mail",

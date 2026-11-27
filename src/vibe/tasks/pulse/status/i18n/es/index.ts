@@ -14,6 +14,10 @@ export const translations: typeof enTranslations = {
       description:
         "Control de la salud y las estadísticas de ejecución del pulso",
     },
+    widget: {
+      refresh: "Actualizar",
+      noData: "Aún no hay ejecuciones",
+    },
     fields: {
       status: {
         title: "Situación",

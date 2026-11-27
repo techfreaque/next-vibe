@@ -1,5 +1,6 @@
 "use client";
 
+import { formatTimestamp } from "next-vibe/core/i18n/core/localization-utils";
 import { Button } from "next-vibe/ui/components/button";
 import { DetailField } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
@@ -22,17 +23,21 @@ import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetContext,
+  useWidgetForm,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React, { useCallback } from "react";
 
 import { CsvImportJobStatus } from "@/leads/import/enum";
 
 import type definition from "./definition";
+import { scopedTranslation } from "./i18n";
 import type retryDefinition from "./retry/definition";
 import type stopDefinition from "./stop/definition";
 
@@ -46,20 +51,6 @@ const STATUS_VARIANT: Record<string, PillVariant> = {
   [CsvImportJobStatus.COMPLETED]: "success",
   [CsvImportJobStatus.FAILED]: "danger",
 };
-
-function formatTimestamp(value: Date | null | undefined): string {
-  if (!value) {
-    return "—";
-  }
-  try {
-    return new Date(value).toLocaleString(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
-  } catch {
-    return value.toISOString();
-  }
-}
 
 function StatusIcon({ status }: { status: string }): React.JSX.Element | null {
   switch (status) {
@@ -96,6 +87,7 @@ export function ImportJobStatusContainer(_props: {
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
   const isLoading = endpointMutations?.read?.isLoading;
 
   const job = data?.job;
@@ -105,7 +97,9 @@ export function ImportJobStatusContainer(_props: {
   const configuration = job?.configuration;
   const timestamps = job?.timestamps;
 
-  const isRunning = info?.status === CsvImportJobStatus.PROCESSING;
+  const canStop =
+    info?.status === CsvImportJobStatus.PROCESSING ||
+    info?.status === CsvImportJobStatus.PENDING;
   const isFailed = info?.status === CsvImportJobStatus.FAILED;
 
   const progressPct =
@@ -142,10 +136,33 @@ export function ImportJobStatusContainer(_props: {
     })();
   }, [navigate]);
 
+  const handleSettings = useCallback((): void => {
+    if (jobId) {
+      void (async (): Promise<void> => {
+        const { default: jobDefinition } = await import("./definition");
+        navigate(jobDefinition.PATCH, { urlPathParams: { jobId } });
+      })();
+    }
+  }, [navigate, jobId]);
+
+  const handleRemove = useCallback((): void => {
+    if (jobId) {
+      void (async (): Promise<void> => {
+        const { default: jobDefinition } = await import("./definition");
+        navigate(jobDefinition.DELETE, { urlPathParams: { jobId } });
+      })();
+    }
+  }, [navigate, jobId]);
+
   // ── Header actions ────────────────────────────────────────────────────────
 
   const headerActions = (
-    <Div className="flex items-center gap-2">
+    <Div className="flex flex-wrap items-center gap-2">
+      {jobId && (
+        <Button size="sm" variant="outline" onClick={handleSettings}>
+          {t("patch.titleShort")}
+        </Button>
+      )}
       {isFailed && (
         <Button
           size="sm"
@@ -157,7 +174,7 @@ export function ImportJobStatusContainer(_props: {
           {t("get.actions.retry")}
         </Button>
       )}
-      {isRunning && (
+      {canStop && (
         <Button
           size="sm"
           variant="destructive"
@@ -166,6 +183,11 @@ export function ImportJobStatusContainer(_props: {
         >
           <XCircle className="h-4 w-4" />
           {t("get.actions.stop")}
+        </Button>
+      )}
+      {jobId && !canStop && (
+        <Button size="sm" variant="outline" onClick={handleRemove}>
+          {t("delete.titleShort")}
         </Button>
       )}
       <Button
@@ -181,15 +203,13 @@ export function ImportJobStatusContainer(_props: {
   );
 
   return (
-    <WidgetShell>
+    <WidgetShell layout="page">
       <FormAlertWidget field={{}} />
 
       <WidgetHeader
-        title={
-          info?.fileName
-            ? `${t("widget.status.title")} - ${info.fileName}`
-            : t("widget.status.title")
-        }
+        size="page"
+        title={info?.fileName ?? t("widget.status.title")}
+        subtitle={info?.fileName ? t("widget.status.title") : undefined}
         backButton={
           <NavigateButtonWidget field={_props.field.children.backButton} />
         }
@@ -200,27 +220,15 @@ export function ImportJobStatusContainer(_props: {
         <LoadingBlock message={t("widget.status.loadingJobStatus")} />
       ) : !data ? null : (
         <>
-          {/* Status + Job ID */}
-          <Div className="flex items-center justify-between gap-2">
+          {info?.status && (
             <Div className="flex items-center gap-2">
-              {info?.status ? <StatusIcon status={info.status} /> : null}
-              {info?.status ? (
-                <StatusPill
-                  status={t(`widget.status.jobStatus.${info.status}`)}
-                  variant={STATUS_VARIANT[info.status] ?? "default"}
-                />
-              ) : null}
-            </Div>
-            {info?.id ? (
-              <DetailField
-                label={t("widget.status.jobId")}
-                value={info.id}
-                mono
-                copyable
-                className="items-end"
+              <StatusIcon status={info.status} />
+              <StatusPill
+                status={t(`widget.status.jobStatus.${info.status}`)}
+                variant={STATUS_VARIANT[info.status] ?? "default"}
               />
-            ) : null}
-          </Div>
+            </Div>
+          )}
 
           {/* Error message */}
           {configuration?.error ? (
@@ -294,15 +302,23 @@ export function ImportJobStatusContainer(_props: {
               <SectionGroup title={t("widget.status.timestampsTitle")}>
                 <DetailField
                   label={t("widget.status.created")}
-                  value={formatTimestamp(timestamps.createdAt)}
+                  value={formatTimestamp(timestamps.createdAt, locale)}
                 />
                 <DetailField
                   label={t("widget.status.started")}
-                  value={formatTimestamp(timestamps.startedAt)}
+                  value={
+                    timestamps.startedAt
+                      ? formatTimestamp(timestamps.startedAt, locale)
+                      : undefined
+                  }
                 />
                 <DetailField
                   label={t("widget.status.completed")}
-                  value={formatTimestamp(timestamps.completedAt)}
+                  value={
+                    timestamps.completedAt
+                      ? formatTimestamp(timestamps.completedAt, locale)
+                      : undefined
+                  }
                 />
               </SectionGroup>
             ) : null}
@@ -322,14 +338,13 @@ export function ImportJobRetryContainer(_props: {
   const data = useWidgetValue<typeof retryDefinition.POST>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
-  const t = useWidgetTranslation<typeof definition.GET>();
+  const t = useWidgetTranslation<typeof retryDefinition.POST>();
+  const { t: jobT } = scopedTranslation.scopedT(useWidgetLocale());
+  const form = useWidgetForm<typeof retryDefinition.POST>();
   const isLoading = endpointMutations?.create?.isSubmitting;
 
   const result = data?.result;
-  const jobId = data?.result
-    ? (_props.field as { urlPathParams?: { jobId?: string } }).urlPathParams
-        ?.jobId
-    : undefined;
+  const jobId = form.watch("jobId");
 
   const handleViewJob = useCallback((): void => {
     if (!jobId) {
@@ -349,18 +364,20 @@ export function ImportJobRetryContainer(_props: {
   }, [navigate]);
 
   return (
-    <WidgetShell>
+    <WidgetShell layout="page">
       <FormAlertWidget field={{}} />
 
       <WidgetHeader
-        title={t("widget.retry.title")}
+        size="page"
+        title={t("post.title")}
+        subtitle={t("post.description")}
         backButton={
           <NavigateButtonWidget field={_props.field.children.backButton} />
         }
       />
 
       {isLoading ? (
-        <LoadingBlock message={t("widget.retry.loadingRetrying")} />
+        <LoadingBlock message={t("post.description")} />
       ) : result ? (
         <ResultBanner
           variant={result.success ? "success" : "danger"}
@@ -373,10 +390,9 @@ export function ImportJobRetryContainer(_props: {
           }
           title={
             result.success
-              ? t("widget.retry.successMessage")
-              : t("widget.retry.failureMessage")
+              ? t("widget.successMessage")
+              : t("post.errors.server.title")
           }
-          message={result.message ?? undefined}
         >
           {result.success ? (
             <>
@@ -387,7 +403,7 @@ export function ImportJobRetryContainer(_props: {
                 className="gap-1.5 text-xs"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
-                {t("widget.retry.viewJobStatus")}
+                {jobT("widget.retry.viewJobStatus")}
               </Button>
               <Button
                 size="sm"
@@ -396,12 +412,20 @@ export function ImportJobRetryContainer(_props: {
                 className="gap-1.5 text-xs"
               >
                 <List className="h-3.5 w-3.5" />
-                {t("widget.retry.viewLeads")}
+                {jobT("widget.retry.viewLeads")}
               </Button>
             </>
           ) : null}
         </ResultBanner>
-      ) : null}
+      ) : (
+        <SubmitButtonWidget<typeof retryDefinition.POST>
+          field={{
+            text: "post.titleShort",
+            variant: "primary",
+            className: "min-h-10 self-stretch @md:self-end",
+          }}
+        />
+      )}
     </WidgetShell>
   );
 }
@@ -415,7 +439,8 @@ export function ImportJobStopContainer(_props: {
   const data = useWidgetValue<typeof stopDefinition.POST>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
-  const t = useWidgetTranslation<typeof definition.GET>();
+  const t = useWidgetTranslation<typeof stopDefinition.POST>();
+  const { t: jobT } = scopedTranslation.scopedT(useWidgetLocale());
   const isLoading = endpointMutations?.create?.isSubmitting;
 
   const result = data?.result;
@@ -435,18 +460,20 @@ export function ImportJobStopContainer(_props: {
   }, [navigate]);
 
   return (
-    <WidgetShell>
+    <WidgetShell layout="page">
       <FormAlertWidget field={{}} />
 
       <WidgetHeader
-        title={t("widget.stop.title")}
+        size="page"
+        title={t("post.title")}
+        subtitle={t("post.description")}
         backButton={
           <NavigateButtonWidget field={_props.field.children.backButton} />
         }
       />
 
       {isLoading ? (
-        <LoadingBlock message={t("widget.stop.loadingStopping")} />
+        <LoadingBlock message={t("post.description")} />
       ) : result ? (
         <ResultBanner
           variant={result.success ? "success" : "danger"}
@@ -459,10 +486,9 @@ export function ImportJobStopContainer(_props: {
           }
           title={
             result.success
-              ? t("widget.stop.successMessage")
-              : t("widget.stop.failureMessage")
+              ? t("widget.successMessage")
+              : t("post.errors.server.title")
           }
-          message={result.message ?? undefined}
         >
           {result.success ? (
             <>
@@ -473,7 +499,7 @@ export function ImportJobStopContainer(_props: {
                 className="gap-1.5 text-xs"
               >
                 <List className="h-3.5 w-3.5" />
-                {t("widget.stop.viewLeads")}
+                {jobT("widget.stop.viewLeads")}
               </Button>
               <Button
                 size="sm"
@@ -482,12 +508,20 @@ export function ImportJobStopContainer(_props: {
                 className="gap-1.5 text-xs"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
-                {t("widget.stop.startNewImport")}
+                {jobT("widget.stop.startNewImport")}
               </Button>
             </>
           ) : null}
         </ResultBanner>
-      ) : null}
+      ) : (
+        <SubmitButtonWidget<typeof stopDefinition.POST>
+          field={{
+            text: "post.titleShort",
+            variant: "destructive",
+            className: "min-h-10 self-stretch @md:self-end",
+          }}
+        />
+      )}
     </WidgetShell>
   );
 }

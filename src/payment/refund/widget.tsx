@@ -27,6 +27,7 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetResponseOnly,
   useWidgetTranslation,
@@ -39,7 +40,6 @@ import {
 } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
-import { UuidFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/uuid-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { type JSX, useMemo, useRef, useState } from "react";
@@ -173,9 +173,8 @@ function RefundTransactionReview({
             value={transaction.userEmail}
           />
           <DetailField
-            label={t("widget.customerId")}
-            value={transaction.userId}
-            mono
+            label={t("widget.transactionDate")}
+            value={formatDate(transaction.createdAt, locale, "PP p")}
           />
           <DetailField
             label={t("widget.originalAmount")}
@@ -193,7 +192,11 @@ function RefundTransactionReview({
       </SectionGroup>
       {transaction.refundEligible ? (
         <>
-          <NumberFieldWidget fieldName="amount" field={fields.amount} />
+          <NumberFieldWidget
+            fieldName="amount"
+            field={fields.amount}
+            presentation="money"
+          />
           <Span className="text-sm text-muted-foreground">
             {t("widget.amountHelp", { currency: transaction.currency })}
           </Span>
@@ -220,7 +223,6 @@ function RefundTransactionReview({
                 <AlertDialogTitle>{t("widget.confirmTitle")}</AlertDialogTitle>
                 <AlertDialogDescription>
                   {t("widget.confirmDescription", {
-                    transactionId: transaction.id,
                     email: transaction.userEmail,
                   })}{" "}
                   {review?.amount === undefined
@@ -270,6 +272,7 @@ export function PaymentRefundWidget({
   const t = useWidgetTranslation<typeof definition.POST>();
   const locale = useWidgetLocale();
   const value = useWidgetValue<typeof definition.POST>();
+  const { push } = useWidgetNavigation();
   const responseOnly = useWidgetResponseOnly();
   const form = useWidgetForm<typeof definition.POST>();
   const transactionId = transactionIdSchema
@@ -300,11 +303,6 @@ export function PaymentRefundWidget({
               mono
             />
             <DetailField
-              label={t("post.response.refund.transactionId")}
-              value={refund.transactionId}
-              mono
-            />
-            <DetailField
               label={t("post.response.refund.amount")}
               value={
                 currency
@@ -329,10 +327,6 @@ export function PaymentRefundWidget({
       ) : (
         !responseOnly && (
           <>
-            <UuidFieldWidget
-              fieldName="transactionId"
-              field={children.transactionId}
-            />
             {transactionId ? (
               <RefundTransactionReview
                 key={transactionId}
@@ -340,9 +334,17 @@ export function PaymentRefundWidget({
                 fields={children}
               />
             ) : (
-              <Span className="text-sm text-muted-foreground">
-                {t("widget.enterTransaction")}
-              </Span>
+              <EmptyBlock
+                title={t("widget.chooseTransaction")}
+                message={t("widget.enterTransaction")}
+                action={{
+                  label: t("widget.chooseTransaction"),
+                  onClick: () =>
+                    push(processorDefinitions.GET, {
+                      data: { view: ProcessorView.TRANSACTIONS },
+                    }),
+                }}
+              />
             )}
           </>
         )

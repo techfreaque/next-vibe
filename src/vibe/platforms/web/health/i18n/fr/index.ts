@@ -30,6 +30,36 @@ export const translations: typeof enTranslations = {
         description: "Inclure les informations sur les ressources système",
       },
     },
+    widget: {
+      refresh: "Vérifier l’état",
+      health: {
+        healthy: "Normal",
+        warning: "Avertissement",
+        critical: "Critique",
+        unknown: "Inconnu",
+      },
+      results: {
+        pass: "Réussi",
+        warn: "Avertissement",
+        fail: "Échec",
+      },
+      checks: {
+        traffic: "Réception du trafic",
+        process: "Processus serveur",
+      },
+      messages: {
+        draining: "Arrêt en cours. {{count}} flux restent actifs.",
+        accepting: "Le serveur accepte le trafic. {{count}} flux actifs.",
+        memory: "Utilisation élevée de la mémoire ({{usage}}).",
+        processOk: "Le serveur fonctionne normalement.",
+        databaseOk: "La base de données est connectée.",
+        databaseFailed: "Échec de la connexion à la base de données.",
+        tasksDisabled:
+          "L’exécuteur de tâches est désactivé dans cet environnement.",
+        tasksOk: "L’exécuteur de tâches est disponible.",
+        systemOk: "Les ressources système sont en bon état.",
+      },
+    },
     response: {
       status: {
         title: "Statut",

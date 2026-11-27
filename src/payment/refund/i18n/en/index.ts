@@ -49,7 +49,10 @@ export const translations = {
     customerEmail: "Customer email",
     customerId: "Customer ID",
     originalAmount: "Original charge",
-    enterTransaction: "Enter a transaction ID to load payment details.",
+    chooseTransaction: "Find a payment",
+    enterTransaction:
+      "Open a payment in Transactions to check the charge and refund amount.",
+    transactionDate: "Charged on",
     lookupLoading: "Loading saved transaction",
     transactionMissing: "Transaction not found",
     lookupFailed: "Couldn’t load the transaction",
@@ -64,7 +67,7 @@ export const translations = {
     review: "Review amount",
     confirmTitle: "Confirm Stripe refund",
     confirmDescription:
-      "Stripe will refund transaction {{transactionId}} for {{email}}. This action moves money.",
+      "Stripe will refund the payment for {{email}}. This action moves money.",
     confirm: "Issue refund",
     cancel: "Cancel",
   },

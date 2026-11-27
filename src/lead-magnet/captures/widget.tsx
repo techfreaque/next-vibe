@@ -1,32 +1,50 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
+import { formatTimestamp } from "next-vibe/core/i18n/core/localization-utils";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Download } from "next-vibe/ui/components/icons/Download";
 import { Users } from "next-vibe/ui/components/icons/Users";
+import { ListItem } from "next-vibe/ui/components/list-item";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { downloadFile } from "next-vibe/ui/lib/download";
 import {
+  useWidgetLocale,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
+import { LeadMagnetCaptureStatus } from "../enum";
 import type endpoints from "./definition";
 import type { CapturesListResponseOutput } from "./definition";
 
 type CaptureItem = CapturesListResponseOutput["items"][number];
 
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+function wasCaptured(item: CaptureItem): boolean {
+  return (
+    item.status === LeadMagnetCaptureStatus.SUCCESS || item.status === "SUCCESS"
+  );
+}
+
+function escapeSpreadsheetCell(value: string): string {
+  const safeValue = /^[\s]*[=+\-@]|^[\t\r\n]/u.test(value)
+    ? `'${value}`
+    : value;
+  return `"${safeValue.replaceAll('"', '""')}"`;
 }
 
 function downloadCsv(items: CaptureItem[]): void {
@@ -35,13 +53,11 @@ function downloadCsv(items: CaptureItem[]): void {
     r.createdAt,
     r.firstName,
     r.email,
-    r.status,
+    wasCaptured(r) ? "SUCCESS" : "FAILED",
     r.errorMessage ?? "",
   ]);
   const csv = [header, ...rows]
-    .map((row) =>
-      row.map((cell) => `"${String(cell).replaceAll(/"/g, '""')}"`).join(","),
-    )
+    .map((row) => row.map(escapeSpreadsheetCell).join(","))
     .join("\n");
 
   downloadFile(
@@ -53,90 +69,102 @@ function downloadCsv(items: CaptureItem[]): void {
 
 export function LeadMagnetCapturesWidget(): JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
+  const locale = useWidgetLocale();
+  const embedded = useWidgetResponseOnly();
   const data = useWidgetValue<typeof endpoints.GET>();
   const items = data?.items ?? [];
 
-  const handleExport = (): void => {
-    downloadCsv(items);
+  const renderStatus = (item: CaptureItem): JSX.Element => {
+    const captured = wasCaptured(item);
+    return (
+      <StatusPill
+        status={item.status}
+        label={t(captured ? "widget.statusSuccess" : "widget.statusFailed")}
+        variant={captured ? "success" : "danger"}
+      />
+    );
   };
 
-  if (items.length === 0) {
-    return (
-      <Div className="flex flex-col items-center gap-4 px-4 py-10 text-center">
-        <Div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-          <Users className="h-6 w-6 text-muted-foreground" />
-        </Div>
-        <Span className="text-sm text-muted-foreground max-w-xs">
-          {t("widget.empty")}
-        </Span>
-      </Div>
-    );
-  }
+  const exportButton = items.length > 0 && (
+    <Button
+      type="button"
+      variant={embedded ? "outline" : "default"}
+      size="sm"
+      onClick={() => downloadCsv(items)}
+      className="min-h-10 gap-2"
+    >
+      <Download className="size-4" />
+      {t("widget.exportCsv")}
+    </Button>
+  );
 
   return (
-    <Div className="flex flex-col gap-4">
-      {/* Header row */}
-      <Div className="flex items-center justify-between px-1">
-        <Span className="text-sm font-medium text-muted-foreground">
-          {data?.total ?? items.length} leads
-        </Span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExport}
-          className="gap-2"
-        >
-          <Download className="h-3 w-3" />
-          {t("widget.exportCsv")}
-        </Button>
-      </Div>
-
-      {/* Table */}
-      <Div className="rounded-lg border overflow-hidden">
-        {/* Column headers */}
-        <Div className="grid grid-cols-[1fr_1fr_2fr_auto] gap-0 border-b bg-muted/50 px-4 py-2">
-          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("widget.columns.date")}
-          </Span>
-          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("widget.columns.name")}
-          </Span>
-          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("widget.columns.email")}
-          </Span>
-          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("widget.columns.status")}
-          </Span>
-        </Div>
-
-        {/* Rows */}
-        {items.map((item, i) => (
-          <Div
-            key={item.id}
-            className={`grid grid-cols-[1fr_1fr_2fr_auto] gap-0 items-center px-4 py-3 ${
-              i < items.length - 1 ? "border-b" : ""
-            }`}
-          >
-            <Span className="text-xs text-muted-foreground">
-              {formatDate(item.createdAt)}
+    <WidgetShell
+      layout={embedded ? "compact" : "page"}
+      padding="none"
+      scroll={!embedded}
+    >
+      {!embedded && (
+        <WidgetHeader
+          size="page"
+          title={t("list.title")}
+          actions={exportButton}
+        />
+      )}
+      {items.length === 0 ? (
+        <EmptyBlock icon={<Users />} title={t("widget.empty")} />
+      ) : (
+        <>
+          <Div className="flex flex-wrap items-center justify-between gap-2">
+            <Span className="text-sm font-medium text-muted-foreground">
+              {t("list.response.total")}{" "}
+              <Span className="tabular-nums">
+                {(data?.total ?? items.length).toLocaleString(locale)}
+              </Span>
             </Span>
-            <Span className="text-sm font-medium truncate pr-2">
-              {item.firstName}
-            </Span>
-            <Span className="text-sm text-muted-foreground truncate pr-2">
-              {item.email}
-            </Span>
-            <Badge
-              variant={item.status === "SUCCESS" ? "default" : "destructive"}
-              className="text-xs"
-            >
-              {item.status === "SUCCESS"
-                ? t("widget.statusSuccess")
-                : t("widget.statusFailed")}
-            </Badge>
+            {embedded && exportButton}
           </Div>
-        ))}
-      </Div>
-    </Div>
+          <Div className="grid gap-2 @lg:hidden">
+            {items.map((item) => (
+              <ListItem
+                key={item.id}
+                title={item.firstName}
+                subtitle={item.email}
+                badges={renderStatus(item)}
+                meta={formatTimestamp(item.createdAt, locale)}
+              />
+            ))}
+          </Div>
+          <Div className="hidden overflow-hidden rounded-xl border bg-card @lg:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("widget.columns.name")}</TableHead>
+                  <TableHead>{t("widget.columns.email")}</TableHead>
+                  <TableHead>{t("widget.columns.date")}</TableHead>
+                  <TableHead>{t("widget.columns.status")}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">
+                      {item.firstName}
+                    </TableCell>
+                    <TableCell className="break-all text-muted-foreground">
+                      {item.email}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap tabular-nums text-muted-foreground">
+                      {formatTimestamp(item.createdAt, locale)}
+                    </TableCell>
+                    <TableCell>{renderStatus(item)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Div>
+        </>
+      )}
+    </WidgetShell>
   );
 }

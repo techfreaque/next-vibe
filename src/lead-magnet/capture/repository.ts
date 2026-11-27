@@ -7,6 +7,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { customSkills } from "next-vibe/agent/skills/db";
+import { SkillsRepository } from "next-vibe/agent/skills/repository";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -36,13 +37,13 @@ export const LeadMagnetCaptureRepository = {
   ): Promise<ResponseType<CapturePostResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     const { t: parentT } = parentScopedTranslation.scopedT(locale);
-    const { skillId, firstName, email } = data;
+    const { firstName, email } = data;
 
     // 1. Look up skill → get owner userId
     const skillRows = await db
-      .select({ userId: customSkills.userId })
+      .select({ userId: customSkills.userId, skillId: customSkills.id })
       .from(customSkills)
-      .where(eq(customSkills.id, skillId))
+      .where(SkillsRepository.resolveSkillIdCondition(data.skillId))
       .limit(1);
 
     if (skillRows.length === 0) {
@@ -52,7 +53,7 @@ export const LeadMagnetCaptureRepository = {
       });
     }
 
-    const { userId } = skillRows[0];
+    const { userId, skillId } = skillRows[0];
 
     // 2. Get creator's lead magnet config
     const configRows = await db
@@ -141,5 +142,5 @@ function buildSignupUrl(
   if (refCode) {
     params.set("ref", refCode);
   }
-  return `/${locale}/user/sign-up?${params.toString()}`;
+  return `/${locale}/user/signup?${params.toString()}`;
 }

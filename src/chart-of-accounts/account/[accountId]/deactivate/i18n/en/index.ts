@@ -5,9 +5,9 @@ export const translations = {
     description:
       "Soft-deactivate an account. Cannot deactivate system accounts or accounts with posted journal entry lines.",
     accountId: {
-      label: "Account ID",
+      label: "Account",
       description: "The account to deactivate",
-      placeholder: "Account UUID",
+      placeholder: "Choose an account",
     },
     errors: {
       unauthorized: { title: "Unauthorized", description: "Login required" },

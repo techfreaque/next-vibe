@@ -8,17 +8,21 @@ import { z } from "zod";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
 import { scopedTranslation } from "../../../tasks/i18n";
-import {
-  objectField,
-  responseField,
-} from "../../../unified-ui/_shared/utils-i18n";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
+import { responseField } from "../../../unified-ui/_shared/utils-i18n";
 import { ERROR_LOGS_CLEANUP_ALIAS } from "./constants";
+
+const ErrorLogsCleanupWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({
+    default: module.ErrorLogsCleanupWidget,
+  })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -39,12 +43,8 @@ const { POST } = createEndpoint({
     UserRole.SKILL_OFF,
   ],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "errorMonitor.cleanup.post.container.title",
-    description: "errorMonitor.cleanup.post.container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
+    render: ErrorLogsCleanupWidget,
     usage: { response: true },
     children: {
       deletedCount: responseField(scopedTranslation, {

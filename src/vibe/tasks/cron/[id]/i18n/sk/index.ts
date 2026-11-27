@@ -175,6 +175,10 @@ export const translations: typeof enTranslations = {
       taskInput: {
         label: "Vstup úlohy",
         description: "Vstupné údaje JSON pre úlohu",
+        invalidJson:
+          "Neplatný JSON. Skontrolujte úvodzovky, čiarky a zátvorky.",
+        notObject:
+          'Vstupom úlohy musí byť objekt JSON, napríklad { "key": "value" }.',
       },
       hidden: {
         label: "Skryté",
@@ -299,7 +303,7 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "ID úlohy",
+        label: "Kľúč úlohy",
         description: "Jedinečné ID úlohy na odstránenie",
       },
     },

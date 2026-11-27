@@ -55,7 +55,7 @@ export const translations: typeof enTranslations = {
     confirmDelete: {
       title: "Odpojiť {{provider}}?",
       description:
-        "Noví odberatelia už nebudú pribúdať. Získané kontakty ostanú tam, kde sú.",
+        "Odpojením zastavíte nové registrácie a vymažete históriu na tejto stránke. Kontakty, ktoré ste už odoslali, zostanú u poskytovateľa.",
       cancel: "Ponechať pripojenie",
       proceed: "Odpojiť",
     },

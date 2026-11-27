@@ -535,6 +535,11 @@ export const { PATCH } = createEndpoint({
         label: "patch.response.affectedRows.title",
         schema: z.number(),
       }),
+      affectedFingerprints: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "patch.response.fingerprint.title",
+        schema: z.array(z.string()).optional(),
+      }),
     },
   }),
   options: {

@@ -6,6 +6,7 @@ import { db } from "next-vibe/database";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { userRoles } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { saveAdminReviewScreenshots } from "next-vibe/tooling/testing/e2e/admin-review-screenshots";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import {
@@ -233,11 +234,13 @@ describe("Ledger report company selection", () => {
         for (const report of reports.filter(
           ({ key }) => !taxOnly || key === "tax-report",
         )) {
-          await fixtures.context.addCookies([{
-            name: workspaceCompanyCookieName(identity.id),
-            value: alternative.companyId,
-            url: baseUrl,
-          }]);
+          await fixtures.context.addCookies([
+            {
+              name: workspaceCompanyCookieName(identity.id),
+              value: alternative.companyId,
+              url: baseUrl,
+            },
+          ]);
           const reportSlug = endpointToUrlSegment(report.definition);
           const endpointPath = "/" + report.definition.path.join("/");
           const api = `**/api/${locale}${endpointPath}*`;
@@ -275,11 +278,17 @@ describe("Ledger report company selection", () => {
           const view = page.locator(`#admin-tool-${reportSlug}`);
           const prompt = view.getByText(t(report.prompt), { exact: true });
           const picker = page.locator("#erp-company-switch");
-          expect(await picker.textContent()).toContain("Disposable Alternative Ledger");
-          expect(await view.getByRole("button", {
-            name: docs("documents.chooseCompany"),
-            exact: true,
-          }).count()).toBe(0);
+          expect(await picker.textContent()).toContain(
+            "Disposable Alternative Ledger",
+          );
+          expect(
+            await view
+              .getByRole("button", {
+                name: docs("documents.chooseCompany"),
+                exact: true,
+              })
+              .count(),
+          ).toBe(0);
           await picker.click();
           const reportResponse = (): Promise<Response> =>
             page.waitForResponse(
@@ -293,7 +302,9 @@ describe("Ledger report company selection", () => {
               },
               { timeout: 60_000 },
             );
-          const companyOption = page.getByRole("menuitemradio").filter({ hasText: companyName });
+          const companyOption = page
+            .getByRole("menuitemradio")
+            .filter({ hasText: companyName });
           const firstResult = isTax
             ? undefined
             : Promise.all([reportResponse(), companyOption.click()]);
@@ -422,5 +433,33 @@ describe("Ledger report company selection", () => {
       }
     },
     240_000,
+  );
+
+  e2e.it(
+    "localizes balance sheet subtype labels and opens the matching account ledger",
+    async (fixtures) => {
+      const { page, goto } = fixtures;
+      const { companyId, userId } = await prepareAtlasCompany(
+        fixtures,
+        "Northbridge Accounting",
+      );
+      await seedVatMovements(companyId, userId);
+      for (const locale of ["en-US", "de-DE", "sk-SK"] as const) {
+        const { t } = scopedTranslation.scopedT(locale);
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await goto(`/tools/coa-balance-sheet?arg.companyId=${companyId}`, locale);
+        const view = page.locator("#admin-tool-coa-balance-sheet");
+        await view.getByText(t(AccountSubtype.BANK), { exact: true }).waitFor();
+        await view.getByText(t(AccountSubtype.VAT_PAYABLE), { exact: true }).waitFor();
+        await view.getByText(t("balanceSheet.widget.balanced"), { exact: true }).waitFor();
+        expect(await view.getByText(/enums\.accountSubtype/u).count()).toBe(0);
+        await saveAdminReviewScreenshots(page, "coa-balance-sheet", locale);
+        if (locale === "en-US") {
+          await view.getByRole("button", { name: "1000", exact: true }).click();
+          await page.locator("#admin-tool-coa-ledger").getByText(formatMoney(85.5, "EUR", locale), { exact: true }).first().waitFor();
+        }
+      }
+    },
+    120_000,
   );
 });

@@ -27,15 +27,20 @@ import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetEndpoint,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetLogger,
+  useWidgetResponseOnly,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CONTENT_DISPLAY } from "../../skills/enum";
 import { ModelUtility } from "../enum";
@@ -53,6 +58,7 @@ type ModelsT = ReturnType<typeof modelsScopedTranslation.scopedT>["t"];
 
 const TYPE_ORDER = ["text", "image", "video", "audio"] as const;
 type ModelTypeKey = (typeof TYPE_ORDER)[number];
+type ModelFilters = typeof definition.GET.types.RequestOutput;
 
 const TYPE_ICONS: Record<ModelTypeKey, typeof MessageSquare> = {
   text: MessageSquare,
@@ -306,17 +312,21 @@ function ModelsListFilters({
 }): JSX.Element {
   return (
     <Div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
-      <Div className="grid grid-cols-1 gap-3 @lg:grid-cols-2 @4xl:grid-cols-4">
-        <TextFieldWidget fieldName="query" field={children.query} />
+      <Div className="grid grid-cols-2 gap-3 @4xl:grid-cols-4">
+        <Div className="col-span-2 @lg:col-span-1">
+          <TextFieldWidget fieldName="query" field={children.query} />
+        </Div>
         <SelectFieldWidget fieldName="modelType" field={children.modelType} />
         <SelectFieldWidget
           fieldName="contentLevel"
           field={children.contentLevel}
         />
-        <SelectFieldWidget
-          fieldName="intelligence"
-          field={children.intelligence}
-        />
+        <Div className="col-span-2 @lg:col-span-1">
+          <SelectFieldWidget
+            fieldName="intelligence"
+            field={children.intelligence}
+          />
+        </Div>
       </Div>
       <FormAlertWidget field={{}} />
     </Div>
@@ -329,13 +339,73 @@ export function ModelsListWidget({
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const { t: tModels } = modelsScopedTranslation.scopedT(locale);
-  const value = useWidgetValue<typeof definition.GET>();
+  const initialData = useWidgetValue<typeof definition.GET>();
+  const endpoint = useWidgetEndpoint<typeof definition.GET>();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
   const form = useWidgetForm<typeof definition.GET>();
   const onPick = usePickerCallback<ModelListItem>();
   const isPickerMode = !!onPick;
+  const responseOnly = useWidgetResponseOnly();
+  const canFilter = !isPickerMode && !responseOnly;
 
   const [localQuery, setLocalQuery] = useState("");
   const [activeContent, setActiveContent] = useState<string | null>(null);
+  const [appliedFilters, setAppliedFilters] = useState<ModelFilters>();
+  const scheduledFilters = useRef<string | undefined>(undefined);
+  const query = form?.watch("query");
+  const modelType = form?.watch("modelType");
+  const contentLevel = form?.watch("contentLevel");
+  const intelligence = form?.watch("intelligence");
+
+  useEffect((): (() => void) | undefined => {
+    const parsed = endpoint.requestSchema.safeParse({
+      query,
+      modelType,
+      contentLevel,
+      intelligence,
+    });
+    if (!canFilter || !parsed.success) {
+      return;
+    }
+    const key = JSON.stringify(parsed.data);
+    if (scheduledFilters.current === undefined) {
+      scheduledFilters.current = key;
+      return;
+    }
+    if (scheduledFilters.current === key) {
+      return;
+    }
+    const timer = setTimeout((): void => {
+      scheduledFilters.current = key;
+      setAppliedFilters(parsed.data);
+    }, 300);
+    return (): void => clearTimeout(timer);
+  }, [
+    canFilter,
+    contentLevel,
+    endpoint.requestSchema,
+    intelligence,
+    modelType,
+    query,
+  ]);
+
+  const filteredRead = useApiQuery({
+    endpoint,
+    requestData: appliedFilters ?? {},
+    options: {
+      enabled: canFilter && appliedFilters !== undefined,
+      queryKey: JSON.stringify([
+        "model-catalog-filter",
+        user.isPublic ? user.leadId : user.id,
+        locale,
+        appliedFilters,
+      ]),
+    },
+    logger,
+    user,
+  });
+  const value = appliedFilters ? filteredRead.data : initialData;
 
   const filtered = useMemo(() => {
     if (!value) {
@@ -360,12 +430,8 @@ export function ModelsListWidget({
     return models;
   }, [value, localQuery, activeContent]);
 
-  const filterValues = form?.watch();
   const hasServerFilters = Boolean(
-    filterValues?.query ||
-    filterValues?.modelType ||
-    filterValues?.contentLevel ||
-    filterValues?.intelligence,
+    query || modelType || contentLevel || intelligence,
   );
   const clearServerFilters = (): void => {
     form?.reset({});
@@ -454,7 +520,12 @@ export function ModelsListWidget({
       />
       <ModelsListFilters fields={field.children} />
 
-      {!value ? (
+      {appliedFilters && filteredRead.error ? (
+        <EmptyBlock
+          title={t("get.errors.server.title")}
+          message={filteredRead.error.message}
+        />
+      ) : !value ? (
         <ModelGridSkeleton />
       ) : types.length === 0 ? (
         <ModelGrid
@@ -492,12 +563,24 @@ export function ModelsListWidget({
                 })}
               </TabsList>
             </Div>
-            <Span className="text-[13px] tabular-nums text-muted-foreground">
-              {t("get.browser.statsLabel", {
-                matched: value.models.length,
-                total: value.totalCount,
-              })}
-            </Span>
+            <Div className="flex flex-wrap items-center gap-2">
+              <Span className="text-[13px] tabular-nums text-muted-foreground">
+                {t("get.browser.statsLabel", {
+                  matched: value.models.length,
+                  total: value.totalCount,
+                })}
+              </Span>
+              {hasServerFilters && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearServerFilters}
+                >
+                  {t("get.browser.clearFilters")}
+                </Button>
+              )}
+            </Div>
           </Div>
           {types.map((type) => (
             <TabsContent key={type} value={type} className="mt-0">

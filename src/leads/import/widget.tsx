@@ -18,15 +18,18 @@ import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { RefreshCcw } from "next-vibe/ui/components/icons/RefreshCcw";
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Square } from "next-vibe/ui/components/icons/Square";
-import { Upload } from "next-vibe/ui/components/icons/Upload";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Li } from "next-vibe/ui/components/li";
 import { ExternalLink } from "next-vibe/ui/components/link";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
 import { Code } from "next-vibe/ui/components/typography";
 import { Ul } from "next-vibe/ui/components/ul";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetContext,
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -135,6 +138,8 @@ export function LeadsImportContainer({
   const t = useWidgetTranslation<typeof definition.POST>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
+  const form = useWidgetForm<typeof definition.POST>();
+  const chunked = form?.watch("useChunkedProcessing") ?? true;
   const isLoading = endpointMutations?.create?.isSubmitting;
 
   const errors = data?.errors ?? [];
@@ -191,112 +196,120 @@ export function LeadsImportContainer({
         : "#ef4444";
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Header */}
-      <Div className="flex items-center gap-2 pb-2 border-b">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex items-center gap-2 mr-auto">
-          <Upload className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">
-            {t("post.widget.headerTitle")}
-          </Span>
-        </Div>
-        <ExternalLink
-          href={buildTemplateCsvDataUri()}
-          download="leads-import-template.csv"
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors border rounded-md px-2.5 py-1.5"
-        >
-          <Download className="h-3.5 w-3.5" />
-          {t("post.widget.exportTemplateButton")}
-        </ExternalLink>
-      </Div>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("post.widget.headerTitle")}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+        actions={
+          <ExternalLink
+            href={buildTemplateCsvDataUri()}
+            download="leads-import-template.csv"
+            className="inline-flex min-h-10 items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <Download className="size-4 shrink-0" />
+            {t("post.widget.exportTemplateButton")}
+          </ExternalLink>
+        }
+      />
 
       {/* Form */}
       {!data && !isLoading && (
-        <>
-          {/* Guidance */}
-          <Div className="rounded-lg border border-dashed bg-muted/30 p-6 flex flex-col gap-4">
-            <Div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-              <Div className="flex flex-col gap-1">
-                <Span className="font-medium text-sm">
-                  {t("post.widget.importGuideTitle")}
-                </Span>
-                <Span className="text-xs text-muted-foreground">
-                  {t("post.widget.importGuideSubtitle")}
-                </Span>
-                <Div className="flex flex-wrap gap-1 mt-1">
-                  {CSV_COLUMNS.map((col) => (
-                    <CsvColumnBadge key={col} col={col} />
-                  ))}
-                </Div>
-                <ImportGuideNote t={t} />
-              </Div>
-            </Div>
-
-            <Div className="flex items-start gap-3 border-t pt-3">
-              <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-              <Div className="flex flex-col gap-0.5">
-                <Span className="font-medium text-sm">
-                  {t("post.widget.fileRequirementsTitle")}
-                </Span>
-                <Ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
-                  <Li>{t("post.widget.fileRequirementFormat")}</Li>
-                  <Li>{t("post.widget.fileRequirementHeader")}</Li>
-                  <Li>{t("post.widget.fileRequirementSize")}</Li>
-                  <FileRequirementChunked t={t} />
-                </Ul>
-              </Div>
-            </Div>
-          </Div>
-
+        <Div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
           <FormAlertWidget field={{}} />
-
-          <FileFieldWidget fieldName="file" field={children.file} />
-
-          <SelectFieldWidget
-            fieldName="defaultCountry"
-            field={children.defaultCountry}
-          />
-          <SelectFieldWidget
-            fieldName="defaultLanguage"
-            field={children.defaultLanguage}
-          />
-          <SelectFieldWidget
-            fieldName="defaultStatus"
-            field={children.defaultStatus}
-          />
-          <SelectFieldWidget
-            fieldName="defaultCampaignStage"
-            field={children.defaultCampaignStage}
-          />
-          <SelectFieldWidget
-            fieldName="defaultSource"
-            field={children.defaultSource}
-          />
-          <BooleanFieldWidget
-            fieldName="skipDuplicates"
-            field={children.skipDuplicates}
-          />
-          <BooleanFieldWidget
-            fieldName="updateExisting"
-            field={children.updateExisting}
-          />
-          <BooleanFieldWidget
-            fieldName="useChunkedProcessing"
-            field={children.useChunkedProcessing}
-          />
-          <NumberFieldWidget fieldName="batchSize" field={children.batchSize} />
-
+          <Div className="rounded-xl border bg-card p-4">
+            <FileFieldWidget fieldName="file" field={children.file} />
+          </Div>
+          <Div className="grid grid-cols-1 gap-4 rounded-xl border bg-card p-4 @md:grid-cols-2 @xl:grid-cols-3">
+            <SelectFieldWidget
+              fieldName="defaultCountry"
+              field={children.defaultCountry}
+            />
+            <SelectFieldWidget
+              fieldName="defaultLanguage"
+              field={children.defaultLanguage}
+            />
+            <SelectFieldWidget
+              fieldName="defaultStatus"
+              field={children.defaultStatus}
+            />
+            <SelectFieldWidget
+              fieldName="defaultCampaignStage"
+              field={children.defaultCampaignStage}
+            />
+            <SelectFieldWidget
+              fieldName="defaultSource"
+              field={children.defaultSource}
+            />
+          </Div>
+          <Div className="grid grid-cols-1 gap-4 rounded-xl border bg-card p-4 @md:grid-cols-2 @xl:grid-cols-3">
+            <BooleanFieldWidget
+              fieldName="skipDuplicates"
+              field={children.skipDuplicates}
+            />
+            <BooleanFieldWidget
+              fieldName="updateExisting"
+              field={children.updateExisting}
+            />
+            <BooleanFieldWidget
+              fieldName="useChunkedProcessing"
+              field={children.useChunkedProcessing}
+            />
+            {chunked && (
+              <NumberFieldWidget
+                fieldName="batchSize"
+                field={children.batchSize}
+              />
+            )}
+          </Div>
           <SubmitButtonWidget<typeof definition.POST>
             field={{
               text: "post.widget.headerTitle",
               loadingText: "post.widget.loadingText",
               icon: "upload",
               variant: "primary",
+              className: "min-h-10 self-stretch @md:self-end",
             }}
           />
-        </>
+
+          <SectionGroup
+            title={t("post.widget.importGuideTitle")}
+            collapsible
+            defaultOpen={false}
+          >
+            <Div className="flex flex-col gap-4">
+              <Div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                <Div className="flex flex-col gap-1">
+                  <Span className="text-xs text-muted-foreground">
+                    {t("post.widget.importGuideSubtitle")}
+                  </Span>
+                  <Div className="flex flex-wrap gap-1 mt-1">
+                    {CSV_COLUMNS.map((col) => (
+                      <CsvColumnBadge key={col} col={col} />
+                    ))}
+                  </Div>
+                  <ImportGuideNote t={t} />
+                </Div>
+              </Div>
+
+              <Div className="flex items-start gap-3 border-t pt-3">
+                <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                <Div className="flex flex-col gap-0.5">
+                  <Span className="font-medium text-sm">
+                    {t("post.widget.fileRequirementsTitle")}
+                  </Span>
+                  <Ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
+                    <Li>{t("post.widget.fileRequirementFormat")}</Li>
+                    <Li>{t("post.widget.fileRequirementHeader")}</Li>
+                    <Li>{t("post.widget.fileRequirementSize")}</Li>
+                    <FileRequirementChunked t={t} />
+                  </Ul>
+                </Div>
+              </Div>
+            </Div>
+          </SectionGroup>
+        </Div>
       )}
 
       {/* Loading */}
@@ -544,6 +557,6 @@ export function LeadsImportContainer({
           )}
         </>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

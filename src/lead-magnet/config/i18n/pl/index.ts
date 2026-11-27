@@ -48,7 +48,7 @@ export const translations: typeof enTranslations = {
     confirmDelete: {
       title: "Odłączyć {{provider}}?",
       description:
-        "Nowi subskrybenci przestaną trafiać na Twoją listę. Zebrane już kontakty zostaną tam, gdzie są.",
+        "Odłączenie zatrzyma zapisy i usunie widoczną tu historię. Kontakty przekazane dostawcy zostaną u niego.",
       cancel: "Zostaw połączenie",
       proceed: "Odłącz",
     },

@@ -17,6 +17,7 @@ import { cronTaskExecutions, cronTasks } from "../cron/db";
 import { CronTaskPriority, CronTaskStatus, TaskCategory, TaskOutputMode } from "../enum";
 import { TASK_WATCHDOG_SELF_ID } from "../watchdog/config";
 import { TASK_WATCHDOG_SWEEP_ALIAS } from "../watchdog/constants";
+import { pulseHealth } from "./db";
 
 const pg = new PGlite();
 const db = drizzle(pg);
@@ -165,6 +166,40 @@ test("pulse leaves a live watchdog claim alone and completes a replacement for a
   expect(history[0]?.startedAt).toEqual(abandonedAt);
   expect(history[1]?.completedAt).toBeInstanceOf(Date);
   expect(history[1]?.result).toEqual({ checked: 0, cancelled: 0 });
+});
+
+test("pulse dry run reports due tasks without recording a pulse", async () => {
+  const { PulseHealthRepository } = await import("./repository");
+  const taskId = "dry-run-fixture";
+  const before = await db.select().from(pulseHealth);
+  await db.insert(cronTasks).values({
+    id: taskId,
+    shortId: taskId,
+    routeId: taskId,
+    displayName: "Dry run fixture",
+    category: TaskCategory.TEST,
+    priority: CronTaskPriority.LOW,
+    schedule: "* * * * *",
+  });
+  try {
+    const report = await PulseHealthRepository.executePulse(
+      {
+        dryRun: true,
+        force: true,
+        taskNames: [taskId],
+        systemLocale: defaultLocale,
+      },
+      logger,
+      defaultLocale,
+    );
+    expect(report.success && report.data.summary.tasksDue).toEqual([taskId]);
+    expect(report.success && report.data.summary.tasksExecuted).toEqual([]);
+    const [task] = await db.select().from(cronTasks).where(eq(cronTasks.id, taskId));
+    expect(task?.executionCount).toBe(0);
+    expect(await db.select().from(pulseHealth)).toEqual(before);
+  } finally {
+    await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
+  }
 });
 
 test("pulse history localizes task ids and handles shared legacy keys", async () => {

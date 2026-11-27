@@ -15,7 +15,6 @@ import {
   Methods,
   WidgetType,
 } from "../../../core/definition/enums";
-import type { WidgetData } from "../../../core/utils/json";
 import { UserRole } from "../../../identity/roles/enum";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
@@ -47,6 +46,7 @@ import {
 } from "../../enum";
 import { taskInputSchema, taskOwnerSchema } from "../db";
 import type { CronTaskRecentExecution } from "../history/definition";
+import { makeTaskInputRequestSchema } from "../task-input-schema";
 import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -62,39 +62,10 @@ const CronTaskCreateContainer = lazyWidget(() =>
   })),
 );
 
-/**
- * Task input accepts the object itself (AI/MCP/typed callers) or a JSON
- * string (web textarea, CLI). Both normalize to the same record.
- */
-const taskInputRequestSchema = z
-  .union([z.string(), taskInputSchema])
-  .transform((value, ctx) => {
-    if (typeof value !== "string") {
-      return value;
-    }
-    if (!value.trim()) {
-      return {};
-    }
-    let parsedJson: WidgetData;
-    try {
-      parsedJson = JSON.parse(value);
-    } catch {
-      ctx.addIssue({
-        code: "custom",
-        message: "post.fields.taskInput.invalidJson",
-      });
-      return z.NEVER;
-    }
-    const parsed = taskInputSchema.safeParse(parsedJson);
-    if (!parsed.success) {
-      ctx.addIssue({
-        code: "custom",
-        message: "post.fields.taskInput.notObject",
-      });
-      return z.NEVER;
-    }
-    return parsed.data;
-  });
+const taskInputRequestSchema = makeTaskInputRequestSchema({
+  invalidJson: "post.fields.taskInput.invalidJson",
+  notObject: "post.fields.taskInput.notObject",
+});
 
 /**
  * GET /cron/tasks - List cron tasks

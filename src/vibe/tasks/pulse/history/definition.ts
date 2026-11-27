@@ -43,6 +43,9 @@ export const { GET } = createEndpoint({
   subCategory: "tasksPulse",
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
   tags: ["tags.pulse" as const],
+  options: {
+    formOptions: { autoSubmit: true, debounceMs: 300 },
+  },
 
   fields: customWidgetObject({
     render: PulseHistoryContainer,

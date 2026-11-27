@@ -24,6 +24,7 @@ import {
   useWidgetEndpointMutations,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -43,6 +44,7 @@ export function BudgetCapsWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const mutations = useWidgetEndpointMutations();
+  const response = useWidgetResponse();
   const numberFormat = new Intl.NumberFormat(locale, {
     maximumFractionDigits: 1,
   });
@@ -60,18 +62,20 @@ export function BudgetCapsWidget(): JSX.Element {
   const rows = data?.rows;
 
   return (
-    <WidgetShell>
+    <WidgetShell layout="page">
       <Div className="flex flex-col gap-4">
         <WidgetHeader
+          size="page"
           title={t("budgetCaps.get.widget.title")}
+          subtitle={t("budgetCaps.get.widget.subtitle")}
           backButton={
             canGoBack ? (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
+                className="-ml-1 min-h-10 min-w-10"
                 onClick={() => pop()}
-                className="-ml-1"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -83,6 +87,7 @@ export function BudgetCapsWidget(): JSX.Element {
                 type="button"
                 variant="ghost"
                 size="sm"
+                className="min-h-10 min-w-10"
                 onClick={() => void mutations?.read?.refetch?.()}
                 aria-label={t("budgetCaps.get.widget.refresh")}
               >
@@ -91,7 +96,7 @@ export function BudgetCapsWidget(): JSX.Element {
               <Button
                 type="button"
                 size="sm"
-                className="gap-1.5"
+                className="min-h-10 gap-1.5"
                 onClick={openSet}
               >
                 <Plus className="h-4 w-4" />
@@ -100,12 +105,12 @@ export function BudgetCapsWidget(): JSX.Element {
             </>
           }
         />
-        <P className="text-sm text-muted-foreground">
-          {t("budgetCaps.get.widget.subtitle")}
-        </P>
+        <FormAlertWidget field={{}} />
 
         {!rows ? (
-          <LoadingBlock message={t("budgetCaps.get.widget.loading")} />
+          response?.success !== false && (
+            <LoadingBlock message={t("budgetCaps.get.widget.loading")} />
+          )
         ) : (
           <>
             <P className="text-sm font-medium tabular-nums">
@@ -175,23 +180,36 @@ export function BudgetCapSetWidget({
   const { pop, canGoBack } = useWidgetNavigation();
 
   return (
-    <Div className="max-w-lg mx-auto w-full px-4 pt-6 pb-6 flex flex-col gap-4">
-      {canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("budgetCaps.post.widget.back")}
-        </Button>
-      )}
-      <P className="text-sm text-muted-foreground">
-        {t("budgetCaps.post.widget.hint")}
-      </P>
-      <Div className="flex flex-col gap-3">
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
+      <WidgetHeader
+        size="page"
+        title={t("budgetCaps.post.title")}
+        subtitle={t("budgetCaps.post.widget.hint")}
+        backButton={
+          canGoBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => pop()}
+              className="min-h-10 gap-1.5"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("budgetCaps.post.widget.back")}
+            </Button>
+          )
+        }
+        actions={
+          <SubmitButtonWidget<typeof definition.POST>
+            field={{
+              text: "budgetCaps.get.widget.add",
+              className: "h-10 w-full @lg:w-auto",
+            }}
+          />
+        }
+      />
+      <FormAlertWidget field={{}} />
+      <Div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
         <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2">
           <SelectFieldWidget
             fieldName="scope"
@@ -217,10 +235,6 @@ export function BudgetCapSetWidget({
           field={withValue(field.children.note, undefined, null)}
         />
       </Div>
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "budgetCaps.post.title" as const }}
-      />
-    </Div>
+    </WidgetShell>
   );
 }

@@ -7,14 +7,19 @@ import { db } from "next-vibe/database";
 import { scopedTranslation as helpTranslation } from "next-vibe/help-tool/i18n";
 import { leads } from "next-vibe/identity/lead/db";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
+import { saveAdminReviewScreenshots } from "next-vibe/tooling/testing/e2e/admin-review-screenshots";
 import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import type { Page } from "playwright";
 import { describe, expect } from "vitest";
 
+import { authAtlas } from "@/chart-of-accounts/tests/atlas-workflow-fixture";
+
 import { scopedTranslation as detailTranslation } from "../[id]/i18n";
 import { category } from "../category";
+import { scopedTranslation as createTranslation } from "../create/i18n";
+import { scopedTranslation as importTranslation } from "../import/i18n";
 import dashboard from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -44,6 +49,44 @@ async function captureFixture(page: Page, state: "default" | "empty" | "detail")
 
 describe("E2E: Leads workspace", () => {
   const e2e = useE2E("leads-dashboard");
+
+  for (const locale of ["en-US", "de-DE"] as const) {
+    e2e.it(`opens the dashboard actions with saved report data in ${locale}`, async (fixture) => {
+      const { page } = fixture;
+      const { t: reviewT } = scopedTranslation.scopedT(locale);
+      const { t: createT } = createTranslation.scopedT(locale);
+      const { t: importT } = importTranslation.scopedT(locale);
+      const sample = dashboard.GET.responseSchema.parse(
+        dashboard.GET.examples.responses?.default,
+      );
+      await page.route(/\/api\/[^/]+\/leads\/dashboard(?:\?|$)/u, (route) =>
+        route.fulfill({ json: { success: true, data: sample } }),
+      );
+      await authAtlas(fixture, await resolveTestAdminUser());
+      const dashboardPage = "/tools/leads-dashboard";
+      const dashboardTool = page.locator("#admin-tool-leads-dashboard");
+      const opener = dashboardTool.getByText(reviewT("widget.humanLeads"), { exact: true });
+      await fixture.goto(dashboardPage, locale);
+      await opener.waitFor();
+      await saveAdminReviewScreenshots(page, "leads-dashboard", locale);
+
+      await opener.click();
+      await page.locator("#admin-tool-acquisition-report").waitFor();
+      await fixture.goto(dashboardPage, locale);
+      const create = dashboardTool.getByRole("button", { name: reviewT("widget.newLead"), exact: true });
+      await create.click();
+      await page.getByRole("heading", { name: createT("widget.headerCreateLead"), exact: true }).waitFor();
+      await fixture.goto(dashboardPage, locale);
+      await dashboardTool.getByRole("button", { name: reviewT("widget.importLeads"), exact: true }).click();
+      const importForm = page.locator('input[type="file"]').filter({ visible: true });
+      const importEntry = page.getByText(importT("post.titleShort"), { exact: true }).last();
+      await importForm.or(importEntry).first().waitFor();
+      if (await importEntry.isVisible()) {
+        await importEntry.click();
+      }
+      await importForm.waitFor();
+    });
+  }
 
   e2e.it("opens the dynamic Leads category, drills into its recent record and follows acquisition", async ({
     cleanup, gotoReady, loginAs, page,

@@ -13,13 +13,13 @@ export const translations: typeof enTranslations = {
     description:
       "Enregistre la compétence qui a amené ce lead (attribution au premier contact)",
     skillId: {
-      label: "ID de la skill",
-      description: "UUID de la skill personnalisée à attribuer à ce lead",
+      label: "Compétence",
+      description: "Choisissez une compétence publiée par la communauté.",
     },
     errors: {
       validation: {
-        title: "ID de skill invalide",
-        description: "Doit être un UUID valide de skill personnalisée",
+        title: "Choisissez une compétence",
+        description: "Choisissez une compétence publiée par la communauté.",
       },
       network: {
         title: "Erreur réseau",
@@ -62,7 +62,7 @@ export const translations: typeof enTranslations = {
     skipped: {
       title: "Non enregistré",
       description:
-        "Aucune session visiteur à attribuer. Ouvrez d'abord une page, puis réessayez.",
+        "La première compétence de ce visiteur reste enregistrée. Testez une autre compétence dans une nouvelle session.",
     },
     submit: "Attribuer la skill",
   },

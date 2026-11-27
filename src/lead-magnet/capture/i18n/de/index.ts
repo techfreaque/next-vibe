@@ -75,6 +75,7 @@ export const translations: typeof enTranslations = {
     },
   },
   form: {
+    signUp: "Konto erstellen",
     headline: "Bleib auf dem Laufenden",
     namePlaceholder: "Dein Vorname",
     emailPlaceholder: "Deine E-Mail",

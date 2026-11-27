@@ -31,6 +31,7 @@ import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { Section } from "next-vibe/ui/components/section";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
 import {
@@ -57,7 +58,7 @@ import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/numb
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { AcquisitionFilterInputs } from "../growth/acquisition-filter-inputs";
 import type definition from "./definition";
@@ -487,6 +488,7 @@ export function LeadsStatsContainer({
   const onSubmit = useWidgetOnSubmit();
   const form = useWidgetForm<typeof definition.GET>();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersId = useId();
 
   // Picking a named preset drops a stale custom range: explicit dates win
   // server-side, so leaving them set would silently override the preset.
@@ -502,6 +504,15 @@ export function LeadsStatsContainer({
   }, [dateRangePreset, form]);
 
   const data = useWidgetValue<typeof definition.GET>();
+  const totalLeads = data?.totalLeads ?? 0;
+  const unsubscribeRate =
+    totalLeads > 0 ? (data?.unsubscribedLeads ?? 0) / totalLeads : 0;
+  const formatRate = (rate: number): string =>
+    rate.toLocaleString(locale, {
+      style: "percent",
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    });
 
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
@@ -569,8 +580,8 @@ export function LeadsStatsContainer({
 
   const handleSearchLeads = useCallback((): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("@/leads/list/definition");
-      navigate(listDef.default.GET);
+      const searchDef = await import("@/leads/search/definition");
+      navigate(searchDef.default.GET);
     })();
   }, [navigate]);
 
@@ -639,8 +650,9 @@ export function LeadsStatsContainer({
   );
 
   return (
-    <WidgetShell>
+    <WidgetShell layout="page">
       <WidgetHeader
+        size="page"
         title={t("widget.title")}
         backButton={<NavigateButtonWidget field={children.backButton} />}
         actions={
@@ -651,6 +663,7 @@ export function LeadsStatsContainer({
               size="sm"
               onClick={handleRefresh}
               title={t("widget.refresh")}
+              aria-label={t("widget.refresh")}
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
@@ -662,10 +675,10 @@ export function LeadsStatsContainer({
       <Div className="flex flex-wrap gap-2">
         <Button
           type="button"
-          variant="default"
+          variant="outline"
           size="sm"
           onClick={() => openReport("acquisition")}
-          className="h-8 text-xs"
+          className="min-h-10"
         >
           {t("widget.openAcquisition")}
         </Button>
@@ -674,7 +687,7 @@ export function LeadsStatsContainer({
           variant="outline"
           size="sm"
           onClick={() => openReport("funnel")}
-          className="h-8 text-xs"
+          className="min-h-10"
         >
           {t("widget.openFunnel")}
         </Button>
@@ -683,7 +696,7 @@ export function LeadsStatsContainer({
           variant="outline"
           size="sm"
           onClick={() => openReport("abuse")}
-          className="h-8 text-xs"
+          className="min-h-10"
         >
           {t("widget.openAbuse")}
         </Button>
@@ -692,7 +705,7 @@ export function LeadsStatsContainer({
           variant="default"
           size="sm"
           onClick={handleViewAllLeads}
-          className="gap-1.5 h-8 text-xs"
+          className="min-h-10 gap-1.5"
         >
           <List className="h-3.5 w-3.5" />
           {t("widget.viewAllLeads")}
@@ -702,7 +715,7 @@ export function LeadsStatsContainer({
           variant="outline"
           size="sm"
           onClick={handleSearchLeads}
-          className="gap-1.5 h-8 text-xs"
+          className="min-h-10 gap-1.5"
         >
           <Search className="h-3.5 w-3.5" />
           {t("widget.searchLeads")}
@@ -712,7 +725,7 @@ export function LeadsStatsContainer({
           variant="outline"
           size="sm"
           onClick={handleExportLeads}
-          className="gap-1.5 h-8 text-xs"
+          className="min-h-10 gap-1.5"
         >
           <Download className="h-3.5 w-3.5" />
           {t("widget.export")}
@@ -722,7 +735,7 @@ export function LeadsStatsContainer({
           variant="outline"
           size="sm"
           onClick={handleImportLeads}
-          className="gap-1.5 h-8 text-xs"
+          className="min-h-10 gap-1.5"
         >
           <Upload className="h-3.5 w-3.5" />
           {t("widget.import")}
@@ -732,7 +745,7 @@ export function LeadsStatsContainer({
           variant="outline"
           size="sm"
           onClick={handleBatchUpdate}
-          className="gap-1.5 h-8 text-xs"
+          className="min-h-10 gap-1.5"
         >
           <Zap className="h-3.5 w-3.5" />
           {t("widget.batchUpdate")}
@@ -748,7 +761,9 @@ export function LeadsStatsContainer({
           onClick={() => {
             setFiltersOpen((v) => !v);
           }}
-          className="flex items-center gap-1.5 h-8 text-xs"
+          aria-expanded={filtersOpen}
+          aria-controls={filtersId}
+          className="flex min-h-10 items-center gap-1.5"
         >
           <Filter className="h-3.5 w-3.5" />
           {t("widget.filters")}
@@ -757,7 +772,10 @@ export function LeadsStatsContainer({
 
       {/* Filter panel */}
       {filtersOpen && (
-        <Div className="rounded-lg border p-4 flex flex-col gap-3 bg-muted/20">
+        <Section
+          id={filtersId}
+          className="rounded-lg border p-4 flex flex-col gap-3 bg-muted/20"
+        >
           <Div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <SelectFieldWidget
               fieldName="timePeriod"
@@ -883,14 +901,14 @@ export function LeadsStatsContainer({
           >
             {t("widget.applyFilters")}
           </Button>
-        </Div>
+        </Section>
       )}
 
       {/* KPI overview */}
       <MetricGrid columns={4}>
         <MetricCard
           label={t("widget.totalLeads")}
-          value={data?.totalLeads ?? 0}
+          value={totalLeads}
           trend={trend}
         />
         <MetricCard
@@ -907,7 +925,7 @@ export function LeadsStatsContainer({
         />
         <MetricCard
           label={t("widget.conversionRate")}
-          value={`${((data?.conversionRate ?? 0) * 100).toFixed(1)}%`}
+          value={formatRate(data?.conversionRate ?? 0)}
           variant="success"
           trend={trend}
         />
@@ -917,17 +935,17 @@ export function LeadsStatsContainer({
       <MetricGrid columns={4}>
         <MetricCard
           label={t("widget.openRate")}
-          value={`${((data?.averageOpenRate ?? 0) * 100).toFixed(1)}%`}
+          value={formatRate(data?.averageOpenRate ?? 0)}
           variant="info"
         />
         <MetricCard
           label={t("widget.clickRate")}
-          value={`${((data?.averageClickRate ?? 0) * 100).toFixed(1)}%`}
+          value={formatRate(data?.averageClickRate ?? 0)}
           variant="info"
         />
         <MetricCard
           label={t("widget.unsubscribeRate")}
-          value={`${((data?.signupRate ?? 0) * 100).toFixed(1)}%`}
+          value={formatRate(unsubscribeRate)}
         />
         <MetricCard
           label={t("widget.newThisMonth")}
@@ -940,15 +958,18 @@ export function LeadsStatsContainer({
       <SectionGroup title={t("widget.newLeadsTimeline")}>
         <MetricGrid columns={3}>
           <MetricCard
-            label={`${t("widget.today")} (${todayLabel})`}
+            label={t("widget.today")}
+            description={todayLabel}
             value={data?.leadsCreatedToday ?? 0}
           />
           <MetricCard
-            label={`${t("widget.thisWeek")} (${weekRange.from} ${t("widget.dateSeparator")} ${weekRange.to})`}
+            label={t("widget.thisWeek")}
+            description={`${weekRange.from} ${t("widget.dateSeparator")} ${weekRange.to}`}
             value={data?.leadsCreatedThisWeek ?? 0}
           />
           <MetricCard
-            label={`${t("widget.thisMonth")} (${monthRange.from} ${t("widget.dateSeparator")} ${monthRange.to})`}
+            label={t("widget.thisMonth")}
+            description={`${monthRange.from} ${t("widget.dateSeparator")} ${monthRange.to}`}
             value={data?.leadsCreatedThisMonth ?? 0}
           />
         </MetricGrid>

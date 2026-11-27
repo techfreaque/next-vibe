@@ -1,5 +1,5 @@
 export const translations = {
-  category: "Pulse Execution",
+  category: "Pulse execution",
   tags: {
     execute: "Execute",
   },
@@ -7,24 +7,25 @@ export const translations = {
     executePulse: "Failed to execute pulse",
   },
   post: {
-    title: "Execute Pulse",
-    titleShort: "Execute Pulse",
+    title: "Execute pulse",
+    titleShort: "Execute pulse",
     description: "Execute pulse health monitoring and task execution",
     container: {
-      title: "Pulse Execution",
+      title: "Pulse execution",
       description: "Execute pulse monitoring and run scheduled tasks",
     },
     fields: {
       dryRun: {
-        label: "Dry Run",
+        label: "Dry run",
         description: "Perform a dry run without making actual changes",
       },
       taskNames: {
-        label: "Task Names",
-        description: "Specific task names to execute (optional)",
+        label: "Task aliases",
+        description:
+          "Enter an endpoint alias and press Enter. Leave blank to include all eligible tasks.",
       },
       force: {
-        label: "Force Execution",
+        label: "Force execution",
         description: "Force execution even if tasks are not due",
       },
       success: {
@@ -36,10 +37,10 @@ export const translations = {
     },
     response: {
       pulseId: "Pulse ID",
-      executedAt: "Executed At",
+      executedAt: "Executed at",
       totalTasksDiscovered: "Total Tasks Discovered",
       tasksDue: "Tasks Due",
-      tasksExecuted: "Tasks Executed",
+      tasksExecuted: "Tasks executed",
       tasksSucceeded: "Tasks Succeeded",
       tasksFailed: "Tasks Failed",
       tasksSkipped: "Tasks Skipped",

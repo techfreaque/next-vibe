@@ -26,9 +26,8 @@ export const translations: typeof enTranslations = {
     peppol: "Stiahnuť XML Peppol",
     slovak: "Stiahnuť XML eFaktúry",
     xrechnung: "XML XRechnung",
-    send: "Odoslať cez Peppol",
-    providerNeeded:
-      "Pripojte certifikovaného digitálneho poštára a zaregistrujte Peppol ID vystavovateľa.",
+    sendHint:
+      "Stiahnutý súbor XML odošlite cez svojho poskytovateľa elektronickej fakturácie.",
     back: "Späť",
     submit: "Pripraviť e-faktúru",
     invoice: "Faktúra {{number}}",

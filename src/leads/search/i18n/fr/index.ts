@@ -88,6 +88,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    unnamedLead: "Prospect sans nom",
     previous: "Précédente",
     next: "Suivante",
     page: "Page {{page}} sur {{pages}}",

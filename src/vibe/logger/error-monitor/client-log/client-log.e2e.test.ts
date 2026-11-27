@@ -16,6 +16,7 @@ import { REQUEST_ID_HEADER_NAME as REQUEST_ID_HEADER } from "@/env/constants";
 import trackingEndpoints from "@/leads/tracking/definition";
 
 import { db } from "../../../database";
+import { saveAdminReviewScreenshots } from "../../../tooling/testing/e2e/admin-review-screenshots";
 import { useE2E } from "../../../tooling/testing/e2e/harness";
 import type { LoggerMetadata } from "../../types";
 import { errorLogs } from "../db";
@@ -32,18 +33,24 @@ async function removeLogs(messagePrefix: string): Promise<void> {
 describe("E2E: client error reporting", () => {
   const e2e = useE2E("vibe/logger/error-monitor/client-log");
 
-  e2e.it("reports an error entered in the form", async ({ open, cleanup }) => {
-    const message = `e2e-client-log-${Date.now()}`;
+  e2e.it("reports an error entered in the form", async ({ open, cleanup, page }) => {
+    const message = `e2e-client-log-${Date.now()}: sample browser warning`;
     cleanup(() => removeLogs(message));
 
     const form = await open(endpoint);
     await form.fill({ level: "warn", message });
+    await saveAdminReviewScreenshots(page, "report-client-error", "en-US");
     const result = await form.submit();
     expect(result.sent).toBe(true);
     if (!result.sent) return;
     expect(result.response.success, JSON.stringify(result.response)).toBe(true);
     if (!result.response.success) return;
     expect(result.response.data.ok).toBe(true);
+    const [stored] = await db
+      .select({ level: errorLogs.level })
+      .from(errorLogs)
+      .where(eq(errorLogs.message, `[client] ${message}`));
+    expect(stored?.level).toBe("warn");
   });
 
   e2e.it("blocks a report without a message", async ({ open }) => {

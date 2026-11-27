@@ -89,9 +89,9 @@ export const translations: typeof enTranslations = {
     },
   },
   customerId: {
-    label: "ID zákazníka",
-    description: "Identifikátor zákazníka v Stripe",
-    placeholder: "Zadajte ID zákazníka",
+    label: "Zákazník",
+    description: "Vyber účet prepojený so zákazníkom v Stripe.",
+    placeholder: "Vyhľadať zákazníka",
   },
   amount: {
     label: "Suma",

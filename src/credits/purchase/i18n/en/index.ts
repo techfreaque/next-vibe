@@ -47,6 +47,8 @@ export const translations = {
       content: "Total Credits",
     },
     pack: {
+      addPack: "Add one pack",
+      removePack: "Remove one pack",
       qtyCredits: "{{count}} credits",
       title: "Credit Pack",
       description: "Top up your plan. Credits never expire.",

@@ -21,6 +21,7 @@ import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
@@ -160,7 +161,8 @@ export function BusinessOverviewWidget(): JSX.Element {
   };
 
   return (
-    <WidgetShell padding="none" className="gap-4">
+    <WidgetShell layout="page" className="min-w-0 gap-4">
+      <WidgetHeader size="page" title={t("get.title")} />
       <AnalyticsToolbar
         rangeControls={
           <ReportAnalyticsPeriod
@@ -513,6 +515,7 @@ function OverviewBody({
             <KpiTile
               drillHint={TARGET.usage}
               label={t("get.widget.kpi.creditSpend")}
+              wrapLabel
               value={money.kpis.creditSpendUsd.value}
               previous={money.kpis.creditSpendUsd.previous}
               format="currency"

@@ -15,6 +15,7 @@ import {
 import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
 import { leads } from "next-vibe/identity/lead/db";
 import { E2E_HYDRATION_TIMEOUT_MS } from "next-vibe/tooling/testing/e2e/config";
+import { saveAdminReviewScreenshots } from "next-vibe/tooling/testing/e2e/admin-review-screenshots";
 import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
@@ -27,21 +28,26 @@ import leadSkillEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
 
 const endpoint = leadSkillEndpoints.PATCH;
-const { t } = scopedTranslation.scopedT("en-GLOBAL");
 const skillsT = skillsScopedTranslation.scopedT("en-GLOBAL").t;
 
 async function createSkill(
   cleanup: E2EFixtures["cleanup"],
-): Promise<{ skillId: string; creatorId: string; name: string }> {
+): Promise<{ skillId: string; slug: string; creatorId: string; name: string }> {
   const admin = await resolveTestAdminUser();
   const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
   // Unique name: the creator page lists every skill the admin owns
   const name = `E2E Attribution Skill ${suffix}`;
-  const [skill] = await db
+  const skillId = crypto.randomUUID();
+  const slug = `e2e-lead-skill-${suffix}`;
+  cleanup(async () => {
+    await db.delete(customSkills).where(eq(customSkills.id, skillId));
+  });
+  await db
     .insert(customSkills)
     .values({
+      id: skillId,
       userId: admin.id,
-      slug: `e2e-lead-skill-${suffix}`,
+      slug,
       name,
       description: "Skill used by the lead attribution E2E suite",
       tagline: "E2E attribution",
@@ -50,12 +56,8 @@ async function createSkill(
       category: SkillCategory.ASSISTANT,
       ownershipType: SkillOwnershipType.PUBLIC,
       status: SkillStatus.PUBLISHED,
-    })
-    .returning({ id: customSkills.id });
-  cleanup(async () => {
-    await db.delete(customSkills).where(eq(customSkills.id, skill.id));
-  });
-  return { skillId: skill.id, creatorId: admin.id, name };
+    });
+  return { skillId, slug, creatorId: admin.id, name };
 }
 
 /** The visitor's lead, from the cookie the middleware issued to this browser. */
@@ -124,25 +126,42 @@ describe("E2E: lead skill attribution", () => {
     expect(await visitorLeadSkill(context)).toBe(skillId);
   });
 
-  e2e.it("attributes a skill entered in the form", async ({ open, page, context, cleanup }) => {
-    const { skillId } = await createSkill(cleanup);
+  for (const locale of ["en-US", "de-DE"] as const) {
+    e2e.it(`selects a published skill by name and preserves first touch in ${locale}`, async (fixture) => {
+      const { page, context, cleanup } = fixture;
+      const first = await createSkill(cleanup);
+      const second = await createSkill(cleanup);
+      const path = "/tools/leads/skill/PATCH";
+      const { t: reviewT } = scopedTranslation.scopedT(locale);
+      const { t: browserT } = skillsScopedTranslation.scopedT(locale);
+      const picker = page.locator('button[name="skillId"]');
+      const search = page.getByPlaceholder(browserT("get.search.placeholder")).last();
+      const submit = page.getByTestId("endpoint-submit").filter({ visible: true });
+      const pick = async (name: string): Promise<void> => {
+        await picker.click();
+        await search.fill(name);
+        await page.getByText(name, { exact: true }).filter({ visible: true }).first().click();
+        await page.getByText(name, { exact: true }).filter({ visible: true }).last().waitFor();
+      };
+      await fixture.goto(path, locale);
+      await saveAdminReviewScreenshots(page, "leads_skill_PATCH", locale);
+      await pick(first.name);
+      const attributed = await fixture.capture(endpoint, () => submit.click());
+      expect(attributed.requestBody).toEqual({ skillId: first.slug });
+      expect(attributed.response).toMatchObject({ success: true, data: { success: true } });
+      await page.getByText(reviewT("patch.success.title"), { exact: true }).first().waitFor();
 
+      await pick(second.name);
+      const skipped = await fixture.capture(endpoint, () => submit.click());
+      expect(skipped.requestBody).toEqual({ skillId: second.slug });
+      expect(skipped.response).toMatchObject({ success: true, data: { success: false } });
+      await page.getByText(reviewT("patch.skipped.title"), { exact: true }).first().waitFor();
+      expect(await visitorLeadSkill(context)).toBe(first.skillId);
+    });
+  }
+
+  e2e.it("requires a skill selection before sending", async ({ open }) => {
     const form = await open(endpoint);
-    await form.fill({ skillId });
-    const result = await form.submit();
-    expect(result.sent).toBe(true);
-    if (!result.sent) return;
-    expect(result.response.success, JSON.stringify(result.response)).toBe(true);
-    if (!result.response.success) return;
-    expect(result.response.data.success).toBe(true);
-
-    await page.getByText(t("patch.success.title")).waitFor({ state: "visible" });
-    expect(await visitorLeadSkill(context)).toBe(skillId);
-  });
-
-  e2e.it("blocks a malformed skill id before sending", async ({ open }) => {
-    const form = await open(endpoint);
-    await form.fill({ skillId: "not-a-uuid" });
     const result = await form.submit();
     expect(result.sent).toBe(false);
     if (result.sent) return;

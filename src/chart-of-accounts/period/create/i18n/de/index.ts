@@ -6,9 +6,9 @@ export const translations: typeof enTranslations = {
     titleShort: "Neue Periode",
     description: "Neue Buchhaltungsperiode für ein Unternehmen anlegen",
     companyId: {
-      label: "Unternehmens-ID",
+      label: "Unternehmen",
       description: "Unternehmen, für das die Periode eröffnet wird",
-      placeholder: "Unternehmens-UUID",
+      placeholder: "Unternehmen auswählen",
     },
     name: {
       label: "Periodenname",

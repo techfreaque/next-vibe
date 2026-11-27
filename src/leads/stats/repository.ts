@@ -9,6 +9,7 @@ import {
   and,
   count,
   desc,
+  DrizzleQueryError,
   eq,
   gte,
   inArray,
@@ -31,6 +32,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { databaseFailureDiagnostics } from "next-vibe/database/error-diagnostics";
 import { emailCampaigns, leads } from "next-vibe/identity/lead/db";
 import {
   convertCountryFilter,
@@ -217,10 +219,12 @@ export class LeadStatsRepository {
 
       return success(response);
     } catch (error) {
-      const errorDetails = parseError(error);
+      const failure = error instanceof Error ? error : parseError(error);
       logger.error("Error getting leads stats", {
-        error: errorDetails.message,
-        stack: errorDetails.stack,
+        ...databaseFailureDiagnostics(failure),
+        error:
+          failure instanceof DrizzleQueryError ? undefined : failure.message,
+        stack: failure instanceof DrizzleQueryError ? undefined : failure.stack,
         dateRange: {
           from: dateFrom?.toISOString(),
           to: dateTo?.toISOString(),
@@ -647,7 +651,67 @@ export class LeadStatsRepository {
         return LeadStatsRepository.createEmptyHistoricalDataStructure();
       }
 
-      // Get historical data for each metric with individual error handling
+      const types = LeadStatsRepository.METRIC_TYPES;
+      const metrics = [
+        types.TOTAL,
+        types.NEW,
+        types.ACTIVE,
+        types.CAMPAIGN_RUNNING,
+        types.WEBSITE_USER,
+        types.NEWSLETTER_SUBSCRIBER,
+        types.CONVERTED,
+        types.SIGNED_UP,
+        types.SUBSCRIPTION_CONFIRMED,
+        types.UNSUBSCRIBED,
+        types.BOUNCED,
+        types.INVALID,
+        types.EMAILS_SENT,
+        types.EMAILS_OPENED,
+        types.EMAILS_CLICKED,
+      ];
+      const emptyIntervalData = intervals.map((interval) => ({
+        x: interval.label,
+        y: 0,
+      }));
+      const data: (typeof emptyIntervalData)[] = [];
+      const concurrentReads = 2;
+      // The report also reads summary, breakdown and acquisition data. Give
+      // other requests room in the shared pool while loading historical series.
+      for (let offset = 0; offset < metrics.length; offset += concurrentReads) {
+        const batch = metrics.slice(offset, offset + concurrentReads);
+        const results = await Promise.allSettled(
+          batch.map((metric) =>
+            metric === types.TOTAL
+              ? LeadStatsRepository.getCumulativeTotalLeads(
+                  intervals,
+                  whereConditions,
+                  timePeriod,
+                  filters,
+                  logger,
+                )
+              : LeadStatsRepository.getHistoricalMetric(
+                  intervals,
+                  whereConditions,
+                  metric,
+                  timePeriod,
+                  filters,
+                  logger,
+                ),
+          ),
+        );
+        for (const [index, result] of results.entries()) {
+          if (result.status === "fulfilled") {
+            data.push(result.value);
+          } else {
+            logger.error(`Error getting historical metric: ${batch[index]}`, {
+              error: parseError(result.reason).message,
+              timePeriod,
+              intervalCount: intervals.length,
+            });
+            data.push(emptyIntervalData);
+          }
+        }
+      }
       const [
         totalLeadsData,
         newLeadsData,
@@ -664,166 +728,7 @@ export class LeadStatsRepository {
         emailsSentData,
         emailsOpenedData,
         emailsClickedData,
-      ] = await Promise.allSettled([
-        // Use specialized method for cumulative total leads
-        LeadStatsRepository.getCumulativeTotalLeads(
-          intervals,
-          whereConditions,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.NEW,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.ACTIVE,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.CAMPAIGN_RUNNING,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.WEBSITE_USER,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.NEWSLETTER_SUBSCRIBER,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.CONVERTED,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.SIGNED_UP,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.SUBSCRIPTION_CONFIRMED,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.UNSUBSCRIBED,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.BOUNCED,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.INVALID,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.EMAILS_SENT,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.EMAILS_OPENED,
-          timePeriod,
-          filters,
-          logger,
-        ),
-        LeadStatsRepository.getHistoricalMetric(
-          intervals,
-          whereConditions,
-          LeadStatsRepository.METRIC_TYPES.EMAILS_CLICKED,
-          timePeriod,
-          filters,
-          logger,
-        ),
-      ]).then((results) => {
-        // Extract successful results and provide fallbacks for failed ones
-        const emptyIntervalData = intervals.map((interval) => ({
-          x: interval.label,
-          y: 0,
-        }));
-
-        return results.map((result, index) => {
-          if (result.status === "fulfilled") {
-            return result.value;
-          }
-          const metricNames = [
-            "totalLeads",
-            "newLeads",
-            "activeLeads",
-            "campaignRunningLeads",
-            "websiteUserLeads",
-            "newsletterSubscriberLeads",
-            "convertedLeads",
-            "signedUpLeads",
-            "subscriptionConfirmedLeads",
-            "unsubscribedLeads",
-            "bouncedLeads",
-            "invalidLeads",
-            "emailsSent",
-            "emailsOpened",
-            "emailsClicked",
-          ];
-          logger.error(
-            `Error getting historical metric: ${metricNames[index]}`,
-            {
-              error: parseError(result.reason).message,
-              timePeriod,
-              intervalCount: intervals.length,
-            },
-          );
-          return emptyIntervalData;
-        });
-      });
+      ] = data;
 
       // Calculate rates from the raw data
       const openRateData = LeadStatsRepository.calculateRateData(
@@ -1058,36 +963,20 @@ export class LeadStatsRepository {
   private static async generateGroupedStats(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsGroupedStats> {
-    // Get grouped statistics from database
-    const [
-      byStatusData,
-      bySourceData,
-      byCountryData,
-      byLanguageData,
-      byCampaignStageData,
-      byJourneyVariantData,
-      byEngagementLevelData,
-      byConversionFunnelData,
-    ] = await Promise.all([
-      LeadStatsRepository.getGroupedByStatus(whereConditions),
-      LeadStatsRepository.getGroupedBySource(whereConditions),
-      LeadStatsRepository.getGroupedByCountry(whereConditions),
-      LeadStatsRepository.getGroupedByLanguage(whereConditions),
-      LeadStatsRepository.getGroupedByCampaignStage(whereConditions),
-      LeadStatsRepository.getGroupedByJourneyVariant(whereConditions),
-      LeadStatsRepository.getGroupedByEngagementLevel(whereConditions),
-      LeadStatsRepository.getGroupedByConversionFunnel(whereConditions),
-    ]);
-
     return {
-      byStatus: byStatusData,
-      bySource: bySourceData,
-      byCountry: byCountryData,
-      byLanguage: byLanguageData,
-      byCampaignStage: byCampaignStageData,
-      byJourneyVariant: byJourneyVariantData,
-      byEngagementLevel: byEngagementLevelData,
-      byConversionFunnel: byConversionFunnelData,
+      byStatus: await LeadStatsRepository.getGroupedByStatus(whereConditions),
+      bySource: await LeadStatsRepository.getGroupedBySource(whereConditions),
+      byCountry: await LeadStatsRepository.getGroupedByCountry(whereConditions),
+      byLanguage:
+        await LeadStatsRepository.getGroupedByLanguage(whereConditions),
+      byCampaignStage:
+        await LeadStatsRepository.getGroupedByCampaignStage(whereConditions),
+      byJourneyVariant:
+        await LeadStatsRepository.getGroupedByJourneyVariant(whereConditions),
+      byEngagementLevel:
+        await LeadStatsRepository.getGroupedByEngagementLevel(whereConditions),
+      byConversionFunnel:
+        await LeadStatsRepository.getGroupedByConversionFunnel(whereConditions),
     };
   }
 

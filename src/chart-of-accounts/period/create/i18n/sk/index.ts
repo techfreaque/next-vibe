@@ -6,9 +6,9 @@ export const translations: typeof enTranslations = {
     titleShort: "Nové obdobie",
     description: "Vytvorte účtovné obdobie pre spoločnosť.",
     companyId: {
-      label: "ID firmy",
+      label: "Firma",
       description: "Firma, pre ktorú chcete otvoriť obdobie",
-      placeholder: "UUID firmy",
+      placeholder: "Vyberte firmu",
     },
     name: {
       label: "Názov obdobia",

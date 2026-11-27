@@ -3,23 +3,23 @@
  *
  * The product calls this endpoint silently when a visitor favorites a skill
  * (first-touch attribution). This surface lets the same call be made by hand:
- * skill id in, attribution outcome out.
+ * choose a skill and see whether the lead was attributed.
  */
 
 "use client";
 
-import { Platform } from "next-vibe/platforms/platforms";
+import { SkillSourceFilter } from "next-vibe/agent/skills/enum";
 import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Info } from "next-vibe/ui/components/icons/Info";
-import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
-  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { UuidFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/uuid-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React from "react";
@@ -36,8 +36,6 @@ export function LeadSkillWidget({
   const children = field.children;
   const data = useWidgetValue<typeof definition.PATCH>();
   const t = useWidgetTranslation<typeof definition.PATCH>();
-  const platform = useWidgetPlatform();
-  const isCli = platform === Platform.CLI || platform === Platform.MCP;
 
   const outcome =
     data?.success === true ? (
@@ -62,38 +60,28 @@ export function LeadSkillWidget({
       </Div>
     ) : null;
 
-  const form = (
-    <>
-      <FormAlertWidget field={{}} />
-      <UuidFieldWidget fieldName="skillId" field={children.skillId} />
-      <SubmitButtonWidget<typeof definition.PATCH>
-        field={{ text: "patch.submit", icon: "zap", variant: "primary" }}
-      />
-    </>
-  );
-
-  if (isCli) {
-    return (
-      <Div className="flex flex-col gap-2">
-        {outcome}
-        {form}
-      </Div>
-    );
-  }
-
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      <Div className="flex flex-col gap-1 pb-2 border-b">
-        <Div className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">{t("patch.title")}</Span>
-        </Div>
-        <Span className="text-sm text-muted-foreground">
-          {t("patch.description")}
-        </Span>
-      </Div>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("patch.title")}
+        subtitle={t("patch.description")}
+      />
       {outcome}
-      {form}
-    </Div>
+      <FormAlertWidget field={{}} />
+      <EntityPickerFieldWidget
+        fieldName="skillId"
+        field={children.skillId}
+        listData={{ sourceFilter: SkillSourceFilter.COMMUNITY }}
+      />
+      <SubmitButtonWidget<typeof definition.PATCH>
+        field={{
+          text: "patch.submit",
+          icon: "zap",
+          variant: "primary",
+          className: "min-h-10 self-stretch @md:self-end",
+        }}
+      />
+    </WidgetShell>
   );
 }

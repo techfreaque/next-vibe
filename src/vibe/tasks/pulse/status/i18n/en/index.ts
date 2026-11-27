@@ -1,35 +1,39 @@
 export const translations = {
-  category: "Pulse Status",
+  category: "Pulse status",
   tags: {
     status: "Status",
   },
   get: {
-    title: "Pulse Status",
-    titleShort: "Pulse Status",
-    description: "Get pulse health monitoring status",
+    title: "Pulse status",
+    titleShort: "Pulse status",
+    description: "Review pulse runs and their success rate.",
     container: {
       title: "Pulse Health Status",
       description: "Monitor pulse execution health and statistics",
     },
+    widget: {
+      refresh: "Refresh",
+      noData: "No runs yet",
+    },
     fields: {
       status: {
         title: "Status",
-        label: "Pulse Status",
+        label: "Pulse status",
         description: "Current pulse health status",
       },
       lastPulseAt: {
         title: "Last Pulse At",
-        label: "Last Pulse",
+        label: "Last pulse",
         description: "Timestamp of last pulse execution",
       },
       successRate: {
-        title: "Success Rate",
-        label: "Success Rate",
+        title: "Success rate",
+        label: "Success rate",
         description: "Percentage of successful pulse executions",
       },
       totalExecutions: {
-        title: "Total Executions",
-        label: "Total Executions",
+        title: "Total executions",
+        label: "Total executions",
         description: "Total number of pulse executions",
       },
     },

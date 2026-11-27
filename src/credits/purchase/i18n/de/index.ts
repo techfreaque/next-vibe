@@ -49,6 +49,8 @@ export const translations: typeof enTranslations = {
       content: "Gesamt-Credits",
     },
     pack: {
+      addPack: "Ein Paket hinzufügen",
+      removePack: "Ein Paket abziehen",
       qtyCredits: "{{count}} Credits",
       title: "Credit-Paket",
       description: "Lädt deinen Plan auf. Credits verfallen nie.",

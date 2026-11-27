@@ -30,6 +30,35 @@ export const translations: typeof enTranslations = {
         description: "System-Ressourceninformationen einschließen",
       },
     },
+    widget: {
+      refresh: "Zustand prüfen",
+      health: {
+        healthy: "In Ordnung",
+        warning: "Warnung",
+        critical: "Kritisch",
+        unknown: "Unbekannt",
+      },
+      results: {
+        pass: "Bestanden",
+        warn: "Warnung",
+        fail: "Fehlgeschlagen",
+      },
+      checks: {
+        traffic: "Annahme von Anfragen",
+        process: "Serverprozess",
+      },
+      messages: {
+        draining: "Die Instanz fährt herunter. Noch {{count}} Streams aktiv.",
+        accepting: "Die Instanz nimmt Anfragen an. {{count}} Streams aktiv.",
+        memory: "Hohe Speicherauslastung ({{usage}}).",
+        processOk: "Der Server läuft normal.",
+        databaseOk: "Die Datenbankverbindung steht.",
+        databaseFailed: "Keine Verbindung zur Datenbank.",
+        tasksDisabled: "Der Aufgabenplaner ist in dieser Umgebung deaktiviert.",
+        tasksOk: "Der Aufgabenplaner ist verfügbar.",
+        systemOk: "Die Systemressourcen sind in Ordnung.",
+      },
+    },
     response: {
       status: {
         title: "Status",

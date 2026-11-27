@@ -5360,6 +5360,8 @@ export const translations: typeof enTranslations = {
       },
       patch: {
         error: {
+          invalidStatusTransition:
+            "Ce prospect ne peut pas passer du statut {{current}} au statut {{next}}.",
           not_found: {
             title: "Lead introuvable",
           },

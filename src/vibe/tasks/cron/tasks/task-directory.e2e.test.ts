@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { inArray } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { saveAdminReviewScreenshots } from "next-vibe/tooling/testing/e2e/admin-review-screenshots";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { describe, expect } from "vitest";
@@ -47,7 +48,7 @@ describe("Automation task directory", () => {
 
       const { t } = scopedTranslation.scopedT(locale);
       const { t: taskT } = taskTranslations.scopedT(locale);
-      await page.goto(`${baseUrl}/${locale}/tools/task-list`, { waitUntil: "commit", timeout: 60_000 });
+      await fixture.goto("/tools/task-list", locale);
       const search = page.getByRole("textbox", { name: t("get.fields.search.label"), exact: true });
       await search.waitFor({ timeout: 45_000 });
       const readSearch = page.waitForResponse((response) => {
@@ -81,6 +82,7 @@ describe("Automation task directory", () => {
       await completedLow.waitFor({ state: "hidden" });
       await completedHigh.waitFor();
       expect(await failedHigh.isVisible()).toBe(false);
+      await saveAdminReviewScreenshots(page, "task-list", locale);
       if (process.env["TASK_DIRECTORY_SHOTS"] === "1") {
         await saveAdminViewMatrix(page, "automation", `task-list-filtered-${locale.slice(0, 2)}`);
       }

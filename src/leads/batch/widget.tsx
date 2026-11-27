@@ -14,6 +14,8 @@ import { List } from "next-vibe/ui/components/icons/List";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
@@ -98,17 +100,17 @@ export function LeadsBatchUpdateContainer({
   }, [navigate]);
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Header */}
-      <Div className="flex items-center gap-2 pb-2 border-b">
-        <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base mr-auto">
-          {t("widget.update.headerTitle")}
-        </Span>
-        {isSubmitting && (
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        )}
-      </Div>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("widget.update.headerTitle")}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+        actions={
+          isSubmitting ? (
+            <Loader2 className="size-4 animate-spin text-muted-foreground" />
+          ) : undefined
+        }
+      />
 
       {/* Active Filter Summary (prefilled from list, read-only display) */}
       {hasActiveFilters && (
@@ -155,7 +157,7 @@ export function LeadsBatchUpdateContainer({
         <Span className="font-medium text-sm text-muted-foreground">
           {t("widget.update.sectionUpdates")}
         </Span>
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid grid-cols-1 gap-3 @md:grid-cols-2">
           <SelectFieldWidget
             field={children.updates.children.status}
             fieldName="updates.status"
@@ -168,7 +170,7 @@ export function LeadsBatchUpdateContainer({
             field={children.updates.children.source}
             fieldName="updates.source"
           />
-          <Div className="col-span-2">
+          <Div className="@md:col-span-2">
             <TextFieldWidget
               field={children.updates.children.notes}
               fieldName="updates.notes"
@@ -182,7 +184,7 @@ export function LeadsBatchUpdateContainer({
         <Span className="font-medium text-sm text-muted-foreground">
           {t("widget.update.sectionSettings")}
         </Span>
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid grid-cols-1 gap-3 @md:grid-cols-2">
           <SelectFieldWidget field={children.scope} fieldName="scope" />
           <NumberFieldWidget
             field={children.maxRecords}
@@ -199,6 +201,7 @@ export function LeadsBatchUpdateContainer({
           loadingText: "widget.update.submitButtonLoading" as const,
           icon: "refresh-cw",
           variant: "primary",
+          className: "min-h-10 self-stretch @md:self-end",
         }}
       />
 
@@ -371,7 +374,7 @@ export function LeadsBatchUpdateContainer({
           </Div>
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }
 
@@ -424,13 +427,12 @@ export function LeadsBatchDeleteContainer({
   }, [navigate]);
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      <Div className="flex items-center gap-2 pb-2 border-b">
-        <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base mr-auto text-destructive">
-          {t("widget.delete.headerTitle")}
-        </Span>
-      </Div>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("widget.delete.headerTitle")}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+      />
 
       {/* Active Filter Summary (prefilled from list, read-only display) */}
       {hasActiveFilters && (
@@ -497,6 +499,7 @@ export function LeadsBatchDeleteContainer({
           loadingText: "widget.delete.submitButtonLoading" as const,
           icon: "trash",
           variant: "destructive",
+          className: "min-h-10 self-stretch @md:self-end",
         }}
       />
 
@@ -637,6 +640,6 @@ export function LeadsBatchDeleteContainer({
           ))}
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

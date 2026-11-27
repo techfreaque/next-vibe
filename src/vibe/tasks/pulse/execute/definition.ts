@@ -15,6 +15,8 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
@@ -23,6 +25,10 @@ import {
 } from "../../../unified-ui/_shared/utils-i18n";
 import { PULSE_EXECUTE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const PulseExecuteWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({ default: module.PulseExecuteWidget })),
+);
 
 /**
  * Pulse Execute Endpoint (POST)
@@ -43,12 +49,8 @@ const { POST } = createEndpoint({
   subCategory: "tasksPulse",
   tags: ["tags.execute"],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.container.title",
-    description: "post.container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
+    render: PulseExecuteWidget,
     usage: { request: "data", response: true },
     children: {
       // === REQUEST DATA FIELDS ===
@@ -63,11 +65,10 @@ const { POST } = createEndpoint({
 
       taskNames: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MULTISELECT,
+        fieldType: FieldDataType.TAGS,
         label: "post.fields.taskNames.label",
         description: "post.fields.taskNames.description",
         columns: 6,
-        options: [],
         schema: z.array(z.string()).optional(),
       }),
 

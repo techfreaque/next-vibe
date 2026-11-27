@@ -5,6 +5,11 @@
 
 "use client";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  formatSimpleDate,
+  formatTimestamp,
+} from "next-vibe/core/i18n/core/localization-utils";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
@@ -30,21 +35,25 @@ import type definition from "./definition";
 import { type ModelCatalogScanT, scopedTranslation } from "./i18n";
 import type { CatalogReport, CatalogScanSummary } from "./schema";
 
-function formatDate(iso: string): string {
-  return iso.slice(0, 16).replace("T", " ");
-}
-
-function formatUsd(value: number | null): string {
-  return value === null ? "?" : `$${value}`;
+function formatUsd(value: number | null, locale: CountryLanguage): string {
+  return value === null
+    ? "?"
+    : new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 6,
+      }).format(value);
 }
 
 function ScanMeta({
   scan,
   report,
+  locale,
   t,
 }: {
   scan: CatalogScanSummary;
   report: CatalogReport;
+  locale: CountryLanguage;
   t: ModelCatalogScanT;
 }): JSX.Element {
   return (
@@ -52,12 +61,12 @@ function ScanMeta({
       <StatusPill
         status="scanned"
         variant="muted"
-        label={`${t("widget.scannedAt")} ${formatDate(scan.scannedAt)}`}
+        label={`${t("widget.scannedAt")} ${formatTimestamp(scan.scannedAt, locale)}`}
       />
       <StatusPill
         status="since"
         variant="muted"
-        label={`${t("widget.newSince")} ${formatDate(report.newSince)}`}
+        label={`${t("widget.newSince")} ${formatTimestamp(report.newSince, locale)}`}
       />
       {scan.emailedTo.length > 0 ? (
         <StatusPill
@@ -86,10 +95,12 @@ function ScanMeta({
 function ReportView({
   scan,
   report,
+  locale,
   t,
 }: {
   scan: CatalogScanSummary;
   report: CatalogReport;
+  locale: CountryLanguage;
   t: ModelCatalogScanT;
 }): JSX.Element {
   const uncensoredCount = report.newModels.filter((m) => m.uncensored).length;
@@ -97,7 +108,7 @@ function ReportView({
 
   return (
     <Div className="flex flex-col gap-4">
-      <ScanMeta scan={scan} report={report} t={t} />
+      <ScanMeta scan={scan} report={report} locale={locale} t={t} />
 
       <MetricGrid columns={3}>
         <MetricCard
@@ -161,7 +172,7 @@ function ReportView({
                   ) : null}
                 </Div>
               }
-              meta={`${formatUsd(m.inputUsdPer1M)} / ${formatUsd(m.outputUsdPer1M)} ${t("widget.perMillion")} · ${t("widget.context")} ${m.contextWindow ?? "?"} · ${m.createdAt?.slice(0, 10) ?? "?"}`}
+              meta={`${formatUsd(m.inputUsdPer1M, locale)} / ${formatUsd(m.outputUsdPer1M, locale)} ${t("widget.perMillion")} · ${t("widget.context")} ${m.contextWindow?.toLocaleString(locale) ?? "?"} · ${m.createdAt ? formatSimpleDate(new Date(m.createdAt), locale) : "?"}`}
             />
           ))
         )}
@@ -235,7 +246,7 @@ function ReportView({
               key={`${d.apiProvider}-${d.providerModel}-${d.modelId}`}
               title={d.modelId}
               subtitle={`${d.apiProvider} · ${d.providerModel}`}
-              meta={d.expiresAt}
+              meta={formatSimpleDate(new Date(d.expiresAt), locale)}
               badges={
                 d.legacy ? (
                   <StatusPill
@@ -301,19 +312,29 @@ export function ModelCatalogScanWidget(): JSX.Element {
   ) : undefined;
 
   return (
-    <WidgetShell className="gap-4">
+    <WidgetShell layout="page" className="gap-4">
       <WidgetHeader
+        size="page"
         title={t("get.title")}
         backButton={backButton}
         actions={
-          <Button type="button" size="sm" onClick={handleRun}>
+          <Button
+            type="button"
+            className="min-h-10 w-full @lg:w-auto"
+            onClick={handleRun}
+          >
             {t("widget.runNow")}
           </Button>
         }
       />
       {value?.scan && value.report ? (
         <>
-          <ReportView scan={value.scan} report={value.report} t={t} />
+          <ReportView
+            scan={value.scan}
+            report={value.report}
+            locale={locale}
+            t={t}
+          />
           {value.history.length > 1 ? (
             <SectionGroup
               title={t("widget.sections.history")}
@@ -323,7 +344,7 @@ export function ModelCatalogScanWidget(): JSX.Element {
               {value.history.map((h) => (
                 <ListItem
                   key={h.id}
-                  title={formatDate(h.scannedAt)}
+                  title={formatTimestamp(h.scannedAt, locale)}
                   meta={`${h.newModels} ${t("widget.metrics.newModels")} · ${h.priceChanges} ${t("widget.metrics.priceChanges")} · ${h.missingUpstream} ${t("widget.metrics.missing")}`}
                 />
               ))}
@@ -364,9 +385,13 @@ export function ModelCatalogScanRunWidget({
   ) : undefined;
 
   return (
-    <WidgetShell className="gap-4">
-      <WidgetHeader title={t("post.title")} backButton={backButton} />
-      <Div className="grid grid-cols-2 gap-3">
+    <WidgetShell layout="page" className="gap-4">
+      <WidgetHeader
+        size="page"
+        title={t("post.title")}
+        backButton={backButton}
+      />
+      <Div className="grid gap-3 @md:grid-cols-2">
         <BooleanFieldWidget fieldName="force" field={children.force} />
         <BooleanFieldWidget fieldName="sendEmail" field={children.sendEmail} />
       </Div>
@@ -386,7 +411,12 @@ export function ModelCatalogScanRunWidget({
         <P className="text-sm text-muted-foreground">{t("widget.skipped")}</P>
       ) : null}
       {result?.scan && result.report ? (
-        <ReportView scan={result.scan} report={result.report} t={t} />
+        <ReportView
+          scan={result.scan}
+          report={result.report}
+          locale={locale}
+          t={t}
+        />
       ) : null}
     </WidgetShell>
   );

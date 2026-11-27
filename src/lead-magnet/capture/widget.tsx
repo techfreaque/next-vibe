@@ -9,16 +9,30 @@
 
 "use client";
 
+import { SkillSourceFilter } from "next-vibe/agent/skills/enum";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetResponseOnly,
+  useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React, { useCallback, useState } from "react";
 import { z } from "zod";
 
@@ -28,6 +42,59 @@ import { scopedTranslation } from "./i18n";
 type CaptureState = "idle" | "submitting" | "done" | "error";
 
 const emailSchema = z.email();
+
+export function LeadMagnetCaptureContainer({
+  field,
+}: {
+  field: typeof captureEndpoints.POST.fields;
+}): React.JSX.Element {
+  const t = useWidgetTranslation<typeof captureEndpoints.POST>();
+  const result = useWidgetValue<typeof captureEndpoints.POST>();
+  const responseOnly = useWidgetResponseOnly();
+  const { children } = field;
+
+  return (
+    <AdminForm
+      title={t("submit.groups.main.title")}
+      description={t("submit.description")}
+      primaryAction={
+        !responseOnly && !result ? (
+          <SubmitButtonWidget<typeof captureEndpoints.POST>
+            field={{ text: "form.send" }}
+          />
+        ) : undefined
+      }
+      result={
+        result ? (
+          <ResultBanner
+            variant={result.captured ? "success" : "info"}
+            title={
+              result.captured
+                ? t("submit.response.captured")
+                : t("submit.response.nextStep")
+            }
+          >
+            <Button variant="outline" asChild>
+              <Link href={result.signupUrl}>{t("form.signUp")}</Link>
+            </Button>
+          </ResultBanner>
+        ) : undefined
+      }
+    >
+      {!responseOnly && !result && (
+        <AdminFormSection title={t("submit.groups.main.description")}>
+          <EntityPickerFieldWidget
+            fieldName="skillId"
+            field={children.skillId}
+            listData={{ sourceFilter: SkillSourceFilter.COMMUNITY }}
+          />
+          <TextFieldWidget fieldName="firstName" field={children.firstName} />
+          <EmailFieldWidget fieldName="email" field={children.email} />
+        </AdminFormSection>
+      )}
+    </AdminForm>
+  );
+}
 
 export function LeadCaptureForm({
   skillId,

@@ -175,6 +175,10 @@ export const translations: typeof enTranslations = {
       taskInput: {
         label: "Task Input",
         description: "Datos de entrada JSON para la tarea",
+        invalidJson:
+          "No es válido JSON. Compruebe las cotizaciones, comas y corchetes.",
+        notObject:
+          'La entrada de tareas debe ser un objeto JSON, como { "key": "value" }.',
       },
       hidden: {
         label: "Oculto",
@@ -300,7 +304,7 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "Task ID",
+        label: "Clave de la tarea",
         description: "Unico identificador de la tarea para eliminar",
       },
     },

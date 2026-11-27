@@ -7,7 +7,6 @@ import { Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { InputKeyboardEvent } from "../../web/components/input";
 import type {
   TagOption,
   TagsFieldProps,
@@ -29,6 +28,7 @@ export function TagsField<TKey extends string>({
   allowCustom = true,
   disabled = false,
   className,
+  inputLabel,
   t,
 }: TagsFieldProps<TKey>): React.JSX.Element {
   const { locale } = useTranslation();
@@ -89,18 +89,6 @@ export function TagsField<TKey extends string>({
     onChange(value.filter((tag: string) => tag !== tagToRemove));
   };
 
-  const handleKeyPress = (e: InputKeyboardEvent): void => {
-    // Input component doesn't actually use onKeyPress on native, but we accept it for API compatibility
-    // This handler won't be called on native TextInput
-    if (e.key === "Enter" && inputValue.trim()) {
-      if (allowCustom) {
-        addTag(inputValue);
-      }
-    } else if (e.key === "Backspace" && !inputValue && value.length > 0) {
-      removeTag(value[value.length - 1]);
-    }
-  };
-
   const handleInputFocus = (): void => {
     if (suggestions.length > 0) {
       setShowSuggestions(true);
@@ -147,6 +135,10 @@ export function TagsField<TKey extends string>({
             <UIText className="text-xs">{getTagLabel(tag)}</UIText>
             {!disabled && (
               <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={globalT("ui.multiSelect.remove", {
+                  label: getTagLabel(tag),
+                })}
                 onPress={() => removeTag(tag)}
                 className="h-3 w-3 items-center justify-center"
               >
@@ -163,16 +155,28 @@ export function TagsField<TKey extends string>({
             onOpenChange={handleSuggestionsOpenChange}
           >
             <PopoverTrigger>
-              <View className="flex-1 min-w-[120px]">
+              <View className="flex-1 min-w-[120px] flex-row items-center">
                 <Input
+                  aria-label={inputLabel}
                   value={inputValue}
                   onChangeText={setInputValue}
-                  onKeyPress={handleKeyPress}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
                   placeholder={value.length === 0 ? placeholder : ""}
-                  className="border-0 p-0 h-6 bg-transparent"
+                  className="flex-1 border-0 p-0 h-6 bg-transparent"
                 />
+                {allowCustom && inputValue.trim().length > 0 && (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={globalT("common.addCustomValue", {
+                      value: inputValue.trim(),
+                    })}
+                    className="h-8 w-8 items-center justify-center"
+                    onPress={() => addTag(inputValue)}
+                  >
+                    <Plus size={16} className="text-foreground" />
+                  </Pressable>
+                )}
               </View>
             </PopoverTrigger>
 
@@ -209,26 +213,6 @@ export function TagsField<TKey extends string>({
                       </View>
                     ),
                   )}
-
-                  {allowCustom &&
-                    inputValue.trim() &&
-                    !filteredSuggestions.some(
-                      (s: TagOption<TKey>) => s.value === inputValue.trim(),
-                    ) && (
-                      <View className="p-2 border-t border-border">
-                        <Pressable
-                          onPress={() => addTag(inputValue)}
-                          className="flex-row items-center w-full h-8 px-2 rounded-sm active:bg-accent"
-                        >
-                          <Plus size={14} className="mr-2 text-foreground" />
-                          <UIText className="text-base">
-                            {globalT("common.addCustomValue", {
-                              value: inputValue.trim(),
-                            })}
-                          </UIText>
-                        </Pressable>
-                      </View>
-                    )}
                 </ScrollView>
               </PopoverContent>
             )}

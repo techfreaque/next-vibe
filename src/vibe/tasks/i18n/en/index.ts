@@ -119,7 +119,7 @@ export const translations = {
         "every {{interval}} hours starting at hour {{start}}",
       atHours: "at hours {{hours}}",
       fromHourToHour: "from hour {{from}} to {{to}}",
-      atHour: "at hour {{hour}}",
+      atHour: "at {{hour}}",
     },
     calendar: {
       onDays: "on days {{days}}",

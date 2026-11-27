@@ -332,14 +332,18 @@ export function AdminPayoutsContainer({
     navigate(
       () =>
         import("@/users/view/definition").then((module) => module.default.GET),
-      { data: { userId: item.userId } },
+      {
+        data: { userId: item.userId },
+      },
     );
   }
 
   function openCodeReport(code: string): void {
     navigate(
       () => import("../code/definition").then((module) => module.default.GET),
-      { data: { code } },
+      {
+        data: { code },
+      },
     );
   }
 
@@ -1033,7 +1037,9 @@ export function PayoutActionContainer({
     : undefined;
   const allowedActions = payout ? getAdminPayoutActions(payout) : [];
   const allowed =
-    !read.isFetching && Boolean(action && allowedActions.includes(action));
+    !value?.success &&
+    !read.isFetching &&
+    Boolean(action && allowedActions.includes(action));
 
   const { pop, canGoBack } = useWidgetNavigation();
   const headerTitle =
@@ -1113,18 +1119,24 @@ export function PayoutActionContainer({
               )}
             </DetailGrid>
           )}
-          {payout && allowedActions.length > 1 && (
-            <SelectFieldWidget
-              fieldName="action"
-              field={{
-                ...children.action,
-                options: children.action.options.filter((option) =>
-                  allowedActions.includes(option.value),
-                ),
-              }}
-            />
-          )}
-          {payout &&
+          {!value?.success &&
+            payout &&
+            allowedActions.length > 0 &&
+            (allowedActions.length > 1 ||
+              !action ||
+              !allowedActions.includes(action)) && (
+              <SelectFieldWidget
+                fieldName="action"
+                field={{
+                  ...children.action,
+                  options: children.action.options.filter((option) =>
+                    allowedActions.includes(option.value),
+                  ),
+                }}
+              />
+            )}
+          {!value?.success &&
+            payout &&
             (!allowedActions.length ||
               Boolean(action && !allowedActions.includes(action))) && (
               <Span className="text-sm text-muted-foreground">

@@ -87,9 +87,9 @@ export const translations = {
     },
   },
   customerId: {
-    label: "Customer ID",
-    description: "Stripe customer identifier",
-    placeholder: "Enter customer ID",
+    label: "Customer",
+    description: "Choose the account linked to the Stripe customer.",
+    placeholder: "Find a customer",
   },
   amount: {
     label: "Amount",

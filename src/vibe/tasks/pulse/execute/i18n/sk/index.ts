@@ -22,8 +22,9 @@ export const translations: typeof enTranslations = {
         description: "Skúšobné spustenie bez vykonania zmien",
       },
       taskNames: {
-        label: "Názvy úloh",
-        description: "Konkrétne názvy úloh, ktoré sa majú vykonať (nepovinné)",
+        label: "Aliasy úloh",
+        description:
+          "Zadajte alias koncového bodu a stlačte Enter. Prázdne pole zahrnie všetky príslušné úlohy.",
       },
       force: {
         label: "Vynútiť spustenie",

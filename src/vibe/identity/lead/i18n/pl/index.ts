@@ -5309,6 +5309,8 @@ export const translations: typeof enTranslations = {
       },
       patch: {
         error: {
+          invalidStatusTransition:
+            "Nie można zmienić statusu tego leada z {{current}} na {{next}}.",
           not_found: {
             title: "Lead nie znaleziony",
           },

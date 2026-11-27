@@ -14,6 +14,10 @@ export const translations: typeof enTranslations = {
       description:
         "Surveiller la santé et les statistiques d'exécution du pulse",
     },
+    widget: {
+      refresh: "Actualiser",
+      noData: "Aucune exécution",
+    },
     fields: {
       status: {
         title: "Statut",

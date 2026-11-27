@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     description:
       "Disattivare un account. Non può disattivare gli account di sistema o gli account con le linee di inserimento della rivista postate.",
     accountId: {
-      label: "Account ID",
+      label: "Conto",
       description: "L'account per disattivare",
-      placeholder: "Account UUID",
+      placeholder: "Scegli un conto",
     },
     errors: {
       unauthorized: {

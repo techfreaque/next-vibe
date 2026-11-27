@@ -4,6 +4,7 @@
  */
 
 "use client";
+import { formatTimestamp } from "next-vibe/core/i18n/core/localization-utils";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -20,6 +21,7 @@ import { openInNewTab } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -73,6 +75,7 @@ export function LeadEngagementTrackingContainer({
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const locale = useWidgetLocale();
   const user = useWidgetUser();
   // Lead/user pickers list admin-only endpoints — visitors are tracked via their own lead cookie
   const isAdmin =
@@ -100,11 +103,11 @@ export function LeadEngagementTrackingContainer({
   }, [navigate]);
 
   const engagementTypeLabel = data?.responseEngagementType
-    ? String(data.responseEngagementType).replaceAll("_", " ")
+    ? t(data.responseEngagementType)
     : null;
 
   const createdAtFormatted = data?.createdAt
-    ? new Date(String(data.createdAt)).toLocaleString()
+    ? formatTimestamp(data.createdAt, locale)
     : null;
 
   return (
@@ -161,23 +164,8 @@ export function LeadEngagementTrackingContainer({
           {/* Key fields */}
           <Div className="flex flex-col gap-0">
             <MetadataRow
-              label={t("widget.post.labels.engagementId")}
-              value={data?.id}
-              mono
-            />
-            <MetadataRow
               label={t("widget.post.labels.type")}
               value={engagementTypeLabel}
-            />
-            <MetadataRow
-              label={t("widget.post.labels.leadId")}
-              value={leadId}
-              mono
-            />
-            <MetadataRow
-              label={t("widget.post.labels.campaignId")}
-              value={data?.responseCampaignId}
-              mono
             />
             <MetadataRow
               label={t("widget.post.labels.ipAddress")}
@@ -233,7 +221,7 @@ export function LeadEngagementTrackingContainer({
             <Span className="text-xs text-muted-foreground mr-auto">
               {t("widget.post.nextSteps")}
             </Span>
-            {leadId && (
+            {isAdmin && leadId && (
               <Button
                 type="button"
                 variant="outline"
@@ -490,16 +478,6 @@ export function LeadClickTrackingContainer({
 
           {/* Details */}
           <Div className="flex flex-col gap-0">
-            <MetadataRow
-              label={t("widget.get.labels.leadId")}
-              value={leadId}
-              mono
-            />
-            <MetadataRow
-              label={t("widget.get.labels.campaignId")}
-              value={data?.responseCampaignId}
-              mono
-            />
             {data?.redirectUrl && (
               <MetadataRow
                 label={t("widget.get.labels.redirectUrl")}
@@ -526,7 +504,7 @@ export function LeadClickTrackingContainer({
                 {t("widget.get.openUrlButton")}
               </Button>
             )}
-            {leadId && (
+            {isAdmin && leadId && (
               <Button
                 type="button"
                 variant="outline"

@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     description:
       "Desactivar una cuenta. No puede desactivar cuentas del sistema o cuentas con las líneas de entrada de la revista publicadas.",
     accountId: {
-      label: "Cuenta ID",
+      label: "Cuenta",
       description: "La cuenta para desactivar",
-      placeholder: "Cuenta UUID",
+      placeholder: "Selecciona una cuenta",
     },
     errors: {
       unauthorized: {

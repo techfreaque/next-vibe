@@ -149,10 +149,18 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         currency: data.currency,
       });
 
-      const stripeCustomerId = await this.findStripeCustomerByUserId(
-        userId,
-        logger,
-      );
+      let invoiceUserId = data.customerId ?? userId;
+      if (data.customerId?.startsWith("cus_")) {
+        const [customer] = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.stripeCustomerId, data.customerId))
+          .limit(1);
+        invoiceUserId = customer?.id ?? "";
+      }
+      const stripeCustomerId = invoiceUserId
+        ? await this.findStripeCustomerByUserId(invoiceUserId, logger)
+        : null;
       if (!stripeCustomerId) {
         logger.error("payment.invoice.error.customerNotFound", { userId });
         return fail({
@@ -164,11 +172,13 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       const invoice = await stripeClient.invoices.create({
         customer: stripeCustomerId,
         collection_method: "send_invoice",
-        days_until_due: data.dueDate ? 30 : undefined,
+        ...(data.dueDate
+          ? { due_date: Math.floor(data.dueDate.getTime() / 1000) }
+          : { days_until_due: 30 }),
         description: data.description,
         metadata: {
-          userId,
           ...data.metadata,
+          userId: invoiceUserId,
         },
       });
 
@@ -197,7 +207,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         message: tInvoice("success.created"),
         invoice: {
           id: finalizedInvoice.id,
-          userId,
+          userId: invoiceUserId,
           stripeInvoiceId: finalizedInvoice.id,
           invoiceNumber: finalizedInvoice.number || "N/A",
           amount: data.amount,
@@ -214,7 +224,9 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
                     : InvoiceStatus.DRAFT,
           invoiceUrl: finalizedInvoice.hosted_invoice_url || "",
           invoicePdf: finalizedInvoice.invoice_pdf || "",
-          dueDate: data.dueDate ? new Date(data.dueDate) : new Date(),
+          dueDate: finalizedInvoice.due_date
+            ? new Date(finalizedInvoice.due_date * 1000)
+            : (data.dueDate ?? new Date(finalizedInvoice.created * 1000)),
           paidAt: finalizedInvoice.status_transitions?.paid_at
             ? new Date(finalizedInvoice.status_transitions.paid_at * 1000)
             : undefined,

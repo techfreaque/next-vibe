@@ -5418,6 +5418,8 @@ export const translations: typeof enTranslations = {
       },
       patch: {
         error: {
+          invalidStatusTransition:
+            "Questo contatto non può passare dallo stato {{current}} allo stato {{next}}.",
           not_found: {
             title: "Piombo non trovato",
           },

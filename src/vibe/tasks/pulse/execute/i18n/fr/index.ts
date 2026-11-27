@@ -23,8 +23,9 @@ export const translations: typeof enTranslations = {
         description: "Simuler l'exécution sans appliquer de modifications",
       },
       taskNames: {
-        label: "Noms des tâches",
-        description: "Noms des tâches précises à exécuter (facultatif)",
+        label: "Alias de tâches",
+        description:
+          "Saisissez l’alias d’un point d’accès et appuyez sur Entrée. Laissez le champ vide pour inclure toutes les tâches concernées.",
       },
       force: {
         label: "Forcer l'exécution",

@@ -13,6 +13,10 @@ export const translations: typeof enTranslations = {
       title: "Prevádzkový stav Pulse",
       description: "Sleduje stav a štatistiky spustení Pulse.",
     },
+    widget: {
+      refresh: "Obnoviť",
+      noData: "Zatiaľ bez spustení",
+    },
     fields: {
       status: {
         title: "Stav",

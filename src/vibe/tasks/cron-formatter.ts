@@ -88,6 +88,14 @@ function generateDescription(
 ): string {
   const parts: string[] = [];
   const { t } = scopedTranslation.scopedT(locale);
+  const fixedTime =
+    /^(?:[01]?\d|2[0-3])$/u.test(hour) && /^[0-5]?\d$/u.test(minute)
+      ? new Intl.DateTimeFormat(locale, {
+          timeZone: "UTC",
+          hour: "numeric",
+          minute: "2-digit",
+        }).format(Date.UTC(2000, 0, 1, Number(hour), Number(minute)))
+      : undefined;
 
   // Handle frequency
   if (
@@ -136,7 +144,7 @@ function generateDescription(
         to: end,
       }),
     );
-  } else if (minute !== "0") {
+  } else if (minute !== "0" && !fixedTime) {
     parts.push(
       t("cron.patterns.atMinute", {
         minute,
@@ -183,7 +191,7 @@ function generateDescription(
   } else {
     parts.push(
       t("cron.patterns.atHour", {
-        hour: formatHour(hour, locale),
+        hour: fixedTime ?? formatHour(hour, locale),
       }),
     );
   }

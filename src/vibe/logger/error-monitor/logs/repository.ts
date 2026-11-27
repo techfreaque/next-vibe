@@ -690,19 +690,30 @@ export class ErrorLogsRepository {
           .update(errorLogs)
           .set({ resolved: data.resolved })
           .where(
-            sql`${errorLogs.message} = (SELECT e.message FROM ${errorLogs} e WHERE e.fingerprint = ${data.similarTo})`,
+            and(
+              sql`${errorLogs.message} = (SELECT e.message FROM ${errorLogs} e WHERE e.fingerprint = ${data.similarTo})`,
+              eq(errorLogs.resolved, !data.resolved),
+            ),
           )
           .returning({ fingerprint: errorLogs.fingerprint });
         if (updated.length === 0) {
-          return fail({
-            message: t("patch.errors.notFound.title"),
-            errorType: ErrorResponseTypes.NOT_FOUND,
-          });
+          const [target] = await db
+            .select({ fingerprint: errorLogs.fingerprint })
+            .from(errorLogs)
+            .where(eq(errorLogs.fingerprint, data.similarTo))
+            .limit(1);
+          if (!target) {
+            return fail({
+              message: t("patch.errors.notFound.title"),
+              errorType: ErrorResponseTypes.NOT_FOUND,
+            });
+          }
         }
         return success({
           responseFingerprint: data.similarTo,
           responseResolved: data.resolved,
           affectedRows: updated.length,
+          affectedFingerprints: updated.map((row) => row.fingerprint),
         });
       }
       if (data.fingerprints && data.fingerprints.length > 0) {

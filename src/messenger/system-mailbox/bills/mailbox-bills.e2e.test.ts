@@ -1,7 +1,9 @@
 import { randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import { and, eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { saveAdminReviewScreenshots } from "next-vibe/tooling/testing/e2e/admin-review-screenshots";
 import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
 import {
   type E2EFixtures,
@@ -66,7 +68,7 @@ describe("E2E: email supplier bill review", () => {
   e2e.it(
     "opens a synthetic receipt, reads protected evidence, and requests missing facts before posting",
     async (fixtures) => {
-      const { page, gotoReady, capture, cleanup, uniqueEmail } = fixtures;
+      const { page, goto, capture, cleanup, uniqueEmail } = fixtures;
       const { companyId, accountId, headers } =
         await prepareMailboxCompany(fixtures);
       const synthetic = uniqueEmail("supplier-receipt");
@@ -135,13 +137,13 @@ describe("E2E: email supplier bill review", () => {
         .getByText("Database error", { exact: true })
         .last();
       const openReviewList = async (): Promise<void> => {
-        await gotoReady(listPath, () =>
-          receipt.or(unavailable).first().waitFor(),
-        );
+        await goto(listPath, "en-US");
+        await receipt.or(unavailable).first().waitFor();
         if (!(await receipt.isVisible()) && (await unavailable.isVisible())) {
           // Atlas returns Retry-After: 5 when the pooled lead lookup is temporarily saturated.
           await new Promise<void>((resolve) => setTimeout(resolve, 5_000));
-          await gotoReady(listPath, () => receipt.waitFor());
+          await goto(listPath, "en-US");
+          await receipt.waitFor();
         }
       };
       await openReviewList();
@@ -156,10 +158,19 @@ describe("E2E: email supplier bill review", () => {
       expect(read.response.success).toBe(true);
       if (read.response.success)
         expect(read.response.data.contents).toBe(contents);
-      await page
+      const downloadButton = page
         .getByRole("button", { name: String(t("download")), exact: true })
-        .last()
-        .waitFor();
+        .last();
+      await downloadButton.waitFor();
+      await saveAdminReviewScreenshots(page, "mail-bill-evidence", "en-US");
+      const [download] = await Promise.all([
+        page.waitForEvent("download"),
+        downloadButton.click(),
+      ]);
+      expect(await download.failure()).toBeNull();
+      expect(await readFile(await download.path(), "utf8")).toBe(
+        "Synthetic receipt fixture.",
+      );
 
       await openReviewList();
       await page

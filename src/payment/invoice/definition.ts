@@ -56,12 +56,17 @@ const { POST } = createEndpoint({
       // REQUEST FIELDS
       customerId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: async () =>
+          (await import("@/users/list/definition")).default.GET,
+        labelField: "privateName",
         label: "customerId.label" as const,
         description: "customerId.description" as const,
         placeholder: "customerId.placeholder" as const,
         columns: 12,
-        schema: z.string().optional(),
+        schema: z
+          .union([z.uuid(), z.string().regex(/^cus_[A-Za-z0-9]+$/u)])
+          .optional(),
       }),
 
       amount: requestField(scopedTranslation, {
@@ -115,7 +120,9 @@ const { POST } = createEndpoint({
         description: "dueDate.description" as const,
         placeholder: "dueDate.placeholder" as const,
         columns: 12,
-        schema: z.string().optional(),
+        schema: dateSchema
+          .refine((date) => Number.isFinite(date.getTime()))
+          .optional(),
       }),
 
       metadata: requestField(scopedTranslation, {
@@ -152,7 +159,7 @@ const { POST } = createEndpoint({
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.id" as const,
-            schema: z.uuid(),
+            schema: z.string().min(1),
           }),
           userId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
@@ -187,12 +194,12 @@ const { POST } = createEndpoint({
           invoiceUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.invoiceUrl" as const,
-            schema: z.string().url(),
+            schema: z.union([z.url(), z.literal("")]),
           }),
           invoicePdf: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.invoice.invoicePdf" as const,
-            schema: z.string().url(),
+            schema: z.union([z.url(), z.literal("")]),
           }),
           dueDate: responseField(scopedTranslation, {
             type: WidgetType.TEXT,

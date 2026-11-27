@@ -5,6 +5,7 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -19,6 +20,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import { type JSX } from "react";
 
 import { scopedTranslation as companiesScopedTranslation } from "../../../../i18n";
+import { useCompanyMemberLabel } from "../../use-company-member-label";
 import type definition from "./definition";
 
 export function UpdateMemberRoleWidget({
@@ -30,6 +32,11 @@ export function UpdateMemberRoleWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.PATCH>();
   const locale = useWidgetLocale();
+  const form = useWidgetForm<typeof definition.PATCH>();
+  const memberLabel = useCompanyMemberLabel(
+    form?.watch("companyId") ?? "",
+    form?.watch("memberId") ?? "",
+  );
   const { t: tCompanies } = companiesScopedTranslation.scopedT(locale);
 
   const newRole = data?.result?.role;
@@ -49,7 +56,7 @@ export function UpdateMemberRoleWidget({
   return (
     <AdminForm
       title={t("updateRole.patch.widget.title")}
-      description={t("updateRole.patch.description")}
+      description={memberLabel ?? t("updateRole.patch.description")}
       backButton={backButton}
       primaryAction={
         newRole ? null : (

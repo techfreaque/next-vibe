@@ -46,6 +46,7 @@ import { scopedTranslation } from "./i18n";
 const ReferralsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ReferralsContainer })),
 );
+const ReferralPayoutAction = lazyWidget(() => import("./payout-action-widget"));
 
 /**
  * GET: Referral dashboard with codes, earnings, and payout requests
@@ -121,7 +122,7 @@ export const { GET } = createEndpoint({
       }),
 
       // === SORTING OPTIONS ===
-      sortingOptions: objectField(scopedTranslation, {
+      sortingOptions: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.sortingOptions.title" as const,
         description: "get.sortingOptions.description" as const,
@@ -346,42 +347,40 @@ export const { GET } = createEndpoint({
       }),
 
       // === PAGINATION INFO ===
-      paginationInfo: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        layoutType: LayoutType.HORIZONTAL,
-        noCard: true,
-        gap: "4",
+      paginationInfo: {
+        schemaType: "object",
+        type: WidgetType.PAGINATION,
         order: 4,
         usage: { request: "data", response: true },
         children: {
           page: requestResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "get.page.label" as const,
+            label: "get.page.label",
             columns: 3,
             schema: z.coerce.number().optional().default(1),
           }),
           limit: requestResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "get.limit.label" as const,
+            label: "get.limit.label",
             columns: 3,
             schema: z.coerce.number().optional().default(20),
           }),
           totalCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            label: "get.response.totalCount" as const,
+            label: "get.response.totalCount",
             columns: 3,
             schema: z.coerce.number(),
           }),
           pageCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            label: "get.response.pageCount" as const,
+            label: "get.response.pageCount",
             columns: 3,
             schema: z.coerce.number(),
           }),
         },
-      }),
+      },
     },
   }),
 
@@ -485,15 +484,14 @@ export const { POST } = createEndpoint({
   tags: ["post.title" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    noCard: true,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: ReferralPayoutAction,
+    usage: { request: "data", response: true } as const,
     children: {
       requestId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        hidden: true,
         label: "post.requestId.label" as const,
         description: "post.requestId.description" as const,
         placeholder: "post.requestId.placeholder" as const,

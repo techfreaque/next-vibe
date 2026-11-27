@@ -176,6 +176,10 @@ export const translations: typeof enTranslations = {
       taskInput: {
         label: "Entrée de la tâche",
         description: "Données d'entrée JSON de la tâche",
+        invalidJson:
+          "JSON invalide. Vérifiez les guillemets, virgules et crochets.",
+        notObject:
+          'L\'entrée de la tâche doit être un objet JSON, par exemple { "key": "value" }.',
       },
       hidden: {
         label: "Masquée",
@@ -302,7 +306,7 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       id: {
-        label: "ID de la tâche",
+        label: "Clé de la tâche",
         description: "Identifiant unique de la tâche à supprimer",
       },
     },

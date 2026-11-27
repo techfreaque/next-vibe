@@ -22,8 +22,9 @@ export const translations: typeof enTranslations = {
         description: "Testlauf ohne tatsächliche Änderungen durchführen",
       },
       taskNames: {
-        label: "Aufgabennamen",
-        description: "Spezifische Aufgabennamen zum Ausführen (optional)",
+        label: "Aufgaben-Aliasse",
+        description:
+          "Endpunkt-Alias eingeben und Enter drücken. Ohne Auswahl werden alle fälligen Aufgaben berücksichtigt.",
       },
       force: {
         label: "Erzwungene Ausführung",

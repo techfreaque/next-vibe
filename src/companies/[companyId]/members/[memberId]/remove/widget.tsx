@@ -7,6 +7,7 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Span } from "next-vibe/ui/components/span";
 import {
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -15,13 +16,19 @@ import { AdminForm } from "next-vibe/unified-ui/widgets/containers/admin-form/wi
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
+import { useCompanyMemberLabel } from "../../use-company-member-label";
 import type definition from "./definition";
 
 export function RemoveMemberWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
+  const form = useWidgetForm<typeof definition.POST>();
   const t = useWidgetTranslation<typeof definition.POST>();
   const removedId = data?.removedMemberId;
+  const memberLabel = useCompanyMemberLabel(
+    form?.watch("companyId") ?? "",
+    form?.watch("memberId") ?? "",
+  );
 
   const backButton = navigation.canGoBack ? (
     <Button
@@ -38,6 +45,7 @@ export function RemoveMemberWidget(): JSX.Element {
   return (
     <AdminForm
       title={t("removeMember.post.widget.confirmTitle")}
+      description={memberLabel}
       backButton={backButton}
       secondaryActions={
         !removedId && navigation.canGoBack ? (

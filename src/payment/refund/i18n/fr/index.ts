@@ -52,8 +52,10 @@ export const translations: typeof enTranslations = {
     customerEmail: "E-mail du client",
     customerId: "Identifiant client",
     originalAmount: "Montant initial",
+    chooseTransaction: "Rechercher un paiement",
     enterTransaction:
-      "Saisissez un identifiant de transaction pour charger les données du paiement.",
+      "Ouvrez un paiement dans les transactions pour vérifier le débit et le montant du remboursement.",
+    transactionDate: "Débité le",
     lookupLoading: "Chargement de la transaction enregistrée",
     transactionMissing: "Transaction introuvable",
     lookupFailed: "Impossible de charger la transaction",
@@ -68,7 +70,7 @@ export const translations: typeof enTranslations = {
     review: "Vérifier le montant",
     confirmTitle: "Confirmer le remboursement Stripe",
     confirmDescription:
-      "Stripe remboursera la transaction {{transactionId}} pour {{email}}. Cette opération transfère de l’argent.",
+      "Stripe remboursera le paiement de {{email}}. Cette action restitue des fonds.",
     confirm: "Émettre le remboursement",
     cancel: "Annuler",
   },

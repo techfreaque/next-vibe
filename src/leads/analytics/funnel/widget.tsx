@@ -152,8 +152,8 @@ export function FunnelReportWidget(): JSX.Element {
   );
   if (!value) {
     return (
-      <WidgetShell>
-        <WidgetHeader title={t("get.title")} />
+      <WidgetShell layout="page">
+        <WidgetHeader size="page" title={t("get.title")} />
         {toolbar}
         <LoadingBlock message={t("widget.loading")} />
       </WidgetShell>
@@ -180,8 +180,8 @@ export function FunnelReportWidget(): JSX.Element {
   const usedDimension = dimension ?? value.dimensionUsed;
 
   return (
-    <WidgetShell>
-      <WidgetHeader title={t("get.title")} />
+    <WidgetShell layout="page">
+      <WidgetHeader size="page" title={t("get.title")} />
       {toolbar}
       <SectionGroup
         title={t("widget.filtersTitle")}
@@ -193,6 +193,7 @@ export function FunnelReportWidget(): JSX.Element {
       </SectionGroup>
       <KpiGrid columns={4}>
         <KpiTile
+          wrapLabel
           label={stepLabel.humans}
           value={now("humans")}
           previous={prev("humans")}
@@ -206,6 +207,7 @@ export function FunnelReportWidget(): JSX.Element {
           }
         />
         <KpiTile
+          wrapLabel
           label={t("widget.signupRate")}
           value={ratio(now("signups"), now("humans"))}
           previous={prevRatio("signups", "humans")}
@@ -220,6 +222,7 @@ export function FunnelReportWidget(): JSX.Element {
           }
         />
         <KpiTile
+          wrapLabel
           label={t("widget.payRate")}
           value={ratio(now("payers"), now("signups"))}
           previous={prevRatio("payers", "signups")}
@@ -234,6 +237,7 @@ export function FunnelReportWidget(): JSX.Element {
           }
         />
         <KpiTile
+          wrapLabel
           label={t("widget.overallRate")}
           value={ratio(now("payers"), now("humans"))}
           previous={prevRatio("payers", "humans")}
@@ -402,12 +406,14 @@ function SignupStepsSection({
     >
       <KpiGrid columns={4}>
         <KpiTile
+          wrapLabel
           label={label.started}
           value={now("started")}
           previous={prevStarted}
           locale={locale}
         />
         <KpiTile
+          wrapLabel
           label={t("widget.confirmRate")}
           value={ratio(now("confirmed"), now("started"))}
           previous={
@@ -424,6 +430,7 @@ function SignupStepsSection({
           locale={locale}
         />
         <KpiTile
+          wrapLabel
           label={label.bounced}
           value={now("bounced")}
           previous={prev("bounced")}
@@ -432,6 +439,7 @@ function SignupStepsSection({
           locale={locale}
         />
         <KpiTile
+          wrapLabel
           label={label.expired}
           value={now("expired")}
           previous={prev("expired")}
@@ -519,6 +527,7 @@ function WallStepsSection({
     >
       <KpiGrid columns={3}>
         <KpiTile
+          wrapLabel
           label={label.creditWallGuests}
           value={now("creditWallGuests")}
           previous={prev("creditWallGuests")}
@@ -527,6 +536,7 @@ function WallStepsSection({
           locale={locale}
         />
         <KpiTile
+          wrapLabel
           label={label.creditWallAccounts}
           value={now("creditWallAccounts")}
           previous={prev("creditWallAccounts")}
@@ -535,6 +545,7 @@ function WallStepsSection({
           locale={locale}
         />
         <KpiTile
+          wrapLabel
           label={label.consentDeclined}
           value={now("consentDeclined")}
           previous={prev("consentDeclined")}

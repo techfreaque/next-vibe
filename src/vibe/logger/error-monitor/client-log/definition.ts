@@ -10,19 +10,25 @@ import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "../../../core/definition/enums";
 import { WidgetDataSchema } from "../../../core/utils/json";
 import { UserRole } from "../../../identity/roles/enum";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
-  objectField,
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
 import { CLIENT_LOG_PATH } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const ClientErrorReportWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({
+    default: module.ClientErrorReportWidget,
+  })),
+);
 
 export const { POST } = createEndpoint({
   scopedTranslation,
@@ -45,11 +51,8 @@ export const { POST } = createEndpoint({
     UserRole.SKILL_OFF,
   ],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.title" as const,
-    description: "post.description" as const,
-    layoutType: LayoutType.STACKED,
+  fields: customWidgetObject({
+    render: ClientErrorReportWidget,
     usage: { request: "data", response: true },
     children: {
       level: requestField(scopedTranslation, {

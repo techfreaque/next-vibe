@@ -291,7 +291,13 @@ export class LeadsRepository {
             newStatus,
           });
           return fail({
-            message: t("leadsErrors.batch.update.error.default"),
+            message: t(
+              "leadsErrors.leads.patch.error.invalidStatusTransition",
+              {
+                current: t(currentStatus),
+                next: t(newStatus),
+              },
+            ),
             errorType: ErrorResponseTypes.BAD_REQUEST,
           });
         }
@@ -646,7 +652,7 @@ export class LeadsRepository {
               AND other_l.is_bot = false
           )`,
           hasLinkedUser: sql<boolean>`EXISTS (
-            SELECT 1 FROM user_lead_links WHERE lead_id = ${leads.id}
+            SELECT 1 FROM user_lead_links WHERE lead_id = "leads"."id"
           )`,
         })
         .from(leads)
@@ -1031,11 +1037,14 @@ export class LeadsRepository {
         ),
       );
     } catch (error) {
-      logger.error("Error fetching lead by ID (internal)", parseError(error));
+      logger.error(
+        "Error fetching lead by ID (internal)",
+        error instanceof Error
+          ? databaseFailureDiagnostics(error)
+          : { errorType: typeof error },
+      );
       return fail({
-        message: t("leadsErrors.leads.get.error.server.detail", {
-          error: parseError(error).message,
-        }),
+        message: t("leadsErrors.leads.get.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1128,27 +1137,30 @@ export class LeadsRepository {
     skillId: string,
     overwrite: boolean,
     logger: EndpointLogger,
-  ): Promise<void> {
+  ): Promise<boolean> {
     try {
-      if (overwrite) {
-        await db
-          .update(leads)
-          .set({ skillId, updatedAt: new Date() })
-          .where(eq(leads.id, leadId));
-      } else {
-        // Only set if not already attributed (first-touch wins)
-        await db
-          .update(leads)
-          .set({ skillId, updatedAt: new Date() })
-          .where(and(eq(leads.id, leadId), sql`${leads.skillId} IS NULL`));
+      const [updated] = await db
+        .update(leads)
+        .set({ skillId, updatedAt: new Date() })
+        .where(
+          and(
+            eq(leads.id, leadId),
+            overwrite ? undefined : sql`${leads.skillId} IS NULL`,
+          ),
+        )
+        .returning({ id: leads.id });
+      if (!updated) {
+        return false;
       }
       logger.debug("Lead skillId updated", { leadId, skillId, overwrite });
+      return true;
     } catch (error) {
       logger.error("Failed to update lead skillId", {
         leadId,
         skillId,
         error: parseError(error).message,
       });
+      return false;
     }
   }
 

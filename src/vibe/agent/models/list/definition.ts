@@ -64,8 +64,7 @@ const { GET } = createEndpoint({
     firstCliArgKey: "modelType",
   },
 
-  // Filters apply on change; no "Show results" button.
-  options: { formOptions: { autoSubmit: true, debounceMs: 300 } },
+  options: { formOptions: { autoSubmit: false } },
 
   fields: customWidgetObject({
     render: ModelsListContainer,

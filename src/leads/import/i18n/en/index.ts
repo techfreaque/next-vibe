@@ -127,7 +127,7 @@ export const translations = {
       description: "Lead import has been initiated successfully",
     },
     widget: {
-      headerTitle: "Import Leads from CSV",
+      headerTitle: "Import leads from CSV",
       exportTemplateButton: "Export Template",
       importGuideTitle: "Import Guide",
       importGuideSubtitle: "Upload a CSV file with the following columns:",

@@ -206,6 +206,7 @@ export const translations = {
     bulk: {
       selected: "{count} selected",
       selectAll: "Select all",
+      selectTask: "Select {{name}}",
       clearSelection: "Clear selection",
       enable: "Enable",
       disable: "Disable",
@@ -214,7 +215,7 @@ export const translations = {
       confirmDeleteTitle: "Delete tasks?",
       confirmDelete: "Delete {count} task(s)? This cannot be undone.",
       cancel: "Cancel",
-      success: "{succeeded} succeeded, {failed} failed",
+      success: "{{succeeded}} succeeded, {{failed}} failed",
     },
     empty: {
       noTasks: "Queue is empty",

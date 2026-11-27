@@ -25,8 +25,9 @@ export const translations: typeof enTranslations = {
           "Eseguire una corsa asciutta senza fare cambiamenti effettivi",
       },
       taskNames: {
-        label: "Nomi delle attività",
-        description: "Nomi specifici per l'esecuzione (opzionale)",
+        label: "Alias delle attività",
+        description:
+          "Inserisci l’alias dell’endpoint e premi Invio. Lascia vuoto per includere tutte le attività idonee.",
       },
       force: {
         label: "Esecuzione della Forza",
