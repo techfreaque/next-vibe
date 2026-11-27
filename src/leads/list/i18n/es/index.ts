@@ -186,6 +186,10 @@ export const translations: typeof enTranslations = {
       description: "Ordenar por resultados",
       placeholder: "Seleccione el orden",
     },
+    includeBots: {
+      label: "Incluir rastreadores",
+      description: "Mostrar leads marcados como bots y rastreadores web",
+    },
     response: {
       title: "Respuesta de la lista principal",
       description: "Listado de cables con metadatos",

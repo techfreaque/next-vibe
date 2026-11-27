@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { and, count, gte, lt, lte, sql } from "drizzle-orm";
+import { and, count, eq, gte, lt, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -20,6 +20,7 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
+import { leads } from "next-vibe/identity/lead/db";
 
 import { creditWallets } from "../../db";
 
@@ -37,12 +38,14 @@ export class QueryCreditsWalletsTotalRepository {
     const { resolution, range, lookback } = data;
     const firstBucket =
       fillGaps([], range, resolution)[0]?.timestamp ?? range.from;
+    const notBotWallet = sql`(${leads.isBot} IS NOT TRUE)`;
 
     const [baselineRows, createdRows] = await Promise.all([
       db
         .select({ total: count() })
         .from(creditWallets)
-        .where(lt(creditWallets.createdAt, firstBucket)),
+        .leftJoin(leads, eq(creditWallets.leadId, leads.id))
+        .where(and(lt(creditWallets.createdAt, firstBucket), notBotWallet)),
       db
         .select({
           bucket: resolutionBucketExpr(resolution, creditWallets.createdAt).as(
@@ -51,10 +54,12 @@ export class QueryCreditsWalletsTotalRepository {
           total: count(),
         })
         .from(creditWallets)
+        .leftJoin(leads, eq(creditWallets.leadId, leads.id))
         .where(
           and(
             gte(creditWallets.createdAt, firstBucket),
             lte(creditWallets.createdAt, range.to),
+            notBotWallet,
           ),
         )
         .groupBy(sql`1`)

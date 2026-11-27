@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { count, desc, gte, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -52,14 +52,19 @@ export class LeadsDashboardRepository {
         LeadStatus.IN_CONTACT,
       ] as const;
 
+      const notBot = eq(leads.isBot, false);
+
       const [activeRow] = await db
         .select({ cnt: count() })
         .from(leads)
         .where(
-          sql`${leads.status} = ANY(ARRAY[${sql.join(
-            activeStatuses.map((s) => sql`${s}`),
-            sql`, `,
-          )}]::text[])`,
+          and(
+            notBot,
+            sql`${leads.status} = ANY(ARRAY[${sql.join(
+              activeStatuses.map((s) => sql`${s}`),
+              sql`, `,
+            )}]::text[])`,
+          ),
         );
 
       const activeLeadsCount = activeRow?.cnt ?? 0;
@@ -68,7 +73,7 @@ export class LeadsDashboardRepository {
       const [newWeekRow] = await db
         .select({ cnt: count() })
         .from(leads)
-        .where(gte(leads.createdAt, sevenDaysAgo));
+        .where(and(notBot, gte(leads.createdAt, sevenDaysAgo)));
 
       const newThisWeekCount = newWeekRow?.cnt ?? 0;
 
@@ -76,7 +81,9 @@ export class LeadsDashboardRepository {
       const [campaignRow] = await db
         .select({ cnt: count() })
         .from(leads)
-        .where(sql`${leads.status} = ${LeadStatus.CAMPAIGN_RUNNING}`);
+        .where(
+          and(notBot, sql`${leads.status} = ${LeadStatus.CAMPAIGN_RUNNING}`),
+        );
 
       const runningCampaignsCount = campaignRow?.cnt ?? 0;
 
@@ -90,16 +97,22 @@ export class LeadsDashboardRepository {
         .select({ cnt: count() })
         .from(leads)
         .where(
-          sql`${leads.status} = ANY(ARRAY[${sql.join(
-            convertedStatuses.map((s) => sql`${s}`),
-            sql`, `,
-          )}]::text[])`,
+          and(
+            notBot,
+            sql`${leads.status} = ANY(ARRAY[${sql.join(
+              convertedStatuses.map((s) => sql`${s}`),
+              sql`, `,
+            )}]::text[])`,
+          ),
         );
 
       const convertedCount = convertedRow?.cnt ?? 0;
 
-      // Total leads count
-      const [totalRow] = await db.select({ cnt: count() }).from(leads);
+      // Total leads count (excluding flagged crawler/bot leads)
+      const [totalRow] = await db
+        .select({ cnt: count() })
+        .from(leads)
+        .where(notBot);
       const totalLeadsCount = totalRow?.cnt ?? 0;
 
       // Conversion rate
@@ -115,6 +128,7 @@ export class LeadsDashboardRepository {
           cnt: count(),
         })
         .from(leads)
+        .where(notBot)
         .groupBy(leads.status);
 
       const statusBreakdown: Record<string, number> = {};
@@ -135,7 +149,10 @@ export class LeadsDashboardRepository {
         .from(leads)
         // Anonymous visitors have no identity to show; list identified leads.
         .where(
-          sql`(coalesce(trim(${leads.email}), '') <> '' or coalesce(trim(${leads.businessName}), '') <> '')`,
+          and(
+            notBot,
+            sql`(coalesce(trim(${leads.email}), '') <> '' or coalesce(trim(${leads.businessName}), '') <> '')`,
+          ),
         )
         .orderBy(desc(leads.createdAt))
         .limit(5);

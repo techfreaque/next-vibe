@@ -66,7 +66,7 @@ function stageRows(
       // MATERIALIZED: the bot-family regexes run once per lead instead of
       // once per stage FILTER (32 s -> 6 s for 300 days on prod).
       sql`WITH s AS MATERIALIZED (${leadFactsSql(
-        sql`l.created_at >= ${utcSql(range.from)} AND l.created_at <= ${utcSql(range.to)}`,
+        sql`NOT l.is_bot AND l.created_at >= ${utcSql(range.from)} AND l.created_at <= ${utcSql(range.to)}`,
       )})
         SELECT f.bucket, ${stepCounts(sql`f.`)}
         FROM (

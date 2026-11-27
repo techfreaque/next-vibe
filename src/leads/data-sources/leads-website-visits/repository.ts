@@ -19,7 +19,7 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
-import { leadEngagements } from "next-vibe/identity/lead/db";
+import { leadEngagements, leads } from "next-vibe/identity/lead/db";
 import { EngagementTypes } from "next-vibe/identity/lead/enum";
 
 export class QueryLeadsWebsiteVisitsRepository {
@@ -42,8 +42,10 @@ export class QueryLeadsWebsiteVisitsRepository {
         cnt: count(),
       })
       .from(leadEngagements)
+      .innerJoin(leads, eq(leads.id, leadEngagements.leadId))
       .where(
         and(
+          eq(leads.isBot, false),
           eq(leadEngagements.engagementType, EngagementTypes.WEBSITE_VISIT),
           gte(leadEngagements.timestamp, range.from),
           lte(leadEngagements.timestamp, range.to),

@@ -37,6 +37,7 @@ import {
   DEVICE_FILTER_TO_TYPE,
   DEVICE_TYPE_TO_FILTER,
   FunnelReach,
+  isBotFamily,
   LeadChannelFilter,
   LeadDeviceFilter,
   LeadDimension,
@@ -63,13 +64,27 @@ const chrome131Crawler = (noLeadChat: SQL): SQL => sql`(
 )`;
 
 /**
+ * True when segment filters explicitly request bot/crawler traffic.
+ * Reports that hide flagged `leads.is_bot` rows by default honor this opt-in.
+ */
+export function requestsBotTraffic(filters: LeadSegmentFilters): boolean {
+  if (filters.traffic === TrafficFilter.BOTS) {
+    return true;
+  }
+  if (filters.botFamily && isBotFamily(filters.botFamily)) {
+    return true;
+  }
+  return filters.device === LeadDeviceFilter.BOT;
+}
+
+/**
  * `SELECT` of one row per lead with every derived dimension and funnel stamp.
  * `leadCondition` filters on the `l` (leads) alias, e.g. the creation window.
  */
 export function leadFactsSql(leadCondition: SQL = sql`TRUE`): SQL {
   return sql`
     SELECT l.id, l.created_at, l.geo_country AS country,
-      l.country AS locale_country, l.email, l.business_name,
+      l.country AS locale_country, l.email, l.business_name, l.is_bot,
       ${leadDeviceSql(sql`l.device_type`, sql`ident.ua`, sql`fam.bot_family`)} AS device,
       ${leadBrowserSql(sql`l.browser`, sql`ident.ua`)} AS browser,
       ${leadOsSql(sql`l.os`, sql`ident.ua`)} AS os,
@@ -109,7 +124,7 @@ export function leadFactsSql(leadCondition: SQL = sql`TRUE`): SQL {
       WHERE status = ${PaymentStatus.SUCCEEDED} AND amount > 0 GROUP BY user_id
     ) pay ON pay.user_id = u.id
     CROSS JOIN LATERAL (
-      SELECT ${botFamilySql(sql`ident.ua`, chrome131Crawler(sql`lead_chat.first_at IS NULL`))} AS bot_family
+      SELECT ${botFamilySql(sql`ident.ua`, chrome131Crawler(sql`lead_chat.first_at IS NULL`), sql`l.is_bot`)} AS bot_family
     ) fam
     WHERE ${leadCondition}
   `;
@@ -131,7 +146,7 @@ export function humanLeadCreationsSql(leadCondition: SQL): SQL {
       FROM leads l
       CROSS JOIN LATERAL (SELECT ${leadUserAgentSql("l")} AS ua) ident
       LEFT JOIN growth_journeys j ON j.lead_id = l.id
-      WHERE (${leadCondition}) AND ident.ua IS NOT NULL
+      WHERE (${leadCondition}) AND NOT l.is_bot AND ident.ua IS NOT NULL
     ), agents AS MATERIALIZED (
       SELECT DISTINCT ua FROM cohort
     ), human_agents AS MATERIALIZED (

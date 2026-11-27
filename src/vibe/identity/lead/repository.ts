@@ -358,6 +358,9 @@ export class LeadsRepository {
 
       // Build where conditions
       const conditions: SQL[] = [];
+      if (query.includeBots !== true) {
+        conditions.push(eq(leads.isBot, false));
+      }
 
       // Handle status filters (array of filters)
       if (statusFilters && statusFilters.length > 0) {
@@ -455,9 +458,10 @@ export class LeadsRepository {
 
       // Build base conditions without status filter - used for per-status counts
       // so all tabs show accurate counts simultaneously regardless of active status filter
-      const baseConditions: SQL[] = acquisitionCondition
-        ? [acquisitionCondition]
-        : [];
+      const baseConditions: SQL[] = [
+        ...(query.includeBots !== true ? [eq(leads.isBot, false)] : []),
+        ...(acquisitionCondition ? [acquisitionCondition] : []),
+      ];
       if (campaignStageFilters && campaignStageFilters.length > 0) {
         const mappedStages = campaignStageFilters
           .map((filter) => mapCampaignStageFilter(filter))
@@ -621,6 +625,7 @@ export class LeadsRepository {
           deviceType: leads.deviceType,
           browser: leads.browser,
           os: leads.os,
+          isBot: leads.isBot,
           referralCode: leads.referralCode,
           skillId: leads.skillId,
           emailJourneyVariant: leads.emailJourneyVariant,
@@ -631,8 +636,14 @@ export class LeadsRepository {
           uncensoredConsentVersion: leads.uncensoredConsentVersion,
           // Subqueries for link counts
           linkedLeadsCount: sql<number>`(
-            SELECT COUNT(*)::int FROM lead_lead_links
-            WHERE lead_id_1 = ${leads.id} OR lead_id_2 = ${leads.id}
+            SELECT COUNT(*)::int FROM lead_lead_links lll
+            JOIN leads other_l
+              ON other_l.id = CASE
+                WHEN lll.lead_id_1 = "leads"."id" THEN lll.lead_id_2
+                ELSE lll.lead_id_1
+              END
+            WHERE (lll.lead_id_1 = "leads"."id" OR lll.lead_id_2 = "leads"."id")
+              AND other_l.is_bot = false
           )`,
           hasLinkedUser: sql<boolean>`EXISTS (
             SELECT 1 FROM user_lead_links WHERE lead_id = ${leads.id}
@@ -741,6 +752,7 @@ export class LeadsRepository {
       updatedAt: lead.updatedAt,
       linkedLeadsCount: lead.linkedLeadsCount ?? 0,
       hasLinkedUser: lead.hasLinkedUser ?? false,
+      isBot: lead.isBot ?? false,
       referralCode: lead.referralCode ?? null,
     };
   }
@@ -1540,7 +1552,7 @@ export class LeadsRepository {
       });
 
       // Build where conditions (similar to listLeads)
-      const conditions: SQL[] = [];
+      const conditions: SQL[] = [eq(leads.isBot, false)];
 
       if (query.status) {
         conditions.push(eq(leads.status, query.status));
@@ -1792,7 +1804,7 @@ export class LeadsRepository {
       });
 
       // Build where conditions (same logic as listLeads)
-      const conditions: SQL[] = [];
+      const conditions: SQL[] = [eq(leads.isBot, false)];
 
       // Handle status filters (can be array)
       if (status && Array.isArray(status) && status.length > 0) {

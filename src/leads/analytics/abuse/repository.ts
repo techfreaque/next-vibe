@@ -35,7 +35,12 @@ import { isBotFamilySql } from "../bot-sql";
 import type { BotFamily } from "../enum";
 import { AbuseGroupBy } from "../enum";
 import type { LeadSegmentFilters } from "../filters";
-import { andAll, leadFactsSql, segmentConditions } from "../segment-sql";
+import {
+  andAll,
+  leadFactsSql,
+  requestsBotTraffic,
+  segmentConditions,
+} from "../segment-sql";
 import type {
   AbuseReportRequestOutput,
   AbuseReportResponseOutput,
@@ -54,8 +59,9 @@ function groupKey(groupBy: AbuseGroupByValue): SQL {
 /** Leads created in [previousFrom ?? from, to) that match the segment. */
 function segmentCte(win: AnalyticsWindow, filters: LeadSegmentFilters): SQL {
   const start = win.previousFrom ?? win.from;
+  const botFilter = requestsBotTraffic(filters) ? sql`` : sql`AND NOT l.is_bot`;
   return sql`seg AS (
-    SELECT * FROM (${leadFactsSql(sql`l.created_at >= ${utcSql(start)} AND l.created_at < ${utcSql(win.to)}`)}) f
+    SELECT * FROM (${leadFactsSql(sql`l.created_at >= ${utcSql(start)} AND l.created_at < ${utcSql(win.to)} ${botFilter}`)}) f
     WHERE ${andAll(segmentConditions(filters))}
   )`;
 }

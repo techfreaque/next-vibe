@@ -103,9 +103,20 @@ export class AntiFarmingReportRepository {
           count(*) FILTER (WHERE kind = 'guest' AND granted) AS guest_granted,
           count(*) FILTER (WHERE kind = 'guest' AND NOT granted) AS guest_blocked,
           max(created_at) AS last_cl
-        FROM free_pool_claims
-        WHERE (kind = 'account' AND period = ${month})
-           OR (kind = 'guest' AND created_at >= ${since})
+        FROM free_pool_claims fpc
+        WHERE (
+            (fpc.kind = 'account' AND fpc.period = ${month})
+            OR (fpc.kind = 'guest' AND fpc.created_at >= ${since})
+          )
+          AND NOT (
+            fpc.kind = 'guest'
+            AND fpc.pool_key ~ '^lead:[0-9a-fA-F-]{36}$'
+            AND EXISTS (
+              SELECT 1 FROM leads bl
+              WHERE bl.id = substring(fpc.pool_key from 6)::uuid
+                AND bl.is_bot = true
+            )
+          )
         GROUP BY subnet
       )
       SELECT

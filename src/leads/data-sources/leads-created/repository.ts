@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, gte, lte, sql } from "drizzle-orm";
+import { and, count, eq, gte, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -39,7 +39,11 @@ export class QueryLeadsCreatedRepository {
       })
       .from(leads)
       .where(
-        and(gte(leads.createdAt, range.from), lte(leads.createdAt, range.to)),
+        and(
+          eq(leads.isBot, false),
+          gte(leads.createdAt, range.from),
+          lte(leads.createdAt, range.to),
+        ),
       )
       .groupBy(sql`1`)
       .orderBy(sql`1`);

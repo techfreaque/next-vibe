@@ -114,19 +114,27 @@ export const BOT_FAMILY_PATTERNS: ReadonlyArray<{
   },
 ];
 
-/** Bot family key using the user agent and any corroborating automation evidence. */
+/** Bot family key using the user agent, automation evidence, and optional persisted bot flag. */
 export function botFamilySql(
   userAgent: AnyColumn | SQL,
   browserAutomation: SQL,
+  flaggedBot?: SQL,
 ): SQL<string> {
   const cases = BOT_FAMILY_PATTERNS.map(
     ({ family, pattern }) =>
       sql`WHEN (${userAgent}) ~* ${pattern} THEN ${family}`,
   );
+  const noUaFallback = flaggedBot
+    ? sql`CASE WHEN ${flaggedBot} THEN ${BotFamily.OTHER_BOT} ELSE ${BotFamily.NO_UA} END`
+    : sql`${BotFamily.NO_UA}`;
+  const flaggedBranch = flaggedBot
+    ? sql`WHEN ${flaggedBot} THEN ${BotFamily.OTHER_BOT}`
+    : sql``;
   return sql<string>`(CASE
-    WHEN (${userAgent}) IS NULL OR btrim(${userAgent}) = '' THEN ${BotFamily.NO_UA}
+    WHEN (${userAgent}) IS NULL OR btrim(${userAgent}) = '' THEN ${noUaFallback}
     ${sql.join(cases, sql` `)}
     WHEN ${browserAutomation} THEN ${BotFamily.AUTOMATION}
+    ${flaggedBranch}
     ELSE ${BotFamily.HUMAN}
   END)`;
 }

@@ -58,8 +58,13 @@ export function userPoolLeadIdsSql(
       AND NOT EXISTS (
         SELECT 1 FROM ${leads} other_l
         WHERE other_l.id = nxt.lead_id
-          AND other_l.converted_user_id IS NOT NULL
-          AND other_l.converted_user_id <> ${userId}::uuid
+          AND (
+            other_l.is_bot = true
+            OR (
+              other_l.converted_user_id IS NOT NULL
+              AND other_l.converted_user_id <> ${userId}::uuid
+            )
+          )
       )
     )
     SELECT lead_id FROM pool_leads
@@ -93,7 +98,7 @@ export function guestPoolLeadIdsSql(
       AND NOT EXISTS (
         SELECT 1 FROM ${leads} owned_l
         WHERE owned_l.id = nxt.lead_id
-          AND owned_l.converted_user_id IS NOT NULL
+          AND (owned_l.converted_user_id IS NOT NULL OR owned_l.is_bot = true)
       )
     )
     SELECT lead_id FROM guest_leads

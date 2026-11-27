@@ -62,7 +62,8 @@ export type StringWidgetSchema =
  */
 export type BooleanWidgetSchema =
   | z.ZodBoolean
-  | z.ZodOptional<z.ZodBoolean>
+  // An optional filter may accept both query-string and form encodings.
+  | z.ZodOptional<z.ZodType<boolean>>
   | z.ZodNullable<z.ZodBoolean>
   | z.ZodDefault<z.ZodBoolean>
   | z.ZodDefault<z.ZodOptional<z.ZodBoolean>>

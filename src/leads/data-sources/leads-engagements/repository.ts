@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, gte, lte, sql } from "drizzle-orm";
+import { and, count, eq, gte, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -18,7 +18,7 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
-import { leadEngagements } from "next-vibe/identity/lead/db";
+import { leadEngagements, leads } from "next-vibe/identity/lead/db";
 
 export class QueryLeadsEngagementsRepository {
   static async queryLeadsEngagements(data: {
@@ -40,8 +40,10 @@ export class QueryLeadsEngagementsRepository {
         cnt: count(),
       })
       .from(leadEngagements)
+      .innerJoin(leads, eq(leads.id, leadEngagements.leadId))
       .where(
         and(
+          eq(leads.isBot, false),
           gte(leadEngagements.timestamp, range.from),
           lte(leadEngagements.timestamp, range.to),
         ),

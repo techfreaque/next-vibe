@@ -78,6 +78,10 @@ export const leads = pgTable(
     browser: text("browser"),
     os: text("os"),
 
+    // Verified crawler / bot flag (excluded from user-facing/business counts
+    // and default lead lists, kept for SEO / crawl analytics)
+    isBot: boolean("is_bot").notNull().default(false),
+
     // Referral tracking (first-touch, immutable)
     referralCode: text("referral_code"),
 
@@ -146,6 +150,7 @@ export const leads = pgTable(
         sql`GREATEST(${table.createdAt}, ${table.updatedAt})`,
       )
       .where(sql`${table.email} IS NULL AND ${table.convertedUserId} IS NULL`),
+    index("idx_leads_is_bot").on(table.isBot),
   ],
 );
 

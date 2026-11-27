@@ -186,6 +186,10 @@ export const translations: typeof enTranslations = {
       description: "Ordinare i risultati",
       placeholder: "Selezionare ordine ordinario",
     },
+    includeBots: {
+      label: "Includi crawler",
+      description: "Mostra i lead contrassegnati come bot o crawler",
+    },
     response: {
       title: "Guida alla lista di risposta",
       description: "Elenco delle piste con metadati",

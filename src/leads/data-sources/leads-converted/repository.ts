@@ -43,6 +43,7 @@ export class QueryLeadsConvertedRepository {
       .from(leads)
       .where(
         and(
+          eq(leads.isBot, false),
           gte(leads.convertedAt, range.from),
           lte(leads.convertedAt, range.to),
           eq(leads.status, LeadStatus.SIGNED_UP),

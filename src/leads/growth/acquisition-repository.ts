@@ -120,10 +120,20 @@ const historicalChats = sql`
   GROUP BY 1, 2
 `;
 
-function leadSources(leadCondition: SQL, includeChats = false): SQL {
+function leadSources(
+  leadCondition: SQL,
+  includeChats = false,
+  excludeFlaggedBots = true,
+): SQL {
   const firstChat = includeChats
     ? sql`least(j.first_chat_at, account_chat.first_chat_at, guest_chat.first_chat_at)`
     : sql`j.first_chat_at`;
+  const hasCondition = leadCondition.queryChunks.length > 0;
+  const whereClause = excludeFlaggedBots
+    ? hasCondition
+      ? sql`${leadCondition} AND l.is_bot = false`
+      : sql`WHERE l.is_bot = false`
+    : leadCondition;
   return sql`
     SELECT a.*, ${sourceType(sql`a.observed`)} AS source_type, c.code AS ref_code
     FROM (
@@ -161,7 +171,7 @@ function leadSources(leadCondition: SQL, includeChats = false): SQL {
         FROM lead_referrals lr JOIN referral_codes r ON r.id = lr.referral_code_id
         ORDER BY lr.lead_id, lr.created_at DESC, lr.id DESC
       ) linked ON linked.lead_id = l.id
-      ${leadCondition}
+      ${whereClause}
     ) a
     LEFT JOIN referral_codes c ON c.code = a.candidate_code
     LEFT JOIN users owner ON owner.id = c.owner_user_id
@@ -215,6 +225,7 @@ function visitEvents(range: TimeRange, excludeBots = false): SQL {
       ${sourceType(sql`true`)} AS source_type, a.source, a.medium, a.campaign,
       a.referrer_host, c.code AS ref_code, 1::numeric AS value
     FROM growth_visits a
+    JOIN leads vl ON vl.id = a.lead_id AND vl.is_bot = false
     ${codeJoin}
     WHERE ${between(sql`a.visited_at`, range)}
     ${excludeBots ? sql`AND a.lead_id NOT IN (${botVisitLeads(range)})` : sql``}
@@ -448,6 +459,7 @@ export class AcquisitionRepository {
           ${sourceType(sql`true`)} AS source_type, a.source, a.medium, a.campaign,
           a.referrer_host, c.code AS ref_code, 1::numeric AS value
         FROM growth_visits a
+        JOIN leads vl ON vl.id = a.lead_id AND vl.is_bot = false
         ${codeJoin}
         WHERE a.ref_code IN (${codeList})
           AND ${between(sql`a.visited_at`, range)}
@@ -550,7 +562,7 @@ export class AcquisitionRepository {
         (l.first_chat_at IS NOT NULL)::int AS "firstChats",
         EXISTS (SELECT 1 FROM payments p WHERE p.user_id = l.user_id)::int AS payers,
         coalesce((SELECT sum(p.amount) FROM payments p WHERE p.user_id = l.user_id AND p.currency = ${currency}), 0)::float8 AS revenue
-      FROM (${leadSources(sql`WHERE l.id IN (${idList})`, true)}) l
+      FROM (${leadSources(sql`WHERE l.id IN (${idList})`, true, false)}) l
     `);
     return new Map(rows.map((row) => [row.id, { ...row, currency }]));
   }

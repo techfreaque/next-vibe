@@ -10,7 +10,7 @@
 import "server-only";
 
 import type { SQL } from "drizzle-orm";
-import { and, count, desc, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -34,11 +34,12 @@ import {
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { QueryResultRow } from "pg";
 
-import { BotFamily, LeadDimension } from "../analytics/enum";
+import { BotFamily, LeadDimension, TrafficFilter } from "../analytics/enum";
 import {
   dimensionColumn,
   leadFactsSql,
   matchingLeadIdsSql,
+  requestsBotTraffic,
 } from "../analytics/segment-sql";
 import { AcquisitionSourceFilter } from "../growth/acquisition";
 import { AcquisitionRepository } from "../growth/acquisition-repository";
@@ -161,7 +162,15 @@ export class LeadsListRepository {
         .filter(notNull);
 
       // Everything except status: the status tabs count against these.
+      // Exclude flagged crawler/bot leads by default unless explicitly requested.
       const base: SQL[] = [];
+      const showBots =
+        data.includeBots === true ||
+        data.traffic === TrafficFilter.ALL ||
+        requestsBotTraffic(data);
+      if (!showBots) {
+        base.push(eq(leads.isBot, false));
+      }
       if (stages.length > 0) {
         base.push(inArray(leads.currentCampaignStage, stages));
       }
@@ -245,9 +254,16 @@ export class LeadsListRepository {
             createdAt: leads.createdAt,
             updatedAt: leads.updatedAt,
             referralCode: leads.referralCode,
+            isBot: leads.isBot,
             linkedLeadsCount: sql<number>`(
-              SELECT COUNT(*)::int FROM lead_lead_links
-              WHERE lead_id_1 = ${leads.id} OR lead_id_2 = ${leads.id}
+              SELECT COUNT(*)::int FROM lead_lead_links lll
+              JOIN leads other_l
+                ON other_l.id = CASE
+                  WHEN lll.lead_id_1 = "leads"."id" THEN lll.lead_id_2
+                  ELSE lll.lead_id_1
+                END
+              WHERE (lll.lead_id_1 = "leads"."id" OR lll.lead_id_2 = "leads"."id")
+                AND other_l.is_bot = false
             )`,
             hasLinkedUser: sql<boolean>`EXISTS (
               SELECT 1 FROM user_lead_links WHERE lead_id = ${leads.id}

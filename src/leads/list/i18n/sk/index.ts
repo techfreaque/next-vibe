@@ -186,6 +186,10 @@ export const translations: typeof enTranslations = {
       description: "Poradie zoradenia výsledkov",
       placeholder: "Vyberte poradie zoradenia",
     },
+    includeBots: {
+      label: "Zobraziť crawlerov",
+      description: "Zobraziť označené leady botov a vyhľadávacích crawlerov",
+    },
     response: {
       title: "Výsledok načítania kontaktov",
       description: "Zoznam kontaktov rozdelený na strany s metadátami",

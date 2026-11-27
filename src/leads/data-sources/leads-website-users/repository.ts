@@ -47,6 +47,7 @@ export class QueryLeadsWebsiteUsersRepository {
         .from(leads)
         .where(
           and(
+            eq(leads.isBot, false),
             lt(leads.createdAt, next),
             eq(leads.status, LeadStatus.WEBSITE_USER),
           ),

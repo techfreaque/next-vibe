@@ -298,10 +298,13 @@ export async function claimGuestPool(
   logger: EndpointLogger,
 ): Promise<boolean> {
   const [lead] = await db
-    .select({ ip: leadIp })
+    .select({ ip: leadIp, isBot: leads.isBot })
     .from(leads)
     .where(eq(leads.id, leadId))
     .limit(1);
+  if (lead?.isBot) {
+    return false;
+  }
   const subnet = ipSubnetKey(lead?.ip ?? null);
   if (!subnet) {
     return true;

@@ -19,6 +19,7 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
+import { leads } from "next-vibe/identity/lead/db";
 
 import { growthVisits } from "@/leads/growth/db";
 
@@ -44,9 +45,11 @@ export class QueryReferralsLeadClicksRepository {
         cnt: count(),
       })
       .from(growthVisits)
+      .innerJoin(leads, eq(leads.id, growthVisits.leadId))
       .innerJoin(referralCodes, eq(referralCodes.code, growthVisits.refCode))
       .where(
         and(
+          eq(leads.isBot, false),
           gte(growthVisits.visitedAt, range.from),
           lte(growthVisits.visitedAt, range.to),
         ),

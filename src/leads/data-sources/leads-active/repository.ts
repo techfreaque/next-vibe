@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, count, lt, notInArray } from "drizzle-orm";
+import { and, count, eq, lt, notInArray } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -47,6 +47,7 @@ export class QueryLeadsActiveRepository {
         .from(leads)
         .where(
           and(
+            eq(leads.isBot, false),
             lt(leads.createdAt, next),
             notInArray(leads.status, [
               LeadStatus.BOUNCED,

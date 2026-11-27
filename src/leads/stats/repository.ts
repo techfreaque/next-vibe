@@ -241,7 +241,7 @@ export class LeadStatsRepository {
     dateFrom: Date,
     dateTo: Date,
   ): SQL | undefined {
-    const conditions: SQL[] = [];
+    const conditions: SQL[] = [eq(leads.isBot, false)];
 
     // Date range filter
     conditions.push(gte(leads.createdAt, dateFrom));
@@ -1937,7 +1937,7 @@ export class LeadStatsRepository {
   private static buildNonDateConditions(
     filters: LeadsStatsRequestOutput,
   ): SQL[] {
-    const conditions: SQL[] = [];
+    const conditions: SQL[] = [eq(leads.isBot, false)];
 
     // Add status filter if specified (single value, not array)
     if (filters.status && filters.status !== LeadStatusFilter.ALL) {

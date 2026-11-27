@@ -32,6 +32,7 @@ import { PayoutStatus, ReferralEarningStatus } from "../enum";
  * per code.
  */
 const CLICKED_CODE = sql`growth_visits v
+  JOIN leads vl ON vl.id = v.lead_id AND vl.is_bot = false
   CROSS JOIN LATERAL (
     SELECT rc.id AS code_id FROM referral_codes rc
     WHERE lower(rc.code) = lower(v.ref_code)
@@ -204,7 +205,9 @@ export async function queryCodeMetrics(
     ),
     leads AS (
       SELECT lr.referral_code_id AS code_id, count(DISTINCT lr.lead_id)::int AS n
-      FROM lead_referrals lr JOIN scope s ON s.id = lr.referral_code_id
+      FROM lead_referrals lr
+      JOIN leads l ON l.id = lr.lead_id AND l.is_bot = false
+      JOIN scope s ON s.id = lr.referral_code_id
       WHERE ${span(sql`lr.created_at`, range)}
       GROUP BY 1
     ),
@@ -293,7 +296,9 @@ export async function queryTotals(
     SELECT
       (SELECT count(*)::int FROM ${CLICKED_CODE} JOIN scope s ON s.id = vc.code_id
         WHERE ${span(sql`v.visited_at`, range)}) AS clicks,
-      (SELECT count(DISTINCT lr.lead_id)::int FROM lead_referrals lr JOIN scope s ON s.id = lr.referral_code_id
+      (SELECT count(DISTINCT lr.lead_id)::int FROM lead_referrals lr
+        JOIN leads l ON l.id = lr.lead_id AND l.is_bot = false
+        JOIN scope s ON s.id = lr.referral_code_id
         WHERE ${span(sql`lr.created_at`, range)}) AS leads,
       (SELECT count(*)::int FROM user_referrals ur JOIN scope s ON s.id = ur.referral_code_id
         WHERE ${span(sql`ur.created_at`, range)}) AS signups,
@@ -348,7 +353,9 @@ export async function querySeries(
       WHERE ${span(sql`v.visited_at`, range)} GROUP BY 2
     UNION ALL
     SELECT 'leads', ${bucketSql(sql`lr.created_at`, bucket)}, count(DISTINCT lr.lead_id)::float8
-      FROM lead_referrals lr JOIN scope s ON s.id = lr.referral_code_id
+      FROM lead_referrals lr
+      JOIN leads l ON l.id = lr.lead_id AND l.is_bot = false
+      JOIN scope s ON s.id = lr.referral_code_id
       WHERE ${span(sql`lr.created_at`, range)} GROUP BY 2
     UNION ALL
     SELECT 'signups', ${bucketSql(sql`ur.created_at`, bucket)}, count(*)::float8

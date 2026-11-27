@@ -28,6 +28,7 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
+import { leads } from "next-vibe/identity/lead/db";
 
 import { growthJourneys } from "../../db";
 import {
@@ -57,6 +58,7 @@ export class GrowthFunnelStepRepository {
     const { resolution, range, lookback } = data;
     const column = GrowthFunnelStepRepository.stepColumn(data.step);
     const conditions: SQL[] = [
+      eq(leads.isBot, false),
       isNotNull(column),
       gte(column, range.from),
       lte(column, range.to),
@@ -88,6 +90,7 @@ export class GrowthFunnelStepRepository {
         cnt: count(),
       })
       .from(growthJourneys)
+      .innerJoin(leads, eq(leads.id, growthJourneys.leadId))
       .where(and(...conditions))
       .groupBy(sql`1`)
       .orderBy(sql`1`);

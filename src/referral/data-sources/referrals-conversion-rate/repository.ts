@@ -36,7 +36,9 @@ export class QueryReferralsConversionRateRepository {
     >(sql`
       WITH first_visits AS (
         SELECT v.lead_id, c.id AS code_id, min(v.visited_at) AS first_visit
-        FROM growth_visits v JOIN referral_codes c ON c.code = v.ref_code
+        FROM growth_visits v
+        JOIN leads l ON l.id = v.lead_id AND l.is_bot = false
+        JOIN referral_codes c ON c.code = v.ref_code
         WHERE v.visited_at <= ${range.to.toISOString()}::timestamp
         GROUP BY v.lead_id, c.id
       )

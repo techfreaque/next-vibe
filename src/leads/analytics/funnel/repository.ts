@@ -47,6 +47,7 @@ import {
   andAll,
   dimensionColumn,
   leadFactsSql,
+  requestsBotTraffic,
   segmentConditions,
 } from "../segment-sql";
 import type {
@@ -171,7 +172,11 @@ function signupEventsCte(
   ),
   sev AS (
     SELECT ev.*, f.* FROM ev
-    JOIN (${leadFactsSql(sql`l.id IN (SELECT lead_id FROM ev)`)}) f ON f.id = ev.lead_id
+    JOIN (${leadFactsSql(
+      requestsBotTraffic(filters)
+        ? sql`l.id IN (SELECT lead_id FROM ev)`
+        : sql`NOT l.is_bot AND l.id IN (SELECT lead_id FROM ev)`,
+    )}) f ON f.id = ev.lead_id
     WHERE ${andAll(segmentConditions(filters))}
   )`;
 }
@@ -231,7 +236,11 @@ function wallEventsCte(win: AnalyticsWindow, filters: LeadSegmentFilters): SQL {
   ),
   swev AS (
     SELECT wev.*, f.* FROM wev
-    JOIN (${leadFactsSql(sql`l.id IN (SELECT lead_id FROM wev)`)}) f ON f.id = wev.lead_id
+    JOIN (${leadFactsSql(
+      requestsBotTraffic(filters)
+        ? sql`l.id IN (SELECT lead_id FROM wev)`
+        : sql`NOT l.is_bot AND l.id IN (SELECT lead_id FROM wev)`,
+    )}) f ON f.id = wev.lead_id
     WHERE ${andAll(segmentConditions(filters))}
   )`;
 }
@@ -246,8 +255,9 @@ function isWallStep(value: string): value is WallStep {
 
 function cohortCte(win: AnalyticsWindow, filters: LeadSegmentFilters): SQL {
   const start = win.previousFrom ?? win.from;
+  const botFilter = requestsBotTraffic(filters) ? sql`` : sql`AND NOT l.is_bot`;
   return sql`seg AS (
-    SELECT * FROM (${leadFactsSql(sql`l.created_at >= ${utcSql(start)} AND l.created_at < ${utcSql(win.to)}`)}) f
+    SELECT * FROM (${leadFactsSql(sql`l.created_at >= ${utcSql(start)} AND l.created_at < ${utcSql(win.to)} ${botFilter}`)}) f
     WHERE ${andAll(segmentConditions(filters))}
   )`;
 }

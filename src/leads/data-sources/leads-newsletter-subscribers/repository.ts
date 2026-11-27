@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, count, isNotNull, lt } from "drizzle-orm";
+import { and, count, eq, isNotNull, lt } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -46,6 +46,7 @@ export class QueryLeadsNewsletterSubscribersRepository {
         .from(leads)
         .where(
           and(
+            eq(leads.isBot, false),
             isNotNull(leads.subscriptionConfirmedAt),
             lt(leads.subscriptionConfirmedAt, next),
           ),

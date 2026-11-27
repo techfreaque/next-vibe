@@ -184,6 +184,10 @@ export const translations = {
       description: "Sort order for results",
       placeholder: "Select sort order",
     },
+    includeBots: {
+      label: "Include crawler leads",
+      description: "Show flagged bot and search-engine crawler leads",
+    },
     response: {
       title: "Lead List Response",
       description: "Paginated list of leads with metadata",

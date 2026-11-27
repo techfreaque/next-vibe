@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, gte, isNotNull, lte, sql } from "drizzle-orm";
+import { and, count, eq, gte, isNotNull, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -40,6 +40,7 @@ export class QueryLeadsBouncedRepository {
       .from(leads)
       .where(
         and(
+          eq(leads.isBot, false),
           isNotNull(leads.bouncedAt),
           gte(leads.bouncedAt, range.from),
           lte(leads.bouncedAt, range.to),

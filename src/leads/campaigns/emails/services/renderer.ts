@@ -466,6 +466,7 @@ export class EmailRendererService {
       language: language,
       status: LeadStatus.NEW,
       source: LeadSource.WEBSITE, // Default source for preview
+      isBot: false,
       notes: "",
       convertedUserId: null,
       convertedAt: null,

@@ -56,6 +56,7 @@ export class TestEmailRepository {
       language: data.leadData.language,
       status: data.leadData.status,
       source: data.leadData.source || null,
+      isBot: false,
       notes: data.leadData.notes || null,
       convertedUserId: null,
       convertedAt: null,

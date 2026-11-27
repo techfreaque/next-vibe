@@ -65,11 +65,13 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { AnalyticsFilterPanel } from "next-vibe/unified-ui/analytics/filter-panel";
 import { CompactFieldHelpContext } from "next-vibe/unified-ui/widgets/form-fields/_shared/description-style";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { MultiSelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useId, useMemo, useState } from "react";
+import { z } from "zod";
 
 import { FunnelReach, isBotFamily, LeadChannelFilter } from "../analytics/enum";
 import { type LeadDrillFilters, SEGMENT_KEYS } from "../analytics/filters";
@@ -201,7 +203,7 @@ function LeadTableRow({
   isPickerMode,
 }: LeadRowProps): React.JSX.Element {
   const triage = lead.triage;
-  const isBot = triage ? isBotFamily(triage.botFamily) : false;
+  const isBot = lead.isBot || (triage ? isBotFamily(triage.botFamily) : false);
   const { name, anonymous } = leadName(lead, t);
   const secondary =
     lead.email && lead.email !== name
@@ -365,7 +367,7 @@ function DrillRow({
   st: ReturnType<typeof useLeadAnalyticsT>;
 }): React.JSX.Element {
   const triage = lead.triage;
-  const isBot = triage ? isBotFamily(triage.botFamily) : false;
+  const isBot = lead.isBot || (triage ? isBotFamily(triage.botFamily) : false);
   const origin = triage
     ? [
         dimensionValueLabel(triage.channelType, st),
@@ -622,6 +624,7 @@ export function LeadsListContainer({
   const { sourceType, ...acquisitionFilters } =
     form.watch("acquisitionFilters") ?? {};
   const activeSources = form.watch("statusFilters.source") ?? [];
+  const includeBots = form.watch("includeBots") === true;
 
   const drillValues: LeadDrillFilters = {
     traffic: form.watch("traffic"),
@@ -678,6 +681,7 @@ export function LeadsListContainer({
     form.watch("statusFilters.currentCampaignStage")?.length ||
     form.watch("locationFilters.country")?.length ||
     form.watch("locationFilters.language")?.length ||
+    includeBots ||
     drillChips.length,
   );
 
@@ -691,6 +695,7 @@ export function LeadsListContainer({
     form.setValue("locationFilters.country", [], { shouldDirty: true });
     form.setValue("locationFilters.language", [], { shouldDirty: true });
     form.setValue("acquisitionFilters", {}, { shouldDirty: true });
+    form.setValue("includeBots", false, { shouldDirty: true });
     for (const key of DRILL_KEYS) {
       form.setValue(key, undefined, { shouldDirty: true });
     }
@@ -701,7 +706,8 @@ export function LeadsListContainer({
     activeSources.length +
     (form.watch("statusFilters.currentCampaignStage")?.length ?? 0) +
     (form.watch("locationFilters.country")?.length ?? 0) +
-    (form.watch("locationFilters.language")?.length ?? 0);
+    (form.watch("locationFilters.language")?.length ?? 0) +
+    (includeBots ? 1 : 0);
 
   const moreActions = [
     {
@@ -928,6 +934,13 @@ export function LeadsListContainer({
                 <SelectFieldWidget
                   fieldName="sortingOptions.sortOrder"
                   field={children.sortingOptions.children.sortOrder}
+                />
+                <BooleanFieldWidget
+                  fieldName="includeBots"
+                  field={{
+                    ...children.includeBots,
+                    schema: z.boolean().optional(),
+                  }}
                 />
               </Div>
             </CompactFieldHelpContext.Provider>

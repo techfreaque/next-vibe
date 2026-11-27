@@ -25,7 +25,8 @@ beforeAll(async () => {
   await pg.exec(`
     CREATE TABLE leads (
       id uuid PRIMARY KEY, created_at timestamp, signed_up_at timestamp,
-      converted_user_id uuid, referral_code text, metadata jsonb
+      converted_user_id uuid, referral_code text, metadata jsonb,
+      is_bot boolean NOT NULL DEFAULT false
     );
     CREATE TABLE users (id uuid PRIMARY KEY, created_at timestamp, creator_slug text);
     CREATE TABLE growth_journeys (
@@ -191,4 +192,80 @@ test("cohort conversion counts each first visit and excludes signup-only referra
   const conversion = await QueryReferralsConversionRateRepository.queryReferralsConversionRate(period);
   expect(clicks.success && clicks.data.result.reduce((sum, point) => sum + point.value, 0)).toBe(2);
   expect(conversion.success && conversion.data.result.every((point) => point.value === 0)).toBe(true);
+});
+
+test("excludes is_bot flagged crawler leads and their visits from growth stats and referral clicks", async () => {
+  const botLead = "45c83992-bbe4-496a-82a0-2d84e837e099";
+  await pg.query(
+    `INSERT INTO leads (id, created_at, referral_code, metadata, is_bot)
+     VALUES ($1, '2026-11-11', 'CREATOR', '{"userAgent":"Googlebot/2.1"}'::jsonb, true)`,
+    [botLead],
+  );
+  await pg.query(
+    `INSERT INTO growth_visits (lead_id, visited_at, source, medium, campaign, ref_code)
+     VALUES ($1, '2026-11-11', 'reddit', 'social', 'Launch', 'CREATOR')`,
+    [botLead],
+  );
+  await pg.query(
+    `INSERT INTO lead_referrals (id, lead_id, referral_code_id, created_at)
+     VALUES ('45c83992-bbe4-496a-82a0-2d84e837e098', $1, $2, '2026-11-11')`,
+    [botLead, codeId],
+  );
+
+  const { AcquisitionRepository } = await import("./acquisition-repository");
+  const report = await AcquisitionRepository.summary({
+    range,
+    filters: { refCode: "CREATOR", sourceType: AcquisitionSource.CREATOR },
+    currency: "EUR",
+    page: 1,
+  });
+  expect(report.totals).toMatchObject({
+    visits: 2,
+    leads: 2,
+    signups: 1,
+    firstChats: 1,
+    payers: 1,
+    revenue: 12,
+  });
+
+  const referralTotals = await AcquisitionRepository.referralCodeSummary(
+    ["CREATOR"],
+    "USD",
+  );
+  expect(referralTotals.get("CREATOR")).toMatchObject({
+    visits: 2,
+    leads: 2,
+  });
+
+  const { QueryReferralsLeadClicksRepository } =
+    await import("@/referral/data-sources/referrals-lead-clicks/repository");
+  const clicks =
+    await QueryReferralsLeadClicksRepository.queryReferralsLeadClicks({
+      range,
+      resolution: GraphResolution.ONE_DAY,
+    });
+  expect(
+    clicks.success &&
+      clicks.data.result.reduce((sum, point) => sum + point.value, 0),
+  ).toBe(2);
+
+  // Put both first visits in the same bucket and credit the human visit.
+  await pg.query(
+    "UPDATE growth_visits SET visited_at = '2026-11-10' WHERE lead_id = $1",
+    [botLead],
+  );
+  await pg.query("UPDATE growth_journeys SET user_id = NULL WHERE lead_id = $1", [converted]);
+  await pg.query("UPDATE growth_journeys SET user_id = $1 WHERE lead_id = $2", [account, visitor]);
+  const { QueryReferralsConversionRateRepository } =
+    await import("@/referral/data-sources/referrals-conversion-rate/repository");
+  const conversion =
+    await QueryReferralsConversionRateRepository.queryReferralsConversionRate({
+      range,
+      resolution: GraphResolution.ONE_DAY,
+    });
+  expect(conversion.success && conversion.data.result[0]?.value).toBe(100);
+
+  // Explicit leadDetails lookup still inspects a flagged lead when requested by ID
+  const details = await AcquisitionRepository.leadDetails([botLead], "USD");
+  expect(details.get(botLead)).toMatchObject({ visits: 1 });
 });

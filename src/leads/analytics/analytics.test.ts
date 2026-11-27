@@ -37,7 +37,8 @@ beforeAll(async () => {
       id uuid PRIMARY KEY, created_at timestamp, country text, email text, business_name text,
       device_type text, browser text, os text, ip_address text, user_agent text,
       referral_code text, converted_user_id uuid, signed_up_at timestamp,
-      geo_country text, metadata jsonb NOT NULL DEFAULT '{}'::jsonb
+      geo_country text, metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+      is_bot boolean NOT NULL DEFAULT false
     );
     CREATE TABLE users (id uuid PRIMARY KEY, created_at timestamp, email_verified boolean, email text);
     CREATE TABLE growth_journeys (
@@ -742,4 +743,112 @@ test("crawler_visits buckets count verified crawler visits as bots without creat
       metrics: expect.objectContaining({ visits: 57, leads: 0 }),
     }),
   ]);
+});
+
+test("is_bot flagged crawler leads stay in SEO/crawl analytics and are excluded from funnel, abuse and human headline", async () => {
+  const { computeAcquisitionBreakdown, computeAcquisitionCore } =
+    await import("./acquisition/repository");
+  const { getAcquisitionHeadline } = await import("./overview");
+  const { FunnelReportRepository } = await import("./funnel/repository");
+  const { default: funnelDef } = await import("./funnel/definition");
+  const { computeFlaggedSummary } = await import("./abuse/repository");
+  const { LeadFunnelStageRepository } =
+    await import("@/leads/data-sources/leads-funnel-stage/repository");
+  const { LeadFunnelStage } =
+    await import("@/leads/data-sources/leads-funnel-stage/enum");
+  const { GraphResolution } = await import("next-vibe/dataflow/enum");
+
+  const at = "2026-07-10 10:00:00";
+  // 1 human lead, 12 flagged Googlebot leads from the same /24, 1 flagged bot with no UA
+  await pg.exec(`
+    INSERT INTO leads (id, created_at, country, business_name, ip_address, user_agent, is_bot) VALUES
+      ('${id(701)}', '${at}', 'US', 'human', '198.51.100.50', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/142.0 Safari/537.36', false),
+      ('${id(702)}', '${at}', 'US', '', '66.249.66.99', NULL, true);
+    INSERT INTO leads (id, created_at, country, business_name, ip_address, user_agent, is_bot)
+      SELECT ('00000000-0000-4000-8000-' || lpad((710 + g)::text, 12, '0'))::uuid,
+        '2026-07-10 10:00:00'::timestamp + g * interval '1 minute',
+        'US', '', '66.249.66.' || g,
+        'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', true
+      FROM generate_series(1, 12) g;
+    INSERT INTO growth_visits (lead_id, visited_at) VALUES
+      ('${id(701)}', '${at}'),
+      ('${id(711)}', '${at}');
+  `);
+
+  const julWin = resolveAnalyticsWindow(
+    { range: AnalyticsRange.CUSTOM, from: "2026-07-08", to: "2026-07-14" },
+    new Date("2026-07-15T00:00:00Z"),
+  );
+
+  // SEO/crawl analytics (Acquisition report): keeps flagged crawlers in botLeads/botVisits & BOT_FAMILY
+  const core = await computeAcquisitionCore(julWin, {});
+  expect(core.kpis.humanLeads.value).toBe(1);
+  expect(core.kpis.botLeads.value).toBe(13);
+  expect(core.kpis.unknownLeads.value).toBe(0);
+  expect(core.kpis.humanVisits.value).toBe(1);
+  expect(core.kpis.botVisits.value).toBe(1);
+
+  const agents = await computeAcquisitionBreakdown(
+    julWin,
+    {},
+    LeadDimension.BOT_FAMILY,
+  );
+  const byFamily = new Map(agents.map((row) => [row.key, row.metrics.leads]));
+  expect(byFamily.get(BotFamily.HUMAN)).toBe(1);
+  expect(byFamily.get(BotFamily.GOOGLE)).toBe(12);
+  expect(byFamily.get(BotFamily.OTHER_BOT)).toBe(1);
+  expect(byFamily.get(BotFamily.NO_UA)).toBeUndefined();
+
+  // Business headline: excludes flagged bot leads
+  const headline = await getAcquisitionHeadline(julWin);
+  expect(headline.humanLeads.value).toBe(1);
+
+  // Funnel report: excludes flagged bot leads by default
+  const logger = createEndpointLogger(false, defaultLocale);
+  const { t } = funnelDef.GET.scopedTranslation.scopedT(defaultLocale);
+  const funnel = await FunnelReportRepository.getReport(
+    funnelDef.GET.requestSchema.parse({
+      range: AnalyticsRange.CUSTOM,
+      from: "2026-07-08",
+      to: "2026-07-14",
+    }),
+    t,
+    logger,
+  );
+  expect(funnel.success).toBe(true);
+  if (funnel.success) {
+    expect(funnel.data.steps.find((s) => s.key === "leads")?.value).toBe(1);
+    expect(funnel.data.steps.find((s) => s.key === "humans")?.value).toBe(1);
+  }
+
+  // Lead funnel stage data source: excludes flagged bot leads
+  const stageLeads = await LeadFunnelStageRepository.query({
+    resolution: GraphResolution.ONE_DAY,
+    range: { from: julWin.from, to: julWin.to },
+    stage: LeadFunnelStage.LEADS,
+  });
+  expect(stageLeads.success).toBe(true);
+  if (stageLeads.success) {
+    expect(stageLeads.data.result.reduce((s, p) => s + p.value, 0)).toBe(1);
+  }
+
+  // Abuse report: flagged verified crawler /24 burst is excluded by default
+  const abuseDefault = await computeFlaggedSummary(
+    julWin,
+    {},
+    AbuseGroupBy.IP_PREFIX,
+    10,
+  );
+  expect(abuseDefault.flaggedClusters.value).toBe(0);
+  expect(abuseDefault.allLeads).toBe(1);
+
+  // Explicit bot traffic filter still allows inspecting flagged crawler clusters
+  const abuseBots = await computeFlaggedSummary(
+    julWin,
+    { traffic: TrafficFilter.BOTS },
+    AbuseGroupBy.IP_PREFIX,
+    10,
+  );
+  expect(abuseBots.flaggedClusters.value).toBe(1);
+  expect(abuseBots.topKey).toBe("66.249.66.0/24");
 });

@@ -145,6 +145,7 @@ async function provisionAnonymousLead(
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
   const conditions = [
+    eq(leads.isBot, false),
     eq(leads.status, LeadStatus.WEBSITE_USER),
     eq(leads.source, LeadSource.WEBSITE),
     isNull(leads.email),
@@ -292,6 +293,7 @@ async function linkLeadsByIp(
       .where(
         and(
           ne(leads.id, newLeadId),
+          eq(leads.isBot, false),
           isNull(leads.email),
           isNull(leads.convertedUserId),
           or(

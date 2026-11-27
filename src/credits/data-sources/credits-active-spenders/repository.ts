@@ -63,6 +63,7 @@ export class QueryCreditsActiveSpendersRepository {
         ? sql`count(DISTINCT b.spender) FILTER (WHERE b.spender IS NOT NULL
             AND b.spender NOT IN (SELECT user_id FROM user_roles WHERE role = ${UserPermissionRole.ADMIN}))`
         : sql`count(DISTINCT b.actor) FILTER (WHERE b.spender IS NULL AND b.actor IS NOT NULL
+            AND NOT COALESCE(ld.is_bot, false)
             AND ${notBotFamilySql(botFamilySql(leadUserAgentSql("ld"), sql`false`))})`;
 
     const rows = await db.execute<

@@ -186,6 +186,10 @@ export const translations: typeof enTranslations = {
       description: "Sortierreihenfolge für Ergebnisse",
       placeholder: "Sortierreihenfolge auswählen",
     },
+    includeBots: {
+      label: "Crawler-Leads einblenden",
+      description: "Markierte Bot- und Suchmaschinen-Crawler-Leads anzeigen",
+    },
     response: {
       title: "Lead-Listen-Antwort",
       description: "Paginierte Liste von Leads mit Metadaten",

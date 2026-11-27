@@ -35,6 +35,7 @@ import {
   backButton,
   objectField,
   objectOptionalField,
+  requestField,
   responseArrayField,
   responseField,
   widgetField,
@@ -141,6 +142,16 @@ const { GET } = createEndpoint({
       // === ANALYTICS DRILL-DOWN FILTERS (same names as the lead reports) ===
       ...leadSegmentFields,
       ...leadDrillFields,
+
+      // === BOT / CRAWLER VISIBILITY FILTER ===
+      includeBots: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "get.includeBots.label",
+        description: "get.includeBots.description",
+        columns: 3,
+        schema: z.union([z.boolean(), z.stringbool()]).optional(),
+      }),
 
       // === SORTING OPTIONS ===
       sortingOptions: leadsSortingOptionsContainer,
@@ -331,6 +342,10 @@ const { GET } = createEndpoint({
                   type: WidgetType.TEXT,
                   schema: z.boolean(),
                 }),
+                isBot: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.boolean(),
+                }),
                 referralCode: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
@@ -498,6 +513,7 @@ const { GET } = createEndpoint({
               updatedAt: new Date("2023-01-01T00:00:00.000Z"),
               linkedLeadsCount: 0,
               hasLinkedUser: false,
+              isBot: false,
               referralCode: null,
             },
           ],
@@ -573,6 +589,7 @@ const { GET } = createEndpoint({
               updatedAt: new Date("2023-06-01T00:00:00.000Z"),
               linkedLeadsCount: 2,
               hasLinkedUser: true,
+              isBot: false,
               referralCode: "FRIEND20",
             },
           ],
