@@ -614,6 +614,51 @@ test("acquisition, funnel and drill-down agree on the Chrome 131 crawler", async
   ]);
 });
 
+test("Mac Chrome crawler cohort is flagged only without referrer, account or chat", async () => {
+  const at = "2026-11-25 12:00:00";
+  const macUa = (major: number): string =>
+    `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${major}.0.0.0 Safari/537.36`;
+  const rows = [
+    { n: 301, ua: macUa(158), host: null, ref: null },
+    { n: 302, ua: macUa(133), host: null, ref: null },
+    { n: 303, ua: macUa(158), host: "google.com", ref: "/" },
+    { n: 304, ua: macUa(158), host: null, ref: null },
+    { n: 305, ua: macUa(120), host: null, ref: null },
+    {
+      n: 306,
+      ua: macUa(158).replace("10_15_7", "10_15_7; x"),
+      host: null,
+      ref: null,
+    },
+  ];
+  for (const { n, ua, host, ref } of rows) {
+    await pg.query(
+      `INSERT INTO leads (id, created_at, country, business_name, user_agent, metadata)
+       VALUES ($1, $2, 'IN', '', $3, $4)`,
+      [id(n), at, ua, JSON.stringify({ anonymous: true, referer: ref })],
+    );
+    await pg.query(
+      `INSERT INTO growth_journeys (lead_id, first_referrer_host, first_touch_at)
+       VALUES ($1, $2, $3)`,
+      [id(n), host, at],
+    );
+  }
+  await pg.query(
+    "INSERT INTO chat_threads (lead_id, created_at) VALUES ($1, $2)",
+    [id(304), at],
+  );
+  const { db } = await import("next-vibe/database");
+  const { matchingLeadIdsSql } = await import("./segment-sql");
+  const bots = matchingLeadIdsSql({
+    createdFrom: "2026-11-25",
+    createdTo: "2026-11-25",
+    botFamily: BotFamily.AUTOMATION,
+  });
+  expect(
+    bots && (await db.execute(bots)).rows.map((row) => row.id).toSorted(),
+  ).toEqual([id(301), id(302)]);
+});
+
 test("acquisition headline matches current, previous and all-time activity", async () => {
   const { getAcquisitionHeadline } = await import("./overview");
   const { computeAcquisitionCore } = await import("./acquisition/repository");

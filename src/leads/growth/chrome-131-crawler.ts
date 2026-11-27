@@ -23,3 +23,7 @@ export function matchesChrome131CrawlerHeaders(headers: Headers): boolean {
     referrer === `https://www.${CHROME_131_CRAWLER_REFERRER_HOST}`
   );
 }
+
+/** Postgres regex: reduced Mac Chrome UAs of the 2026-11 crawler cohort (majors 133/142/150/158). */
+export const MAC_CHROME_CRAWLER_UA_PATTERN =
+  "^Mozilla/5\\.0 \\(Macintosh; Intel Mac OS X [0-9_]+\\) AppleWebKit/537\\.36 \\(KHTML, like Gecko\\) Chrome/(133|142|150|158)\\.0\\.0\\.0 Safari/537\\.36$";

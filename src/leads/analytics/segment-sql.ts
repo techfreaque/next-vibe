@@ -15,6 +15,7 @@ import {
   CHROME_131_CRAWLER_REFERRER_HOST,
   CHROME_131_CRAWLER_REFERRER_PATH,
   CHROME_131_CRAWLER_UA,
+  MAC_CHROME_CRAWLER_UA_PATTERN,
 } from "@/leads/growth/chrome-131-crawler";
 import { PaymentStatus } from "@/payment/enum";
 
@@ -57,6 +58,21 @@ const chrome131Crawler = (noLeadChat: SQL): SQL => sql`(
   AND l.metadata->>'anonymous' = 'true'
   AND l.metadata->>'referer' = ${CHROME_131_CRAWLER_REFERRER_PATH}
   AND j.first_referrer_host = ${CHROME_131_CRAWLER_REFERRER_HOST}
+  AND l.email IS NULL
+  AND l.converted_user_id IS NULL AND j.user_id IS NULL
+  AND l.signed_up_at IS NULL AND j.signed_up_at IS NULL
+  AND j.first_chat_at IS NULL AND ${noLeadChat}
+)`;
+
+// Mac Chrome crawler cohort (since 2026-11-14, residential proxies, 80+
+// countries, evidence in scratchpad/growth/india-2026-11-27.md): reduced
+// Chrome 133/142/150/158 Mac UAs with no referrer and no account, chat or
+// signup activity. Real users of these builds keep a referrer or act.
+const macChromeCrawler = (noLeadChat: SQL): SQL => sql`(
+  ident.ua ~ ${MAC_CHROME_CRAWLER_UA_PATTERN}
+  AND l.created_at >= timestamp '2026-11-14'
+  AND j.first_referrer_host IS NULL
+  AND coalesce(nullif(btrim(l.metadata->>'referer'), ''), '') = ''
   AND l.email IS NULL
   AND l.converted_user_id IS NULL AND j.user_id IS NULL
   AND l.signed_up_at IS NULL AND j.signed_up_at IS NULL
@@ -124,7 +140,7 @@ export function leadFactsSql(leadCondition: SQL = sql`TRUE`): SQL {
       WHERE status = ${PaymentStatus.SUCCEEDED} AND amount > 0 GROUP BY user_id
     ) pay ON pay.user_id = u.id
     CROSS JOIN LATERAL (
-      SELECT ${botFamilySql(sql`ident.ua`, chrome131Crawler(sql`lead_chat.first_at IS NULL`), sql`l.is_bot`)} AS bot_family
+      SELECT ${botFamilySql(sql`ident.ua`, sql`(${chrome131Crawler(sql`lead_chat.first_at IS NULL`)} OR ${macChromeCrawler(sql`lead_chat.first_at IS NULL`)})`, sql`l.is_bot`)} AS bot_family
     ) fam
     WHERE ${leadCondition}
   `;
@@ -142,6 +158,7 @@ export function humanLeadCreationsSql(leadCondition: SQL): SQL {
     WITH cohort AS MATERIALIZED (
       SELECT l.created_at, ident.ua,
         CASE WHEN ident.ua = ${CHROME_131_CRAWLER_UA} THEN ${chrome131Crawler(noLeadChat)}
+             WHEN ident.ua ~ ${MAC_CHROME_CRAWLER_UA_PATTERN} THEN ${macChromeCrawler(noLeadChat)}
              ELSE false END AS automation
       FROM leads l
       CROSS JOIN LATERAL (SELECT ${leadUserAgentSql("l")} AS ua) ident
