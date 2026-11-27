@@ -17,6 +17,7 @@ import { scopedTranslation as uncensoredScopedTranslation } from "../uncensored-
 import { scopedTranslation } from "./i18n";
 import { type BlogPostCard, getBlogPostCard } from "./posts-cards";
 import type { BlogPostSlug } from "./posts-meta";
+import type { RelatedModelLink } from "./related-models-data";
 import { relatedGuides, TOPIC_HUB_PATHS, type TopicHub } from "./topics";
 
 /** Cards for the given posts, in the given order (unknown slugs skipped). */
@@ -135,6 +136,48 @@ export function RelatedGuides({
             excerpt={card.excerpt}
           />
         ))}
+      </Div>
+    </Div>
+  );
+}
+
+/** Model pages and model comparisons for the end of a post (see related-models-data). */
+export function RelatedModels({
+  locale,
+  links,
+}: {
+  locale: CountryLanguage;
+  links: readonly RelatedModelLink[];
+}): JSX.Element | null {
+  const { t } = scopedTranslation.scopedT(locale);
+  if (links.length === 0) {
+    return null;
+  }
+  return (
+    <Div className="flex flex-col gap-5">
+      <H2 className="border-none pb-0 text-xl font-semibold tracking-tight md:text-2xl">
+        {t("labels.relatedModels")}
+      </H2>
+      <Div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {links.map((link) =>
+          link.kind === "model" ? (
+            <GuideCard
+              key={link.path}
+              href={`/${locale}${link.path}`}
+              eyebrow={t("labels.modelEyebrow")}
+              title={link.name}
+              excerpt={t("labels.modelExcerpt")}
+            />
+          ) : (
+            <GuideCard
+              key={link.path}
+              href={`/${locale}${link.path}`}
+              eyebrow={t("labels.compareEyebrow")}
+              title={t("labels.compareTitle", { a: link.a, b: link.b })}
+              excerpt={t("labels.compareExcerpt")}
+            />
+          ),
+        )}
       </Div>
     </Div>
   );

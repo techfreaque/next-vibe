@@ -418,6 +418,13 @@ export const translations: typeof enTranslations = {
     featured: "Výber redakcie",
     relatedGuides: "Súvisiace návody",
     startHere: "Začni tu",
+    relatedModels: "Modely na vyskúšanie",
+    modelEyebrow: "Model",
+    modelExcerpt:
+      "Cena za správu, kontextové okno a úroveň obsahu. Potom rovno chatuj.",
+    compareEyebrow: "Priame porovnanie",
+    compareTitle: "{{a}} vs. {{b}}",
+    compareExcerpt: "Cena, kontext a úroveň obsahu vedľa seba.",
   },
   topics: {
     uncensored: {

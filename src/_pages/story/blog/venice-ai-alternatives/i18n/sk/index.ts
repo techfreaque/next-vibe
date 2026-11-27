@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatívy k Venice AI na súkromný čet (2026)",
     description:
-      "Venice AI oproti {{appName}}, OpenUncensored, NEAR AI Cloud, Maple, Proton Lumo, NanoGPT a lokálnym aplikáciám. Kde sa spracúvajú zadania, ktoré modely odmietajú menej, ktoré formáty API fungujú a čo stojí navyše.",
+      "Venice AI oproti {{appName}}, OpenUncensored, NEAR AI Cloud, Maple, Proton Lumo a NanoGPT. Kde sa spracúvajú zadania, kto odmieta menej, čo stojí navyše.",
     category: "Porovnanie",
     imageAlt: "Porovnanie alternatív k Venice AI",
     keywords:

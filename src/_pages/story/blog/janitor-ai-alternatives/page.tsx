@@ -43,6 +43,7 @@ import {
 } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { scopedTranslation as compareTranslation } from "../../compare/i18n";
+import type { RelatedModelLink } from "../related-models-data";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -139,13 +140,19 @@ interface Props {
 interface PageData {
   locale: CountryLanguage;
   us: UsParams;
+  relatedModels: RelatedModelLink[];
 }
 
 export async function tanstackLoader({ params }: Props): Promise<PageData> {
   const { locale } = await params;
   const { loadUsFacts, usParams } =
     await import("../../compare/_shared/us-facts");
-  return { locale, us: usParams(await loadUsFacts(locale)) };
+  const { loadRelatedModels } = await import("../related-models-data");
+  return {
+    locale,
+    us: usParams(await loadUsFacts(locale)),
+    relatedModels: await loadRelatedModels(SLUG),
+  };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -188,7 +195,11 @@ function Sources({
   );
 }
 
-export function TanstackPage({ locale, us }: PageData): JSX.Element {
+export function TanstackPage({
+  locale,
+  us,
+  relatedModels,
+}: PageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: compareT } = compareTranslation.scopedT(locale);
   const back = { href: `/${locale}/story/blog`, label: t("back") };
@@ -401,6 +412,7 @@ export function TanstackPage({ locale, us }: PageData): JSX.Element {
         </ArticleSection>
         <ArticleEnd
           post={{ slug: SLUG, locale }}
+          relatedModels={relatedModels}
           back={back}
           title={t("cta.title")}
           actions={

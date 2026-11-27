@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Uncensored AWS Bedrock Alternative: APIs Compared | {{appName}}",
     description:
-      "Bedrock Guardrails are optional, but model refusals and the AWS policy stay. Compare Custom Model Import for abliterated weights with {{appName}}, OpenRouter, Venice, NanoGPT and self-hosting.",
+      "Bedrock Guardrails are optional, but model refusals and the AWS policy stay. Custom Model Import for abliterated weights vs {{appName}}, OpenRouter and Venice.",
     category: "Developer Guide",
     imageAlt: "Uncensored alternatives to AWS Bedrock, compared",
     keywords:

@@ -20,7 +20,7 @@ export async function tanstackLoader(
   props: MultiModelProps,
 ): Promise<MultiModelPageData> {
   const { loadMultiModelPage } = await import("../_multi-model/loader");
-  return loadMultiModelPage(props);
+  return loadMultiModelPage("poe", props);
 }
 
 export function TanstackPage(data: MultiModelPageData): JSX.Element {

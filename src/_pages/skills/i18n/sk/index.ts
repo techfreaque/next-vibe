@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Zručnosti AI: hotoví špecialisti a postavy | {{appName}}",
     description:
-      "Programátori, autori, výskumníci, spoločníci aj necenzurované postavy. Každá zručnosť má vlastné pokyny, model a nástroje. Začni čet alebo si vytvor vlastnú zručnosť a získavaj odmeny.",
+      "Programátori, autori, výskumníci, spoločníci a necenzurované postavy. Každá zručnosť má vlastné pokyny, model a nástroje. Chatuj alebo vytvor vlastnú a zarábaj.",
     category: "Zručnosti AI",
     imageAlt: "Zručnosti AI na {{appName}}",
     keywords:

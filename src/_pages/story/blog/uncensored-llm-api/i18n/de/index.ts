@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Unzensierte LLM-API: abliterierte Modelle | {{appName}}",
     description:
-      "Unzensierte und abliterierte Modelle hinter einer OpenAI- und Anthropic-kompatiblen API. Modell-IDs, Preise im Vergleich zu anderen Hosts, was Vertex, Azure, Bedrock und Together wirklich erlauben, Code und Limits.",
+      "Unzensierte und abliterierte Modelle über eine OpenAI- und Anthropic-kompatible API. Modell-IDs, Preisvergleich, was Vertex, Azure und Bedrock erlauben, Code.",
     category: "Entwickler-Guide",
     imageAlt: "Unzensierte LLM-API mit OpenAI-kompatiblen Endpunkten",
     keywords:

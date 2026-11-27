@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   keywords:
     "AI bez cenzury, czat AI bez cenzury, ChatGPT bez cenzury, AI bez ograniczeń, AI bez filtrów, nieocenzurowana AI, sztuczna inteligencja bez cenzury, abliterowana AI",
   intro:
-    "Bez rejestracji, bez moralizowania. Wybierz model AI bez filtrów do swojego pytania albo zacznij od najtańszego. To ty decydujesz, co czytasz.",
+    "Czat AI bez cenzury to modele, które odpowiadają, zamiast odmawiać. Piszesz w przeglądarce jako gość: darmowe kredyty, bez rejestracji, jedno potwierdzenie 18+. Bez moralizowania. To ty decydujesz, co czytasz.",
   tryModel: "Wypróbuj {{model}}",
   chooseModel: "Porównaj modele do czatu",
   choose:
@@ -56,6 +56,20 @@ export const translations: typeof enTranslations = {
     local: {
       q: "Czy potrzebuję karty graficznej?",
       a: "Wystarczą przeglądarka i połączenie z internetem. Zapytanie przetwarza dostawca modelu. Jeśli chcesz uruchomić model w całości na swoim komputerze, zainstaluj go lokalnie.",
+    },
+    askAnything: {
+      q: "Czy AI bez cenzury można zapytać o wszystko?",
+      a: "Pytać możesz o wszystko. Modele z poziomu bez cenzury pomijają standardowe formułki odmowy, więc większość pytań dostaje konkretną odpowiedź. Model nadal może odmówić albo się pomylić, więc sprawdzaj ważne fakty. Za to, co zrobisz z odpowiedziami, odpowiadasz ty.",
+    },
+    online: {
+      q: "Czy to działa online, bez aplikacji?",
+      a: "Tak. Każdy model działa w przeglądarce, na komputerze i na telefonie. Nic nie instalujesz, nie potrzebujesz GPU. Po dowolnym zakupie te same modele są też dostępne przez API zgodne z OpenAI.",
+    },
+    pick: {
+      q: "Który czatbot AI bez cenzury wybrać?",
+      a: "Na szybkie pytanie zacznij od {{cheapest}}, najtańszego modelu na liście. Do długich dokumentów wybierz model z oknem kontekstu {{context}}.",
+      aWorldview:
+        "Na szybkie pytanie zacznij od {{cheapest}}, najtańszego modelu na liście. Do długich dokumentów wybierz model z oknem kontekstu {{context}}. Jeśli chcesz odpowiedzi spoza mainstreamowych opinii, spróbuj {{model}}: trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie. Efekt to model z przeciwnymi poglądami politycznymi.",
     },
   },
   guides: "Porównaj modele i platformy",

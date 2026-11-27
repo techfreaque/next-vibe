@@ -61,6 +61,7 @@ import {
   AlternativesLinks,
 } from "../_alternatives/comparison";
 import { guideCards } from "../guide-links";
+import type { RelatedModelLink } from "../related-models-data";
 import {
   ALTERNATIVES,
   CHECKED_DATE,
@@ -100,6 +101,7 @@ export interface CharacterAiAlternativesPageData {
   locale: CountryLanguage;
   /** Our live facts, flattened for i18n (free credits, plans, models). */
   us: UsParams;
+  relatedModels: RelatedModelLink[];
 }
 
 export async function tanstackLoader({
@@ -109,7 +111,12 @@ export async function tanstackLoader({
   const { loadUsFacts, usParams } =
     await import("../../compare/_shared/us-facts");
   const facts = await loadUsFacts(locale);
-  return { locale, us: usParams(facts) };
+  const { loadRelatedModels } = await import("../related-models-data");
+  return {
+    locale,
+    us: usParams(facts),
+    relatedModels: await loadRelatedModels(SLUG),
+  };
 }
 
 export const generateMetadata = async ({
@@ -132,6 +139,7 @@ export const generateMetadata = async ({
 export function TanstackPage({
   locale,
   us,
+  relatedModels,
 }: CharacterAiAlternativesPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: compareT } = compareScopedTranslation.scopedT(locale);
@@ -450,6 +458,7 @@ export function TanstackPage({
 
         <ArticleEnd
           post={{ slug: SLUG, locale }}
+          relatedModels={relatedModels}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle", stats)}

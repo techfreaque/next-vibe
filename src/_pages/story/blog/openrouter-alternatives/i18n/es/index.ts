@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternativas a OpenRouter sin censura, comparadas | {{appName}}",
     description:
-      "OpenRouter no lista modelos abliterados. Compara OpenUncensored, Refuseless, NEAR AI Cloud, NanoGPT, Venice, Featherless y {{appName}} en modelos sin censura, comisiones, privacidad y formatos de API.",
+      "OpenRouter no lista modelos abliterados. Compara OpenUncensored, Refuseless, NEAR AI Cloud, NanoGPT, Venice y {{appName}}: comisiones, privacidad y API.",
     category: "Guía para desarrolladores",
     imageAlt:
       "Alternativas a OpenRouter sin censura para desarrolladores, comparadas",

@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Modelos de IA abliterados: LLM sin censura para probar en línea",
-  metaTitle: "Modelos de IA abliterados sin censura, en línea | {{appName}}",
+  metaTitle: "Chat de IA abliterada online, gratis | {{appName}}",
   description:
     "Prueba LLM abliterados, sin rechazos, directamente en el navegador, sin GPU y sin registro. Compara contexto y costo, y enfréntalos al modelo original.",
   keywords:
     "IA abliterada, modelos abliterados, LLM sin censura, modelo de IA sin filtros, ablación de rechazos, IA de código abierto sin censura",
   intro:
-    "Modelos convencionales a los que se les quitaron los rechazos. Elige uno y el chat se abre con ese modelo ya seleccionado.",
+    "Chat de IA abliterada: modelos convencionales a los que se les quitó el rechazo de los pesos, en tu navegador. Sin GPU, sin registro y con créditos gratis. Elige uno y el chat se abre con ese modelo ya seleccionado.",
   models: "Modelos abliterados sin censura",
   estimate:
     "Cada estimación usa el proveedor disponible más económico para ese modelo y parte de {{input}} tokens de entrada y {{output}} de salida. El costo real depende del proveedor y de la longitud de la conversación.",
@@ -55,6 +55,14 @@ export const translations: typeof enTranslations = {
     api: {
       q: "¿Puedo usar modelos abliterados por API?",
       a: "Sí. Los mismos modelos están disponibles en una API compatible con OpenAI y Anthropic, así que tu SDK actual funciona. Las claves de API necesitan un plan de pago. Los créditos gratis y de bonificación no las desbloquean.",
+    },
+    spelling: {
+      q: "¿Abliterated u obliterated? ¿Cuál es correcto?",
+      a: "Abliterated. La palabra une ablación, quitar una parte de una red neuronal, con obliterate (arrasar). Mucha gente busca «obliterated AI chat». Se refiere a la misma técnica y a los mismos modelos de esta página.",
+    },
+    firstPick: {
+      q: "¿Qué modelo abliterado pruebo primero?",
+      a: "{{model}} es el más barato aquí, unos {{credits}} créditos por turno, así que es la forma más económica de empezar. Para ver qué cambió la abliteración, envía el mismo prompt también al modelo original.",
     },
   },
   guides: "Explora la IA sin censura",

@@ -36,6 +36,7 @@ import { versusPath } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
 import { getBlogPostCard } from "../posts-cards";
+import type { RelatedModelLink } from "../related-models-data";
 import { relatedGuides } from "../topics";
 import { scopedTranslation } from "./i18n";
 import {
@@ -51,6 +52,7 @@ import {
 export interface MultiModelPageData {
   locale: CountryLanguage;
   us: UsParams;
+  relatedModels: RelatedModelLink[];
 }
 
 const FAQ_KEYS = ["best", "free", "billing", "privacy", "switching"] as const;
@@ -72,6 +74,7 @@ const OTHER_GUIDES = [
 export function MultiModelArticle({
   locale,
   us,
+  relatedModels,
   subject,
 }: MultiModelPageData & { subject: Subject }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
@@ -294,6 +297,7 @@ export function MultiModelArticle({
 
         <ArticleEnd
           post={post}
+          relatedModels={relatedModels}
           back={back}
           title={t("us.cta")}
           subtitle={t("us.ctaSubtitle", stats)}

@@ -3,14 +3,13 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title:
     "Modely AI upravené metódou abliteration, ktoré si môžeš vyskúšať online",
-  metaTitle:
-    "Abliterated AI: Vyskúšaj upravené jazykové modely online | {{appName}}",
+  metaTitle: "Abliterated AI čet online, vyskúšaj zadarmo | {{appName}}",
   description:
-    "Četuj s jazykovými modelmi upravenými metódou abliteration priamo v prehliadači. Bez grafickej karty a bez registrácie. Porovnaj kontext a cenu za výmenu správ, potom vyskúšaj každý model aj v pôvodnej verzii.",
+    "Četuj s abliterated modelmi priamo v prehliadači, bez GPU a bez registrácie. Porovnaj kontext a cenu, potom každý otestuj proti pôvodnému modelu.",
   keywords:
     "abliterated AI, abliterated LLM, modely bez cenzúry, AI s menším počtom odmietnutí, abliteration, otvorené modely AI",
   intro:
-    "Vyskúšaj modely upravené tak, aby odmietali menej zadaní. Výberom modelu otvoríš čet v prehliadači a model už bude nastavený.",
+    "Abliterated AI čet: bežné modely s odmietaním odstráneným priamo z váh, v tvojom prehliadači. Bez GPU, bez registrácie, kredity zadarmo. Výberom modelu otvoríš čet a model už bude nastavený.",
   models: "Dostupné modely upravené metódou abliteration",
   estimate:
     "Odhady vychádzajú z najlacnejšieho dostupného poskytovateľa pre každý model. Počet tokenov v odhade: {{input}} na vstupe a {{output}} na výstupe. Skutočná cena závisí od poskytovateľa a dĺžky konverzácie.",
@@ -58,6 +57,14 @@ export const translations: typeof enTranslations = {
     api: {
       q: "Môžem tieto modely používať cez API?",
       a: "Áno. Tie isté modely sú dostupné cez API kompatibilné s OpenAI a Anthropic, takže môžeš použiť svoje súčasné SDK. Na kľúče API potrebuješ platené predplatné. Bezplatné a bonusové kredity ich nesprístupnia.",
+    },
+    spelling: {
+      q: "Abliterated alebo obliterated: čo je správne?",
+      a: "Abliterated. Slovo spája abláciu, teda odstránenie časti neurónovej siete, s anglickým obliterate (zničiť). Mnohí hľadajú „obliterated AI chat“. Ide o tú istú techniku a tie isté modely ako tu.",
+    },
+    firstPick: {
+      q: "Ktorý abliterated model vyskúšať ako prvý?",
+      a: "{{model}} je tu najlacnejší, asi {{credits}} kreditov za kolo, takže je to najlacnejší začiatok. Ak chceš vidieť, čo abliterácia zmenila, pošli ten istý prompt aj pôvodnému modelu.",
     },
   },
   guides: "Preskúmaj AI bez cenzúry",

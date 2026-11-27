@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "IA sans censure : le chat IA sans filtre, dans votre navigateur",
-  metaTitle: "IA sans censure : chat sans filtre, essai gratuit | {{appName}}",
+  metaTitle: "Chat IA sans censure en ligne, gratuit | {{appName}}",
   description:
     "IA non censurée, sans filtre ni inscription. Modèles abliterated et vraiment non censurés dans le navigateur, crédits offerts aux invités. Comparez les coûts.",
   keywords:
     "IA sans censure, IA non censurée, chat IA sans filtre, ChatGPT sans filtre, IA sans filtre gratuit, chatbot sans censure, IA sans limite, IA abliterated",
   intro:
-    "Pas d’inscription, pas de leçon de morale. Choisissez un modèle d’IA sans filtre pour votre question ou commencez par le moins cher. C’est vous qui décidez de ce que vous lisez.",
+    "Un chat IA sans censure, ce sont des modèles qui répondent au lieu de refuser. Discutez dans le navigateur en invité : crédits offerts, sans inscription, une seule vérification 18+. Pas de leçon de morale. Vous décidez de ce que vous lisez.",
   tryModel: "Essayer {{model}}",
   chooseModel: "Comparer les modèles",
   choose:
@@ -56,6 +56,20 @@ export const translations: typeof enTranslations = {
     local: {
       q: "Faut-il une carte graphique pour utiliser ces modèles ?",
       a: "Un navigateur et une connexion internet suffisent. Le fournisseur traite votre demande. Pour exécuter entièrement un modèle sur votre machine, vous devez l’installer en local.",
+    },
+    askAnything: {
+      q: "Peut-on tout demander à une IA sans censure ?",
+      a: "Vous pouvez poser n’importe quelle question. Les modèles du niveau non censuré sautent les formules de refus habituelles, la plupart des questions obtiennent donc une réponse directe. Un modèle peut quand même refuser ou se tromper : vérifiez les faits importants. Ce que vous faites des réponses relève de votre responsabilité.",
+    },
+    online: {
+      q: "Ça marche en ligne, sans application ?",
+      a: "Oui. Chaque modèle tourne dans le navigateur, sur ordinateur comme sur mobile. Rien à installer, pas de GPU. Après n’importe quel achat, les mêmes modèles sont aussi accessibles via une API compatible OpenAI.",
+    },
+    pick: {
+      q: "Quel chatbot IA sans censure choisir ?",
+      a: "Pour une question rapide, commencez par {{cheapest}}, le modèle le moins cher de la liste. Pour de longs documents, prenez un modèle avec une fenêtre de contexte de {{context}}.",
+      aWorldview:
+        "Pour une question rapide, commencez par {{cheapest}}, le modèle le moins cher de la liste. Pour de longs documents, prenez un modèle avec une fenêtre de contexte de {{context}}. Pour des réponses hors de l’opinion dominante, essayez {{model}} : entraîné sur des livres et des documents bannis de l’internet grand public, avec pour résultat des opinions politiques à contre-courant.",
     },
   },
   guides: "Comparer les modèles et les plateformes",

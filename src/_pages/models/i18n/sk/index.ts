@@ -17,40 +17,66 @@ export const translations: typeof enTranslations = {
         "modely AI, porovnanie LLM, AI bez cenzúry, AI s otvoreným zdrojovým kódom, ceny AI, {{appName}}",
     },
     model: {
-      title: "{{model}}: cena, API, kontext {{context}} | {{appName}}",
-      titleShort: "{{model}}: cena, API, kontext {{context}}",
-      titleMin: "{{model}}: cena a API",
-      titleUncensored: "{{model}}: čet bez cenzúry, cena a API | {{appName}}",
-      titleUncensoredShort: "{{model}}: čet bez cenzúry, cena a API",
-      titleUncensoredMin: "{{model}}: čet bez cenzúry",
+      title: "{{model}} čet online: cena a API | {{appName}}",
+      titleShort: "{{model}} čet online: cena a API",
+      titleMin: "{{model}} čet online",
+      titleUncensored: "{{model}} čet online bez cenzúry | {{appName}}",
+      titleUncensoredShort: "{{model}} čet online bez cenzúry",
       titleLegacy: "{{model}}: cena a kontext (archív) | {{appName}}",
       titleLegacyShort: "{{model}}: cena a kontext (archív)",
       description:
-        "{{model}} od {{lab}}: vstup {{input}}, výstup {{output}} za milión tokenov. Kontext {{context}}, asi {{credits}} kred. za správu. Kredity na štart zadarmo.",
+        "Četujte s {{model}} od {{lab}} online, bez inštalácie, alebo cez API: vstup {{input}}, výstup {{output}} za 1M tokenov, kontext {{context}}. {{hook}}",
       descriptionFlat:
-        "{{model}} od {{lab}}: asi {{credits}} kred. ({{money}}) za správu, kontext {{context}}, kategória {{tier}}. Kredity na štart zadarmo.",
+        "Četujte s {{model}} od {{lab}} online, bez inštalácie, alebo cez API: asi {{credits}} kreditov ({{money}}) za správu, kontext {{context}}. {{hook}}",
       descriptionUncensored:
-        "{{model}} online bez inštalácie aj cez API. Vstup {{input}}, výstup {{output}} za milión tokenov. Kontext {{context}}. Kredity zadarmo aj bez účtu, potvrdenie veku 18+.",
+        "AI čet bez cenzúry s {{model}} online, bez inštalácie, alebo cez API: vstup {{input}}, výstup {{output}} za 1M tokenov, kontext {{context}}. {{hook}}",
       descriptionUncensoredFlat:
-        "{{model}} online bez inštalácie aj cez API. Asi {{credits}} kred. ({{money}}) za správu. Kontext {{context}}. Kredity zadarmo aj bez účtu, potvrdenie veku 18+.",
+        "AI čet bez cenzúry s {{model}} online, bez inštalácie, alebo cez API: asi {{credits}} kreditov ({{money}}) za správu, kontext {{context}}. {{hook}}",
       descriptionLegacy:
-        "{{model}} od {{lab}} je v archíve. Nástupca: {{successor}}. Kontext {{context}}, asi {{credits}} kred. za správu. Parametre, cena a nástupca.",
+        "{{model}} od {{lab}} je v archíve, nahradil ho {{successor}}. Kontext {{context}}, asi {{credits}} kreditov za správu. Parametre, cena a nástupca na jednom mieste.",
       descriptionLegacyNoSuccessor:
-        "{{model}} od {{lab}} je v archíve. Kontext {{context}}, asi {{credits}} kred. za správu. Parametre, cena a alternatívy.",
+        "{{model}} od {{lab}} je v archíve. Kontext {{context}}, asi {{credits}} kreditov za správu. Parametre, cena a aktuálne alternatívy na jednom mieste.",
+      titleUncensoredNamed:
+        "{{model}} čet online, vyskúšajte zadarmo | {{appName}}",
+      titleUncensoredNamedShort: "{{model}} čet online, vyskúšajte zadarmo",
+      hookGuest: "Kredity zadarmo, bez registrácie.",
+      hookAccount: "Kredity zadarmo s bezplatným účtom.",
+      hookPaid: "Platíte kreditmi za každú správu.",
+      hookAdult: "{{hook}} Jednorazové overenie veku 18+.",
+      descriptionShort:
+        "Četujte s {{model}} online alebo cez API: asi {{credits}} kreditov za správu, kontext {{context}}. {{hook}}",
+      descriptionUncensoredShort:
+        "AI čet bez cenzúry s {{model}} online alebo cez API: asi {{credits}} kreditov za správu, kontext {{context}}. {{hook}}",
+      descriptionUncensoredNamed:
+        "Četujte s {{model}} online, bez inštalácie, alebo cez API: vstup {{input}}, výstup {{output}} za 1M tokenov, kontext {{context}}. {{hook}}",
+      descriptionUncensoredNamedFlat:
+        "Četujte s {{model}} online, bez inštalácie, alebo cez API: asi {{credits}} kreditov ({{money}}) za správu, kontext {{context}}. {{hook}}",
+      descriptionUncensoredNamedShort:
+        "Četujte s {{model}} online alebo cez API: asi {{credits}} kreditov za správu, kontext {{context}}. {{hook}}",
+      descriptionLegacyShort:
+        "{{model}} od {{lab}} je v archíve, nahradil ho {{successor}}. Kontext {{context}}, asi {{credits}} kreditov za správu.",
+      descriptionLegacyNoSuccessorShort:
+        "{{model}} od {{lab}} je v archíve. Kontext {{context}}, asi {{credits}} kreditov za správu. Aktuálne alternatívy.",
       imageAlt: "{{model}} na {{appName}}",
       keywords:
         "{{model}}, cena {{model}}, API {{model}}, kontextové okno {{model}}, AI {{lab}}, {{appName}}",
     },
     media: {
-      title: "{{model}}: {{credits}} kred. za {{unit}} | {{appName}}",
-      titleShort: "{{model}}: {{credits}} kred. za {{unit}}",
-      titleMin: "{{model}}: cena za {{unit}}",
+      title: "{{model}} online: {{credits}} kreditov za {{unit}} | {{appName}}",
+      titleShort: "{{model}} online: {{credits}} kreditov za {{unit}}",
+      titleMin: "{{model}} online",
       titleNoPrice: "{{model}}: {{type}} s AI, cena a použitie | {{appName}}",
       titleNoPriceShort: "{{model}}: {{type}} s AI, cena a použitie",
       description:
-        "{{model}} od {{lab}} ({{type}}). Za {{unit}}: {{credits}} kred. ({{money}}). Vstup: {{inputs}}. Vyskúšaj v nástroji alebo v čete s kreditmi zadarmo.",
+        "{{model}} od {{lab}} ({{type}}) online: {{credits}} kreditov ({{money}}) za {{unit}}. Vstup: {{inputs}}. V prehliadači alebo v čete. {{hook}}",
       descriptionNoPrice:
         "{{model}} od {{lab}} ({{type}}), kategória {{tier}}. Cena za použitie v kreditoch. Vyskúšaj v nástroji alebo v čete s kreditmi zadarmo.",
+      descriptionShort:
+        "{{model}} od {{lab}} online: {{credits}} kreditov ({{money}}) za {{unit}}. V prehliadači alebo v čete. {{hook}}",
+      descriptionMin:
+        "{{model}} online: {{credits}} kreditov za {{unit}}. V prehliadači alebo v čete. {{hook}}",
+      descriptionNoPriceShort:
+        "{{model}} od {{lab}} ({{type}}). Skutočná cena za použitie v kreditoch, v prehliadači alebo v čete.",
       imageAlt: "{{model}} na {{appName}}",
       keywords:
         "{{model}}, cena {{model}}, AI {{lab}}, {{type}} model AI, {{appName}}",

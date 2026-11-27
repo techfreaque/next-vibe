@@ -12,11 +12,17 @@ export interface MultiModelProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export async function loadMultiModelPage({
-  params,
-}: MultiModelProps): Promise<MultiModelPageData> {
+export async function loadMultiModelPage(
+  subject: Subject,
+  { params }: MultiModelProps,
+): Promise<MultiModelPageData> {
   const { locale } = await params;
-  return { locale, us: usParams(await loadUsFacts(locale)) };
+  const { loadRelatedModels } = await import("../related-models-data");
+  return {
+    locale,
+    us: usParams(await loadUsFacts(locale)),
+    relatedModels: await loadRelatedModels(POST_SLUGS[subject]),
+  };
 }
 
 export async function multiModelMetadata(

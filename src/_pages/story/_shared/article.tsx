@@ -25,9 +25,10 @@ import {
   blogPostBreadcrumbs,
   buildBlogPostStructuredData,
 } from "../../_components/structured-data";
-import { RelatedGuides } from "../blog/guide-links";
+import { RelatedGuides, RelatedModels } from "../blog/guide-links";
 import { getBlogPostCard } from "../blog/posts-cards";
 import { type BlogPostSlug, formatPostDate } from "../blog/posts-meta";
+import type { RelatedModelLink } from "../blog/related-models-data";
 import {
   BreadcrumbTrail,
   type BreadcrumbTrailItem,
@@ -356,6 +357,7 @@ export function ArticleEnd({
   actions,
   back,
   post,
+  relatedModels,
 }: {
   title: ReactNode;
   subtitle?: ReactNode;
@@ -363,9 +365,14 @@ export function ArticleEnd({
   back: { href: string; label: string };
   /** Blog post this ends: adds its hub and sibling guides. */
   post?: { slug: BlogPostSlug; locale: CountryLanguage };
+  /** Model pages and comparisons to link (from loadRelatedModels). */
+  relatedModels?: readonly RelatedModelLink[];
 }): JSX.Element {
   return (
     <Div className="flex flex-col gap-8 border-t border-border pt-12">
+      {post !== undefined && relatedModels !== undefined && (
+        <RelatedModels locale={post.locale} links={relatedModels} />
+      )}
       {post !== undefined && (
         <RelatedGuides locale={post.locale} slug={post.slug} />
       )}

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatívy k SillyTavern bez nastavovania (2026)",
     description:
-      "SillyTavern je zadarmo, vyžaduje však Node.js a backend a nedá sa nainštalovať na iPhone. Porovnaj {{appName}}, RisuAI, Agnaistic, KoboldCpp, Janitor AI a LM Studio.",
+      "SillyTavern je zadarmo, no chce Node.js a backend a na iPhone ho nenainštaluješ. Porovnaj {{appName}}, RisuAI, Agnaistic, KoboldCpp, Janitor AI a LM Studio.",
     category: "Porovnanie",
     imageAlt: "Porovnanie online a lokálnych alternatív k SillyTavern",
     keywords:

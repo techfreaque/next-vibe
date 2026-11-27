@@ -665,7 +665,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "{{appName}} vs Venice AI: ईमानदार तुलना 2026",
         description:
-          "{{appName}} vs Venice.ai: कीमत, अनसेंसर्ड मॉडल, mature फ़िल्टर, प्राइवेसी और API आमने-सामने। हम Venice से खरीदते हैं, इसलिए साफ़ बताते हैं कि कौन कहाँ जीतता है।",
+          "{{appName}} vs Venice.ai: कीमत, अनसेंसर्ड मॉडल, mature फ़िल्टर, प्राइवेसी और API आमने-सामने। हम Venice से खरीदते हैं, इसलिए साफ़ बताते हैं कौन कहाँ जीतता है।",
         keywords:
           "Venice AI alternative, Venice.ai vs, Venice AI review, Venice AI pricing, Venice Pro, Venice uncensored, is Venice AI uncensored, Venice AI mature filter, Venice AI API, VVV DIEM, अनसेंसर्ड AI चैट, Venice AI का विकल्प, {{appName}} vs Venice",
       },
@@ -896,7 +896,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "{{appName}} vs NanoGPT: ईमानदार तुलना 2026",
         description:
-          "{{appName}} vs NanoGPT: पे-एज़-यू-गो बनाम प्लान, अनसेंसर्ड और abliterated मॉडल, प्राइवेसी, API और मीडिया। हम NanoGPT से खरीदते हैं और बताते हैं कि वह कहाँ जीतता है।",
+          "{{appName}} vs NanoGPT: पे-एज़-यू-गो बनाम प्लान, अनसेंसर्ड और abliterated मॉडल, प्राइवेसी, API, मीडिया। हम NanoGPT से खरीदते हैं और बताते हैं वह कहाँ जीतता है।",
         keywords:
           "NanoGPT alternative, NanoGPT vs, nano-gpt review, NanoGPT pricing, NanoGPT PRO, NanoGPT uncensored, abliterated models API, pay as you go AI, अनसेंसर्ड AI API, NanoGPT का विकल्प, {{appName}} vs NanoGPT",
       },

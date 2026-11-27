@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Azure OpenAI bez cenzúry: porovnanie alternatív API | {{appName}}",
     description:
-      "Azure predvolene filtruje každý model a zakazuje erotických a romantických chatbotov aj bez filtrov. Porovnanie {{appName}}, OpenRouter, Venice, NanoGPT, abliterovaných API, Bedrock, Vertex a vlastného hostingu.",
+      "Azure predvolene filtruje každý model a zakazuje erotických a romantických chatbotov aj bez filtrov. Porovnaj {{appName}}, Venice a abliterované API.",
     category: "Pre vývojárov",
     imageAlt: "Alternatívy k Azure OpenAI bez cenzúry, porovnanie",
     keywords:

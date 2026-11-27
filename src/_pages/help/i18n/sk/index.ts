@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
     contact: {
       title: "Centrum pomoci: časté otázky, návody a podpora | {{appName}}",
       description:
-        "Odpovede na otázky o kreditoch, platbách, súkromí, necenzurovaných modeloch aj prístupe k API. Návody pre celú platformu {{appName}} a priamy kontakt na podporu cez e-mail a Discord.",
+        "Odpovede na otázky o kreditoch, platbách, súkromí, necenzurovaných modeloch a API. Návody k {{appName}} a priamy kontakt na podporu cez e-mail a Discord.",
       category: "Podpora",
       imageAlt: "Centrum pomoci {{appName}}",
       keywords:

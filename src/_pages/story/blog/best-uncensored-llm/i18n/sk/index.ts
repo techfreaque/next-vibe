@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Najlepšie LLM bez cenzúry v roku 2026 podľa úlohy | {{appName}}",
     description:
-      "Najlepšie LLM bez cenzúry na uvažovanie, čet, programovanie, temnú prózu aj iné pohľady. Porovnanie GLM 5.3 Uncensored a DeepSeek V4.1 Flash Uncensored s aktuálnymi cenami.",
+      "Najlepšie LLM bez cenzúry na uvažovanie, čet, kód, temnú prózu aj iné pohľady. GLM 5.3 Uncensored a DeepSeek V4.1 Flash Uncensored s aktuálnymi cenami.",
     category: "Sprievodca modelmi",
     imageAlt: "Najlepšie jazykové modely bez cenzúry podľa úlohy",
     keywords:

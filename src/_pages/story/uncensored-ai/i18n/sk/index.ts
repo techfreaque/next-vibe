@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Čet s AI bez cenzúry v prehliadači",
-  metaTitle: "AI čet bez cenzúry a registrácie | {{appName}}",
+  metaTitle: "AI čet bez cenzúry online, bez registrácie | {{appName}}",
   description:
-    "Vyskúšaj četbota bez cenzúry v prehliadači s bezplatnými kreditmi pre hostí. Porovnaj modely podľa veľkosti kontextového okna a odhadovanej ceny alebo začni rovno četovať.",
+    "Četbot bez cenzúry priamo v prehliadači: kredity zadarmo pre hostí, bez registrácie. Porovnaj modely podľa kontextu a ceny alebo začni hneď četovať.",
   keywords:
     "AI bez cenzúry, čet s AI bez filtrov, nefiltrovaný AI čet, ChatGPT bez filtrov, četbot bez cenzúry, abliterated AI, AI bez obmedzení",
   intro:
-    "Začni čet s AI bez cenzúry ako hosť. Vyber model pre svoju otázku alebo vyskúšaj ten s najnižšou odhadovanou cenou za výmenu správ.",
+    "AI čet bez cenzúry znamená modely, ktoré odpovedajú namiesto odmietania. Četuj v prehliadači ako hosť: kredity zadarmo, bez registrácie, jedno potvrdenie veku 18+. Vyber model nižšie alebo začni najlacnejším.",
   tryModel: "Vyskúšať {{model}}",
   chooseModel: "Porovnať četovacie modely",
   choose:
@@ -56,6 +56,20 @@ export const translations: typeof enTranslations = {
     local: {
       q: "Potrebujem na tieto modely grafickú kartu?",
       a: "Stačí prehliadač a pripojenie na internet. Zadanie spracuje poskytovateľ. Ak chceš model spúšťať výlučne na vlastnom zariadení, musíš ho nainštalovať lokálne.",
+    },
+    askAnything: {
+      q: "Môžem sa AI bez cenzúry opýtať na čokoľvek?",
+      a: "Opýtať sa môžeš na čokoľvek. Modely z úrovne bez cenzúry preskakujú bežné frázy odmietnutia, takže väčšina otázok dostane priamu odpoveď. Model aj tak môže odmietnuť alebo sa mýliť, dôležité fakty si preto over. Za to, čo s odpoveďami urobíš, zodpovedáš ty.",
+    },
+    online: {
+      q: "Funguje to online, bez aplikácie?",
+      a: "Áno. Každý model beží v prehliadači, na počítači aj v mobile. Nič neinštaluješ, nepotrebuješ GPU. Po akomkoľvek nákupe sú tie isté modely dostupné aj cez API kompatibilné s OpenAI.",
+    },
+    pick: {
+      q: "Ktorý AI četbot bez cenzúry si vybrať?",
+      a: "Na rýchlu otázku začni s {{cheapest}}, najlacnejším modelom v zozname. Na dlhé dokumenty vyber model s kontextovým oknom {{context}}.",
+      aWorldview:
+        "Na rýchlu otázku začni s {{cheapest}}, najlacnejším modelom v zozname. Na dlhé dokumenty vyber model s kontextovým oknom {{context}}. Ak chceš odpovede mimo názorov hlavného prúdu, vyskúšaj {{model}}: trénoval na knihách a dokumentoch vylúčených z hlavného prúdu internetu, čo vedie k odlišným politickým názorom.",
     },
   },
   guides: "Porovnať modely a platformy",

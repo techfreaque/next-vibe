@@ -1,12 +1,12 @@
 export const translations = {
   title: "Abliterated AI models you can try online",
-  metaTitle: "Abliterated AI Chat: Try Abliterated LLMs Online | {{appName}}",
+  metaTitle: "Abliterated AI chat online, free to try | {{appName}}",
   description:
     "Chat with abliterated LLMs in your browser. No GPU, no signup. Compare context and cost per turn, then test each one against its original model.",
   keywords:
     "abliterated AI, abliterated LLM, abliterated models, uncensored LLM, AI model without refusals, abliteration, open-source AI without censorship",
   intro:
-    "Test models modified to refuse fewer prompts. Pick one to open a browser chat with that model already selected.",
+    "Abliterated AI chat: open models with the refusal behavior removed from their weights, running in your browser. No GPU, no sign-up, free guest credits. Pick one to open a chat with it already selected.",
   models: "Available abliterated models",
   estimate:
     "Estimates use the lowest-priced available provider for each model and assume {{input}} input tokens and {{output}} output tokens. The actual cost depends on the provider and conversation length.",
@@ -53,6 +53,14 @@ export const translations = {
     api: {
       q: "Can I use abliterated models through an API?",
       a: "Yes. The same models are available through an OpenAI and Anthropic compatible API, so your existing SDK works. API keys need a paid plan. Free and bonus credits don't unlock them.",
+    },
+    spelling: {
+      q: "Abliterated or obliterated AI: which is right?",
+      a: "Abliterated. The word blends ablation, removing part of a neural network, with obliterate. Many people search for obliterated AI chat. They mean the same technique and the same models listed here.",
+    },
+    firstPick: {
+      q: "Which abliterated model should I try first?",
+      a: "{{model}} costs the least here, about {{credits}} credits per turn, so it is the cheapest way to start. To see what abliteration changed, send the same prompt to the original model too.",
     },
   },
   guides: "Explore uncensored AI",

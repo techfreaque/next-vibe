@@ -182,7 +182,7 @@ export const translations: typeof enTranslations = {
     poe: {
       metaTitle: "Porovnanie 8 alternatív k Poe (2026)",
       description:
-        "Porovnaj alternatívy k Poe s jedným zostatkom, platbou podľa spotreby alebo vlastnými kľúčmi. Pozri si aktuálne ceny, obmedzenia aj možnosti služby {{appName}}.",
+        "Porovnaj alternatívy k Poe s jedným zostatkom, platbou podľa spotreby alebo vlastnými kľúčmi. Aktuálne ceny, obmedzenia aj možnosti {{appName}}.",
       keywords:
         "alternatívy k Poe, náhrada za Poe AI, body Poe, Poe vs. TypingMind, OpenRouter Chat, {{appName}}",
       title: "8 alternatív k Poe pre rôzne rozpočty",
@@ -231,7 +231,7 @@ export const translations: typeof enTranslations = {
     typingMind: {
       metaTitle: "Porovnanie 8 alternatív k TypingMind (2026)",
       description:
-        "Porovnaj alternatívy k TypingMind pre vlastné kľúče API, lokálne modely alebo online chat. Pozri si ceny licencií, účtovanie modelov aj možnosti služby {{appName}}.",
+        "Porovnaj alternatívy k TypingMind pre vlastné kľúče API, lokálne modely či online čet. Ceny licencií, účtovanie modelov aj možnosti {{appName}}.",
       keywords:
         "alternatívy k TypingMind, TypingMind vs. LibreChat, TypingMind vs. Open WebUI, vlastný kľúč API, {{appName}}",
       title: "8 alternatív k TypingMind pre tvoj AI chat",

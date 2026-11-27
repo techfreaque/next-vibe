@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatívy k Chub AI: postavy, lorebooky a ceny (2026)",
     description:
-      "Chub AI prijíma iba kryptomeny a obmedzil bezplatný čet. Porovnaj ceny, filtre, podporu mobilov a pamäť na {{appName}}, Janitor AI, SillyTavern, RisuAI, SpicyChat a CrushOn.",
+      "Chub AI berie iba kryptomeny a obmedzil bezplatný čet. Porovnaj ceny, filtre, mobil a pamäť: {{appName}}, Janitor AI, SillyTavern, RisuAI, SpicyChat, CrushOn.",
     category: "Porovnanie",
     imageAlt: "Porovnanie alternatív k Chub AI na hranie rolí s postavami",
     keywords:

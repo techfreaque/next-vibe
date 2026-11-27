@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Modely bez cenzúry a ich silné stránky | {{appName}}",
     description:
-      "Všetky modely AI bez cenzúry na unbottled.ai. Bežné modely s potlačeným odmietaním aj UncensoredLM trénovaný na zakázaných knihách a dokumentoch. Silné stránky a limity.",
+      "Modely AI bez cenzúry na unbottled.ai: modely s potlačeným odmietaním aj UncensoredLM trénovaný na zakázaných knihách a dokumentoch. Silné stránky a limity.",
     category: "Sprievodca modelmi",
     imageAlt: "Sprievodca modelmi bez cenzúry na {{appName}}",
     keywords:

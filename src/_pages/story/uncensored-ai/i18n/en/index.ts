@@ -1,12 +1,12 @@
 export const translations = {
   title: "Uncensored AI chat in your browser",
-  metaTitle: "Uncensored AI chat without signup | {{appName}}",
+  metaTitle: "Uncensored AI chat online, no sign-up | {{appName}}",
   description:
     "Try an uncensored AI chatbot in your browser with free guest credits. Compare models by context window and estimated cost, or start chatting right away.",
   keywords:
     "uncensored AI, uncensored AI chat, unfiltered AI chat, AI without filters, ChatGPT without filters, uncensored chatbot, abliterated AI, AI without restrictions",
   intro:
-    "Start an uncensored AI chat as a guest. Pick a model for your question or try the one with the lowest estimated cost per exchange.",
+    "Uncensored AI chat means models that answer instead of refusing. Chat with them in your browser as a guest: free credits, no sign-up, one 18+ confirmation. Pick a model below or start with the cheapest.",
   tryModel: "Try {{model}}",
   chooseModel: "Compare chat models",
   choose:
@@ -54,6 +54,20 @@ export const translations = {
     local: {
       q: "Do I need a GPU to run these models?",
       a: "You only need a browser and an internet connection. A provider processes your prompt. Running a model entirely on your own hardware requires a local installation.",
+    },
+    askAnything: {
+      q: "Can I ask an uncensored AI anything?",
+      a: "You can ask any question. Uncensored-tier models skip the standard refusal scripts, so most questions get a straight answer. A model can still decline or be wrong, so check facts that matter. What you do with the answers is your responsibility.",
+    },
+    online: {
+      q: "Does it work online, without an app?",
+      a: "Yes. Every model runs in your browser on desktop or phone. Nothing to install, no GPU. After any purchase, the same models are also available over an OpenAI-compatible API.",
+    },
+    pick: {
+      q: "Which uncensored AI chatbot should I pick?",
+      a: "For a quick question, start with {{cheapest}}, the lowest-cost model in the list. For long documents, pick a model with a {{context}} context window.",
+      aWorldview:
+        "For a quick question, start with {{cheapest}}, the lowest-cost model in the list. For long documents, pick a model with a {{context}} context window. For answers outside mainstream opinion, try {{model}}: trained on books and documents banned from the mainstream internet, resulting in a model with contrary political opinions.",
     },
   },
   guides: "Compare models and platforms",

@@ -997,7 +997,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternativa a FreedomGPT: {{appName}} vs FreedomGPT (2026)",
         description:
-          "{{appName}} frente a FreedomGPT: Liberty y opciones sin censura, reglas de contenido, privacidad, créditos, API y código abierto. Hechos con fuentes, de ambas partes.",
+          "{{appName}} frente a FreedomGPT: Liberty y opciones sin censura, reglas de contenido, privacidad, créditos, API y código abierto. Hechos con fuentes de ambos.",
         keywords:
           "alternativa a FreedomGPT, FreedomGPT vs, precios de FreedomGPT, FreedomGPT Pro, modelo Liberty, FreedomGPT sin censura, alternativa a ChatGPT sin censura, {{appName}} vs FreedomGPT",
       },

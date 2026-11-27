@@ -48,6 +48,7 @@ import {
   FeatureCard,
   FeatureGrid,
 } from "../../_shared/marketing";
+import type { RelatedModelLink } from "../related-models-data";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -135,6 +136,7 @@ export interface ModelRefreshPageData {
   locale: CountryLanguage;
   modelCount: number;
   counts: ModelCountsByContentLevel;
+  relatedModels: RelatedModelLink[];
 }
 
 export async function tanstackLoader({
@@ -142,10 +144,15 @@ export async function tanstackLoader({
 }: Props): Promise<ModelRefreshPageData> {
   const { locale } = await params;
   const availability = await getEnvAvailability();
+  const { relatedModelLinks } = await import("../related-models-data");
   return {
     locale,
     modelCount: getAvailableChatModelCount(false, availability),
     counts: getAvailableChatModelCountsByContentLevel(false, availability),
+    relatedModels: relatedModelLinks(
+      "model-refresh-uncensored-providers",
+      availability,
+    ),
   };
 }
 
@@ -223,6 +230,7 @@ export function TanstackPage({
   locale,
   modelCount,
   counts,
+  relatedModels,
 }: ModelRefreshPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
@@ -365,6 +373,7 @@ export function TanstackPage({
 
         <ArticleEnd
           post={{ slug: "model-refresh-uncensored-providers", locale }}
+          relatedModels={relatedModels}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

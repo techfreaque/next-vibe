@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Alternativa sin censura a AWS Bedrock: APIs comparadas | {{appName}}",
     description:
-      "Los Guardrails de Bedrock son opcionales, pero los rechazos de los modelos y la política de AWS se mantienen. Compara Custom Model Import para pesos abliterados con {{appName}}, OpenRouter, Venice, NanoGPT y el autoalojamiento.",
+      "Los Guardrails de Bedrock son opcionales; los rechazos y la política de AWS, no. Custom Model Import con pesos abliterados frente a {{appName}} y Venice.",
     category: "Guía para desarrolladores",
     imageAlt: "Alternativas sin censura a AWS Bedrock, comparadas",
     keywords:

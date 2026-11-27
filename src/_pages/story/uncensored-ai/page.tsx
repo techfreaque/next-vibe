@@ -16,6 +16,7 @@ import { buildBreadcrumbList } from "@/_pages/_components/structured-data";
 import {
   canonicalComparisonPath,
   FEATURED_COMPARISON_PAIRS,
+  formatTokenCount,
   isIndexableComparison,
   listModelFacts,
   type ModelRef,
@@ -135,12 +136,42 @@ export function TanstackPage({
     "chatgpt-alternative-without-filters",
     locale,
   );
+  // Largest live context window, for the "long documents" pick.
+  const maxContext = models.reduce(
+    (max, model) => Math.max(max, model.contextWindow),
+    0,
+  );
+  const pickVars = {
+    cheapest: firstModel?.name ?? "",
+    context: formatTokenCount(maxContext),
+    model: worldviewModel?.name ?? "",
+  };
   const faq = [
     {
       question: t("faq.access.q"),
       answer: t("faq.access.a", {
         credits: formatNumber(FREE_CREDIT_ALLOWANCE.guest, locale),
       }),
+    },
+    {
+      question: t("faq.askAnything.q"),
+      answer: t("faq.askAnything.a"),
+    },
+    ...(firstModel !== undefined
+      ? [
+          {
+            question: t("faq.pick.q"),
+            answer:
+              worldviewModel !== undefined &&
+              worldviewModel.id !== firstModel.id
+                ? t("faq.pick.aWorldview", pickVars)
+                : t("faq.pick.a", pickVars),
+          },
+        ]
+      : []),
+    {
+      question: t("faq.online.q"),
+      answer: t("faq.online.a"),
     },
     {
       question: t("faq.chatgpt.q"),

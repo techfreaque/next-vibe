@@ -51,6 +51,7 @@ import {
 } from "../../_shared/article";
 import { ArticleCode } from "../../_shared/article-code";
 import { Callout, Cta } from "../../_shared/marketing";
+import type { RelatedModelLink } from "../related-models-data";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -117,16 +118,19 @@ export interface CodingToolsPostPageData {
   baseUrl: string;
   subPrice: string;
   packPrice: string;
+  relatedModels: RelatedModelLink[];
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<CodingToolsPostPageData> {
   const { locale } = await params;
+  const { loadRelatedModels } = await import("../related-models-data");
   return {
     locale,
     baseUrl: buildPublicApiBaseUrl(envClient.NEXT_PUBLIC_APP_URL, locale),
     ...getApiAccessPrices(locale),
+    relatedModels: await loadRelatedModels(SLUG),
   };
 }
 
@@ -192,6 +196,7 @@ export function TanstackPage({
   baseUrl,
   subPrice,
   packPrice,
+  relatedModels,
 }: CodingToolsPostPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -377,6 +382,7 @@ export function TanstackPage({
 
         <ArticleEnd
           post={{ slug: SLUG, locale }}
+          relatedModels={relatedModels}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

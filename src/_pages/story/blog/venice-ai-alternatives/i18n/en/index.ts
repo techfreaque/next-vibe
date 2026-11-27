@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Venice AI Alternatives: Private, Uncensored, Compared (2026)",
     description:
-      "Venice AI vs {{appName}}, OpenUncensored, NEAR AI Cloud, Maple, Proton Lumo, NanoGPT and local apps. Where prompts are processed, which models refuse less, which API formats work and what costs extra.",
+      "Venice AI vs {{appName}}, OpenUncensored, NEAR AI Cloud, Maple, Proton Lumo, NanoGPT and local apps. Where prompts run, who refuses less, what costs extra.",
     category: "Comparison",
     imageAlt: "Venice AI alternatives, compared side by side",
     keywords:

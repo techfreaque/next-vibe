@@ -683,7 +683,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "{{appName}} a Venice AI | Porovnanie 2026",
         description:
-          "{{appName}} a Venice.ai vedľa seba. Ceny, modely bez cenzúry, filter obsahu pre dospelých, súkromie a API. Od Venice nakupujeme služby a uvádzame, v čom ktorá platforma vyniká.",
+          "{{appName}} a Venice.ai vedľa seba: ceny, modely bez cenzúry, filter pre dospelých, súkromie a API. Od Venice nakupujeme, preto férovo píšeme, kto v čom vedie.",
         keywords:
           "alternatíva k Venice AI, porovnanie Venice.ai, recenzia Venice AI, ceny Venice AI, Venice Pro, Venice bez cenzúry, filter obsahu Venice AI, Venice AI API, VVV DIEM, AI čet bez cenzúry, {{appName}} a Venice",
       },
@@ -914,7 +914,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "{{appName}} a NanoGPT | Porovnanie 2026",
         description:
-          "{{appName}} a NanoGPT vedľa seba. Platba podľa spotreby a predplatné, modely bez cenzúry a varianty abliterated, súkromie, API a médiá. Od NanoGPT nakupujeme služby a uvádzame, kde má navrch.",
+          "{{appName}} a NanoGPT: platba za spotrebu či predplatné, modely bez cenzúry aj abliterated, súkromie, API, médiá. Od NanoGPT nakupujeme a píšeme, kde vedie.",
         keywords:
           "alternatíva k NanoGPT, porovnanie NanoGPT, recenzia nano-gpt, ceny NanoGPT, NanoGPT PRO, NanoGPT bez cenzúry, API pre modely abliterated, platby za AI podľa spotreby, API pre AI bez cenzúry, {{appName}} a NanoGPT",
       },
@@ -1068,7 +1068,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternatíva k Gab AI | {{appName}} a Gab AI (2026)",
         description:
-          "{{appName}} a Gab AI vedľa seba. Arya, 214 modelov, zákaz sexuálneho obsahu, súkromie, kredity a API. Od Gab nakupujeme služby a uvádzame, kde ktorá platforma vyniká.",
+          "{{appName}} a Gab AI vedľa seba: Arya, 214 modelov, zákaz sexuálneho obsahu, súkromie, kredity a API. Od Gab nakupujeme a uvádzame, kde ktorá platforma vyniká.",
         keywords:
           "alternatíva k Gab AI, porovnanie Gab AI, recenzia Gab AI, ceny Gab AI, Gab AI Plus, Arya AI, Gab Arya, Gab AI bez cenzúry, Gab AI NSFW, Gab AI API, konzervatívny četbot AI, pravicová AI, AI čet bez cenzúry, {{appName}} a Gab AI",
       },

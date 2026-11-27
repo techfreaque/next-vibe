@@ -12,51 +12,75 @@ export const translations: typeof enTranslations = {
       title:
         "{{count}} modelos de chat con IA: precios, contexto y filtros | {{appName}}",
       description:
-        "Todos los modelos de {{appName}} en una lista. Claude, GPT, Gemini, Grok y DeepSeek. Chats abiertos y sin censura, además de imágenes, voz, música y video. Precio real por uso, ventana de contexto y entradas admitidas. Elige un modelo y pruébalo.",
+        "Todos los modelos de {{appName}}: Claude, GPT, Gemini, Grok, DeepSeek, chat sin censura y abliterado, más imagen, voz y video. Precio real, créditos gratis.",
       imageAlt: "Catálogo de modelos de IA en {{appName}}",
       keywords:
         "modelos de IA, comparación de LLM, IA sin censura, IA de código abierto, precios de IA, {{appName}}",
     },
     model: {
-      title: "{{model}}: precio, API y contexto de {{context}} | {{appName}}",
-      titleShort: "{{model}}: precio, API y contexto de {{context}}",
-      titleMin: "{{model}}: precio y API",
-      titleUncensored:
-        "{{model}}: chat de IA sin censura online, precio y API | {{appName}}",
-      titleUncensoredShort:
-        "{{model}}: chat de IA sin censura online, precio y API",
-      titleUncensoredMin: "{{model}}: chat de IA sin censura",
+      title: "Chatea con {{model}} online: precio y API | {{appName}}",
+      titleShort: "Chatea con {{model}} online: precio y API",
+      titleMin: "Chatea con {{model}} online",
+      titleUncensored: "Chatea con {{model}} online sin censura | {{appName}}",
+      titleUncensoredShort: "Chatea con {{model}} online sin censura",
       titleLegacy:
         "{{model}}: precio y contexto (modelo anterior) | {{appName}}",
       titleLegacyShort: "{{model}}: precio y contexto (modelo anterior)",
       description:
-        "{{model}} de {{lab}}: {{input}} de entrada y {{output}} de salida por millón de tokens. Contexto de {{context}} y unos {{credits}} créditos por mensaje. Empieza con créditos gratis.",
+        "Chatea con {{model}} de {{lab}} online, sin instalar nada, o por API: {{input}} de entrada y {{output}} de salida por 1M de tokens, contexto de {{context}}. {{hook}}",
       descriptionFlat:
-        "{{model}} de {{lab}}: unos {{credits}} créditos ({{money}}) por mensaje, contexto de {{context}}, categoría {{tier}}. Empieza con créditos gratis.",
+        "Chatea con {{model}} de {{lab}} online, sin instalar nada, o por API: unos {{credits}} créditos ({{money}}) por mensaje, contexto de {{context}}. {{hook}}",
       descriptionUncensored:
-        "Chatea con {{model}} online o úsalo por API. {{input}} de entrada y {{output}} de salida por millón de tokens, contexto de {{context}}. Créditos gratis para invitados y una sola confirmación de edad.",
+        "Chat de IA sin censura con {{model}} online, sin instalar nada, o por API: {{input}} de entrada y {{output}} de salida por 1M de tokens, contexto de {{context}}. {{hook}}",
       descriptionUncensoredFlat:
-        "Chatea con {{model}} online o úsalo por API. Unos {{credits}} créditos ({{money}}) por mensaje, contexto de {{context}}. Créditos gratis para invitados y una sola confirmación de edad.",
+        "Chat de IA sin censura con {{model}} online, sin instalar nada, o por API: unos {{credits}} créditos ({{money}}) por mensaje, contexto de {{context}}. {{hook}}",
       descriptionLegacy:
         "{{model}} de {{lab}} es un modelo anterior, reemplazado por {{successor}}. Contexto de {{context}} y unos {{credits}} créditos por mensaje. Especificaciones, precio y modelo sucesor.",
       descriptionLegacyNoSuccessor:
         "{{model}} de {{lab}} es un modelo anterior. Contexto de {{context}} y unos {{credits}} créditos por mensaje. Especificaciones, precio y alternativas actuales.",
+      titleUncensoredNamed:
+        "Chatea con {{model}} online, pruébalo gratis | {{appName}}",
+      titleUncensoredNamedShort: "Chatea con {{model}} online, pruébalo gratis",
+      hookGuest: "Créditos gratis, sin registro.",
+      hookAccount: "Créditos gratis con una cuenta.",
+      hookPaid: "Pagas en créditos por mensaje.",
+      hookAdult: "{{hook}} Confirmas tu edad una sola vez.",
+      descriptionShort:
+        "Chatea con {{model}} online o por API: unos {{credits}} créditos por mensaje, contexto de {{context}}. {{hook}}",
+      descriptionUncensoredShort:
+        "Chat de IA sin censura con {{model}} online o por API: unos {{credits}} créditos por mensaje, contexto de {{context}}. {{hook}}",
+      descriptionUncensoredNamed:
+        "Chatea con {{model}} online, sin instalar nada, o por API: {{input}} de entrada y {{output}} de salida por 1M de tokens, contexto de {{context}}. {{hook}}",
+      descriptionUncensoredNamedFlat:
+        "Chatea con {{model}} online, sin instalar nada, o por API: unos {{credits}} créditos ({{money}}) por mensaje, contexto de {{context}}. {{hook}}",
+      descriptionUncensoredNamedShort:
+        "Chatea con {{model}} online o por API: unos {{credits}} créditos por mensaje, contexto de {{context}}. {{hook}}",
+      descriptionLegacyShort:
+        "{{model}} de {{lab}} es un modelo anterior, reemplazado por {{successor}}. Contexto de {{context}}, unos {{credits}} créditos por mensaje.",
+      descriptionLegacyNoSuccessorShort:
+        "{{model}} de {{lab}} es un modelo anterior. Contexto de {{context}}, unos {{credits}} créditos por mensaje. Mira las alternativas actuales.",
       imageAlt: "{{model}} en {{appName}}",
       keywords:
         "{{model}}, precio de {{model}}, API de {{model}}, ventana de contexto de {{model}}, IA de {{lab}}, {{appName}}",
     },
     media: {
       title:
-        "Precio de {{model}}: {{credits}} créditos por {{unit}} | {{appName}}",
-      titleShort: "Precio de {{model}}: {{credits}} créditos por {{unit}}",
-      titleMin: "Precio de {{model}} por {{unit}}",
+        "{{model}} online: {{credits}} créditos por {{unit}} | {{appName}}",
+      titleShort: "{{model}} online: {{credits}} créditos por {{unit}}",
+      titleMin: "Usa {{model}} online",
       titleNoPrice:
         "{{model}}: precio y uso de la IA para {{type}} | {{appName}}",
       titleNoPriceShort: "{{model}}: precio y uso de la IA para {{type}}",
       description:
-        "{{model}} de {{lab}} ({{type}}): {{credits}} créditos ({{money}}) por {{unit}}. Entrada: {{inputs}}. Úsalo desde la herramienta de creación o desde el chat. Empieza con créditos gratis.",
+        "{{model}} de {{lab}} ({{type}}) online: {{credits}} créditos ({{money}}) por {{unit}}. Entrada: {{inputs}}. En el navegador o desde el chat. {{hook}}",
       descriptionNoPrice:
         "{{model}} de {{lab}} ({{type}}), categoría {{tier}}. Precio real por uso en créditos. Úsalo desde la herramienta de creación o desde el chat. Empieza con créditos gratis.",
+      descriptionShort:
+        "{{model}} de {{lab}} online: {{credits}} créditos ({{money}}) por {{unit}}. En el navegador o desde el chat. {{hook}}",
+      descriptionMin:
+        "{{model}} online: {{credits}} créditos por {{unit}}. En el navegador o desde el chat. {{hook}}",
+      descriptionNoPriceShort:
+        "{{model}} de {{lab}} ({{type}}). Precio real por uso en créditos, en el navegador o desde el chat.",
       imageAlt: "{{model}} en {{appName}}",
       keywords:
         "{{model}}, precio de {{model}}, IA de {{lab}}, modelo de IA para {{type}}, {{appName}}",

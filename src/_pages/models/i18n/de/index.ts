@@ -11,48 +11,72 @@ export const translations: typeof enTranslations = {
     index: {
       title: "{{count}} KI-Chatmodelle: Preise, Kontext, Filter | {{appName}}",
       description:
-        "Alle Modelle auf {{appName}} in einer Liste: Claude, GPT, Gemini, Grok, DeepSeek, offene und unzensierte Chat-Modelle, dazu Bild, Stimme, Musik und Video. Echter Preis pro Nutzung, Kontextfenster, Eingaben. Modell wählen, loslegen.",
+        "Alle KI-Modelle auf {{appName}}: Claude, GPT, Gemini, Grok, DeepSeek, unzensierte und abliterierte Chats, plus Bild, Ton, Video. Echte Preise, Gratis-Credits.",
       imageAlt: "KI-Modellverzeichnis auf {{appName}}",
       keywords:
         "KI-Modelle, LLM-Vergleich, unzensierte KI, Open-Source-KI, KI-Preise, {{appName}}",
     },
     model: {
-      title: "{{model}}: Preis, API & {{context}} Kontext | {{appName}}",
-      titleShort: "{{model}}: Preis, API & {{context}} Kontext",
-      titleMin: "{{model}}: Preis & API",
-      titleUncensored:
-        "{{model}}: unzensierter KI-Chat online, Preis & API | {{appName}}",
-      titleUncensoredShort:
-        "{{model}}: unzensierter KI-Chat online, Preis & API",
-      titleUncensoredMin: "{{model}}: unzensierter KI-Chat",
+      title: "{{model}} online chatten: Preis & API | {{appName}}",
+      titleShort: "{{model}} online chatten: Preis & API",
+      titleMin: "{{model}} online chatten",
+      titleUncensored: "{{model}} unzensiert online chatten | {{appName}}",
+      titleUncensoredShort: "{{model}} unzensiert online chatten",
       titleLegacy: "{{model}}: Preis & Kontext (veraltet) | {{appName}}",
       titleLegacyShort: "{{model}}: Preis & Kontext (veraltet)",
       description:
-        "{{model}} von {{lab}}: {{input}} Input, {{output}} Output pro 1M Token. {{context}} Kontext, ~{{credits}} Credits pro Nachricht. Gratis-Credits zum Start.",
+        "{{model}} von {{lab}} im Browser chatten, ohne Installation, oder per API: {{input}} Input, {{output}} Output pro 1M Token, {{context}} Kontext. {{hook}}",
       descriptionFlat:
-        "{{model}} von {{lab}}: ~{{credits}} Credits ({{money}}) pro Nachricht, {{context}} Kontext, Stufe {{tier}}. Gratis-Credits zum Start.",
+        "{{model}} von {{lab}} im Browser chatten, ohne Installation, oder per API: ~{{credits}} Credits ({{money}}) pro Nachricht, {{context}} Kontext. {{hook}}",
       descriptionUncensored:
-        "{{model}} im Browser chatten oder per API nutzen. {{input}} Input, {{output}} Output pro 1M Token, {{context}} Kontext. Gratis-Credits für Gäste, einmaliger 18+-Check.",
+        "Unzensierter KI-Chat mit {{model}} im Browser, ohne Installation, oder per API: {{input}} Input, {{output}} Output pro 1M Token, {{context}} Kontext. {{hook}}",
       descriptionUncensoredFlat:
-        "{{model}} im Browser chatten oder per API nutzen. ~{{credits}} Credits ({{money}}) pro Nachricht, {{context}} Kontext. Gratis-Credits für Gäste, einmaliger 18+-Check.",
+        "Unzensierter KI-Chat mit {{model}} im Browser, ohne Installation, oder per API: ~{{credits}} Credits ({{money}}) pro Nachricht, {{context}} Kontext. {{hook}}",
       descriptionLegacy:
         "{{model}} von {{lab}} ist veraltet, Nachfolger: {{successor}}. {{context}} Kontext, ~{{credits}} Credits pro Nachricht. Daten, Preis und Nachfolger.",
       descriptionLegacyNoSuccessor:
         "{{model}} von {{lab}} ist veraltet. {{context}} Kontext, ~{{credits}} Credits pro Nachricht. Daten, Preis und aktuelle Alternativen.",
+      titleUncensoredNamed:
+        "{{model}} online chatten, gratis testen | {{appName}}",
+      titleUncensoredNamedShort: "{{model}} online chatten, gratis testen",
+      hookGuest: "Gratis-Credits, ohne Anmeldung.",
+      hookAccount: "Gratis-Credits mit kostenlosem Konto.",
+      hookPaid: "Abrechnung pro Nachricht in Credits.",
+      hookAdult: "{{hook}} Einmaliger 18+-Check.",
+      descriptionShort:
+        "{{model}} im Browser chatten oder per API nutzen: ~{{credits}} Credits pro Nachricht, {{context}} Kontext. {{hook}}",
+      descriptionUncensoredShort:
+        "Unzensierter KI-Chat mit {{model}} im Browser oder per API: ~{{credits}} Credits pro Nachricht, {{context}} Kontext. {{hook}}",
+      descriptionUncensoredNamed:
+        "{{model}} im Browser chatten, ohne Installation, oder per API: {{input}} Input, {{output}} Output pro 1M Token, {{context}} Kontext. {{hook}}",
+      descriptionUncensoredNamedFlat:
+        "{{model}} im Browser chatten, ohne Installation, oder per API: ~{{credits}} Credits ({{money}}) pro Nachricht, {{context}} Kontext. {{hook}}",
+      descriptionUncensoredNamedShort:
+        "{{model}} im Browser chatten oder per API nutzen: ~{{credits}} Credits pro Nachricht, {{context}} Kontext. {{hook}}",
+      descriptionLegacyShort:
+        "{{model}} von {{lab}} ist veraltet, Nachfolger: {{successor}}. {{context}} Kontext, ~{{credits}} Credits pro Nachricht.",
+      descriptionLegacyNoSuccessorShort:
+        "{{model}} von {{lab}} ist veraltet. {{context}} Kontext, ~{{credits}} Credits pro Nachricht. Dazu aktuelle Alternativen.",
       imageAlt: "{{model}} auf {{appName}}",
       keywords:
         "{{model}}, {{model}} Preis, {{model}} API, {{model}} Kontextfenster, {{lab}} KI, {{appName}}",
     },
     media: {
-      title: "{{model}} Preis: {{credits}} Credits pro {{unit}} | {{appName}}",
-      titleShort: "{{model}} Preis: {{credits}} Credits pro {{unit}}",
-      titleMin: "{{model}}: Preis pro {{unit}}",
+      title: "{{model}} online: {{credits}} Credits pro {{unit}} | {{appName}}",
+      titleShort: "{{model}} online: {{credits}} Credits pro {{unit}}",
+      titleMin: "{{model}} online nutzen",
       titleNoPrice: "{{model}}: Preis & Nutzung, {{type}} | {{appName}}",
       titleNoPriceShort: "{{model}}: Preis & Nutzung, {{type}}",
       description:
-        "{{model}} von {{lab}}, Kategorie {{type}}: {{credits}} Credits ({{money}}) pro {{unit}}. Eingabe: {{inputs}}. Im Tool oder per Chat. Gratis-Credits zum Start.",
+        "{{model}} von {{lab}} ({{type}}) online: {{credits}} Credits ({{money}}) pro {{unit}}. Eingabe: {{inputs}}. Im Browser oder per Chat. {{hook}}",
       descriptionNoPrice:
         "{{model}} von {{lab}}, Kategorie {{type}}, Stufe {{tier}}. Echter Preis pro Nutzung in Credits. Im Tool oder per Chat. Gratis-Credits zum Start.",
+      descriptionShort:
+        "{{model}} von {{lab}} online: {{credits}} Credits ({{money}}) pro {{unit}}. Im Browser oder per Chat. {{hook}}",
+      descriptionMin:
+        "{{model}} online: {{credits}} Credits pro {{unit}}. Im Browser oder per Chat. {{hook}}",
+      descriptionNoPriceShort:
+        "{{model}} von {{lab}} ({{type}}). Echter Preis pro Nutzung in Credits, im Browser oder per Chat.",
       imageAlt: "{{model}} auf {{appName}}",
       keywords:
         "{{model}}, {{model}} Preis, {{lab}} KI, {{type}} KI-Modell, {{appName}}",

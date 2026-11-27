@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "KI ohne Zensur: unzensierter KI-Chat im Browser",
-  metaTitle: "KI ohne Zensur: unzensierter Chat, gratis testen | {{appName}}",
+  metaTitle: "Unzensierter KI-Chat online, gratis testen | {{appName}}",
   description:
     "Unzensierte KI ohne Filter und ohne Anmeldung. Abliterierte und echt unzensierte Modelle im Browser, Gratis-Credits für Gäste. Kosten vergleichen, loschatten.",
   keywords:
     "KI ohne Zensur, unzensierte KI, KI ohne Filter, ChatGPT ohne Filter, KI ohne Einschränkungen, unzensierter KI-Chat, KI-Chatbot ohne Zensur, abliterierte KI",
   intro:
-    "Keine Anmeldung, keine Moralpredigt. Wähl ein KI-Modell ohne Filter für deine Frage oder starte mit dem günstigsten. Du entscheidest, was du liest.",
+    "Unzensierter KI-Chat heißt: Modelle, die antworten statt abzublocken. Direkt im Browser, als Gast, mit Gratis-Credits, ohne Anmeldung, nach einmaligem 18+-Check. Keine Moralpredigt. Du entscheidest, was du liest.",
   tryModel: "{{model}} ausprobieren",
   chooseModel: "Chatmodelle vergleichen",
   choose:
@@ -56,6 +56,20 @@ export const translations: typeof enTranslations = {
     local: {
       q: "Brauche ich für diese Modelle eine Grafikkarte?",
       a: "Ein Browser und eine Internetverbindung reichen. Der Anbieter verarbeitet deine Anfrage. Soll das Modell vollständig auf deinem Rechner laufen, brauchst du eine lokale Installation.",
+    },
+    askAnything: {
+      q: "Kann ich eine unzensierte KI alles fragen?",
+      a: "Fragen darfst du alles. Modelle der unzensierten Stufe überspringen die üblichen Verweigerungsfloskeln, die meisten Fragen bekommen also eine klare Antwort. Ein Modell kann trotzdem ablehnen oder danebenliegen, prüf also wichtige Fakten. Was du mit den Antworten machst, verantwortest du.",
+    },
+    online: {
+      q: "Läuft das online, ganz ohne App?",
+      a: "Ja. Jedes Modell läuft im Browser, am Rechner wie am Handy. Keine Installation, keine GPU. Nach jedem Kauf stehen dieselben Modelle auch über eine OpenAI-kompatible API bereit.",
+    },
+    pick: {
+      q: "Welchen unzensierten KI-Chatbot soll ich nehmen?",
+      a: "Für eine schnelle Frage starte mit {{cheapest}}, dem günstigsten Modell der Liste. Für lange Dokumente nimm ein Modell mit {{context}} Kontextfenster.",
+      aWorldview:
+        "Für eine schnelle Frage starte mit {{cheapest}}, dem günstigsten Modell der Liste. Für lange Dokumente nimm ein Modell mit {{context}} Kontextfenster. Für Antworten abseits der Mainstream-Meinung probier {{model}}: trainiert mit Büchern und Dokumenten, die aus dem Mainstream-Internet verbannt wurden. Das Ergebnis ist ein Modell mit politischen Gegenpositionen.",
     },
   },
   guides: "Modelle und Plattformen vergleichen",

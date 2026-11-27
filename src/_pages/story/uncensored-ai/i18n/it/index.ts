@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   keywords:
     "AI senza censura, IA senza censura, intelligenza artificiale senza censura, ChatGPT senza filtri, chat AI senza censura gratis, AI senza filtri, AI senza limiti, AI abliterata",
   intro:
-    "Niente registrazione, niente prediche. Scegli un modello di IA senza filtri per la tua domanda o parti dal più economico. Sei tu a decidere cosa leggere.",
+    "Una chat IA senza censura usa modelli che rispondono invece di rifiutare. Chatti nel browser come ospite: crediti gratuiti, nessuna registrazione, una sola conferma dei 18 anni. Niente prediche. Sei tu a decidere cosa leggere.",
   tryModel: "Prova {{model}}",
   chooseModel: "Confronta i modelli",
   choose:
@@ -56,6 +56,20 @@ export const translations: typeof enTranslations = {
     local: {
       q: "Mi serve una scheda grafica per usare questi modelli?",
       a: "Bastano un browser e una connessione a internet. Il fornitore elabora la tua domanda. Per eseguire un modello interamente sul tuo computer devi installarlo in locale.",
+    },
+    askAnything: {
+      q: "Posso chiedere qualsiasi cosa a un’IA senza censura?",
+      a: "Puoi fare qualsiasi domanda. I modelli del livello senza censura saltano le solite formule di rifiuto, quindi la maggior parte delle domande riceve una risposta diretta. Un modello può comunque rifiutare o sbagliare, quindi verifica i fatti importanti. Quello che fai con le risposte è una tua responsabilità.",
+    },
+    online: {
+      q: "Funziona online, senza app?",
+      a: "Sì. Ogni modello gira nel browser, da computer o da telefono. Niente da installare, nessuna GPU. Dopo qualsiasi acquisto, gli stessi modelli sono disponibili anche tramite un’API compatibile con OpenAI.",
+    },
+    pick: {
+      q: "Quale chatbot IA senza censura scegliere?",
+      a: "Per una domanda veloce, parti da {{cheapest}}, il modello più economico dell’elenco. Per documenti lunghi, scegli un modello con una finestra di contesto di {{context}}.",
+      aWorldview:
+        "Per una domanda veloce, parti da {{cheapest}}, il modello più economico dell’elenco. Per documenti lunghi, scegli un modello con una finestra di contesto di {{context}}. Per risposte fuori dall’opinione dominante, prova {{model}}: addestrato su libri e documenti banditi dall’internet mainstream, con il risultato di opinioni politiche controcorrente.",
     },
   },
   guides: "Confronta modelli e piattaforme",

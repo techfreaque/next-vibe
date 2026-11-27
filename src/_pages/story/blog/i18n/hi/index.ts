@@ -413,6 +413,12 @@ export const translations: typeof enTranslations = {
     featured: "फ़ीचर्ड",
     relatedGuides: "संबंधित गाइड",
     startHere: "यहाँ से शुरू करें",
+    relatedModels: "आज़माने लायक मॉडल",
+    modelEyebrow: "मॉडल",
+    modelExcerpt: "हर मैसेज की कीमत, कॉन्टेक्स्ट विंडो और कंटेंट लेवल देखें, फिर सीधे चैट करें।",
+    compareEyebrow: "आमने-सामने",
+    compareTitle: "{{a}} बनाम {{b}}",
+    compareExcerpt: "कीमत, कॉन्टेक्स्ट और कंटेंट लेवल एक साथ।",
   },
   topics: {
     uncensored: {

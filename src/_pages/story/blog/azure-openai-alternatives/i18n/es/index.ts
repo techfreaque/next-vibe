@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Alternativa sin censura a Azure OpenAI: APIs comparadas | {{appName}}",
     description:
-      "Azure filtra cada modelo por defecto y prohíbe los chatbots eróticos y románticos incluso sin filtros. Compara {{appName}}, OpenRouter, Venice, NanoGPT, APIs abliterated, Bedrock, Vertex y el autoalojamiento.",
+      "Azure filtra cada modelo por defecto y prohíbe los chatbots eróticos y románticos aun sin filtros. Compara {{appName}}, OpenRouter, Venice y APIs abliterated.",
     category: "Guía para desarrolladores",
     imageAlt: "Alternativas sin censura a Azure OpenAI, comparadas",
     keywords:

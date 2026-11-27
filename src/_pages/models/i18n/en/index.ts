@@ -9,47 +9,71 @@ export const translations = {
     index: {
       title: "{{count}} AI chat models: prices, context, filters | {{appName}}",
       description:
-        "Every model on {{appName}} in one list: Claude, GPT, Gemini, Grok, DeepSeek, open and uncensored chat, plus image, voice, music and video. Real price per use, context window, inputs. Pick one, start now.",
+        "Every AI model on {{appName}}: Claude, GPT, Gemini, Grok, DeepSeek, uncensored and abliterated chat, plus image, voice and video. Real prices, free credits.",
       imageAlt: "AI model directory on {{appName}}",
       keywords:
         "AI models, LLM comparison, uncensored AI, open source AI, AI pricing, {{appName}}",
     },
     model: {
-      title: "{{model}} price, API & {{context}} context | {{appName}}",
-      titleShort: "{{model}} price, API & {{context}} context",
-      titleMin: "{{model}} price & API",
-      titleUncensored:
-        "{{model}}: uncensored AI chat online, price & API | {{appName}}",
-      titleUncensoredShort: "{{model}}: uncensored AI chat online, price & API",
-      titleUncensoredMin: "{{model}}: uncensored AI chat",
+      title: "{{model}} chat online: price & API | {{appName}}",
+      titleShort: "{{model}} chat online: price & API",
+      titleMin: "{{model}} chat online",
+      titleUncensored: "{{model}} chat online, uncensored | {{appName}}",
+      titleUncensoredShort: "{{model}} chat online, uncensored",
       titleLegacy: "{{model}} price & context (legacy) | {{appName}}",
       titleLegacyShort: "{{model}} price & context (legacy)",
       description:
-        "{{model}} by {{lab}}: {{input}} input, {{output}} output per 1M tokens. {{context}} context, ~{{credits}} credits per message. Free credits to start.",
+        "Chat with {{model}} by {{lab}} online, no install, or via API: {{input}} input, {{output}} output per 1M tokens, {{context}} context. {{hook}}",
       descriptionFlat:
-        "{{model}} by {{lab}}: ~{{credits}} credits ({{money}}) per message, {{context}} context, {{tier}} tier. Free credits to start.",
+        "Chat with {{model}} by {{lab}} online, no install, or via API: ~{{credits}} credits ({{money}}) per message, {{context}} context. {{hook}}",
       descriptionUncensored:
-        "Chat with {{model}} online, no install, or call it via API. {{input}} input, {{output}} output per 1M tokens, {{context}} context. Free guest credits, one-time 18+ check.",
+        "Uncensored AI chat with {{model}} online, no install, or via API: {{input}} input, {{output}} output per 1M tokens, {{context}} context. {{hook}}",
       descriptionUncensoredFlat:
-        "Chat with {{model}} online, no install, or call it via API. ~{{credits}} credits ({{money}}) per message, {{context}} context. Free guest credits, one-time 18+ check.",
+        "Uncensored AI chat with {{model}} online, no install, or via API: ~{{credits}} credits ({{money}}) per message, {{context}} context. {{hook}}",
       descriptionLegacy:
         "{{model}} by {{lab}} is a legacy model, replaced by {{successor}}. {{context}} context, ~{{credits}} credits per message. Specs, price and successor.",
       descriptionLegacyNoSuccessor:
         "{{model}} by {{lab}} is a legacy model. {{context}} context, ~{{credits}} credits per message. Specs, price and current alternatives.",
+      titleUncensoredNamed: "{{model}} chat online, free to try | {{appName}}",
+      titleUncensoredNamedShort: "{{model}} chat online, free to try",
+      hookGuest: "Free credits, no sign-up.",
+      hookAccount: "Free account credits to start.",
+      hookPaid: "Pay per message in credits.",
+      hookAdult: "{{hook}} One-time 18+ check.",
+      descriptionShort:
+        "Chat with {{model}} online or via API: ~{{credits}} credits per message, {{context}} context. {{hook}}",
+      descriptionUncensoredShort:
+        "Uncensored AI chat with {{model}} online or via API: ~{{credits}} credits per message, {{context}} context. {{hook}}",
+      descriptionUncensoredNamed:
+        "Chat with {{model}} online, no install, or via API: {{input}} input, {{output}} output per 1M tokens, {{context}} context. {{hook}}",
+      descriptionUncensoredNamedFlat:
+        "Chat with {{model}} online, no install, or via API: ~{{credits}} credits ({{money}}) per message, {{context}} context. {{hook}}",
+      descriptionUncensoredNamedShort:
+        "Chat with {{model}} online or via API: ~{{credits}} credits per message, {{context}} context. {{hook}}",
+      descriptionLegacyShort:
+        "{{model}} by {{lab}} is a legacy model, replaced by {{successor}}. {{context}} context, ~{{credits}} credits per message.",
+      descriptionLegacyNoSuccessorShort:
+        "{{model}} by {{lab}} is a legacy model. {{context}} context, ~{{credits}} credits per message. See current alternatives.",
       imageAlt: "{{model}} on {{appName}}",
       keywords:
         "{{model}}, {{model}} price, {{model}} API, {{model}} context window, {{lab}} AI, {{appName}}",
     },
     media: {
-      title: "{{model}} price: {{credits}} credits per {{unit}} | {{appName}}",
-      titleShort: "{{model}} price: {{credits}} credits per {{unit}}",
-      titleMin: "{{model}} price per {{unit}}",
+      title: "{{model}} online: {{credits}} credits per {{unit}} | {{appName}}",
+      titleShort: "{{model}} online: {{credits}} credits per {{unit}}",
+      titleMin: "{{model}} online",
       titleNoPrice: "{{model}}: {{type}} AI price & how to use | {{appName}}",
       titleNoPriceShort: "{{model}}: {{type}} AI price & how to use",
       description:
-        "{{model}} by {{lab}} ({{type}}): {{credits}} credits ({{money}}) per {{unit}}. Input: {{inputs}}. Run it in the tool or from chat. Free credits to start.",
+        "{{model}} by {{lab}} ({{type}}) online: {{credits}} credits ({{money}}) per {{unit}}. Input: {{inputs}}. Use it in the browser or from chat. {{hook}}",
       descriptionNoPrice:
         "{{model}} by {{lab}} ({{type}}), {{tier}} tier. Real price per use in credits. Run it in the tool or from chat. Free credits to start.",
+      descriptionShort:
+        "{{model}} by {{lab}} online: {{credits}} credits ({{money}}) per {{unit}}. Use it in the browser or from chat. {{hook}}",
+      descriptionMin:
+        "{{model}} online: {{credits}} credits per {{unit}}. Use it in the browser or from chat. {{hook}}",
+      descriptionNoPriceShort:
+        "{{model}} by {{lab}} ({{type}}). Real price per use in credits, in the browser or from chat.",
       imageAlt: "{{model}} on {{appName}}",
       keywords:
         "{{model}}, {{model}} price, {{lab}} AI, {{type}} AI model, {{appName}}",

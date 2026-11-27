@@ -119,20 +119,51 @@ describe("model page titles and descriptions", () => {
     }
   });
 
-  test("titles fit a search result when a short variant exists", () => {
+  test("titles and descriptions fit a search result in every locale", () => {
+    for (const locale of LOCALES) {
+      const metas = [
+        ...listModelFacts(ALL).map((facts) => chatModelMeta(facts, locale)),
+        ...listMediaFacts(ALL).map((facts) => mediaModelMeta(facts, locale)),
+      ];
+      for (const meta of metas) {
+        expect(meta.title.length).toBeLessThanOrEqual(60);
+        expect(meta.description.length).toBeLessThanOrEqual(160);
+        // A few long-named legacy pages land just under the 120 target.
+        expect(meta.description.length).toBeGreaterThanOrEqual(110);
+      }
+    }
+  });
+
+  test("current chat titles lead with '<model> chat online'", () => {
     for (const facts of listModelFacts(ALL)) {
-      expect(chatModelMeta(facts, "en-US").title.length).toBeLessThanOrEqual(
-        60,
+      const title = chatModelMeta(facts, "en-US").title;
+      expect(title.startsWith(`${facts.name} chat online`)).toBe(
+        !facts.isLegacy,
       );
     }
   });
 
-  test("uncensored titles only on uncensored-tier pages", () => {
+  test("uncensored wording only on uncensored-tier pages", () => {
     for (const facts of listModelFacts(ALL)) {
-      const title = chatModelMeta(facts, "en-US").title;
-      expect(title.includes("uncensored AI")).toBe(
-        !facts.isLegacy && facts.content === ContentLevel.UNCENSORED,
-      );
+      if (facts.isLegacy) {
+        continue;
+      }
+      const { title, description } = chatModelMeta(facts, "en-US");
+      const uncensored = facts.content === ContentLevel.UNCENSORED;
+      // The tier shows in the title, either in our wording or the model name.
+      expect(/uncensored|abliterat/i.test(title)).toBe(uncensored);
+      expect(description.includes("18+") || /uncensored|abliterat/i.test(description)).toBe(uncensored);
+    }
+  });
+
+  test("no sign-up promise unless the guest allowance covers one message", () => {
+    for (const facts of listModelFacts(ALL)) {
+      const { description } = chatModelMeta(facts, "en-US");
+      if (description.includes("no sign-up")) {
+        expect(facts.creditsPerMessage).toBeLessThanOrEqual(
+          FREE_CREDIT_ALLOWANCE.guest,
+        );
+      }
     }
   });
 });

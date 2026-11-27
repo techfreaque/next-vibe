@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Uncensored LLM API: Abliterated Models, OpenAI SDK | {{appName}}",
     description:
-      "Uncensored and abliterated models behind one OpenAI and Anthropic compatible API. Model ids, prices vs other hosts, what Vertex, Azure, Bedrock and Together really allow, code and limits.",
+      "Uncensored and abliterated models on one OpenAI and Anthropic compatible API. Model ids, prices vs other hosts, what Vertex, Azure and Bedrock allow, code.",
     category: "Developer Guide",
     imageAlt: "Uncensored LLM API with OpenAI-compatible endpoints",
     keywords:

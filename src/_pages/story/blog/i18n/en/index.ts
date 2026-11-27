@@ -415,6 +415,13 @@ export const translations = {
     featured: "Featured",
     relatedGuides: "Related guides",
     startHere: "Start here",
+    relatedModels: "Models to try",
+    modelEyebrow: "Model",
+    modelExcerpt:
+      "Price per message, context window and content tier, then chat with it.",
+    compareEyebrow: "Head to head",
+    compareTitle: "{{a}} vs {{b}}",
+    compareExcerpt: "Price, context and content tier side by side.",
   },
   topics: {
     uncensored: {

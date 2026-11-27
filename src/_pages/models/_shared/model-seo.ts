@@ -91,18 +91,72 @@ function fitTitle(
 
 /** Google cuts snippets at ~160 characters. */
 const DESCRIPTION_MAX_CHARS = 160;
+/** Shorter snippets leave room Google fills with page text. */
+const DESCRIPTION_MIN_CHARS = 120;
 
-/** The full description when it fits a snippet, else the shorter one. */
+/**
+ * First candidate (richest first) inside the 120-160 snippet window, else the
+ * first that fits under 160, else the last (shortest).
+ */
 function fitDescription(
-  full: TranslatedKeyType,
-  short: TranslatedKeyType,
+  first: TranslatedKeyType,
+  ...rest: TranslatedKeyType[]
 ): TranslatedKeyType {
-  return full.length <= DESCRIPTION_MAX_CHARS ? full : short;
+  const candidates = [first, ...rest];
+  const fitting = candidates.filter(
+    (candidate) => candidate.length <= DESCRIPTION_MAX_CHARS,
+  );
+  return (
+    fitting.find((candidate) => candidate.length >= DESCRIPTION_MIN_CHARS) ??
+    fitting[0] ??
+    candidates[candidates.length - 1] ??
+    first
+  );
 }
 
 export interface PageMeta {
   title: TranslatedKeyType;
   description: TranslatedKeyType;
+}
+
+/** The model's own name already says it is uncensored or abliterated. */
+function nameSaysUncensored(name: string): boolean {
+  return /uncensored|abliterat/i.test(name);
+}
+
+/** Description templates per page family, richest first. */
+const DESCRIPTION_TEMPLATES = {
+  plain: {
+    token: "description",
+    flat: "descriptionFlat",
+    short: "descriptionShort",
+  },
+  uncensored: {
+    token: "descriptionUncensored",
+    flat: "descriptionUncensoredFlat",
+    short: "descriptionUncensoredShort",
+  },
+  uncensoredNamed: {
+    token: "descriptionUncensoredNamed",
+    flat: "descriptionUncensoredNamedFlat",
+    short: "descriptionUncensoredNamedShort",
+  },
+} as const;
+
+type StartHook = "hookGuest" | "hookAccount" | "hookPaid";
+
+/**
+ * What the free allowances buy for one use: guests (no sign-up) when the
+ * guest pool covers at least one use, else a free account, else paid only.
+ * Same thresholds as the "Is <model> free?" FAQ.
+ */
+function startHook(creditsPerUse: number): StartHook {
+  if (creditsPerUse <= FREE_CREDIT_ALLOWANCE.guest) {
+    return "hookGuest";
+  }
+  return creditsPerUse <= FREE_CREDIT_SIGNED_IN_TOTAL
+    ? "hookAccount"
+    : "hookPaid";
 }
 
 export function chatModelMeta(
@@ -138,42 +192,68 @@ export function chatModelMeta(
       ),
       description:
         facts.successor === null
-          ? t("meta.model.descriptionLegacyNoSuccessor", vars)
-          : t("meta.model.descriptionLegacy", vars),
+          ? fitDescription(
+              t("meta.model.descriptionLegacyNoSuccessor", vars),
+              t("meta.model.descriptionLegacyNoSuccessorShort", vars),
+            )
+          : fitDescription(
+              t("meta.model.descriptionLegacy", vars),
+              t("meta.model.descriptionLegacyShort", vars),
+            ),
     };
   }
   const uncensored = facts.content === ContentLevel.UNCENSORED;
-  const flatDescription = t(
-    uncensored
-      ? "meta.model.descriptionUncensoredFlat"
-      : "meta.model.descriptionFlat",
-    vars,
+  const named = uncensored && nameSaysUncensored(facts.name);
+  const hookKey = startHook(facts.creditsPerMessage);
+  const plainHook = t(`meta.model.${hookKey}`);
+  // Uncensored models add the one-time age check; it is the first thing cut.
+  const hooks = uncensored
+    ? [t("meta.model.hookAdult", { hook: plainHook }), plainHook]
+    : [plainHook];
+  const family = !uncensored
+    ? DESCRIPTION_TEMPLATES.plain
+    : named
+      ? DESCRIPTION_TEMPLATES.uncensoredNamed
+      : DESCRIPTION_TEMPLATES.uncensored;
+  // Richest first: token prices, then the flat per-message price, then the
+  // short line without lab and money. Each with and without the age check.
+  const templates =
+    facts.tokenPrice === null
+      ? [family.flat, family.short]
+      : [family.token, family.flat, family.short];
+  const candidates = templates.flatMap((template) =>
+    hooks.map((hook) => t(`meta.model.${template}`, { ...vars, hook })),
   );
-  const description = facts.tokenPrice
-    ? fitDescription(
-        t(
-          uncensored
-            ? "meta.model.descriptionUncensored"
-            : "meta.model.description",
-          vars,
-        ),
-        flatDescription,
+  const [firstCandidate, ...otherCandidates] = candidates;
+  const description =
+    firstCandidate === undefined
+      ? t("meta.model.descriptionShort", { ...vars, hook: plainHook })
+      : fitDescription(firstCandidate, ...otherCandidates);
+  // "<model> chat online" leads every title: the query shape that ranks.
+  const title = !uncensored
+    ? fitTitle(
+        t("meta.model.title", vars),
+        t("meta.model.titleShort", vars),
+        t("meta.model.titleMin", vars),
       )
-    : flatDescription;
-  return {
-    title: uncensored
-      ? fitTitle(
+    : named
+      ? hookKey === "hookGuest"
+        ? fitTitle(
+            t("meta.model.titleUncensoredNamed", vars),
+            t("meta.model.titleUncensoredNamedShort", vars),
+            t("meta.model.titleMin", vars),
+          )
+        : fitTitle(
+            t("meta.model.title", vars),
+            t("meta.model.titleShort", vars),
+            t("meta.model.titleMin", vars),
+          )
+      : fitTitle(
           t("meta.model.titleUncensored", vars),
           t("meta.model.titleUncensoredShort", vars),
-          t("meta.model.titleUncensoredMin", vars),
-        )
-      : fitTitle(
-          t("meta.model.title", vars),
-          t("meta.model.titleShort", vars),
           t("meta.model.titleMin", vars),
-        ),
-    description,
-  };
+        );
+  return { title, description };
 }
 
 export function mediaModelMeta(
@@ -196,7 +276,10 @@ export function mediaModelMeta(
         t("meta.media.titleNoPrice", base),
         t("meta.media.titleNoPriceShort", base),
       ),
-      description: t("meta.media.descriptionNoPrice", base),
+      description: fitDescription(
+        t("meta.media.descriptionNoPrice", base),
+        t("meta.media.descriptionNoPriceShort", base),
+      ),
     };
   }
   const vars = {
@@ -204,6 +287,7 @@ export function mediaModelMeta(
     credits: formatNumber(facts.price.credits, locale),
     money: formatMoney(facts.price.credits, locale),
     unit: mediaUnitText(facts.price, t),
+    hook: t(`meta.model.${startHook(facts.price.credits)}`),
   };
   return {
     title: fitTitle(
@@ -211,7 +295,11 @@ export function mediaModelMeta(
       t("meta.media.titleShort", vars),
       t("meta.media.titleMin", vars),
     ),
-    description: t("meta.media.description", vars),
+    description: fitDescription(
+      t("meta.media.description", vars),
+      t("meta.media.descriptionShort", vars),
+      t("meta.media.descriptionMin", vars),
+    ),
   };
 }
 
@@ -1064,11 +1152,37 @@ export function chatModelLanding(facts: ModelFacts): ModelLandingKey | null {
 }
 
 /**
- * Posts that cover this chat model, most specific first: the explainer for
- * its kind of uncensored and the best uncensored LLM guide, then roleplay,
+ * Posts that cover this chat model, most specific first: the post about its
+ * family or platform, the explainer for its kind of uncensored and the best uncensored LLM guide, then roleplay,
  * API and coding-tool guides where relevant. A landing page (see
  * chatModelLanding) takes one of the MAX_BLOG_LINKS slots.
  */
+/**
+ * The post written about this model's own family or platform, if any:
+ * DeepSeek, Claude, Grok, GPT, Gab, FreedomGPT and Venice each have one.
+ */
+function familyPost(facts: ModelFacts): BlogPostSlug | null {
+  if (facts.slug.includes("deepseek")) {
+    return "deepseek-uncensored";
+  }
+  switch (facts.labName) {
+    case "Anthropic":
+      return "claude-without-filters";
+    case "xAI":
+      return "grok-alternative";
+    case "OpenAI":
+      return "chatgpt-alternative-without-filters";
+    case "Gab AI":
+      return "gab-ai-alternatives";
+    case "FreedomGPT":
+      return "freedomgpt-alternatives";
+    case "Venice.ai":
+      return "venice-ai-alternatives";
+    default:
+      return null;
+  }
+}
+
 export function chatModelBlogSlugs(facts: ModelFacts): BlogPostSlug[] {
   const kind = uncensoredKind(facts);
   const roleplay = hasStrength(
@@ -1076,13 +1190,20 @@ export function chatModelBlogSlugs(facts: ModelFacts): BlogPostSlug[] {
     ModelUtility.ROLEPLAY,
     ModelUtility.ROLEPLAY_DARK,
   );
+  const family = familyPost(facts);
   const candidates: BlogPostSlug[] = [];
   if (kind !== null) {
+    // The family post takes the explainer's slot; the best-uncensored guide
+    // stays on every uncensored page.
     candidates.push(
+      family ??
+        (kind === "abliterated"
+          ? "abliterated-vs-uncensored-models"
+          : "uncensored-models-what-each-is-good-at"),
+      "best-uncensored-llm",
       kind === "abliterated"
         ? "abliterated-vs-uncensored-models"
         : "uncensored-models-what-each-is-good-at",
-      "best-uncensored-llm",
     );
     if (roleplay) {
       candidates.push("ai-roleplay-without-filter");
@@ -1095,6 +1216,9 @@ export function chatModelBlogSlugs(facts: ModelFacts): BlogPostSlug[] {
       "chatgpt-alternative-without-filters",
     );
   } else {
+    if (family !== null) {
+      candidates.push(family);
+    }
     if (hasStrength(facts, ModelUtility.CODING) && facts.supportsTools) {
       candidates.push("unbottled-api-in-coding-tools");
     }

@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   keywords:
     "abliterowana AI, abliterowane modele, LLM bez cenzury, model AI bez filtrów, nieocenzurowany LLM, abliteracja, AI open source bez cenzury",
   intro:
-    "Modele z głównego nurtu, z których wycięto odmowy. Wybierz jeden, a czat otworzy się od razu z tym modelem.",
+    "Czat AI abliterowany: modele z głównego nurtu, z których wag wycięto odmowy, działające w przeglądarce. Bez GPU, bez rejestracji, darmowe kredyty. Wybierz jeden, a czat otworzy się od razu z tym modelem.",
   models: "Abliterowane modele bez cenzury",
   estimate:
     "Szacunek opiera się na cenie najtańszego dostępnego dostawcy danego modelu i zakłada {{input}} tokenów wejściowych oraz {{output}} wyjściowych. Rzeczywisty koszt zależy od dostawcy i długości rozmowy.",
@@ -55,6 +55,14 @@ export const translations: typeof enTranslations = {
     api: {
       q: "Czy mogę używać modeli abliterowanych przez API?",
       a: "Tak. Te same modele są dostępne przez API zgodne z OpenAI i Anthropic, więc twoje obecne SDK zadziała. Klucze API wymagają płatnego planu. Darmowe i bonusowe kredyty ich nie odblokowują.",
+    },
+    spelling: {
+      q: "Abliterated czy obliterated: jak poprawnie?",
+      a: "Abliterated. Słowo łączy ablację, czyli usunięcie części sieci neuronowej, z angielskim obliterate (zniszczyć). Wiele osób szuka „obliterated AI chat”. Chodzi o tę samą technikę i te same modele, które są tutaj.",
+    },
+    firstPick: {
+      q: "Od którego abliterowanego modelu zacząć?",
+      a: "{{model}} jest tu najtańszy, około {{credits}} kredytów za turę, więc to najtańszy start. Żeby zobaczyć, co zmieniła abliteracja, wyślij ten sam prompt także do oryginalnego modelu.",
     },
   },
   guides: "Poznaj AI bez cenzury",

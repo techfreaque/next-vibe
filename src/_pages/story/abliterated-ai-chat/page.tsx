@@ -117,8 +117,21 @@ export function TanstackPage({
     { name: uncensoredT("breadcrumb"), path: TOPIC_HUB_PATHS.uncensored },
     { name: t("breadcrumb"), path: TOPIC_HUB_PATHS.abliterated },
   ];
+  const cheapest = models[0];
   const faq = [
     { question: t("faq.meaning.q"), answer: t("faq.meaning.a") },
+    { question: t("faq.spelling.q"), answer: t("faq.spelling.a") },
+    ...(cheapest !== undefined
+      ? [
+          {
+            question: t("faq.firstPick.q"),
+            answer: t("faq.firstPick.a", {
+              model: cheapest.name,
+              credits: formatNumber(cheapest.creditsPerMessage, locale),
+            }),
+          },
+        ]
+      : []),
     ...(worldviewModel !== null
       ? [
           {

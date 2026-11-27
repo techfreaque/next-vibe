@@ -11,48 +11,72 @@ export const translations: typeof enTranslations = {
     index: {
       title: "{{count}} AI चैट मॉडल: कीमत, कॉन्टेक्स्ट, फ़िल्टर | {{appName}}",
       description:
-        "{{appName}} के सारे मॉडल एक लिस्ट में: Claude, GPT, Gemini, Grok, DeepSeek, ओपन और अनसेंसर्ड चैट, साथ में इमेज, वॉइस, म्यूज़िक और वीडियो। असली कीमत, कॉन्टेक्स्ट। अभी शुरू करें।",
+        "{{appName}} के सारे AI मॉडल: Claude, GPT, Gemini, Grok, DeepSeek, अनसेंसर्ड और abliterated चैट, साथ में इमेज, वॉइस और वीडियो। असली कीमत, फ़्री क्रेडिट।",
       imageAlt: "{{appName}} पर AI मॉडल डायरेक्टरी",
       keywords:
         "AI मॉडल, LLM तुलना, अनसेंसर्ड AI, ओपन सोर्स AI, AI कीमत, हिंदी में AI, {{appName}}",
     },
     model: {
-      title: "{{model}} कीमत, API और {{context}} कॉन्टेक्स्ट | {{appName}}",
-      titleShort: "{{model}} कीमत, API और {{context}} कॉन्टेक्स्ट",
-      titleMin: "{{model}} कीमत और API",
-      titleUncensored:
-        "{{model}}: अनसेंसर्ड AI चैट ऑनलाइन, कीमत और API | {{appName}}",
-      titleUncensoredShort: "{{model}}: अनसेंसर्ड AI चैट ऑनलाइन, कीमत और API",
-      titleUncensoredMin: "{{model}}: अनसेंसर्ड AI चैट",
+      title: "{{model}} चैट ऑनलाइन: कीमत और API | {{appName}}",
+      titleShort: "{{model}} चैट ऑनलाइन: कीमत और API",
+      titleMin: "{{model}} चैट ऑनलाइन",
+      titleUncensored: "{{model}} अनसेंसर्ड चैट ऑनलाइन | {{appName}}",
+      titleUncensoredShort: "{{model}} अनसेंसर्ड चैट ऑनलाइन",
       titleLegacy: "{{model}} कीमत और कॉन्टेक्स्ट (पुराना) | {{appName}}",
       titleLegacyShort: "{{model}} कीमत और कॉन्टेक्स्ट (पुराना)",
       description:
-        "{{lab}} का {{model}}: हर 1M टोकन पर {{input}} इनपुट, {{output}} आउटपुट। {{context}} कॉन्टेक्स्ट, हर मैसेज ~{{credits}} क्रेडिट। शुरू करने के लिए फ़्री क्रेडिट।",
+        "{{lab}} के {{model}} से ऑनलाइन चैट करें, कुछ इंस्टॉल नहीं, या API से: हर 1M टोकन पर {{input}} इनपुट, {{output}} आउटपुट, {{context}} कॉन्टेक्स्ट। {{hook}}",
       descriptionFlat:
-        "{{lab}} का {{model}}: हर मैसेज ~{{credits}} क्रेडिट ({{money}}), {{context}} कॉन्टेक्स्ट, {{tier}} टियर। शुरू करने के लिए फ़्री क्रेडिट।",
+        "{{lab}} के {{model}} से ऑनलाइन चैट करें, कुछ इंस्टॉल नहीं, या API से: हर मैसेज ~{{credits}} क्रेडिट ({{money}}), {{context}} कॉन्टेक्स्ट। {{hook}}",
       descriptionUncensored:
-        "{{model}} से ऑनलाइन चैट करें, कुछ इंस्टॉल नहीं, या API से चलाएँ। हर 1M टोकन पर {{input}} इनपुट, {{output}} आउटपुट, {{context}} कॉन्टेक्स्ट। फ़्री गेस्ट क्रेडिट, एक बार 18+ चेक।",
+        "{{model}} के साथ अनसेंसर्ड AI चैट, ऑनलाइन, कुछ इंस्टॉल नहीं, या API से: हर 1M टोकन पर {{input}} इनपुट, {{output}} आउटपुट, {{context}} कॉन्टेक्स्ट। {{hook}}",
       descriptionUncensoredFlat:
-        "{{model}} से ऑनलाइन चैट करें, कुछ इंस्टॉल नहीं, या API से चलाएँ। हर मैसेज ~{{credits}} क्रेडिट ({{money}}), {{context}} कॉन्टेक्स्ट। फ़्री गेस्ट क्रेडिट, एक बार 18+ चेक।",
+        "{{model}} के साथ अनसेंसर्ड AI चैट, ऑनलाइन, कुछ इंस्टॉल नहीं, या API से: हर मैसेज ~{{credits}} क्रेडिट ({{money}}), {{context}} कॉन्टेक्स्ट। {{hook}}",
       descriptionLegacy:
         "{{lab}} का {{model}} अब पुराना मॉडल है, इसकी जगह {{successor}} ने ली है। {{context}} कॉन्टेक्स्ट, हर मैसेज ~{{credits}} क्रेडिट। स्पेक्स, कीमत और नया मॉडल।",
       descriptionLegacyNoSuccessor:
         "{{lab}} का {{model}} अब पुराना मॉडल है। {{context}} कॉन्टेक्स्ट, हर मैसेज ~{{credits}} क्रेडिट। स्पेक्स, कीमत और मौजूदा विकल्प।",
+      titleUncensoredNamed: "{{model}} चैट ऑनलाइन, फ़्री में आज़माएँ | {{appName}}",
+      titleUncensoredNamedShort: "{{model}} चैट ऑनलाइन, फ़्री में आज़माएँ",
+      hookGuest: "फ़्री क्रेडिट, साइन-अप की ज़रूरत नहीं।",
+      hookAccount: "फ़्री अकाउंट पर शुरुआती क्रेडिट।",
+      hookPaid: "हर मैसेज का भुगतान क्रेडिट में।",
+      hookAdult: "{{hook}} एक बार 18+ चेक।",
+      descriptionShort:
+        "{{model}} से ऑनलाइन या API से चैट करें: हर मैसेज ~{{credits}} क्रेडिट, {{context}} कॉन्टेक्स्ट। {{hook}}",
+      descriptionUncensoredShort:
+        "{{model}} के साथ अनसेंसर्ड AI चैट, ऑनलाइन या API से: हर मैसेज ~{{credits}} क्रेडिट, {{context}} कॉन्टेक्स्ट। {{hook}}",
+      descriptionUncensoredNamed:
+        "{{model}} से ऑनलाइन चैट करें, कुछ इंस्टॉल नहीं, या API से: हर 1M टोकन पर {{input}} इनपुट, {{output}} आउटपुट, {{context}} कॉन्टेक्स्ट। {{hook}}",
+      descriptionUncensoredNamedFlat:
+        "{{model}} से ऑनलाइन चैट करें, कुछ इंस्टॉल नहीं, या API से: हर मैसेज ~{{credits}} क्रेडिट ({{money}}), {{context}} कॉन्टेक्स्ट। {{hook}}",
+      descriptionUncensoredNamedShort:
+        "{{model}} से ऑनलाइन या API से चैट करें: हर मैसेज ~{{credits}} क्रेडिट, {{context}} कॉन्टेक्स्ट। {{hook}}",
+      descriptionLegacyShort:
+        "{{lab}} का {{model}} पुराना मॉडल है, इसकी जगह {{successor}} ने ली है। {{context}} कॉन्टेक्स्ट, हर मैसेज ~{{credits}} क्रेडिट।",
+      descriptionLegacyNoSuccessorShort:
+        "{{lab}} का {{model}} पुराना मॉडल है। {{context}} कॉन्टेक्स्ट, हर मैसेज ~{{credits}} क्रेडिट। मौजूदा विकल्प भी देखें।",
       imageAlt: "{{appName}} पर {{model}}",
       keywords:
         "{{model}}, {{model}} कीमत, {{model}} API, {{model}} कॉन्टेक्स्ट विंडो, {{lab}} AI, {{appName}}",
     },
     media: {
-      title: "{{model}} कीमत: हर {{unit}} {{credits}} क्रेडिट | {{appName}}",
-      titleShort: "{{model}} कीमत: हर {{unit}} {{credits}} क्रेडिट",
-      titleMin: "{{model}} कीमत प्रति {{unit}}",
+      title: "{{model}} ऑनलाइन: हर {{unit}} {{credits}} क्रेडिट | {{appName}}",
+      titleShort: "{{model}} ऑनलाइन: हर {{unit}} {{credits}} क्रेडिट",
+      titleMin: "{{model}} ऑनलाइन",
       titleNoPrice:
         "{{model}}: {{type}} AI कीमत और इस्तेमाल का तरीका | {{appName}}",
       titleNoPriceShort: "{{model}}: {{type}} AI कीमत और इस्तेमाल का तरीका",
       description:
-        "{{lab}} का {{model}} ({{type}}): हर {{unit}} {{credits}} क्रेडिट ({{money}})। इनपुट: {{inputs}}। टूल में या चैट से चलाएँ। शुरू करने के लिए फ़्री क्रेडिट।",
+        "{{lab}} का {{model}} ({{type}}) ऑनलाइन: हर {{unit}} {{credits}} क्रेडिट ({{money}})। इनपुट: {{inputs}}। ब्राउज़र में या चैट से चलाएँ। {{hook}}",
       descriptionNoPrice:
         "{{lab}} का {{model}} ({{type}}), {{tier}} टियर। हर इस्तेमाल की असली कीमत क्रेडिट में। टूल में या चैट से चलाएँ। शुरू करने के लिए फ़्री क्रेडिट।",
+      descriptionShort:
+        "{{lab}} का {{model}} ऑनलाइन: हर {{unit}} {{credits}} क्रेडिट ({{money}})। ब्राउज़र में या चैट से चलाएँ। {{hook}}",
+      descriptionMin:
+        "{{model}} ऑनलाइन: हर {{unit}} {{credits}} क्रेडिट। ब्राउज़र में या चैट से चलाएँ। {{hook}}",
+      descriptionNoPriceShort:
+        "{{lab}} का {{model}} ({{type}})। हर इस्तेमाल की असली कीमत क्रेडिट में, ब्राउज़र में या चैट से।",
       imageAlt: "{{appName}} पर {{model}}",
       keywords:
         "{{model}}, {{model}} कीमत, {{lab}} AI, {{type}} AI मॉडल, {{appName}}",

@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Abliterierte KI-Modelle: LLMs ohne Zensur online testen",
-  metaTitle: "Abliterierte KI-Modelle ohne Zensur online testen | {{appName}}",
+  metaTitle: "Abliterierte KI online chatten, gratis testen | {{appName}}",
   description:
     "Abliterierte LLMs ohne Verweigerung im Browser testen, ohne GPU und ohne Anmeldung. Kontext und Kosten vergleichen, gegen das Originalmodell antreten lassen.",
   keywords:
     "abliterierte KI, abliterierte Modelle, LLM ohne Zensur, KI-Modell ohne Filter, unzensiertes LLM, Abliteration, Open-Source-KI ohne Zensur",
   intro:
-    "Mainstream-Modelle, denen die Verweigerung herausgeschnitten wurde. Wähl eins aus und der Chat öffnet sich mit genau diesem Modell.",
+    "Abliterierter KI-Chat: Mainstream-Modelle, denen die Verweigerung aus den Gewichten herausgeschnitten wurde, direkt im Browser. Keine GPU, keine Anmeldung, Gratis-Credits. Wähl eins aus und der Chat öffnet sich mit genau diesem Modell.",
   models: "Abliterierte Modelle ohne Zensur",
   estimate:
     "Die Schätzung gilt für den günstigsten verfügbaren Anbieter pro Modell und rechnet mit {{input}} Eingabe- und {{output}} Ausgabetokens. Die tatsächlichen Kosten hängen vom Anbieter und von der Gesprächslänge ab.",
@@ -55,6 +55,14 @@ export const translations: typeof enTranslations = {
     api: {
       q: "Kann ich abliterierte Modelle per API nutzen?",
       a: "Ja. Dieselben Modelle gibt es über eine OpenAI- und Anthropic-kompatible API, dein bestehendes SDK funktioniert also. API-Schlüssel brauchen einen bezahlten Plan. Gratis- und Bonus-Credits schalten sie nicht frei.",
+    },
+    spelling: {
+      q: "Abliterated oder obliterated: was stimmt?",
+      a: "Abliterated. Das Wort verbindet Ablation, also das Entfernen eines Teils im neuronalen Netz, mit obliterate (auslöschen). Viele suchen nach obliterated AI Chat. Gemeint ist dieselbe Technik, gemeint sind dieselben Modelle wie hier.",
+    },
+    firstPick: {
+      q: "Welches abliterierte Modell zuerst testen?",
+      a: "{{model}} ist hier am günstigsten, rund {{credits}} Credits pro Runde, also der billigste Einstieg. Um zu sehen, was die Abliteration verändert hat, schick denselben Prompt auch an das Originalmodell.",
     },
   },
   guides: "Mehr über unzensierte KI",

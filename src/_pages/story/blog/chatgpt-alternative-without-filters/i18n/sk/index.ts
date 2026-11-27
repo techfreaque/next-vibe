@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatíva k ChatGPT bez filtrov | {{appName}}",
     description:
-      "Porovnaj alternatívy k ChatGPT, ktoré odmietajú menej požiadaviek: {{appName}}, Venice, NanoGPT aj lokálne aplikácie. Zisti, aké modely, limity a možnosti súkromia ponúkajú.",
+      "Alternatívy k ChatGPT, ktoré odmietajú menej: {{appName}}, Venice, NanoGPT aj lokálne aplikácie. Porovnaj modely, limity a súkromie, ktoré ponúkajú.",
     category: "Príručka",
     imageAlt: "{{appName}}: alternatíva k ChatGPT bez filtrov",
     keywords:

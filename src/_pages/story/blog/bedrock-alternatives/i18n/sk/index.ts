@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "AWS Bedrock bez cenzúry: porovnanie alternatív API | {{appName}}",
     description:
-      "Bedrock Guardrails sú voliteľné, ale odmietnutia modelov a zásady AWS ostávajú. Porovnanie Custom Model Import pre abliterované váhy s {{appName}}, OpenRouter, Venice, NanoGPT a vlastným hostingom.",
+      "Bedrock Guardrails sú voliteľné, odmietnutia modelov a zásady AWS však ostávajú. Custom Model Import pre abliterované váhy oproti {{appName}} a Venice.",
     category: "Pre vývojárov",
     imageAlt: "Alternatívy k AWS Bedrock bez cenzúry, porovnanie",
     keywords:

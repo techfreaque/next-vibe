@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatívy k NanoGPT: cena za použitie a filtre (2026)",
     description:
-      "NanoGPT obmedzil PRO, zdražel a zverejnil prípady sprístupnenia údajov poskytovateľom. Porovnaj {{appName}}, OpenRouter, Venice, Featherless, Arli AI a Infermatic.",
+      "NanoGPT obmedzil PRO, zdražel a priznal sprístupnenie údajov poskytovateľom. Porovnaj {{appName}}, OpenRouter, Venice, Featherless, Arli AI a Infermatic.",
     category: "Porovnanie",
     imageAlt:
       "Alternatívy k NanoGPT s platbou podľa spotreby a modelmi bez cenzúry",

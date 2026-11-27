@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "API pre LLM bez cenzúry a SDK OpenAI | {{appName}}",
     description:
-      "Necenzurované a abliterované modely cez API kompatibilné s OpenAI a Anthropic. ID modelov, ceny oproti iným hostiteľom, čo naozaj dovoľujú Vertex, Azure, Bedrock a Together, kód a limity.",
+      "Necenzurované a abliterované modely cez API kompatibilné s OpenAI a Anthropic. ID modelov, ceny oproti iným hostiteľom, čo dovolia Vertex, Azure a Bedrock, kód.",
     category: "Pre vývojárov",
     imageAlt:
       "API pre LLM bez cenzúry s koncovými bodmi kompatibilnými s OpenAI",

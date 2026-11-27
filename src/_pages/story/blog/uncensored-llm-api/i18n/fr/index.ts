@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "API LLM non censurée : modèles abliterated | {{appName}}",
     description:
-      "Modèles non censurés et abliterated derrière une seule API compatible OpenAI et Anthropic. Identifiants, prix face aux autres hébergeurs, ce que Vertex, Azure, Bedrock et Together autorisent vraiment, code et limites.",
+      "Modèles non censurés et abliterated via une API compatible OpenAI et Anthropic. Identifiants, prix comparés, règles de Vertex, Azure et Bedrock, code.",
     category: "Guide développeur",
     imageAlt: "API LLM non censurée avec des endpoints compatibles OpenAI",
     keywords:

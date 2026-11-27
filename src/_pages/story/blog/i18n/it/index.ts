@@ -423,6 +423,13 @@ export const translations: typeof enTranslations = {
     featured: "In evidenza",
     relatedGuides: "Guide correlate",
     startHere: "Inizia da qui",
+    relatedModels: "Modelli da provare",
+    modelEyebrow: "Modello",
+    modelExcerpt:
+      "Prezzo per messaggio, finestra di contesto e livello di contenuto. Poi inizia a chattare.",
+    compareEyebrow: "Testa a testa",
+    compareTitle: "{{a}} vs {{b}}",
+    compareExcerpt: "Prezzo, contesto e livello di contenuto fianco a fianco.",
   },
   topics: {
     uncensored: {

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Unzensierte OpenRouter-Alternativen im Vergleich | {{appName}}",
     description:
-      "OpenRouter führt keine abliterierten Modelle. Vergleiche OpenUncensored, Refuseless, NEAR AI Cloud, NanoGPT, Venice, Featherless und {{appName}} bei unzensierten Modellen, Gebühren, Datenschutz und API-Formaten.",
+      "OpenRouter führt keine abliterierten Modelle. Vergleich: OpenUncensored, Refuseless, NEAR AI Cloud, NanoGPT, Venice, {{appName}}. Gebühren, Datenschutz, API.",
     category: "Entwickler-Guide",
     imageAlt: "Unzensierte OpenRouter-Alternativen für Entwickler im Vergleich",
     keywords:
