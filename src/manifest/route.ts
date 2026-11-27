@@ -26,6 +26,7 @@ const MANIFEST_CONSTANTS = {
   },
   ICON_TYPE: "image/png",
   ICON_PURPOSE: "any" as const,
+  ICON_PURPOSE_MASKABLE: "maskable" as const,
   CACHE_CONTROL: "public, max-age=3600",
   CONTENT_TYPE: "application/manifest+json",
 } as const;
@@ -63,16 +64,28 @@ export async function GET(
     categories: [...MANIFEST_CONSTANTS.CATEGORIES],
     icons: [
       {
-        src: "/images/unbottled-icon.png",
+        src: "/images/icon-192.png",
         sizes: MANIFEST_CONSTANTS.ICON_SIZES.SMALL,
         type: MANIFEST_CONSTANTS.ICON_TYPE,
         purpose: MANIFEST_CONSTANTS.ICON_PURPOSE,
       },
       {
-        src: "/images/unbottled-icon.png",
+        src: "/images/icon-512.png",
         sizes: MANIFEST_CONSTANTS.ICON_SIZES.LARGE,
         type: MANIFEST_CONSTANTS.ICON_TYPE,
         purpose: MANIFEST_CONSTANTS.ICON_PURPOSE,
+      },
+      {
+        src: "/images/icon-maskable-192.png",
+        sizes: MANIFEST_CONSTANTS.ICON_SIZES.SMALL,
+        type: MANIFEST_CONSTANTS.ICON_TYPE,
+        purpose: MANIFEST_CONSTANTS.ICON_PURPOSE_MASKABLE,
+      },
+      {
+        src: "/images/icon-maskable-512.png",
+        sizes: MANIFEST_CONSTANTS.ICON_SIZES.LARGE,
+        type: MANIFEST_CONSTANTS.ICON_TYPE,
+        purpose: MANIFEST_CONSTANTS.ICON_PURPOSE_MASKABLE,
       },
     ],
   };

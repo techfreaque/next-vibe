@@ -68,10 +68,13 @@ export async function generateMetadata({
       alternates: null,
       robots: null,
       icons: {
-        // The multi-size favicon.ico is the tab icon. apple-icon.png is a
-        // black line drawing on transparency and disappears on dark tabs.
-        icon: { url: "/favicon.ico", sizes: "any" },
-        apple: "/images/apple-icon.png",
+        // White lamp on a solid brand-blue tile: visible on light and dark
+        // tabs. SVG first, multi-size ICO fallback, opaque apple-touch icon.
+        icon: [
+          { url: "/favicon.svg", type: "image/svg+xml" },
+          { url: "/favicon.ico", sizes: "any" },
+        ],
+        apple: { url: "/images/apple-icon.png", sizes: "180x180" },
       },
       // Search Console / Bing Webmaster tokens, rendered on every page.
       // Read inline: the client build strips generateMetadata, but a helper
