@@ -47,7 +47,7 @@ export function TerminalCard({
   powershell?: boolean;
   /** Optional tab strip rendered in the title bar (platform picker). */
   tabs?: ReactNode;
-  /** Off when rows are alternatives (one per distro), not a sequence. */
+  /** Off when rows are alternatives or require a directory change between commands. */
   copyAll?: boolean;
 }): JSX.Element {
   return (
@@ -79,9 +79,7 @@ export function TerminalCard({
             className="flex items-center gap-2 py-3 pr-1.5 pl-4"
           >
             <Div className="min-w-0 flex-1">
-              <Span className="block font-mono text-xs text-slate-500">
-                {`# ${comment}`}
-              </Span>
+              <Span className="block font-mono text-xs text-slate-400">{`# ${comment}`}</Span>
               <Div className="mt-1 font-mono text-[13px] text-slate-100 sm:text-sm">
                 <Span className="whitespace-pre text-emerald-400 select-none">
                   {powershell ? POWERSHELL_PROMPT : SHELL_PROMPT}
@@ -100,7 +98,7 @@ export function TerminalCard({
               text={command}
               copyLabel={copyLabel}
               copiedLabel={copiedLabel}
-              className="[&>span]:hidden"
+              className="min-h-11 min-w-11 [&>span]:hidden"
             />
           </Div>
         ))}

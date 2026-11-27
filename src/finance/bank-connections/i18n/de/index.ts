@@ -85,15 +85,17 @@ export const translations: typeof enTranslations = {
   review: "Umsätze prüfen",
   held: "Zur Prüfung",
   privateCount: "Privat",
-  connected: "Bank verbunden.",
+  connected:
+    "4 von 4 · Zugriff freigegeben. Wählen Sie das Konto für Ihre Buchhaltung.",
   failed: "Die Verbindung ist fehlgeschlagen. Verbinden Sie die Bank erneut.",
   check: "Anwendung prüfen",
   active: "Die Anwendung ist für Kontoinformationen freigeschaltet.",
   inactive: "Die Anwendung ist für Kontoinformationen nicht freigeschaltet.",
   appUnavailable: "Anwendungsstatus nicht verfügbar.",
   linking:
-    "Die Verknüpfung im Anbieterportal schaltet das Konto frei. Erteilen Sie hier einmalig den Zugriff. Bereits erteilte Freigaben erscheinen automatisch.",
+    "Wählen Sie „Bank verbinden“ für den Lesezugriff. Vor dem ersten Import prüfen Sie die Datenschutzregeln.",
   pick: "Wählen Sie ein Konto für die Vorschau der gebuchten Umsätze.",
+  finishPeriod: "Zeitraum abschließen",
   apply: "Import ausführen",
   previewAction: "Importvorschau",
   dailyHint:
@@ -121,4 +123,5 @@ export const translations: typeof enTranslations = {
   noBookings: "Keine Buchungen in diesem Zeitraum.",
   newBookings: "Neue Buchungen",
   through: "Letzter importierter Buchungstag",
+  viewTransactions: "Importierte Umsätze ansehen",
 };

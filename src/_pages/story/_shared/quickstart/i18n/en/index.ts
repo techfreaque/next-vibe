@@ -27,8 +27,7 @@ export const translations = {
     copy: "Copy",
     copied: "Copied",
     clone: "Get the code",
-    cd: "Step inside",
-    install: "Install. Also puts vibe on your PATH.",
+    install: "Open the next-vibe folder in your terminal, then install",
     dev: "Start. Database, migrations and seed data run on their own.",
     fallback:
       "Shell says vibe: command not found? Open a new terminal, or run bun run dev.",

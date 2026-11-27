@@ -30,8 +30,7 @@ export const translations: typeof enTranslations = {
     copy: "Copier",
     copied: "Copié",
     clone: "Récupérer le code",
-    cd: "Entrer dans le dossier",
-    install: "Installer. Ajoute aussi vibe à votre PATH.",
+    install: "Ouvrez le dossier next-vibe dans le terminal, puis installez",
     dev: "Démarrer. Base de données, migrations et données de départ se font toutes seules.",
     fallback:
       "Le shell ne trouve pas vibe ? Ouvrez un nouveau terminal ou lancez bun run dev.",

@@ -30,8 +30,7 @@ export const translations: typeof enTranslations = {
     copy: "Skopírovať",
     copied: "Skopírované",
     clone: "Stiahni si zdrojový kód",
-    cd: "Prejdi do adresára projektu",
-    install: "Nainštaluj závislosti. Príkaz vibe sa zároveň pridá do PATH.",
+    install: "Otvor priečinok next-vibe v termináli a nainštaluj závislosti",
     dev: "Spusti aplikáciu. Databáza sa pripraví, migrácie sa vykonajú a úvodné údaje sa doplnia automaticky.",
     fallback:
       "Hlási terminál „vibe: command not found“? Otvor nový terminál alebo použi bun run dev.",

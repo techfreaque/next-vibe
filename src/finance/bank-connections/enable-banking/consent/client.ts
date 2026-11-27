@@ -54,29 +54,34 @@ export type ConsentBank = z.infer<typeof bank>;
 export type BankSession = z.infer<typeof sessionResponse>;
 export type PsuType = "personal" | "business";
 
-export async function consentLimit(
+export async function listDirectoryBanks(
   request: ConsentTransport,
-  selected: ConsentBank,
+  country: string,
   psu: PsuType,
-): Promise<number | undefined> {
-  const query = new URLSearchParams({
-    country: selected.country,
-    psu_type: psu,
-  });
+): Promise<z.infer<typeof providers>["aspsps"] | undefined> {
+  const query = new URLSearchParams({ country, psu_type: psu });
   const response = await request(`/aspsps?${query}`, { method: "GET" });
   if (!response.ok) {
     return undefined;
   }
   const parsed = providers.safeParse(await response.json());
-  if (!parsed.success) {
-    return undefined;
-  }
-  return parsed.data.aspsps.find(
-    (row) =>
-      row.name === selected.name &&
-      row.country === selected.country &&
-      (!row.psu_types || row.psu_types.includes(psu)),
-  )?.maximum_consent_validity;
+  return parsed.success
+    ? parsed.data.aspsps.filter(
+        (row) =>
+          row.country === country &&
+          (!row.psu_types || row.psu_types.includes(psu)),
+      )
+    : undefined;
+}
+
+export async function consentLimit(
+  request: ConsentTransport,
+  selected: ConsentBank,
+  psu: PsuType,
+): Promise<number | undefined> {
+  const banks = await listDirectoryBanks(request, selected.country, psu);
+  return banks?.find((row) => row.name === selected.name)
+    ?.maximum_consent_validity;
 }
 
 function jsonPost(

@@ -80,15 +80,17 @@ export const translations = {
   review: "Review transactions",
   held: "Held for review",
   privateCount: "Private",
-  connected: "Bank connected.",
+  connected:
+    "4 of 4 · Access approved. Choose the account to connect to your books.",
   failed: "The connection could not be completed. Try connecting again.",
   check: "Check application",
   active: "Application active for account information.",
   inactive: "Application inactive for account information.",
   appUnavailable: "Application status unavailable.",
   linking:
-    "A control-panel link makes an account eligible. Authorize it once in this app to see it here. Existing app consents appear automatically.",
+    "Choose Connect bank to grant read access. You’ll review your privacy rules before the first import.",
   pick: "Select an account to preview its booked transactions.",
+  finishPeriod: "Finish this period",
   apply: "Apply import",
   previewAction: "Preview import",
   dailyHint:
@@ -116,4 +118,5 @@ export const translations = {
   noBookings: "No bookings in this period.",
   newBookings: "New bookings",
   through: "Last imported booking day",
+  viewTransactions: "View imported transactions",
 };

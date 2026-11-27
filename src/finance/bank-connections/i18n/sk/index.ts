@@ -84,15 +84,17 @@ export const translations: typeof enTranslations = {
   review: "Skontrolovať pohyby",
   held: "Na kontrolu",
   privateCount: "Súkromné",
-  connected: "Banka bola pripojená.",
+  connected:
+    "4 zo 4 · Prístup je povolený. Vyberte účet, ktorý prepojíte s účtovníctvom.",
   failed: "Banku sa nepodarilo pripojiť. Skúste ju pripojiť znova.",
   check: "Overiť aplikáciu",
   active: "Aplikácia má povolený prístup k informáciám o účtoch.",
   inactive: "Prístup aplikácie k informáciám o účtoch nie je aktívny.",
   appUnavailable: "Stav aplikácie sa nepodarilo overiť.",
   linking:
-    "Prepojením v portáli poskytovateľa sprístupníte účet na pripojenie. V tejto aplikácii raz udeľte súhlas. Účty s platným súhlasom sa zobrazia automaticky.",
+    "Pripojte banku a povoľte prístup na čítanie. Pred prvým importom skontrolujete pravidlá súkromia.",
   pick: "Vyberte účet, ktorý chcete použiť na náhľad zaúčtovaných pohybov.",
+  finishPeriod: "Uzavrieť obdobie",
   apply: "Spustiť import",
   previewAction: "Náhľad importu",
   dailyHint:
@@ -120,4 +122,5 @@ export const translations: typeof enTranslations = {
   noBookings: "V tomto období neboli zaúčtované žiadne pohyby.",
   newBookings: "Nové pohyby",
   through: "Posledný importovaný deň",
+  viewTransactions: "Zobraziť importované transakcie",
 };

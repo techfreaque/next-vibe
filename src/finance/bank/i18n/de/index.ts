@@ -297,7 +297,7 @@ export const translations: typeof enTranslations = {
     success: "Kontoauszug verarbeitet",
   },
   list: {
-    title: "Offene Bankzeilen",
+    title: "Bankumsätze",
     description:
       "Prüfen Sie importierte Bankzeilen und gleichen Sie sie mit gebuchten Einträgen ab.",
     success: "Bankzeilen geladen",

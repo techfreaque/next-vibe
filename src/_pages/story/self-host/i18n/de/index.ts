@@ -87,24 +87,13 @@ export const translations: typeof enTranslations = {
       copied: "Kopiert",
       rows: {
         clone: "Code holen",
-        cd: "Ins Verzeichnis wechseln",
-        install: "Installieren. Legt vibe auch in deinen PATH.",
+        install: "Im Terminal den Ordner next-vibe öffnen und installieren",
         dev: "Starten. Datenbank und Startdaten richten sich selbst ein.",
       },
       facts: {
         docker: "Kein Docker",
         postgres: "Keine Postgres-Installation",
         config: "Kein .env-Gefrickel",
-      },
-      troubleshoot: {
-        notFound: {
-          problem: "vibe: command not found?",
-          fix: "Neues Terminal öffnen oder ausführen:",
-        },
-        port: {
-          problem: "Port 3000 belegt?",
-          fix: "Anderen Port nehmen:",
-        },
       },
     },
     prereqs: {

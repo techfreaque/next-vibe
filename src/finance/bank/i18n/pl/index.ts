@@ -289,7 +289,7 @@ export const translations: typeof enTranslations = {
     success: "Wyciąg przetworzony",
   },
   list: {
-    title: "Niedopasowane pozycje bankowe",
+    title: "Transakcje bankowe",
     description: "Sprawdź pozycje wyciągu i połącz je z zapisami księgowymi.",
     success: "Pozycje bankowe wczytane",
   },

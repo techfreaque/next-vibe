@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     titleAccent: "Všetky rozhrania.",
     subtitle:
       "next-vibe je otvorený framework v TypeScripte, na ktorom beží {{appName}}. Čet s AI, účtovníctvo, pokladničný predaj, sklad aj CRM. Jeden koncový bod slúži ako webové rozhranie, príkaz CLI, nástroj MCP aj nástroj pre AI. Ďalší prepojovací kód netreba.",
-    ctaFramework: "Pozrieť si postup",
+    ctaFramework: "Pozrieť zdrojový kód",
     ctaKeys: "Použiť API",
     stats: {
       endpoints: "typové koncové body v repozitári",

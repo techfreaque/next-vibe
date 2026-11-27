@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
     titleAccent: "Todas las interfaces.",
     subtitle:
       "next-vibe es el framework TypeScript de código abierto detrás de {{appName}}. Sobre él funcionan el chat con IA, la contabilidad, el punto de venta, el inventario y el CRM. Un endpoint se convierte en interfaz web, comando de CLI, herramienta MCP y herramienta de IA. Cero código pegamento.",
-    ctaFramework: "Mira el patrón",
+    ctaFramework: "Ver el código fuente",
     ctaKeys: "Usa la API",
     stats: {
       endpoints: "endpoints tipados en el repo",

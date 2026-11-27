@@ -27,6 +27,17 @@ export const translations: typeof enTranslations = {
       languages: "vstavaných jazykov",
     },
   },
+  trialBalance: {
+    sample: "Ukážka účtov · {{date}} · EUR",
+    account: "Účet",
+    debit: "Má dať",
+    credit: "Dal",
+    bank: "Banka",
+    sales: "Tržby",
+    wages: "Mzdy",
+    total: "Súčet výkazu",
+    open: "Pozrieť celý výkaz",
+  },
   ledger: {
     eyebrow: "Účtovníctvo",
     title: "Podvojne. Bez výnimiek.",

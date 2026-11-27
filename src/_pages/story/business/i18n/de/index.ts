@@ -26,9 +26,20 @@ export const translations: typeof enTranslations = {
       languages: "Sprachen eingebaut",
     },
   },
+  trialBalance: {
+    sample: "Konten (Auszug) · {{date}} · EUR",
+    account: "Konto",
+    debit: "Soll",
+    credit: "Haben",
+    bank: "Bank",
+    sales: "Umsatz",
+    wages: "Löhne",
+    total: "Gesamtsumme",
+    open: "Vollständigen Bericht ansehen",
+  },
   ledger: {
     eyebrow: "Buchhaltung",
-    title: "Doppelte Buchführung. Erzwungen.",
+    title: "Jede Buchung im Gleichgewicht.",
     intro:
       "Rechnungen, Eingangsrechnungen, Zahlungen und Kassenverkäufe landen von selbst im Hauptbuch, inklusive Fremdwährungsbuchungen mit täglichen EZB-Kursen, realisierten Kursdifferenzen und Stichtagsbewertung. Soll gleich Haben, sonst wird nichts gebucht.",
     points: {

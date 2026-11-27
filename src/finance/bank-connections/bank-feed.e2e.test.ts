@@ -322,12 +322,12 @@ describe("Owner-authorized bank feed", () => {
         await save.waitFor();
         await save.click();
         await fixtures.page
-          .getByRole("button", { name: policyT("saved"), exact: true })
+          .getByRole("button", { name: policyT("rules"), exact: true })
           .last()
           .waitFor();
         expect(calls).toBe(0);
         await fixtures.page
-          .getByRole("button", { name: policyT("saved"), exact: true })
+          .getByRole("button", { name: policyT("rules"), exact: true })
           .last()
           .click();
         await openPreview.waitFor();

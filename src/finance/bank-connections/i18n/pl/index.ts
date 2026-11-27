@@ -82,15 +82,17 @@ export const translations: typeof enTranslations = {
   review: "Sprawdź transakcje",
   held: "Do sprawdzenia",
   privateCount: "Prywatne",
-  connected: "Połączono z bankiem.",
+  connected:
+    "4 z 4 · Dostęp przyznany. Wybierz rachunek do połączenia z księgami.",
   failed: "Nie udało się połączyć z bankiem. Spróbuj ponownie.",
   check: "Sprawdź aplikację",
   active: "Aplikacja ma dostęp do informacji o rachunkach.",
   inactive: "Dostęp aplikacji do informacji o rachunkach jest nieaktywny.",
   appUnavailable: "Nie można sprawdzić stanu aplikacji.",
   linking:
-    "Powiązanie rachunku w panelu dostawcy umożliwia połączenie. Jednorazowo autoryzuj dostęp w tej aplikacji. Rachunki z ważną zgodą pojawią się automatycznie.",
+    "Wybierz połączenie banku i zezwól na odczyt. Przed pierwszym importem sprawdzisz reguły prywatności.",
   pick: "Wybierz rachunek, aby zobaczyć podgląd zaksięgowanych transakcji.",
+  finishPeriod: "Zakończ ten okres",
   apply: "Wykonaj import",
   previewAction: "Podgląd importu",
   dailyHint:
@@ -117,4 +119,5 @@ export const translations: typeof enTranslations = {
   noBookings: "Brak księgowań w tym okresie.",
   newBookings: "Nowe operacje",
   through: "Ostatni zaimportowany dzień",
+  viewTransactions: "Pokaż zaimportowane transakcje",
 };

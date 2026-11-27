@@ -2,7 +2,7 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 
-import { and, asc, eq, gt, isNull, lte, type SQL } from "drizzle-orm";
+import { and, asc, eq, gt, isNull, lte, type SQL, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -158,7 +158,7 @@ export async function startEnableBankingConsent(
     return { status: "forbidden" };
   }
   const [account] = await db
-    .select({ name: accountNodes.name })
+    .select({ name: accountNodes.name, code: accountNodes.code })
     .from(accountNodes)
     .where(activeBankAccount(companyId, ledgerAccountId));
   if (!account) {
@@ -200,7 +200,11 @@ export async function startEnableBankingConsent(
       requestedUntil,
       expiresAt: new Date(current.getTime() + attemptLifetimeMs),
     });
-    return { status: "started", url, ledgerAccountName: account.name };
+    return {
+      status: "started",
+      url,
+      ledgerAccountName: `${account.code} · ${account.name}`,
+    };
   } catch {
     return { status: "unavailable" };
   }
@@ -224,7 +228,7 @@ export async function completeEnableBankingConsent(
     now = () => new Date(),
     secret,
   }: ConsentDependencies,
-): Promise<boolean> {
+): Promise<false | { companyId: string }> {
   if (!input.state) {
     return false;
   }
@@ -361,7 +365,7 @@ export async function completeEnableBankingConsent(
           await tx.insert(accounts).values({ id, ...values });
         }
       }
-      return true;
+      return { companyId };
     });
   } catch {
     return false;
@@ -403,6 +407,8 @@ export async function listEnableBankingAccounts(
       id: string;
       name: string;
       currency: string | null;
+      suggestedAccountId?: string;
+      ledgerLabel?: string;
       consentUntil: string;
     }>
   >
@@ -416,21 +422,57 @@ export async function listEnableBankingAccounts(
     .select({
       id: accounts.id,
       bank: consents.bankName,
+      consentId: consents.id,
+      ledgerId: accountNodes.id,
+      ledgerCode: accountNodes.code,
+      ledgerName: accountNodes.name,
+      ledgerEligible: sql<boolean>`${accountNodes.isActive} and ${accountNodes.isPostable} and ${accountNodes.subtype} = ${AccountSubtype.BANK}`,
       ordinal: accounts.ordinal,
       currency: accounts.currency,
       expiry: consents.consentUntil,
     })
     .from(accounts)
     .innerJoin(consents, eq(consents.id, accounts.consentId))
+    .innerJoin(
+      enableBankingAttempts,
+      eq(enableBankingAttempts.id, consents.attemptId),
+    )
+    .innerJoin(
+      accountNodes,
+      eq(accountNodes.id, enableBankingAttempts.ledgerAccountId),
+    )
     .where(activeConsent(companyId, actorId))
     .orderBy(asc(consents.bankName), asc(consents.id), asc(accounts.ordinal));
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    counts.set(row.consentId, (counts.get(row.consentId) ?? 0) + 1);
+  }
   return success(
-    rows.map(({ id, bank, ordinal, currency, expiry }) => ({
-      id,
-      name: `${bank} · ${ordinal}`,
-      currency,
-      consentUntil: expiry.toISOString().slice(0, 10),
-    })),
+    rows.map(
+      ({
+        id,
+        bank,
+        ordinal,
+        currency,
+        expiry,
+        consentId,
+        ledgerId,
+        ledgerCode,
+        ledgerName,
+        ledgerEligible,
+      }) => ({
+        suggestedAccountId:
+          ledgerEligible && counts.get(consentId) === 1 ? ledgerId : undefined,
+        ledgerLabel:
+          ledgerEligible && counts.get(consentId) === 1
+            ? `${ledgerCode} · ${ledgerName}`
+            : undefined,
+        id,
+        name: `${bank} · ${ordinal}`,
+        currency,
+        consentUntil: expiry.toISOString().slice(0, 10),
+      }),
+    ),
   );
 }
 

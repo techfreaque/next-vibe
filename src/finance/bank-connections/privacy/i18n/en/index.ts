@@ -67,4 +67,6 @@ export const translations = {
     unavailable: "Bank privacy could not complete.",
     import: "The approved movement could not be imported.",
   },
+  firstSetupHint:
+    "Privacy filtering starts on. Only transactions that match your business rules reach the ledger. Private and unrecognized transactions are discarded. Next, choose suppliers to include.",
 };

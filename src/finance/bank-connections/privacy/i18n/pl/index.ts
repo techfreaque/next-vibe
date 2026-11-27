@@ -71,4 +71,6 @@ export const translations: typeof enTranslations = {
     unavailable: "Nie udało się wykonać operacji prywatności.",
     import: "Nie udało się zaimportować zatwierdzonej operacji.",
   },
+  firstSetupHint:
+    "Filtr prywatności jest włączony. Do ksiąg trafią tylko transakcje zgodne z regułami firmowymi. Transakcje prywatne i nierozpoznane zostaną odrzucone. Następnie wybierzesz dostawców.",
 };

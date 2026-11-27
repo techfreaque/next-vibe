@@ -17,6 +17,8 @@ export const { GET, POST, tools } = endpointsHandler({
         data.checkApplication,
         logger,
         locale,
+        data.directoryCountry,
+        data.directoryPersonal,
       ),
   },
   [Methods.POST]: {

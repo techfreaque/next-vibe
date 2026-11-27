@@ -393,9 +393,29 @@ export async function resolvePageHead(
   return metadataToHead(merged, title);
 }
 
-/** `viewport` export → theme-color / color-scheme meta (Next semantics). */
+/** Mirror the Next viewport export in the TanStack document head. */
 export function viewportToHead(viewport: Viewport): PageHeadMeta[] {
   const meta: PageHeadMeta[] = [];
+  const settings: readonly [string, string | number | undefined][] = [
+    ["width", viewport.width],
+    ["height", viewport.height],
+    ["initial-scale", viewport.initialScale],
+    ["minimum-scale", viewport.minimumScale],
+    ["maximum-scale", viewport.maximumScale],
+    [
+      "user-scalable",
+      viewport.userScalable === undefined
+        ? undefined
+        : viewport.userScalable
+          ? "yes"
+          : "no",
+    ],
+    ["interactive-widget", viewport.interactiveWidget],
+  ];
+  const content = settings.flatMap(([name, value]) =>
+    value === undefined ? [] : [`${name}=${value}`],
+  );
+  pushName(meta, "viewport", content.join(", "));
   const themeColor = viewport.themeColor;
   if (typeof themeColor === "string") {
     meta.push({ name: "theme-color", content: themeColor });

@@ -14,7 +14,6 @@ import {
 import { z } from "zod";
 
 import { bankErrorTypes } from "../bank/endpoint-errors";
-import { bankFeedAvailability } from "./configuration";
 import { scopedTranslation } from "./i18n";
 
 const list = lazyWidget(() =>
@@ -37,7 +36,6 @@ const base = {
   path: ["finance", "bank-connections"],
   category: "finance",
   subCategory: "Bank reconciliation",
-  admin: bankFeedAvailability,
   icon: "wallet",
   tags: ["connection"],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF, UserRole.MCP_OFF],
@@ -55,7 +53,36 @@ const { GET } = createEndpoint({
     render: list,
     usage: { request: "data", response: true },
     children: {
-      companyId: company,
+      companyId: { ...company, includeInCacheKey: true },
+      directoryCountry: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        hidden: true,
+        includeInCacheKey: true,
+        schema: z
+          .string()
+          .regex(/^(?:[A-Z]{2}|countries)$/u)
+          .optional(),
+      }),
+      directoryPersonal: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        hidden: true,
+        includeInCacheKey: true,
+        schema: z.boolean().optional(),
+      }),
+      directory: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .object({
+            country: z.string(),
+            personal: z.boolean(),
+            status: z.enum(["ready", "unconfigured", "unavailable"]),
+            choices: z.array(z.string()),
+          })
+          .optional(),
+      }),
       checkApplication: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -77,6 +104,8 @@ const { GET } = createEndpoint({
             currency: z.string().nullable(),
             consentUntil: z.iso.date(),
             accountId: z.uuid().nullable(),
+            suggestedAccountId: z.uuid().optional(),
+            ledgerLabel: z.string().optional(),
             startDay: z.iso.date().optional(),
             through: z.iso.date().nullable(),
             daily: z.boolean(),
@@ -96,14 +125,22 @@ const { GET } = createEndpoint({
 });
 const { POST } = createEndpoint({
   ...base,
+  admin: { role: "record" },
   method: Methods.POST,
   aliases: ["bank-connection-sync"],
   title: "sync",
   options: {
+    formOptions: { persistForm: false },
     mutationOptions: {
-      onSuccess: async ({ logger }) => {
+      onSuccess: async ({ logger, requestData }) => {
         const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-        await apiClient.refetchEndpoint(GET, logger);
+        await apiClient.refetchEndpoint(GET, logger, {
+          requestData: {
+            companyId: requestData.companyId,
+            directoryCountry: undefined,
+            directoryPersonal: undefined,
+          },
+        });
       },
     },
   },
@@ -134,7 +171,7 @@ const { POST } = createEndpoint({
       }),
       startDay: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.DATE,
         label: "start",
         schema: z.iso.date().optional(),
       }),

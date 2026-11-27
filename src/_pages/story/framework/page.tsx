@@ -457,7 +457,7 @@ export function TanstackPage({
         actions={
           <>
             <Cta
-              href="#framework"
+              href="#framework-source"
               label={t("hero.ctaFramework")}
               icon={ArrowDown}
               arrow={false}
@@ -521,10 +521,13 @@ export function TanstackPage({
         intro={renderRich(t("framework.intro", { appName }))}
       >
         <Div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)] lg:gap-8">
-          <Div className="min-w-0">
+          <Div
+            id="framework-source"
+            tabIndex={-1}
+            className="min-w-0 scroll-mt-20"
+          >
             <CodeTabs
               {...copy}
-              wrapByDefault={false}
               tabs={[
                 {
                   label: "definition.ts",
@@ -604,8 +607,7 @@ export function TanstackPage({
               />
             </Div>
           </Div>
-          {/* Below lg the payoff (what it becomes) comes before the code */}
-          <Div className="order-first min-w-0 divide-y divide-border rounded-xl border border-border bg-card px-4 shadow-xs sm:px-5 lg:sticky lg:top-24 lg:order-none">
+          <Div className="min-w-0 divide-y divide-border rounded-xl border border-border bg-card px-4 shadow-xs sm:px-5 lg:sticky lg:top-24">
             <P className="py-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
               {t("framework.becomes")}
             </P>
@@ -730,6 +732,7 @@ export function TanstackPage({
             copyLabel={quickstartT("terminal.copy")}
             copiedLabel={quickstartT("terminal.copied")}
             copyAllLabel={quickstartT("terminal.copyAll")}
+            copyAll={false}
           />
           <Div className="flex min-w-0 flex-col gap-4">
             <Div className="rounded-xl border border-border bg-card p-5 shadow-xs">

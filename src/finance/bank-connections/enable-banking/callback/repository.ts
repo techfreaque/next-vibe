@@ -24,7 +24,7 @@ export async function redirectBankConsent(
   if (!origin || url.pathname !== enableBankingCallbackPath) {
     return new Response(null, { status: 400, headers });
   }
-  const target = new URL("/en-GLOBAL/tools/bank-connections", origin);
+  const target = new URL("/tools/bank-connections", origin);
   const states = url.searchParams.getAll("state");
   const codes = url.searchParams.getAll("code");
   const authorized =
@@ -44,6 +44,9 @@ export async function redirectBankConsent(
         )
       : false;
   target.searchParams.set("bankConsent", authorized ? "connected" : "failed");
+  if (authorized) {
+    target.searchParams.set("arg.companyId", authorized.companyId);
+  }
   return new Response(null, {
     status: 303,
     headers: { ...headers, location: target.href },

@@ -87,24 +87,14 @@ export const translations: typeof enTranslations = {
       copied: "Skopírované",
       rows: {
         clone: "Získaj zdrojový kód",
-        cd: "Prejdi do priečinka",
-        install: "Nainštaluj závislosti. Príkaz vibe sa pridá do PATH.",
+        install:
+          "Otvor priečinok next-vibe v termináli a nainštaluj závislosti",
         dev: "Spusti aplikáciu. Databáza aj počiatočné údaje sa pripravia automaticky.",
       },
       facts: {
         docker: "Bez Dockeru",
         postgres: "Bez inštalácie Postgresu",
         config: "Bez úprav súboru .env",
-      },
-      troubleshoot: {
-        notFound: {
-          problem: "vibe: command not found?",
-          fix: "Otvor nový terminál alebo spusti",
-        },
-        port: {
-          problem: "Je port 3000 obsadený?",
-          fix: "Použi iný port:",
-        },
       },
     },
     prereqs: {

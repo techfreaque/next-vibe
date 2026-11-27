@@ -295,7 +295,7 @@ export const translations: typeof enTranslations = {
     success: "Relevé traité",
   },
   list: {
-    title: "Lignes bancaires à rapprocher",
+    title: "Opérations bancaires",
     description:
       "Consultez les lignes importées et associez-les aux écritures comptabilisées.",
     success: "Lignes bancaires chargées",

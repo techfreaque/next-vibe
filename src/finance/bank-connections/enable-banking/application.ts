@@ -29,3 +29,18 @@ export async function applicationAccess(
     return "unavailable";
   }
 }
+
+export async function listBankCountries(
+  request: ConsentTransport,
+): Promise<string[] | undefined> {
+  const response = await request("/application", { method: "GET" });
+  if (!response.ok) {
+    return undefined;
+  }
+  const data = application
+    .extend({ countries: z.array(z.string().regex(/^[A-Z]{2}$/u)) })
+    .safeParse(await response.json());
+  return data.success && data.data.active && data.data.services.includes("AIS")
+    ? data.data.countries
+    : undefined;
+}

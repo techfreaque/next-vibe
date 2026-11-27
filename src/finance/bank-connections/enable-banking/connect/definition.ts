@@ -116,14 +116,14 @@ const { POST } = createEndpoint({
         companyId: "00000000-0000-4000-8000-000000000001",
         ledgerAccountId: "00000000-0000-4000-8000-000000000002",
         bankCountry: "DE",
-        bankName: "C24 Bank",
+        bankName: "C24",
         personal: true,
       },
     },
     responses: {
       default: {
         url: "https://auth.enablebanking.com/ais/start",
-        authorizedBank: "C24 Bank",
+        authorizedBank: "C24",
         authorizedLedgerAccount: "Operating bank account",
       },
     },

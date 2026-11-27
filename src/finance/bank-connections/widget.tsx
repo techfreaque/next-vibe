@@ -2,6 +2,15 @@
 
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
 import { H2, P } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
@@ -13,25 +22,26 @@ import {
 import {
   useWidgetForm,
   useWidgetIsInteractive,
+  useWidgetIsSubmitting,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetResponseOnly,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
-import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useId, useMemo } from "react";
 
 import { DocumentScopePicker } from "@/finance/document-list-ui";
 
 import { BankAccountPicker } from "../bank/account-picker";
 import { BankPageHeader } from "../bank/page-header";
-import type definition from "./definition";
+import definition from "./definition";
 
 export function BankFeedListWidget(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -53,6 +63,7 @@ export function BankFeedListWidget(): JSX.Element {
         actions={
           interactive && companyId ? (
             <Button
+              variant={accounts.length ? "outline" : "default"}
               type="button"
               size="sm"
               onClick={() =>
@@ -88,7 +99,7 @@ export function BankFeedListWidget(): JSX.Element {
               submit?.();
             }}
           />
-          {companyId && (
+          {companyId && notice !== "connected" && (
             <Button
               type="button"
               variant="outline"
@@ -150,15 +161,17 @@ export function BankFeedListWidget(): JSX.Element {
                 <Button
                   type="button"
                   size="sm"
-                  variant="outline"
+                  variant="default"
                   onClick={() =>
                     void import("./definition").then((m) =>
                       push(m.default.POST, {
                         data: {
                           companyId,
                           feedId: feed.id,
-                          accountId: feed.accountId ?? undefined,
-                          startDay: feed.startDay,
+                          accountId: feed.accountId ?? feed.suggestedAccountId,
+                          startDay:
+                            feed.startDay ??
+                            new Date().toISOString().slice(0, 10),
                           setupOnly: !feed.accountId,
                           dryRun: true,
                           daily: feed.daily,
@@ -186,6 +199,8 @@ export function BankFeedListWidget(): JSX.Element {
                           return push(privacy.PATCH, {
                             data: {
                               connectionId: feed.id,
+                              firstSetup: true,
+                              mode: "mixed",
                               operation: "policy",
                             },
                           });
@@ -217,13 +232,48 @@ export function BankFeedSyncWidget({
   const responseOnly = useWidgetResponseOnly();
   const interactive = useWidgetIsInteractive() && !responseOnly;
   const companyId = form.watch("companyId");
-  const preview = form.watch("dryRun");
-  const setup = form.watch("setupOnly");
+  const startDayId = useId();
+  const feedId = form.watch("feedId");
+  const accountId = form.watch("accountId");
+  const readOptions = useMemo(
+    () => ({
+      read: {
+        initialState: {
+          companyId,
+          directoryCountry: undefined,
+          directoryPersonal: undefined,
+        },
+        queryOptions: { enabled: interactive && Boolean(companyId) },
+        formOptions: { persistForm: false },
+      },
+    }),
+    [companyId, interactive],
+  );
+  const feedRead = useEndpoint(
+    { GET: definition.GET },
+    readOptions,
+    useWidgetLogger(),
+    useWidgetUser(),
+  ).read;
+  const feeds = feedRead?.data?.feeds;
+  const feed = feeds?.find((row) => row.id === feedId);
+  const setup = feed ? !feed.accountId : form.watch("setupOnly");
+  const submit = useWidgetOnSubmit();
+  const submitting = useWidgetIsSubmitting();
+  const start = (dryRun: boolean): void => {
+    form.setValue("dryRun", dryRun);
+    form.setValue("matchedOnly", true);
+    form.setValue("setupOnly", Boolean(setup));
+    submit?.();
+  };
   const navigation = useWidgetNavigation();
   const result = data?.result;
   return (
     <WidgetShell layout="page">
-      <BankPageHeader title={t("sync")} subtitle={t("dailyHint")} />
+      <BankPageHeader
+        title={t(setup || result?.setupFeedId ? "setup" : "sync")}
+        subtitle={t(setup || result?.setupFeedId ? "setupHint" : "dailyHint")}
+      />
       {result && !result.setupFeedId && (
         <Div className="space-y-4 rounded-lg border bg-card p-4">
           <Div className="space-y-1">
@@ -296,47 +346,148 @@ export function BankFeedSyncWidget({
           )}
         </Div>
       )}
-      {interactive && (
-        <>
-          <Div className="grid gap-3 @lg:grid-cols-2">
-            <DocumentScopePicker
-              kind="company"
-              required
-              value={companyId}
-              onSelect={(id) => form.reset({ companyId: id, dryRun: true })}
-            />
-            <EntityPickerFieldWidget
-              fieldName="feedId"
-              field={children.feedId}
-            />
-            <BankAccountPicker
-              companyId={companyId}
-              accountId={form.watch("accountId")}
-              onSelect={(id) => form.setValue("accountId", id)}
-            />
-            <TextFieldWidget fieldName="startDay" field={children.startDay} />
-            <BooleanFieldWidget
-              fieldName="setupOnly"
-              field={children.setupOnly}
-            />
-            {!setup && (
-              <BooleanFieldWidget fieldName="dryRun" field={children.dryRun} />
-            )}
-            {!setup && (
-              <BooleanFieldWidget
-                fieldName="matchedOnly"
-                field={children.matchedOnly}
-              />
-            )}
-            <BooleanFieldWidget fieldName="daily" field={children.daily} />
-          </Div>
-          <SubmitButtonWidget
-            field={{
-              text: setup ? "setup" : preview ? "previewAction" : "apply",
-              className: "self-start",
-            }}
+      {interactive && !result && (
+        <Div className="flex max-w-xl flex-col gap-4 rounded-xl border bg-card p-4">
+          <DocumentScopePicker
+            kind="company"
+            required
+            value={companyId}
+            onSelect={(id) =>
+              form.reset({ companyId: id, dryRun: true, matchedOnly: true })
+            }
           />
-        </>
+          {feed ? (
+            <P className="font-semibold">
+              {feed.name} {feed.currency}
+            </P>
+          ) : (
+            <Select
+              value={feedId ?? ""}
+              onValueChange={(id) => {
+                const selected = feeds?.find((row) => row.id === id);
+                form.reset({
+                  companyId,
+                  feedId: id,
+                  accountId:
+                    selected?.accountId ?? selected?.suggestedAccountId,
+                  startDay:
+                    selected?.startDay ?? new Date().toISOString().slice(0, 10),
+                  dryRun: true,
+                  matchedOnly: true,
+                  setupOnly: !selected?.accountId,
+                });
+              }}
+            >
+              <SelectTrigger aria-label={t("select")}>
+                <SelectValue placeholder={t("select")} />
+              </SelectTrigger>
+              <SelectContent>
+                {feeds?.map((row) => (
+                  <SelectItem value={row.id} key={row.id}>
+                    {row.name} {row.currency}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          {setup ? (
+            <>
+              <BankAccountPicker
+                companyId={companyId}
+                accountId={accountId}
+                accountName={
+                  feed?.suggestedAccountId === accountId
+                    ? feed?.ledgerLabel
+                    : undefined
+                }
+                onSelect={(id) => form.setValue("accountId", id)}
+              />
+              <Div className="space-y-1">
+                <Label htmlFor={startDayId}>{t(children.startDay.label)}</Label>
+                <Input
+                  id={startDayId}
+                  type="date"
+                  value={form.watch("startDay") ?? ""}
+                  onChangeText={(value) =>
+                    form.setValue("startDay", value || undefined, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                />
+              </Div>
+            </>
+          ) : (
+            feed && (
+              <>
+                <P>{feed.ledgerLabel}</P>
+                <P className="text-sm text-muted-foreground">
+                  {t("matchedOnly")}
+                </P>
+                {feed.through && (
+                  <BooleanFieldWidget
+                    fieldName="daily"
+                    field={children.daily}
+                  />
+                )}
+              </>
+            )
+          )}
+          <Button
+            data-testid="endpoint-submit"
+            type="button"
+            disabled={submitting || !feed || !accountId}
+            onClick={() => start(true)}
+          >
+            {t(setup ? "setup" : "previewAction")}
+          </Button>
+        </Div>
+      )}
+      {interactive && result && !result.setupFeedId && (
+        <Div className="flex flex-wrap gap-2">
+          {result.preview && (
+            <Button
+              type="button"
+              disabled={submitting}
+              onClick={() => start(false)}
+            >
+              {t(
+                (result.eligibleBookings ?? result.imported) > result.skipped
+                  ? "apply"
+                  : "finishPeriod",
+              )}
+            </Button>
+          )}
+          {!result.preview && (
+            <Button
+              type="button"
+              onClick={() =>
+                void import("../bank/list/definition").then((m) =>
+                  navigation.push(m.default.GET, {
+                    data: { companyId, accountId, status: "all" },
+                  }),
+                )
+              }
+            >
+              {t("viewTransactions")}
+            </Button>
+          )}
+          {result.preview && (
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() =>
+                void import("./privacy/definition").then((m) =>
+                  navigation.push(m.default.GET, {
+                    data: { connectionId: feedId },
+                  }),
+                )
+              }
+            >
+              {t("privacyAction")}
+            </Button>
+          )}
+        </Div>
       )}
       <FormAlertWidget field={{}} />
       {result?.setupFeedId && (
@@ -351,6 +502,9 @@ export function BankFeedSyncWidget({
                   navigation.push(m.default.PATCH, {
                     data: {
                       connectionId: result.setupFeedId,
+                      companyId,
+                      firstSetup: true,
+                      mode: "mixed",
                       operation: "policy",
                     },
                   }),

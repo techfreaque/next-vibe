@@ -85,7 +85,8 @@ export const translations: typeof enTranslations = {
   review: "Verifica movimenti",
   held: "Da verificare",
   privateCount: "Privati",
-  connected: "Banca collegata.",
+  connected:
+    "4 di 4 · Accesso autorizzato. Scegli il conto da collegare alla contabilità.",
   failed: "Collegamento non riuscito. Provi a collegare di nuovo la banca.",
   check: "Verifica applicazione",
   active: "L’applicazione è attiva per la consultazione dei conti.",
@@ -93,8 +94,9 @@ export const translations: typeof enTranslations = {
     "L’accesso dell’applicazione alle informazioni sui conti è inattivo.",
   appUnavailable: "Stato dell’applicazione non disponibile.",
   linking:
-    "Il collegamento nel portale del fornitore abilita il conto. Autorizzi l’accesso una volta in questa applicazione. I conti già autorizzati compaiono automaticamente.",
+    "Collega la banca per autorizzare la lettura. Prima di importare potrai controllare le regole di riservatezza.",
   pick: "Selezioni un conto per visualizzare un’anteprima dei movimenti contabilizzati.",
+  finishPeriod: "Chiudi il periodo",
   apply: "Esegui importazione",
   previewAction: "Anteprima importazione",
   dailyHint:
@@ -123,4 +125,5 @@ export const translations: typeof enTranslations = {
   noBookings: "Nessun movimento nel periodo.",
   newBookings: "Nuovi movimenti",
   through: "Ultimo giorno importato",
+  viewTransactions: "Vedi le operazioni importate",
 };

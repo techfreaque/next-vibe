@@ -179,6 +179,27 @@ describe("E2E: bank consent", () => {
             });
           },
         );
+        await page.route(
+          (url) => url.pathname.endsWith("/finance/bank-connections"),
+          async (route) => {
+            const params = new URL(route.request().url()).searchParams;
+            const country = params.get("directoryCountry") ?? "countries";
+            await route.fulfill({
+              json: {
+                success: true,
+                data: {
+                  feeds: [],
+                  directory: {
+                    country,
+                    personal: true,
+                    status: "ready",
+                    choices: country === "countries" ? ["DE"] : [bank.name],
+                  },
+                },
+              },
+            });
+          },
+        );
         await page.addInitScript(() => {
           localStorage.setItem("theme_v2", "system");
         });
@@ -186,27 +207,29 @@ describe("E2E: bank consent", () => {
         await page.emulateMedia({ colorScheme: "light" });
         const { t } = scopedTranslation.scopedT(defaultLocale);
         await page.goto(
-          `${baseUrl}/${defaultLocale}/tools/connect-bank?companyId=${companyId}`,
+          `${baseUrl}/${defaultLocale}/tools/connect-bank?arg.companyId=${companyId}`,
         );
         await page
           .getByRole("heading", { name: t("title"), exact: true })
           .last()
           .waitFor({ timeout: 60_000 });
+        await page.getByRole("combobox", { name: t("bankCountry") }).click();
         await page
-          .locator('[data-field="ledgerAccountId"] button')
-          .last()
+          .getByRole("option", { name: "Germany", exact: true })
           .click();
         await page
-          .getByRole("option", { name: "Fixture bank ledger", exact: true })
+          .getByRole("button", { name: bank.name, exact: true })
           .click();
         await page
-          .locator('[data-field="bankCountry"] input')
-          .last()
-          .fill("DE");
+          .getByRole("button", { name: t("next"), exact: true })
+          .click();
+        await page.getByRole("combobox", { name: t("ledgerAccount") }).click();
         await page
-          .locator('[data-field="bankName"] input')
-          .last()
-          .fill(bank.name);
+          .getByRole("option", {
+            name: "1100 · Fixture bank ledger",
+            exact: true,
+          })
+          .click();
         await page.screenshot({
           path: `${directory}/connect-desktop-light.png`,
         });
@@ -222,7 +245,7 @@ describe("E2E: bank consent", () => {
         await page.setViewportSize({ width: 390, height: 844 });
         await page.emulateMedia({ colorScheme: "dark" });
         await page.goto(
-          `${baseUrl}/sk-SK/tools/connect-bank?companyId=${companyId}`,
+          `${baseUrl}/sk-SK/tools/connect-bank?arg.companyId=${companyId}`,
         );
         const { t: sk } = scopedTranslation.scopedT("sk-SK");
         await page
@@ -343,7 +366,9 @@ describe("E2E: bank consent", () => {
       // oxlint-disable-next-line restricted/no-raw-fetch -- real Atlas HTTP route without upstream traffic
       const realRejection = await fetch(
         `${baseUrl}${enableBankingCallbackPath}?state=corrupted`,
-        { redirect: "manual" },
+        {
+          redirect: "manual",
+        },
       );
       expect(realRejection.status).toBe(303);
       expect(realRejection.headers.get("location")).toContain(
@@ -357,7 +382,7 @@ describe("E2E: bank consent", () => {
       const approved = await callback(state);
       expect(approved.status).toBe(303);
       expect(approved.headers.get("location")).toBe(
-        `${origin}/en-GLOBAL/tools/bank-connections?bankConsent=connected`,
+        `${origin}/tools/bank-connections?bankConsent=connected&arg.companyId=${companyId}`,
       );
       expect(approved.headers.get("referrer-policy")).toBe("no-referrer");
       expect((await callback(state)).headers.get("location")).toContain(
@@ -599,7 +624,9 @@ describe("E2E: bank consent", () => {
       const races = await Promise.all([callback(racingState), callback(state)]);
       expect(
         races.every((response) =>
-          response.headers.get("location")?.endsWith("bankConsent=connected"),
+          response.headers
+            .get("location")
+            ?.endsWith(`bankConsent=connected&arg.companyId=${companyId}`),
         ),
       ).toBe(true);
       const afterRace = await listEnableBankingAccounts(

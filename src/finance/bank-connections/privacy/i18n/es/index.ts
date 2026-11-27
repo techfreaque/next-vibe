@@ -71,4 +71,6 @@ export const translations: typeof enTranslations = {
     unavailable: "No se pudo completar la operación de privacidad.",
     import: "No se pudo importar el movimiento aprobado.",
   },
+  firstSetupHint:
+    "El filtro de privacidad está activo. Solo se guardan las operaciones que coincidan con tus reglas comerciales. Se descartan las privadas y las desconocidas. A continuación, elige tus proveedores.",
 };

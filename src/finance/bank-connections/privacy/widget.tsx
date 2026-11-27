@@ -38,6 +38,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import { type JSX, useEffect } from "react";
 import { z } from "zod";
 
+import { scopedTranslation as feedTranslation } from "../i18n";
 import definitions from "./definition";
 
 const policyOnly = { PATCH: definitions.PATCH };
@@ -69,6 +70,7 @@ export function PrivacyInbox(): JSX.Element {
     user,
   );
   const scope = data?.connectionIdSelected;
+  const feedT = feedTranslation.scopedT(locale).t;
   const mode = data?.mode ?? "mixed";
   return (
     <WidgetShell layout="page">
@@ -104,13 +106,11 @@ export function PrivacyInbox(): JSX.Element {
       {!scope ? (
         <EmptyBlock title={t("selectConnection")} />
       ) : (
-        <Div className="grid min-w-0 gap-4 @4xl:grid-cols-[minmax(0,1fr)_minmax(250px,360px)]">
-          <Div className="flex min-w-0 flex-col gap-3">
-            <WidgetHeader size="section" title={t("inbox")} />
-            {!data?.reviews.length ? (
-              <EmptyBlock title={t("empty")} />
-            ) : (
-              data.reviews.map((row) => (
+        <Div className="grid min-w-0 max-w-3xl gap-4">
+          {!!data?.reviews.length && (
+            <Div className="order-last flex min-w-0 flex-col gap-3">
+              <WidgetHeader size="section" title={t("inbox")} />
+              {data.reviews.map((row) => (
                 <Div
                   key={row.identity}
                   className="flex min-w-0 flex-col gap-3 rounded-xl border bg-card p-4"
@@ -178,13 +178,13 @@ export function PrivacyInbox(): JSX.Element {
                     </Div>
                   )}
                 </Div>
-              ))
-            )}
-          </Div>
+              ))}
+            </Div>
+          )}
           <Div className="min-w-0 space-y-3 rounded-xl border bg-card p-4">
             <WidgetHeader size="section" title={t("policy")} />
             <P className="text-sm text-muted-foreground">
-              {`${t(`modes.${mode}`)} · ${data?.retentionDays ?? 30} ${t("retention").toLowerCase()}`}
+              {t(`modes.${mode}`)}
             </P>
             {interactive && (
               <Div className="flex flex-wrap gap-2">
@@ -194,6 +194,11 @@ export function PrivacyInbox(): JSX.Element {
                   variant="outline"
                   onClick={() =>
                     push(definitions.PATCH, {
+                      renderInModal: true,
+                      popNavigationOnSuccess: 1,
+                      onSuccessCallback: () => {
+                        void mutations?.read?.refetch();
+                      },
                       data: {
                         connectionId: scope,
                         operation: "policy",
@@ -211,10 +216,18 @@ export function PrivacyInbox(): JSX.Element {
                   variant="outline"
                   onClick={() =>
                     push(definitions.PATCH, {
+                      renderInModal: true,
+                      popNavigationOnSuccess: 1,
+                      onSuccessCallback: () => {
+                        void mutations?.read?.refetch();
+                      },
                       data: {
                         connectionId: scope,
                         companyId: data?.companyId,
                         operation: "set",
+                        field: "counterparty",
+                        match: "equals",
+                        result: "business",
                       },
                     })
                   }
@@ -238,7 +251,7 @@ export function PrivacyInbox(): JSX.Element {
                       <P className="break-all">
                         {`${t(`ruleFields.${rule.field}`)} · ${t(`matches.${rule.match}`)} ${rule.literal} · ${t(`outcomes.${rule.result}`)}`}
                       </P>
-                      {supplier && (
+                      {supplier && supplier.name !== rule.literal && (
                         <P className="text-muted-foreground">{supplier.name}</P>
                       )}
                       {interactive && (
@@ -284,6 +297,9 @@ export function PrivacyInbox(): JSX.Element {
                           field: "counterparty",
                           match: "equals",
                           literal,
+                          supplierId: data.suggestedSuppliers?.find(
+                            ({ name }) => name === literal,
+                          )?.id,
                           result: "business",
                         })
                       }
@@ -293,6 +309,27 @@ export function PrivacyInbox(): JSX.Element {
                   </Div>
                 ))}
               </Div>
+            )}
+            {interactive && data?.companyId && data.ledgerAccountId && (
+              <Button
+                type="button"
+                disabled={update.isSubmitting}
+                onClick={() =>
+                  void import("../definition").then((m) =>
+                    push(m.default.POST, {
+                      data: {
+                        companyId: data.companyId,
+                        accountId: data.ledgerAccountId,
+                        feedId: scope,
+                        dryRun: true,
+                        matchedOnly: true,
+                      },
+                    }),
+                  )
+                }
+              >
+                {feedT("previewAction")}
+              </Button>
             )}
             {update.response?.success === false && (
               <P className="text-sm text-destructive">
@@ -314,9 +351,10 @@ export function PrivacyPolicy({
   const t = useWidgetTranslation<typeof definitions.PATCH>();
   const value = useWidgetValue<typeof definitions.PATCH>();
   const form = useWidgetForm<typeof definitions.PATCH>();
-  const { pop, push, canGoBack } = useWidgetNavigation();
+  const { push } = useWidgetNavigation();
   const operation = form?.watch("operation") ?? "policy";
   const updatePolicy = operation === "policy";
+  const firstSetup = form.watch("firstSetup") === true;
   const result = form?.watch("result");
   const companyId = form?.watch("companyId");
   const supplierId = form?.watch("supplierId");
@@ -338,15 +376,20 @@ export function PrivacyPolicy({
       />
       <FormAlertWidget field={{}} />
       {value?.saved ? (
-        <Button
-          type="button"
-          className="self-start"
-          variant="outline"
-          disabled={!canGoBack}
-          onClick={() => pop()}
-        >
-          {t("saved")}
-        </Button>
+        <Div className="flex max-w-xl flex-col gap-3 rounded-xl border bg-card p-4">
+          <P>{t("saved")}</P>
+          <Button
+            type="button"
+            className="self-start"
+            onClick={() =>
+              push(definitions.GET, {
+                data: { connectionId: form.getValues("connectionId") },
+              })
+            }
+          >
+            {t("rules")}
+          </Button>
+        </Div>
       ) : (
         interactive && (
           <Div className="flex max-w-xl flex-col gap-4">
@@ -356,11 +399,17 @@ export function PrivacyPolicy({
                 fieldName="connectionId"
               />
             )}
-            <SelectFieldWidget
-              field={children.operation}
-              fieldName="operation"
-            />
-            {updatePolicy ? (
+            {!firstSetup && (
+              <SelectFieldWidget
+                field={children.operation}
+                fieldName="operation"
+              />
+            )}
+            {firstSetup ? (
+              <P className="rounded-xl border bg-card p-4">
+                {t("firstSetupHint")}
+              </P>
+            ) : updatePolicy ? (
               <>
                 <SelectFieldWidget field={children.mode} fieldName="mode" />
                 <NumberFieldWidget

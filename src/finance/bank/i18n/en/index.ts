@@ -290,7 +290,7 @@ export const translations = {
     success: "Statement processed",
   },
   list: {
-    title: "Unmatched bank lines",
+    title: "Bank transactions",
     description:
       "Review imported bank lines and link them to posted journal entries.",
     success: "Bank lines loaded",

@@ -296,7 +296,7 @@ export const translations: typeof enTranslations = {
     success: "Extracto procesado",
   },
   list: {
-    title: "Movimientos pendientes de conciliar",
+    title: "Transacciones bancarias",
     description:
       "Revisa los movimientos importados y vincúlalos con asientos contabilizados.",
     success: "Movimientos bancarios cargados",

@@ -73,4 +73,6 @@ export const translations: typeof enTranslations = {
     unavailable: "Der Datenschutzvorgang konnte nicht abgeschlossen werden.",
     import: "Die freigegebene Bewegung konnte nicht übernommen werden.",
   },
+  firstSetupHint:
+    "Der Datenschutzfilter ist aktiv. Nur Umsätze, die Ihren Geschäftsregeln entsprechen, gelangen ins Hauptbuch. Private und unbekannte Umsätze werden verworfen. Wählen Sie anschließend Ihre Lieferanten.",
 };

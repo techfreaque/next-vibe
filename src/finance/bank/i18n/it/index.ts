@@ -294,7 +294,7 @@ export const translations: typeof enTranslations = {
     success: "Estratto conto elaborato",
   },
   list: {
-    title: "Righe bancarie da riconciliare",
+    title: "Movimenti bancari",
     description:
       "Controlla le righe importate e collegale alle scritture registrate.",
     success: "Righe bancarie caricate",

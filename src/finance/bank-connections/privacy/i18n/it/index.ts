@@ -71,4 +71,6 @@ export const translations: typeof enTranslations = {
     unavailable: "Operazione di riservatezza non completata.",
     import: "Impossibile importare il movimento approvato.",
   },
+  firstSetupHint:
+    "Il filtro per la riservatezza è attivo. Nel libro mastro entrano solo le operazioni che corrispondono alle regole aziendali. Quelle private o sconosciute vengono scartate. Scegli quindi i fornitori da includere.",
 };

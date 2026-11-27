@@ -17,6 +17,7 @@ import {
   type CountryLanguage,
   LanguagesArr,
 } from "next-vibe/core/i18n/core/config";
+import { toIntlLocale } from "next-vibe/core/i18n/core/language-utils";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -44,7 +45,18 @@ import { Users } from "next-vibe/ui/components/icons/Users";
 import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { Image } from "next-vibe/ui/components/image";
 import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
+import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
 import { H3, P } from "next-vibe/ui/components/typography";
 import type { IconComponent } from "next-vibe/ui/lib/helper";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
@@ -347,6 +359,102 @@ function ScreenFrame({
   );
 }
 
+// Selected rows and report totals from the saved Nordlicht Studio capture, in EUR.
+const TRIAL_BALANCE_ROWS = [
+  { key: "bank", debit: 92056.5, credit: 74745.6 },
+  { key: "sales", debit: 0, credit: 56350 },
+  { key: "wages", debit: 55800, credit: 0 },
+] as const;
+const TRIAL_BALANCE_TOTAL = 172428.42;
+
+function TrialBalancePreview({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const localeTag = toIntlLocale(locale);
+  const amount = new Intl.NumberFormat(localeTag, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  const date = new Intl.DateTimeFormat(localeTag, {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  }).format(new Date("2026-11-30T00:00:00Z"));
+  const caption = t("ledger.reports.trialBalance");
+  const imageBase = `/images/business/trial-balance-${shotLanguage(locale)}`;
+
+  return (
+    <Div className="mt-10 overflow-hidden rounded-xl border border-border bg-card shadow-lg shadow-primary/5 lg:hidden">
+      <Div className="flex flex-col gap-1 border-b border-border px-4 py-3">
+        <P className="text-base font-semibold text-foreground">{caption}</P>
+        <P className="text-sm text-muted-foreground">
+          {t("trialBalance.sample", { date })}
+        </P>
+      </Div>
+      <Table className="tabular-nums">
+        <TableCaption className="sr-only">{caption}</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="pl-4">{t("trialBalance.account")}</TableHead>
+            <TableHead className="text-right">
+              {t("trialBalance.debit")}
+            </TableHead>
+            <TableHead className="pr-4 text-right">
+              {t("trialBalance.credit")}
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {TRIAL_BALANCE_ROWS.map(({ key, debit, credit }) => (
+            <TableRow key={key}>
+              <TableHead className="pl-4 font-medium text-foreground">
+                {t(`trialBalance.${key}`)}
+              </TableHead>
+              <TableCell className="whitespace-nowrap text-right">
+                {amount.format(debit)}
+              </TableCell>
+              <TableCell className="pr-4 whitespace-nowrap text-right">
+                {amount.format(credit)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableHead className="pl-4 font-semibold text-foreground">
+              {t("trialBalance.total")}
+            </TableHead>
+            <TableCell className="font-semibold whitespace-nowrap text-right">
+              {amount.format(TRIAL_BALANCE_TOTAL)}
+            </TableCell>
+            <TableCell className="pr-4 font-semibold whitespace-nowrap text-right">
+              {amount.format(TRIAL_BALANCE_TOTAL)}
+            </TableCell>
+          </TableRow>
+        </TableFooter>
+      </Table>
+      <Div className="border-t border-border px-4">
+        <ExternalLink
+          href={`${imageBase}-light.jpg`}
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary hover:underline dark:hidden"
+        >
+          {t("trialBalance.open")}
+          <ArrowRight className="size-4" aria-hidden />
+        </ExternalLink>
+        <ExternalLink
+          href={`${imageBase}-dark.jpg`}
+          className="hidden min-h-11 items-center gap-2 text-sm font-medium text-primary hover:underline dark:inline-flex"
+        >
+          {t("trialBalance.open")}
+          <ArrowRight className="size-4" aria-hidden />
+        </ExternalLink>
+      </Div>
+    </Div>
+  );
+}
+
 function StepChip({ children }: { children: ReactNode }): JSX.Element {
   return (
     <Span className="inline-flex min-h-8 items-center rounded-md border border-border bg-background px-2.5 text-sm font-medium text-foreground">
@@ -425,8 +533,9 @@ export function TanstackPage({
           alt={t("hero.shotAlt", { appName })}
           width={1600}
           height={1187}
-          className="mt-12 md:mt-16"
+          className="hidden lg:mt-16 lg:block"
         />
+        <TrialBalancePreview locale={locale} />
         <StatGrid
           className="mt-6 md:mt-8"
           items={[
@@ -470,7 +579,7 @@ export function TanstackPage({
         <ScreenFrame
           name="bills"
           lang={shotLanguage(locale)}
-          alt={t("ledger.shotAlt")}
+          alt={t("ledger.shotAlt", { appName })}
           width={1600}
           height={504}
           className="mt-10"
@@ -718,6 +827,7 @@ export function TanstackPage({
             copyLabel={quickstartT("terminal.copy")}
             copiedLabel={quickstartT("terminal.copied")}
             copyAllLabel={quickstartT("terminal.copyAll")}
+            copyAll={false}
           />
           <CtaRow className="lg:flex-col lg:items-start">
             <Cta

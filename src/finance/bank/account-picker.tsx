@@ -19,6 +19,7 @@ const accountSelection = z.object({
   companyId: z.uuid(),
   name: z.string(),
   subtype: z.string(),
+  code: z.string(),
   isActive: z.boolean(),
 });
 
@@ -49,7 +50,11 @@ export function BankAccountPicker({
       const { default: definition } =
         await import("@/chart-of-accounts/account/list/definition");
       push(definition.GET, {
-        data: { companyId, postableOnly: true },
+        data: {
+          companyId,
+          postableOnly: true,
+          subtypes: [AccountSubtype.BANK],
+        },
         renderInModal: true,
         pickerLabelField: "name",
         pickerCallback: (candidate) => {
@@ -64,7 +69,10 @@ export function BankAccountPicker({
             return;
           }
           setSelectionRejected(false);
-          setPicked(parsed.data);
+          setPicked({
+            id: parsed.data.id,
+            name: `${parsed.data.code} · ${parsed.data.name}`,
+          });
           onSelect(parsed.data.id);
         },
       });

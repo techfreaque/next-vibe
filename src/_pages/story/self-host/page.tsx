@@ -115,12 +115,6 @@ const OPENROUTER_KEYS_URL = "https://openrouter.ai/keys";
 /** The default local URL `vibe dev` serves on. */
 const LOCAL_URL = "localhost:3000";
 
-/** Troubleshooting lines: problem, fix, and the command to run. */
-const TROUBLESHOOT = [
-  { key: "notFound", command: "bun run dev" },
-  { key: "port", command: "vibe dev --port=4000" },
-] as const;
-
 const SERVER_COMMANDS = [
   { key: "start", command: "vibe build && vibe start" },
   { key: "update", command: "vibe rebuild" },
@@ -257,14 +251,6 @@ function ColumnHeading({
         </H3>
       </Div>
     </Div>
-  );
-}
-
-function Code({ children }: { children: ReactNode }): JSX.Element {
-  return (
-    <Span className="rounded-md border border-border bg-card px-1.5 py-0.5 font-mono text-[0.8125rem] whitespace-nowrap text-foreground">
-      {children}
-    </Span>
   );
 }
 
@@ -422,6 +408,7 @@ export function TanstackPage({
               copyLabel={t("start.terminal.copy")}
               copiedLabel={t("start.terminal.copied")}
               copyAllLabel={t("start.terminal.copyAll")}
+              copyAll={false}
             />
             <Div className="flex flex-wrap gap-2">
               {LOCAL_FACTS.map((key) => (
@@ -434,21 +421,6 @@ export function TanstackPage({
                 </Span>
               ))}
             </Div>
-            <Div className="flex flex-col gap-2">
-              {TROUBLESHOOT.map(({ key, command }) => (
-                <P
-                  key={key}
-                  className="text-sm leading-relaxed text-muted-foreground [overflow-wrap:anywhere]"
-                >
-                  <Span className="font-medium text-foreground">
-                    {t(`start.terminal.troubleshoot.${key}.problem`)}
-                  </Span>{" "}
-                  {t(`start.terminal.troubleshoot.${key}.fix`)}{" "}
-                  <Code>{command}</Code>
-                </P>
-              ))}
-            </Div>
-
             <Details className="group mt-2 rounded-xl border border-border bg-card shadow-xs">
               <Summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-foreground [&::-webkit-details-marker]:hidden">
                 <Span className="flex min-w-0 items-center gap-2">
@@ -567,7 +539,7 @@ export function TanstackPage({
                 label={t("ai.account.cta", vars)}
               />
               <Cta
-                href={`/${locale}/pricing`}
+                href={`/${locale}/subscription/overview`}
                 label={t("ai.account.pricing")}
                 variant="secondary"
               />

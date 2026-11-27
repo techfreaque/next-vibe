@@ -2,7 +2,7 @@ import "server-only";
 
 import { createHmac, hkdfSync } from "node:crypto";
 
-import { and, desc, eq, gt, inArray, isNull, lte } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, isNull, lte, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -799,7 +799,12 @@ export class BankPrivacyRepository {
         ];
       });
       const names = await db
-        .selectDistinct({ vendor: purchasingVendors.name })
+        .select({
+          name: purchasingVendors.name,
+          supplierId: sql<
+            string | null
+          >`case when count(*) = 1 then min(${purchasingVendors.id}::text) end`,
+        })
         .from(purchasingVendors)
         .where(
           and(
@@ -807,20 +812,19 @@ export class BankPrivacyRepository {
             eq(purchasingVendors.isActive, true),
           ),
         )
+        .groupBy(purchasingVendors.name)
         .orderBy(purchasingVendors.name)
         .limit(12);
-      const suggestions = names
-        .map(({ vendor }) => vendor)
-        .filter(
-          (name) =>
-            name.length >= 3 &&
-            name.length <= 200 &&
-            !policy.rules.some(
-              (rule) =>
-                rule.field === "counterparty" &&
-                normalizeMatch(rule.literal) === normalizeMatch(name),
-            ),
-        );
+      const candidates = names.filter(
+        ({ name }) =>
+          name.length >= 3 &&
+          name.length <= 200 &&
+          !policy.rules.some(
+            (rule) =>
+              rule.field === "counterparty" &&
+              normalizeMatch(rule.literal) === normalizeMatch(name),
+          ),
+      );
       const configuredIds = policy.rules.flatMap(({ supplierId }) =>
         supplierId ? [supplierId] : [],
       );
@@ -839,11 +843,15 @@ export class BankPrivacyRepository {
       return success({
         connections,
         connectionIdSelected: connectionId,
+        ledgerAccountId: mapping.accountId,
         companyId: mapping.companyId,
         ruleSuppliers,
         ...policy,
         reviews,
-        suggestions,
+        suggestions: candidates.map(({ name }) => name),
+        suggestedSuppliers: candidates.flatMap(({ name, supplierId }) =>
+          supplierId ? [{ name, id: supplierId }] : [],
+        ),
       });
     } catch {
       logger.error("Bank privacy review could not load");
@@ -921,7 +929,7 @@ export class BankPrivacyRepository {
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
-      return success({ saved: true });
+      return success({ saved: true, savedCompanyId: mapping.companyId });
     } catch {
       logger.error("Bank privacy policy could not be saved");
       return fail({
@@ -940,7 +948,7 @@ export class BankPrivacyRepository {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       const mapping = await findMapping(data.connectionId, actorId);
-      if (!mapping) {
+      if (!mapping || !(await getDocumentAccess(actorId, mapping))?.canManage) {
         return fail({
           message: t("errors.forbidden"),
           errorType: ErrorResponseTypes.FORBIDDEN,

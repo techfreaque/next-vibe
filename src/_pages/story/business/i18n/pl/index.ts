@@ -26,6 +26,17 @@ export const translations: typeof enTranslations = {
       languages: "wbudowanych języków",
     },
   },
+  trialBalance: {
+    sample: "Wybrane konta · {{date}} · EUR",
+    account: "Konto",
+    debit: "Wn",
+    credit: "Ma",
+    bank: "Bank",
+    sales: "Sprzedaż",
+    wages: "Płace",
+    total: "Suma raportu",
+    open: "Zobacz pełny raport",
+  },
   ledger: {
     eyebrow: "Księgi",
     title: "Podwójny zapis. Bez wyjątków.",

@@ -137,7 +137,12 @@ export function BankListWidget(): JSX.Element {
     return {
       id: line.id,
       cells: {
-        transactionId: line.transactionId,
+        transactionId:
+          line.counterparty ||
+          line.description ||
+          (/^[a-f0-9]{64}$/u.test(line.transactionId)
+            ? t("fields.line")
+            : line.transactionId),
         date,
         amount: amountCell,
         status: statusPill,
@@ -366,7 +371,7 @@ export function BankListWidget(): JSX.Element {
             label={t("list.title")}
             columns={[
               { id: "date", label: t("fields.bookedDate") },
-              { id: "transactionId", label: t("fields.transactionId") },
+              { id: "transactionId", label: t("fields.description") },
               { id: "amount", label: t("fields.amount"), numeric: true },
               { id: "status", label: t("fields.status") },
               { id: "action", label: "" },
@@ -377,8 +382,9 @@ export function BankListWidget(): JSX.Element {
                 {rows.map((row) => (
                   <ListItem
                     key={row.id}
-                    title={row.cells.date}
-                    subtitle={row.cells.transactionId}
+                    title={row.cells.transactionId}
+                    subtitle={row.cells.date}
+                    badges={row.cells.status}
                     meta={row.cells.amount}
                     onClick={row.onOpen}
                   />

@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Bank verbinden",
   description:
-    "Wählen Sie Bank und Sachkonto. Ihre Bank genehmigt den Lesezugriff für bis zu 180 Tage.",
+    "Erteilen Sie Lesezugriff. Nach der Rückkehr legen Sie fest, welche geschäftlichen Umsätze Sie übernehmen, und prüfen die Importvorschau.",
   company: "Unternehmen",
   ledgerAccount: "Bankkonto im Hauptbuch",
-  bankCountry: "Ländercode der Bank",
+  bankCountry: "Land der Bank",
   bankName: "Bankname",
   psu: "Bankzugang",
   personal: "Privates Bankkonto",
@@ -23,4 +23,20 @@ export const translations: typeof enTranslations = {
   invalidAccount:
     "Die Bankfreigabe ist nicht verfügbar oder bereits abgelaufen.",
   expiryTitle: "Bankfreigabe läuft bald ab",
+  bankStep: "1 von 4 · Bank wählen",
+  ledgerStep: "2 von 4 · Sachkonto wählen",
+  authorizeStep: "3 von 4 · Lesezugriff freigeben",
+  next: "Sachkonto wählen",
+  back: "Zurück zur Bankauswahl",
+  createAccount: "Bankkonto im Kontenplan anlegen",
+  noLedger:
+    "In diesem Unternehmen fehlt ein aktives Bankkonto im Kontenplan. Legen Sie eines an.",
+  search: "Bank suchen",
+  noBanks: "Keine passende Bank. Prüfen Sie Name, Land oder Zugangsart.",
+  loading: "Bankverzeichnis wird geladen…",
+  unconfigured:
+    "Die Serververwaltung muss die Anwendungs-ID und den Signaturschlüssel für Enable Banking hinterlegen.",
+  directoryUnavailable:
+    "Das Bankenverzeichnis ist gerade nicht erreichbar. Laden Sie es erneut.",
+  retry: "Erneut versuchen",
 };

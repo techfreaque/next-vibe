@@ -1,7 +1,7 @@
 /**
  * The one quickstart used by the self-host and developer pages.
  *
- * 1. Prerequisites per platform (git + Bun), 2. four commands, 3. everything
+ * 1. Prerequisites per platform (git + Bun), 2. three commands, 3. everything
  * else in the browser. Verified on a fresh clone without Docker: PGlite is
  * the default database, `bun i` puts `vibe` on PATH, the ADMIN quick login
  * opens the setup wizard (admin login, security keys, AI provider:
@@ -26,11 +26,8 @@ import { scopedTranslation } from "./i18n";
 import { Prereqs } from "./prereqs";
 import { TerminalCard } from "./terminal";
 
-const REPO_DIR = GITHUB_REPO_URL.split("/").pop() ?? "next-vibe";
-
 export const QUICKSTART_COMMANDS = [
   { key: "clone", command: `git clone ${GITHUB_REPO_URL}` },
-  { key: "cd", command: `cd ${REPO_DIR}` },
   { key: "install", command: "bun i" },
   { key: "dev", command: "vibe dev" },
 ] as const;
@@ -131,6 +128,7 @@ export function Quickstart({
               copyLabel={t("terminal.copy")}
               copiedLabel={t("terminal.copied")}
               copyAllLabel={t("terminal.copyAll")}
+              copyAll={false}
             />
             <Note>{t("terminal.fallback")}</Note>
             <Note>{t("terminal.port")}</Note>

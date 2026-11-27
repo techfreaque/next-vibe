@@ -29,8 +29,7 @@ export const translations: typeof enTranslations = {
     copy: "Copia",
     copied: "Copiato",
     clone: "Scarica il codice",
-    cd: "Entra nella cartella",
-    install: "Installa. Il comando aggiunge anche vibe al PATH.",
+    install: "Apri la cartella next-vibe nel terminale, poi installa",
     dev: "Avvia. Il database, le migrazioni e i dati iniziali si configurano da soli.",
     fallback:
       "La shell dice «vibe: command not found»? Apri un nuovo terminale o esegui bun run dev.",

@@ -74,7 +74,9 @@ test("uses only expected authorization paths and returns the reported consent ca
     }
     expect(
       typeof init.body === "string" ? JSON.parse(init.body) : undefined,
-    ).toEqual({ code: "fixture-code" });
+    ).toEqual({
+      code: "fixture-code",
+    });
     return Response.json({
       session_id: "11111111-1111-4111-8111-111111111111",
       accounts: [

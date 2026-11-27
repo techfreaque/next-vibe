@@ -114,6 +114,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       connectionId: requestField(scopedTranslation, {
+        includeInCacheKey: true,
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "connection",
@@ -133,6 +134,18 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.uuid().optional(),
         hidden: true,
+      }),
+      ledgerAccountId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.uuid().optional(),
+      }),
+      suggestedSuppliers: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "ruleSupplier",
+        schema: z
+          .array(z.object({ id: z.uuid(), name: z.string() }))
+          .optional(),
       }),
       ruleSuppliers: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -198,12 +211,23 @@ const { PATCH } = createEndpoint({
   options: {
     formOptions: { persistForm: false },
     mutationOptions: {
-      onSuccess: async ({ logger }) => {
+      onSuccess: async ({ logger, requestData, responseData }) => {
         const [{ apiClient }, { default: feeds }] = await Promise.all([
           import("next-vibe/unified-ui/hooks/store"),
           import("../definition"),
         ]);
-        await apiClient.refetchEndpoint(feeds.GET, logger);
+        await apiClient.refetchEndpoint(GET, logger, {
+          requestData: { connectionId: requestData.connectionId },
+        });
+        if (responseData.savedCompanyId) {
+          await apiClient.refetchEndpoint(feeds.GET, logger, {
+            requestData: {
+              companyId: responseData.savedCompanyId,
+              directoryCountry: undefined,
+              directoryPersonal: undefined,
+            },
+          });
+        }
       },
     },
   },
@@ -212,6 +236,12 @@ const { PATCH } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       connectionId: scopeField,
+      firstSetup: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        hidden: true,
+        schema: z.boolean().optional(),
+      }),
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -286,6 +316,11 @@ const { PATCH } = createEndpoint({
           value,
           label: `outcomes.${value}` as const,
         })),
+      }),
+      savedCompanyId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.uuid().optional(),
       }),
       saved: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

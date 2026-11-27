@@ -70,4 +70,6 @@ export const translations: typeof enTranslations = {
     unavailable: "Úkon na ochranu súkromia sa nepodarilo dokončiť.",
     import: "Schválený pohyb sa nepodarilo preniesť.",
   },
+  firstSetupHint:
+    "Filter súkromia je zapnutý. Do účtovníctva sa uložia len transakcie zodpovedajúce firemným pravidlám. Súkromné a nerozpoznané transakcie sa zahodia. V ďalšom kroku vyberiete dodávateľov.",
 };

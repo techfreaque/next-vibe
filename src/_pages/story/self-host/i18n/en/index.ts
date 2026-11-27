@@ -84,24 +84,13 @@ export const translations = {
       copied: "Copied",
       rows: {
         clone: "Get the code",
-        cd: "Step inside",
-        install: "Install. Also puts vibe on your PATH.",
+        install: "Open the next-vibe folder in your terminal, then install",
         dev: "Start. Database and seed data set up on their own.",
       },
       facts: {
         docker: "No Docker",
         postgres: "No Postgres install",
         config: "No .env editing",
-      },
-      troubleshoot: {
-        notFound: {
-          problem: "vibe: command not found?",
-          fix: "Open a new terminal, or run",
-        },
-        port: {
-          problem: "Port 3000 taken?",
-          fix: "Use another port:",
-        },
       },
     },
     prereqs: {

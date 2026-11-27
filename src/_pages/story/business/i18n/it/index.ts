@@ -26,6 +26,17 @@ export const translations: typeof enTranslations = {
       languages: "lingue integrate",
     },
   },
+  trialBalance: {
+    sample: "Estratto del report · {{date}} · EUR",
+    account: "Conto",
+    debit: "Dare",
+    credit: "Avere",
+    bank: "Banca",
+    sales: "Vendite",
+    wages: "Stipendi",
+    total: "Totale report",
+    open: "Visualizza il report completo",
+  },
   ledger: {
     eyebrow: "I conti",
     title: "Partita doppia. Senza eccezioni.",

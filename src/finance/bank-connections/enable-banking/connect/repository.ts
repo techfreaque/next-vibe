@@ -45,12 +45,12 @@ export async function connectEnableBanking(
   logger: EndpointLogger,
   locale: CountryLanguage,
   t: ReturnType<typeof scopedTranslation.scopedT>["t"],
+  request = configuredConsentTransport(),
+  origin = configuredConsentOrigin(),
 ): Promise<ResponseType<(typeof definition.POST)["types"]["ResponseOutput"]>> {
-  const origin = configuredConsentOrigin();
-  const request = configuredConsentTransport();
   if (!origin || !request) {
     return fail({
-      message: t("unavailable"),
+      message: t("unconfigured"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }

@@ -24,6 +24,17 @@ export const translations = {
       languages: "languages built in",
     },
   },
+  trialBalance: {
+    sample: "Selected accounts · {{date}} · EUR",
+    account: "Account",
+    debit: "Debit",
+    credit: "Credit",
+    bank: "Bank",
+    sales: "Sales",
+    wages: "Wages",
+    total: "Report total",
+    open: "View full report",
+  },
   ledger: {
     eyebrow: "The books",
     title: "Double-entry. Enforced.",

@@ -293,7 +293,7 @@ export const translations: typeof enTranslations = {
     success: "Bankový výpis spracovaný",
   },
   list: {
-    title: "Nespárované riadky bankového výpisu",
+    title: "Bankové transakcie",
     description:
       "Skontrolovať importované riadky bankového výpisu a spárovať ich so zaúčtovanými zápismi.",
     success: "Riadky bankového výpisu načítané",

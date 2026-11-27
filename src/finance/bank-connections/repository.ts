@@ -23,8 +23,12 @@ import type {
   BankSyncOutput,
 } from "./definition";
 import { createEnableBankingAdapter } from "./enable-banking/adapter";
-import { applicationAccess } from "./enable-banking/application";
+import {
+  applicationAccess,
+  listBankCountries,
+} from "./enable-banking/application";
 import { configuredConsentTransport } from "./enable-banking/connect/repository";
+import { listDirectoryBanks } from "./enable-banking/consent/client";
 import {
   listEnableBankingAccounts,
   resolveEnableBankingAccount,
@@ -42,6 +46,9 @@ export async function listBankFeeds(
   check: boolean,
   logger: EndpointLogger,
   locale: CountryLanguage,
+  directoryCountry?: string,
+  directoryPersonal = true,
+  transport = configuredConsentTransport,
 ): Promise<ResponseType<BankConnectionsOutput>> {
   const accounts = await listEnableBankingAccounts(
     companyId,
@@ -52,16 +59,60 @@ export async function listBankFeeds(
   if (!accounts.success) {
     return accounts;
   }
+  if (directoryCountry) {
+    const request = transport();
+    const directory = {
+      country: directoryCountry,
+      personal: directoryPersonal,
+    };
+    if (!request) {
+      return success({
+        feeds: [],
+        directory: { ...directory, status: "unconfigured", choices: [] },
+      });
+    }
+    try {
+      const choices =
+        directoryCountry === "countries"
+          ? await listBankCountries(request)
+          : (
+              await listDirectoryBanks(
+                request,
+                directoryCountry,
+                directoryPersonal ? "personal" : "business",
+              )
+            )?.map(({ name }) => name);
+      if (choices) {
+        return success({
+          feeds: [],
+          directory: {
+            ...directory,
+            status: "ready",
+            choices: [...new Set(choices)].toSorted(),
+          },
+        });
+      }
+    } catch {
+      // Provider failures contain no customer-facing recovery information.
+    }
+    return success({
+      feeds: [],
+      directory: { ...directory, status: "unavailable", choices: [] },
+    });
+  }
   const mappings = await db
     .select({
       feed: bankFeedMappings.consentAccountId,
       accountId: bankFeedMappings.accountId,
+      code: accountNodes.code,
+      name: accountNodes.name,
       daily: bankFeedMappings.daily,
       startDay: bankFeedMappings.startDay,
       privacyConfigured: bankPrivacySettings.mappingId,
       through: bankFeedCheckpoints.through,
     })
     .from(bankFeedMappings)
+    .innerJoin(accountNodes, eq(accountNodes.id, bankFeedMappings.accountId))
     .leftJoin(
       bankFeedCheckpoints,
       and(
@@ -95,6 +146,14 @@ export async function listBankFeeds(
       const row = byFeed.get(account.id);
       return {
         ...account,
+        suggestedAccountId:
+          !row &&
+          !mappings.some(
+            ({ accountId }) => accountId === account.suggestedAccountId,
+          )
+            ? account.suggestedAccountId
+            : undefined,
+        ledgerLabel: row ? `${row.code} · ${row.name}` : account.ledgerLabel,
         accountId: row?.accountId ?? null,
         daily: row?.daily ?? false,
         startDay: row?.startDay,

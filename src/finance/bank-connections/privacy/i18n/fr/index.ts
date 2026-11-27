@@ -72,4 +72,6 @@ export const translations: typeof enTranslations = {
     unavailable: "L’opération de confidentialité a échoué.",
     import: "L’opération approuvée n’a pas pu être importée.",
   },
+  firstSetupHint:
+    "Le filtre de confidentialité est actif. Seules les opérations qui correspondent à vos règles professionnelles sont enregistrées. Les opérations privées ou inconnues sont écartées. Choisissez ensuite vos fournisseurs.",
 };
