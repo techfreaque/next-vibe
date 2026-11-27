@@ -1155,6 +1155,7 @@ export const translations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NOWPayments",
+      whop: "Whop",
     },
     paymentStatus: {
       pending: "Pending",

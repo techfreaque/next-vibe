@@ -34,12 +34,6 @@ export const translations: typeof enTranslations = {
         description: "Choisissez comment vous voulez payer",
         placeholder: "Sélectionner un moyen de paiement",
       },
-      payCurrency: {
-        label: "Cryptomonnaie",
-        description:
-          "Monnaie de paiement. Laissez vide pour choisir sur la page de paiement.",
-        placeholder: "Choisir une monnaie",
-      },
       metadata: {
         label: "Métadonnées",
         description: "Métadonnées supplémentaires pour la session de paiement",
@@ -193,6 +187,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NowPayments",
+      whop: "Whop",
     },
   },
 
@@ -202,6 +197,9 @@ export const translations: typeof enTranslations = {
     yearly: "Annuel",
   },
   availability: {
+    whopCardLabel: "Carte bancaire",
+    whopCardDescription:
+      "Visa, Mastercard et plus. Paiement sécurisé via Whop.",
     cardPaused:
       "Le paiement par carte est suspendu pour le moment. La crypto fonctionne tout de suite.",
     cardPausedError:
@@ -209,26 +207,7 @@ export const translations: typeof enTranslations = {
     nowpaymentsCardLabel: "Carte ou crypto (NOWPayments)",
     nowpaymentsCardDescription:
       "Visa, Mastercard, Apple Pay, Google Pay ou Bitcoin, Ethereum et plus encore",
-    cryptoPickCoin: "Choisissez une monnaie",
-    cryptoCoinUnavailable:
-      "Cette monnaie n'est pas disponible pour le moment. Choisissez-en une autre.",
-    cryptoCoinBelowMinimum:
-      "Ce montant est sous le minimum de cette monnaie. Choisissez-en une autre.",
     cryptoAmountBelowMinimum:
       "Ce montant est sous le minimum crypto. Ajoutez un pack ou choisissez un plan plus grand.",
-  },
-  cryptoCoin: {
-    btc: "Bitcoin (BTC)",
-    eth: "Ethereum (ETH)",
-    usdtTrc20: "USDT (TRON)",
-    usdtErc20: "USDT (Ethereum)",
-    usdtBsc: "USDT (BNB Chain)",
-    usdc: "USDC (Ethereum)",
-    sol: "Solana (SOL)",
-    ltc: "Litecoin (LTC)",
-    xmr: "Monero (XMR)",
-    doge: "Dogecoin (DOGE)",
-    trx: "TRON (TRX)",
-    bnbBsc: "BNB (BNB Chain)",
   },
 };

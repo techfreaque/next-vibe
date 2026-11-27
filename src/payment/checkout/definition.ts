@@ -25,7 +25,6 @@ import {
   PaymentProviderDB,
   PaymentProviderOptions,
 } from "../enum";
-import { CryptoCoinDB, CryptoCoinOptions } from "./crypto-coins";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -119,19 +118,6 @@ const { POST } = createEndpoint({
         columns: 12,
         options: PaymentProviderOptions,
         schema: z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
-      }),
-
-      // Crypto only: the coin picked in the buy dialog. Omitted, the buyer
-      // picks on the NOWPayments page.
-      payCurrency: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "form.fields.payCurrency.label" as const,
-        description: "form.fields.payCurrency.description" as const,
-        placeholder: "form.fields.payCurrency.placeholder" as const,
-        columns: 12,
-        options: CryptoCoinOptions,
-        schema: z.enum(CryptoCoinDB).optional(),
       }),
 
       metadata: requestField(scopedTranslation, {

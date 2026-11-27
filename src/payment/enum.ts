@@ -9,7 +9,7 @@ import { scopedTranslation } from "./i18n";
 
 /**
  * Payment provider enum
- * Supports Stripe and NOWPayments (crypto)
+ * Supports Stripe, NOWPayments (crypto) and Whop (card)
  */
 export const {
   enum: PaymentProvider,
@@ -18,6 +18,7 @@ export const {
 } = createEnumOptions(scopedTranslation, {
   STRIPE: "enums.paymentProvider.stripe",
   NOWPAYMENTS: "enums.paymentProvider.nowpayments",
+  WHOP: "enums.paymentProvider.whop",
 });
 
 /**
@@ -153,6 +154,7 @@ export const {
 export const PaymentProviderDB = [
   PaymentProvider.STRIPE,
   PaymentProvider.NOWPAYMENTS,
+  PaymentProvider.WHOP,
 ] as const;
 
 export const PaymentStatusDB = [

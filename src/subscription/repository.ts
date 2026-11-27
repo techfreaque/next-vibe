@@ -42,7 +42,7 @@ import {
   getCheckoutProviders,
   nowPaymentsAcceptsCards,
 } from "../payment/providers/availability";
-import { getCryptoCoinMinimums } from "../payment/providers/nowpayments/min-amounts";
+import { getCryptoMinimumUsd } from "../payment/providers/nowpayments/min-amounts";
 import { StripeProvider } from "../payment/providers/stripe/repository";
 import type { WebhookData } from "../payment/providers/types";
 import { getEnvAvailability } from "../vibe/agent/env-availability";
@@ -412,8 +412,7 @@ export class SubscriptionRepository {
       ...result.data,
       checkoutProviders: await getCheckoutProviders(logger),
       nowPaymentsAcceptsCards: nowPaymentsAcceptsCards(),
-      cryptoCoins:
-        (await getCryptoCoinMinimums(logger, { wait: false })) ?? undefined,
+      cryptoMinUsd: await getCryptoMinimumUsd(logger),
     });
   }
 
@@ -478,11 +477,12 @@ export class SubscriptionRepository {
       }
 
       // AUTOMATIC SYNC: Verify subscription with Stripe if it has a provider ID.
-      // Skip for NOWPayments - one-time payments have no recurring subscription to sync.
+      // Stripe only: NOWPayments plans are one-off invoices and Whop pushes
+      // every membership change by webhook.
       if (
         syncWithProvider &&
         subscription.providerSubscriptionId &&
-        subscription.provider !== PaymentProvider.NOWPAYMENTS
+        subscription.provider === PaymentProvider.STRIPE
       ) {
         // Terminal statuses never change on Stripe's side; re-checking them
         // made every page view of a former subscriber hit the Stripe API.
@@ -605,7 +605,7 @@ export class SubscriptionRepository {
         isPastDue &&
         syncWithProvider &&
         subscription.providerSubscriptionId &&
-        subscription.provider !== PaymentProvider.NOWPAYMENTS
+        subscription.provider === PaymentProvider.STRIPE
           ? await SubscriptionRepository.resolveRetryPaymentUrl(
               subscription.providerSubscriptionId,
               logger,
@@ -613,7 +613,7 @@ export class SubscriptionRepository {
           : null;
       const needsCardHint =
         syncWithProvider &&
-        subscription.provider !== PaymentProvider.NOWPAYMENTS &&
+        subscription.provider === PaymentProvider.STRIPE &&
         subscription.status !== SubscriptionStatus.ACTIVE &&
         subscription.status !== SubscriptionStatus.TRIALING;
       const cardHint = needsCardHint
@@ -713,7 +713,6 @@ export class SubscriptionRepository {
           planId: data.plan,
           billingInterval: data.billingInterval,
           provider: data.provider,
-          payCurrency: data.payCurrency,
         },
         user,
         locale,
@@ -1192,6 +1191,7 @@ export class SubscriptionRepository {
           subscription.providerSubscriptionId,
           logger,
           locale,
+          data.cancelAtPeriodEnd,
         );
 
         if (!cancelResult.success) {
@@ -1308,6 +1308,43 @@ export class SubscriptionRepository {
           isYearly,
           currentPeriodEnd: currentPeriodEnd.toISOString(),
         });
+      } else if (providerEnum === PaymentProvider.WHOP) {
+        // Whop: the membership is the subscription. The webhook carries its
+        // period (looked up at verification); fall back to the membership
+        // API, then to one interval from now.
+        providerSubscriptionId = session.subscription;
+        if (!providerSubscriptionId) {
+          logger.error("Missing Whop membership for subscription checkout", {
+            sessionId: session.id,
+          });
+          return;
+        }
+        let startMs = session.current_period_start
+          ? session.current_period_start * 1000
+          : undefined;
+        let endMs = session.current_period_end
+          ? session.current_period_end * 1000
+          : undefined;
+        if (!startMs || !endMs) {
+          const membership = await getPaymentProvider(
+            PaymentProvider.WHOP,
+          ).retrieveSubscription(providerSubscriptionId, logger, locale);
+          if (membership.success) {
+            startMs = membership.data.currentPeriodStart;
+            endMs = membership.data.currentPeriodEnd;
+          }
+        }
+        currentPeriodStart = startMs ? new Date(startMs) : new Date();
+        currentPeriodEnd = endMs
+          ? new Date(endMs)
+          : new Date(
+              currentPeriodStart.getTime() +
+                (billingInterval === BillingInterval.YEARLY ? 365 : 30) *
+                  24 *
+                  60 *
+                  60 *
+                  1000,
+            );
       } else {
         // Stripe: retrieve subscription from provider for accurate period dates
         providerSubscriptionId = session.subscription;
@@ -1899,6 +1936,105 @@ export class SubscriptionRepository {
       logger.error("Failed to process subscription cancellation", {
         error: parseError(error),
         subscriptionId,
+      });
+    }
+  }
+
+  /**
+   * Provider-pushed subscription state (Whop membership.updated): the
+   * payload is the full current state, so no provider round trip. Whop
+   * delivers events unordered and may send the membership before the
+   * payment that creates our row: an unknown membership is skipped (the
+   * payment webhook stores it with its period).
+   */
+  static async handleProviderSubscriptionState(
+    state: WebhookData,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<void> {
+    try {
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.providerSubscriptionId, state.id))
+        .limit(1);
+      if (!subscription) {
+        logger.info("Provider subscription state for an unknown plan", {
+          subscriptionId: state.id,
+          status: state.status,
+        });
+        return;
+      }
+      const status = state.status ?? "";
+      // canceled / expired / completed: access is over.
+      if (
+        status === "canceled" ||
+        status === "expired" ||
+        status === "completed"
+      ) {
+        await SubscriptionRepository.handleSubscriptionCanceled(
+          state.id,
+          logger,
+          locale,
+        );
+        return;
+      }
+      if (subscription.status === SubscriptionStatus.CANCELED) {
+        logger.info("Ignoring state update for a canceled subscription", {
+          subscriptionId: state.id,
+          status,
+        });
+        return;
+      }
+      const start = state.current_period_start
+        ? new Date(state.current_period_start * 1000)
+        : null;
+      const end = state.current_period_end
+        ? new Date(state.current_period_end * 1000)
+        : null;
+      // Periods only move forward; the paid renewal grants the credits.
+      const periodMoves =
+        start &&
+        end &&
+        (!subscription.currentPeriodEnd ||
+          end.getTime() >= subscription.currentPeriodEnd.getTime());
+      const cancelAtPeriodEnd =
+        state.cancel_at_period_end ?? subscription.cancelAtPeriodEnd;
+      const now = new Date();
+      await db
+        .update(subscriptions)
+        .set({
+          ...(periodMoves && start && end
+            ? { currentPeriodStart: start, currentPeriodEnd: end }
+            : {}),
+          cancelAtPeriodEnd,
+          cancelAt: cancelAtPeriodEnd
+            ? ((periodMoves ? end : subscription.currentPeriodEnd) ?? null)
+            : null,
+          canceledAt: cancelAtPeriodEnd
+            ? (subscription.canceledAt ?? now)
+            : null,
+          ...(status === "active"
+            ? {
+                status: SubscriptionStatus.ACTIVE,
+                paymentFailedAt: null,
+                gracePeriodEndsAt: null,
+              }
+            : status === "trialing"
+              ? { status: SubscriptionStatus.TRIALING }
+              : {}),
+          updatedAt: now,
+        })
+        .where(eq(subscriptions.id, subscription.id));
+      logger.debug("Provider subscription state applied", {
+        subscriptionId: state.id,
+        status,
+        cancelAtPeriodEnd,
+      });
+    } catch (error) {
+      logger.error("Failed to apply provider subscription state", {
+        error: parseError(error),
+        subscriptionId: state.id,
       });
     }
   }

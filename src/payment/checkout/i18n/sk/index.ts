@@ -34,12 +34,6 @@ export const translations: typeof enTranslations = {
         description: "Vyber si spôsob platby",
         placeholder: "Vyber poskytovateľa platby",
       },
-      payCurrency: {
-        label: "Kryptomena",
-        description:
-          "Mena na platbu. Nechaj prázdne a vyber ju na platobnej stránke.",
-        placeholder: "Vyber menu",
-      },
       metadata: {
         label: "Metadáta",
         description: "Doplňujúce metadáta platobnej relácie",
@@ -193,6 +187,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NowPayments",
+      whop: "Whop",
     },
   },
 
@@ -202,6 +197,8 @@ export const translations: typeof enTranslations = {
     yearly: "Ročne",
   },
   availability: {
+    whopCardLabel: "Karta",
+    whopCardDescription: "Visa, Mastercard a ďalšie. Bezpečná platba cez Whop.",
     cardPaused:
       "Platby kartou sú zatiaľ pozastavené. Kryptomenou zaplatíš hneď.",
     cardPausedError:
@@ -209,24 +206,7 @@ export const translations: typeof enTranslations = {
     nowpaymentsCardLabel: "Karta alebo kryptomeny (NOWPayments)",
     nowpaymentsCardDescription:
       "Visa, Mastercard, Apple Pay, Google Pay alebo bitcoin, ether a ďalšie",
-    cryptoPickCoin: "Vyber menu",
-    cryptoCoinUnavailable: "Táto mena teraz nie je dostupná. Vyber inú.",
-    cryptoCoinBelowMinimum: "Táto suma je pod minimom tejto meny. Vyber inú.",
     cryptoAmountBelowMinimum:
       "Táto suma je pod minimom pre kryptomeny. Pridaj balík alebo vyber väčší plán.",
-  },
-  cryptoCoin: {
-    btc: "Bitcoin (BTC)",
-    eth: "Ethereum (ETH)",
-    usdtTrc20: "USDT (TRON)",
-    usdtErc20: "USDT (Ethereum)",
-    usdtBsc: "USDT (BNB Chain)",
-    usdc: "USDC (Ethereum)",
-    sol: "Solana (SOL)",
-    ltc: "Litecoin (LTC)",
-    xmr: "Monero (XMR)",
-    doge: "Dogecoin (DOGE)",
-    trx: "TRON (TRX)",
-    bnbBsc: "BNB (BNB Chain)",
   },
 };

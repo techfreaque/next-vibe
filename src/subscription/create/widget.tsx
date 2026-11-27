@@ -61,15 +61,14 @@ import publicCapDefinitions from "@/credits/public-cap/definition";
 import { scopedTranslation as publicCapScopedTranslation } from "@/credits/public-cap/i18n";
 import purchaseDefinitions from "@/credits/purchase/definition";
 import { scopedTranslation as purchaseScopedTranslation } from "@/credits/purchase/i18n";
-import { CryptoCoinPicker } from "@/payment/checkout/crypto-coin-picker";
+import { CryptoCheckoutOption } from "@/payment/checkout/crypto-checkout-option";
 import {
+  CRYPTO_FALLBACK_MIN_USD,
   cryptoAmountUsd,
-  type CryptoCoinMinimum,
-  type CryptoCoinValue,
-  cryptoMinimumUsd,
 } from "@/payment/checkout/crypto-coins";
 import { scopedTranslation as checkoutScopedTranslation } from "@/payment/checkout/i18n";
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
+import { resolveCardCheckoutProvider } from "@/payment/providers/card-provider";
 import { ProductIds, productsRepository } from "@/products/platform-products";
 import {
   getPricingParams,
@@ -154,25 +153,30 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const [liveCheckout, setLiveCheckout] = useState<{
     providers: (typeof PaymentProviderValue)[];
     nowPaymentsAcceptsCards: boolean;
-    cryptoCoins: CryptoCoinMinimum[] | undefined;
+    cryptoMinUsd: number | undefined;
   } | null>(null);
   const checkoutProviders =
     liveCheckout?.providers ?? currentSubscription?.checkoutProviders;
   const nowPaymentsAcceptsCards =
     liveCheckout?.nowPaymentsAcceptsCards ??
     currentSubscription?.nowPaymentsAcceptsCards === true;
-  // Live NOWPayments minimums: the crypto option lists only coins that take
-  // the amount. Undefined while unknown (server floor applies).
-  const cryptoCoins = liveCheckout
-    ? liveCheckout.cryptoCoins
-    : currentSubscription?.cryptoCoins;
+  // Crypto floor from the live NOWPayments minimums: below it no coin takes
+  // the amount. The coin itself is picked on the NOWPayments page.
+  const cryptoMinUsd =
+    (liveCheckout
+      ? liveCheckout.cryptoMinUsd
+      : currentSubscription?.cryptoMinUsd) ?? CRYPTO_FALLBACK_MIN_USD;
   // Unknown (older server, read still loading) means card stays offered; the
   // server refuses a paused provider anyway.
-  const isCardCheckoutPaused =
-    checkoutProviders !== undefined &&
-    !checkoutProviders.includes(PaymentProvider.STRIPE);
+  // Whop takes over card checkout while Stripe is paused.
+  const cardProvider = resolveCardCheckoutProvider(checkoutProviders);
+  const isCardCheckoutPaused = cardProvider === null;
+  const whopAvailable =
+    checkoutProviders?.includes(PaymentProvider.WHOP) === true;
+  const showStripeOption =
+    cardProvider === PaymentProvider.STRIPE || !whopAvailable;
 
-  // Crypto plans are one-off invoices, checked against the coin minimums.
+  // Crypto plans are one-off invoices, checked against the crypto floor.
   const pendingTierProductId = pendingPlan
     ? getTierProductForPlan(pendingPlan.plan)
     : null;
@@ -219,7 +223,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
         setLiveCheckout({
           providers: fresh.data.checkoutProviders,
           nowPaymentsAcceptsCards: fresh.data.nowPaymentsAcceptsCards === true,
-          cryptoCoins: fresh.data.cryptoCoins,
+          cryptoMinUsd: fresh.data.cryptoMinUsd,
         });
       }
       if (fresh.data.status === SubscriptionStatus.ACTIVE) {
@@ -242,7 +246,6 @@ export function SubscriptionCreateContainer(): JSX.Element {
 
   const handleSubProviderSelect = (
     provider: typeof PaymentProviderValue,
-    payCurrency?: typeof CryptoCoinValue,
   ): void => {
     setIsSubProviderModalOpen(false);
     if (!pendingPlan) {
@@ -253,7 +256,6 @@ export function SubscriptionCreateContainer(): JSX.Element {
       shouldDirty: true,
     });
     form.setValue("provider", provider, { shouldDirty: true });
-    form.setValue("payCurrency", payCurrency, { shouldDirty: true });
     onSubmit?.();
   };
 
@@ -337,10 +339,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const totalPrice = packPrice * packQty;
   const totalCredits = packCredits * packQty;
   const packUsd = cryptoAmountUsd(ProductIds.CREDIT_PACK, "one_time");
-  const minCryptoPacks = Math.max(
-    MIN_QTY,
-    Math.ceil(cryptoMinimumUsd(cryptoCoins) / packUsd),
-  );
+  const minCryptoPacks = Math.max(MIN_QTY, Math.ceil(cryptoMinUsd / packUsd));
 
   function setPackQty(next: number): void {
     packForm?.setValue("quantity", Math.max(MIN_QTY, next), {
@@ -354,12 +353,10 @@ export function SubscriptionCreateContainer(): JSX.Element {
 
   const handlePackProviderSelect = (
     provider: typeof PaymentProviderValue,
-    payCurrency?: typeof CryptoCoinValue,
   ): void => {
     setIsPackProviderModalOpen(false);
     packForm?.setValue("productId", ProductIds.CREDIT_PACK);
     packForm?.setValue("provider", provider);
-    packForm?.setValue("payCurrency", payCurrency);
     void packSubmit?.();
   };
 
@@ -541,27 +538,50 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 {tCheckout("availability.cardPaused")}
               </Div>
             )}
-            <Button
-              type="button"
-              variant="outline"
-              className={cn(
-                "h-auto p-4 justify-start whitespace-normal",
-                isCardCheckoutPaused && "order-last",
-              )}
-              onClick={() => handleSubProviderSelect(PaymentProvider.STRIPE)}
-              disabled={isCardCheckoutPaused}
-            >
-              <CreditCard className="h-6 w-6 text-primary mr-3" />
-              <Div className="min-w-0 text-left">
-                <Div className="font-semibold">{t("buy.provider.stripe")}</Div>
-                <Div className="text-sm text-muted-foreground">
-                  {t("buy.provider.stripeDescription")}
+            {whopAvailable && (
+              <Button
+                type="button"
+                variant="outline"
+                data-testid="whop-card-option"
+                className="h-auto p-4 justify-start whitespace-normal"
+                onClick={() => handleSubProviderSelect(PaymentProvider.WHOP)}
+              >
+                <CreditCard className="h-6 w-6 text-primary mr-3" />
+                <Div className="min-w-0 text-left">
+                  <Div className="font-semibold">
+                    {tCheckout("availability.whopCardLabel")}
+                  </Div>
+                  <Div className="text-sm text-muted-foreground">
+                    {tCheckout("availability.whopCardDescription")}
+                  </Div>
                 </Div>
-              </Div>
-            </Button>
-            <CryptoCoinPicker
+              </Button>
+            )}
+            {showStripeOption && (
+              <Button
+                type="button"
+                variant="outline"
+                className={cn(
+                  "h-auto p-4 justify-start whitespace-normal",
+                  isCardCheckoutPaused && "order-last",
+                )}
+                onClick={() => handleSubProviderSelect(PaymentProvider.STRIPE)}
+                disabled={isCardCheckoutPaused}
+              >
+                <CreditCard className="h-6 w-6 text-primary mr-3" />
+                <Div className="min-w-0 text-left">
+                  <Div className="font-semibold">
+                    {t("buy.provider.stripe")}
+                  </Div>
+                  <Div className="text-sm text-muted-foreground">
+                    {t("buy.provider.stripeDescription")}
+                  </Div>
+                </Div>
+              </Button>
+            )}
+            <CryptoCheckoutOption
               amountUsd={pendingPlanUsd}
-              coins={cryptoCoins}
+              minimumUsd={cryptoMinUsd}
               acceptsCards={nowPaymentsAcceptsCards}
               title={
                 nowPaymentsAcceptsCards
@@ -574,11 +594,8 @@ export function SubscriptionCreateContainer(): JSX.Element {
                   : t("buy.provider.nowpaymentsDescription")
               }
               belowMinimumNotice={t("buy.provider.cryptoAmountTooLow")}
-              onSelect={(payCurrency) =>
-                handleSubProviderSelect(
-                  PaymentProvider.NOWPAYMENTS,
-                  payCurrency,
-                )
+              onSelect={() =>
+                handleSubProviderSelect(PaymentProvider.NOWPAYMENTS)
               }
             />
           </Div>
@@ -607,29 +624,50 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 {tCheckout("availability.cardPaused")}
               </Div>
             )}
-            <Button
-              type="button"
-              variant="outline"
-              className={cn(
-                "h-auto p-4 justify-start whitespace-normal",
-                isCardCheckoutPaused && "order-last",
-              )}
-              onClick={() => handlePackProviderSelect(PaymentProvider.STRIPE)}
-              disabled={isCardCheckoutPaused}
-            >
-              <CreditCard className="h-6 w-6 text-primary mr-3" />
-              <Div className="min-w-0 text-left">
-                <Div className="font-semibold">
-                  {tPurchase("post.provider.stripe")}
+            {whopAvailable && (
+              <Button
+                type="button"
+                variant="outline"
+                data-testid="whop-card-option"
+                className="h-auto p-4 justify-start whitespace-normal"
+                onClick={() => handlePackProviderSelect(PaymentProvider.WHOP)}
+              >
+                <CreditCard className="h-6 w-6 text-primary mr-3" />
+                <Div className="min-w-0 text-left">
+                  <Div className="font-semibold">
+                    {tCheckout("availability.whopCardLabel")}
+                  </Div>
+                  <Div className="text-sm text-muted-foreground">
+                    {tCheckout("availability.whopCardDescription")}
+                  </Div>
                 </Div>
-                <Div className="text-sm text-muted-foreground">
-                  {tPurchase("post.provider.stripeDescription")}
+              </Button>
+            )}
+            {showStripeOption && (
+              <Button
+                type="button"
+                variant="outline"
+                className={cn(
+                  "h-auto p-4 justify-start whitespace-normal",
+                  isCardCheckoutPaused && "order-last",
+                )}
+                onClick={() => handlePackProviderSelect(PaymentProvider.STRIPE)}
+                disabled={isCardCheckoutPaused}
+              >
+                <CreditCard className="h-6 w-6 text-primary mr-3" />
+                <Div className="min-w-0 text-left">
+                  <Div className="font-semibold">
+                    {tPurchase("post.provider.stripe")}
+                  </Div>
+                  <Div className="text-sm text-muted-foreground">
+                    {tPurchase("post.provider.stripeDescription")}
+                  </Div>
                 </Div>
-              </Div>
-            </Button>
-            <CryptoCoinPicker
+              </Button>
+            )}
+            <CryptoCheckoutOption
               amountUsd={packUsd * packQty}
-              coins={cryptoCoins}
+              minimumUsd={cryptoMinUsd}
               acceptsCards={nowPaymentsAcceptsCards}
               title={
                 nowPaymentsAcceptsCards
@@ -645,11 +683,8 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 "post.provider.cryptoMinimumDisabled",
                 { min: minCryptoPacks },
               )}
-              onSelect={(payCurrency) =>
-                handlePackProviderSelect(
-                  PaymentProvider.NOWPAYMENTS,
-                  payCurrency,
-                )
+              onSelect={() =>
+                handlePackProviderSelect(PaymentProvider.NOWPAYMENTS)
               }
             />
           </Div>

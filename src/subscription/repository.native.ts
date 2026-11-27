@@ -167,6 +167,20 @@ export class SubscriptionRepository {
     throw new Error("handleSubscriptionCanceled is not implemented on native");
   }
 
+  static async handleProviderSubscriptionState(
+    // oxlint-disable-next-line no-unused-vars
+    _state: WebhookData,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<void> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error(
+      "handleProviderSubscriptionState is not implemented on native",
+    );
+  }
+
   static async handleSubscriptionUpdated(
     // oxlint-disable-next-line no-unused-vars
     _subscriptionId: string,

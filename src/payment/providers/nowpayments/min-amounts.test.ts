@@ -3,32 +3,20 @@ import { afterEach, expect, it } from "vitest";
 
 import { ProductIds } from "../../../products/repository-client";
 import {
+  CRYPTO_FALLBACK_MIN_USD,
   cryptoAcceptsAmount,
   cryptoAmountUsd,
-  CryptoCoin,
-  type CryptoCoinMinimum,
   cryptoMinimumUsd,
-  eligibleCryptoCoins,
-  CRYPTO_FALLBACK_MIN_USD,
 } from "../../checkout/crypto-coins";
-import {
-  resetCryptoMinimumsCache,
-  resolveCryptoPayCurrency,
-} from "./min-amounts";
+import { checkCryptoAmount, resetCryptoMinimumCache } from "./min-amounts";
 
 const logger = createEndpointLogger(false, "en-GLOBAL");
 
-// Live NOWPayments minimums 2026-11-27 (USD, fee paid by the buyer).
-const LIVE: CryptoCoinMinimum[] = [
-  { coin: CryptoCoin.BTC, minUsd: 6.94 },
-  { coin: CryptoCoin.ETH, minUsd: 6.48 },
-  { coin: CryptoCoin.USDT_TRC20, minUsd: 16.5 },
-  { coin: CryptoCoin.LTC, minUsd: 6.29 },
-  { coin: CryptoCoin.XMR, minUsd: 12.62 },
-];
+// Lowest live NOWPayments minimum 2026-11-27 (LTC, USD, fee paid by buyer).
+const LOWEST_LIVE_MIN_USD = 6.29;
 
 afterEach(() => {
-  resetCryptoMinimumsCache();
+  resetCryptoMinimumCache();
 });
 
 it("prices crypto checks at the US list price", () => {
@@ -37,101 +25,52 @@ it("prices crypto checks at the US list price", () => {
   expect(cryptoAmountUsd(ProductIds.CREDIT_PACK, "one_time", 3)).toBe(15);
 });
 
-it("lists only coins whose minimum (plus headroom) the amount covers", () => {
-  // Starter monthly ($8): BTC, ETH, LTC yes; USDT on TRON and Monero no.
-  expect(eligibleCryptoCoins(LIVE, 8).map((m) => m.coin)).toEqual([
-    CryptoCoin.BTC,
-    CryptoCoin.ETH,
-    CryptoCoin.LTC,
-  ]);
-  // One $5 pack is below every coin.
-  expect(eligibleCryptoCoins(LIVE, 5)).toEqual([]);
-  expect(cryptoAcceptsAmount(LIVE, 5)).toBe(false);
-  // Two packs ($10) pass the cheapest coins.
-  expect(cryptoAcceptsAmount(LIVE, 10)).toBe(true);
-  expect(Math.ceil(cryptoMinimumUsd(LIVE) / 5)).toBe(2);
+it("blocks crypto only below the lowest coin minimum (plus headroom)", () => {
+  const floor = cryptoMinimumUsd(LOWEST_LIVE_MIN_USD);
+  // Starter monthly ($8) takes crypto.
+  expect(cryptoAcceptsAmount(floor, 8)).toBe(true);
+  // One $5 pack is below every coin; two packs ($10) pass.
+  expect(cryptoAcceptsAmount(floor, 5)).toBe(false);
+  expect(cryptoAcceptsAmount(floor, 10)).toBe(true);
+  expect(Math.ceil(floor / 5)).toBe(2);
   // Unknown minimums fall back to a fixed floor.
   expect(cryptoMinimumUsd(undefined)).toBe(CRYPTO_FALLBACK_MIN_USD);
-  expect(cryptoAcceptsAmount(null, 8)).toBe(true);
-  expect(cryptoAcceptsAmount(null, 5)).toBe(false);
+  expect(cryptoMinimumUsd(null)).toBe(CRYPTO_FALLBACK_MIN_USD);
 });
 
-it("allows Starter monthly via crypto and passes the picked coin", async () => {
-  resetCryptoMinimumsCache(LIVE);
-  const btc = await resolveCryptoPayCurrency(
-    {
-      productId: ProductIds.SUBSCRIPTION,
-      interval: "month",
-      quantity: 1,
-      payCurrency: CryptoCoin.BTC,
-    },
+it("lets Starter monthly through to the NOWPayments page", async () => {
+  resetCryptoMinimumCache(LOWEST_LIVE_MIN_USD);
+  const starter = await checkCryptoAmount(
+    { productId: ProductIds.SUBSCRIPTION, interval: "month", quantity: 1 },
     "en-GLOBAL",
     logger,
   );
-  expect(btc.success && btc.data).toBe("btc");
+  expect(starter.success).toBe(true);
 
-  const hosted = await resolveCryptoPayCurrency(
-    {
-      productId: ProductIds.SUBSCRIPTION,
-      interval: "month",
-      quantity: 1,
-      payCurrency: undefined,
-    },
+  const twoPacks = await checkCryptoAmount(
+    { productId: ProductIds.CREDIT_PACK, interval: "one_time", quantity: 2 },
     "en-GLOBAL",
     logger,
   );
-  expect(hosted.success && hosted.data).toBeNull();
+  expect(twoPacks.success).toBe(true);
 });
 
-it("refuses a coin below its minimum and an amount below every coin", async () => {
-  resetCryptoMinimumsCache(LIVE);
-  const tron = await resolveCryptoPayCurrency(
-    {
-      productId: ProductIds.SUBSCRIPTION,
-      interval: "month",
-      quantity: 1,
-      payCurrency: CryptoCoin.USDT_TRC20,
-    },
-    "en-GLOBAL",
-    logger,
-  );
-  expect(tron.success).toBe(false);
-  expect(tron.message).toContain("below that coin's minimum");
-
-  const onePack = await resolveCryptoPayCurrency(
-    {
-      productId: ProductIds.CREDIT_PACK,
-      interval: "one_time",
-      quantity: 1,
-      payCurrency: undefined,
-    },
+it("refuses an amount below every coin minimum", async () => {
+  resetCryptoMinimumCache(LOWEST_LIVE_MIN_USD);
+  const onePack = await checkCryptoAmount(
+    { productId: ProductIds.CREDIT_PACK, interval: "one_time", quantity: 1 },
     "en-GLOBAL",
     logger,
   );
   expect(onePack.success).toBe(false);
+  expect(onePack.message).toContain("below the crypto minimum");
 
-  const twoPacks = await resolveCryptoPayCurrency(
-    {
-      productId: ProductIds.CREDIT_PACK,
-      interval: "one_time",
-      quantity: 2,
-      payCurrency: CryptoCoin.LTC,
-    },
+  // Unknown minimums: the fallback floor still refuses one pack.
+  resetCryptoMinimumCache(null);
+  const unknown = await checkCryptoAmount(
+    { productId: ProductIds.CREDIT_PACK, interval: "one_time", quantity: 1 },
     "en-GLOBAL",
     logger,
   );
-  expect(twoPacks.success && twoPacks.data).toBe("ltc");
-
-  // No minimum known for the coin: the pick passes, NOWPayments decides.
-  const doge = await resolveCryptoPayCurrency(
-    {
-      productId: ProductIds.SUBSCRIPTION,
-      interval: "year",
-      quantity: 1,
-      payCurrency: CryptoCoin.DOGE,
-    },
-    "en-GLOBAL",
-    logger,
-  );
-  expect(doge.success && doge.data).toBe("doge");
+  expect(unknown.success).toBe(false);
 });

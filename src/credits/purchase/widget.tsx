@@ -48,14 +48,14 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/n
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import { CryptoCoinPicker } from "@/payment/checkout/crypto-coin-picker";
+import { CryptoCheckoutOption } from "@/payment/checkout/crypto-checkout-option";
 import {
+  CRYPTO_FALLBACK_MIN_USD,
   cryptoAmountUsd,
-  type CryptoCoinValue,
-  cryptoMinimumUsd,
 } from "@/payment/checkout/crypto-coins";
 import { scopedTranslation as checkoutScopedTranslation } from "@/payment/checkout/i18n";
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
+import { resolveCardCheckoutProvider } from "@/payment/providers/card-provider";
 import {
   getPricingParams,
   ProductIds,
@@ -123,9 +123,15 @@ export function CreditsPurchaseContainer({
   const { t: tCheckout } = checkoutScopedTranslation.scopedT(locale);
   // Unknown (older server, read still loading) keeps card offered; the
   // server refuses a paused provider anyway.
-  const isCardCheckoutPaused =
-    subscription?.checkoutProviders !== undefined &&
-    !subscription.checkoutProviders.includes(PaymentProvider.STRIPE);
+  // Whop takes over card checkout while Stripe is paused.
+  const cardProvider = resolveCardCheckoutProvider(
+    subscription?.checkoutProviders,
+  );
+  const isCardCheckoutPaused = cardProvider === null;
+  const whopAvailable =
+    subscription?.checkoutProviders?.includes(PaymentProvider.WHOP) === true;
+  const showStripeOption =
+    cardProvider === PaymentProvider.STRIPE || !whopAvailable;
   const nowPaymentsAcceptsCards =
     subscription?.nowPaymentsAcceptsCards === true;
 
@@ -138,21 +144,15 @@ export function CreditsPurchaseContainer({
     setIsProviderModalOpen(true);
   }
 
-  // Live NOWPayments minimums: only coins that take the amount are offered.
-  const cryptoCoins = subscription?.cryptoCoins;
+  // Crypto floor from the live NOWPayments minimums: below it no coin takes
+  // the amount. The coin itself is picked on the NOWPayments page.
+  const cryptoMinUsd = subscription?.cryptoMinUsd ?? CRYPTO_FALLBACK_MIN_USD;
   const packUsd = cryptoAmountUsd(ProductIds.CREDIT_PACK, "one_time");
-  const minCryptoPacks = Math.max(
-    MIN_QTY,
-    Math.ceil(cryptoMinimumUsd(cryptoCoins) / packUsd),
-  );
+  const minCryptoPacks = Math.max(MIN_QTY, Math.ceil(cryptoMinUsd / packUsd));
 
-  function handleProviderSelect(
-    provider: typeof PaymentProviderValue,
-    payCurrency?: typeof CryptoCoinValue,
-  ): void {
+  function handleProviderSelect(provider: typeof PaymentProviderValue): void {
     setIsProviderModalOpen(false);
     form.setValue("provider", provider);
-    form.setValue("payCurrency", payCurrency);
     onSubmit?.();
   }
 
@@ -184,27 +184,50 @@ export function CreditsPurchaseContainer({
                 {tCheckout("availability.cardPaused")}
               </Div>
             )}
-            <Button
-              type="button"
-              variant="outline"
-              className={cn(
-                "h-auto p-4 justify-start whitespace-normal",
-                isCardCheckoutPaused && "order-last",
-              )}
-              onClick={() => handleProviderSelect(PaymentProvider.STRIPE)}
-              disabled={isCardCheckoutPaused}
-            >
-              <CreditCard className="h-6 w-6 text-primary mr-3" />
-              <Div className="min-w-0 text-left">
-                <Div className="font-semibold">{t("post.provider.stripe")}</Div>
-                <Div className="text-sm text-muted-foreground">
-                  {t("post.provider.stripeDescription")}
+            {whopAvailable && (
+              <Button
+                type="button"
+                variant="outline"
+                data-testid="whop-card-option"
+                className="h-auto p-4 justify-start whitespace-normal"
+                onClick={() => handleProviderSelect(PaymentProvider.WHOP)}
+              >
+                <CreditCard className="h-6 w-6 text-primary mr-3" />
+                <Div className="min-w-0 text-left">
+                  <Div className="font-semibold">
+                    {tCheckout("availability.whopCardLabel")}
+                  </Div>
+                  <Div className="text-sm text-muted-foreground">
+                    {tCheckout("availability.whopCardDescription")}
+                  </Div>
                 </Div>
-              </Div>
-            </Button>
-            <CryptoCoinPicker
+              </Button>
+            )}
+            {showStripeOption && (
+              <Button
+                type="button"
+                variant="outline"
+                className={cn(
+                  "h-auto p-4 justify-start whitespace-normal",
+                  isCardCheckoutPaused && "order-last",
+                )}
+                onClick={() => handleProviderSelect(PaymentProvider.STRIPE)}
+                disabled={isCardCheckoutPaused}
+              >
+                <CreditCard className="h-6 w-6 text-primary mr-3" />
+                <Div className="min-w-0 text-left">
+                  <Div className="font-semibold">
+                    {t("post.provider.stripe")}
+                  </Div>
+                  <Div className="text-sm text-muted-foreground">
+                    {t("post.provider.stripeDescription")}
+                  </Div>
+                </Div>
+              </Button>
+            )}
+            <CryptoCheckoutOption
               amountUsd={packUsd * quantity}
-              coins={cryptoCoins}
+              minimumUsd={cryptoMinUsd}
               acceptsCards={nowPaymentsAcceptsCards}
               title={
                 nowPaymentsAcceptsCards
@@ -219,9 +242,7 @@ export function CreditsPurchaseContainer({
               belowMinimumNotice={t("post.provider.cryptoMinimumDisabled", {
                 min: minCryptoPacks,
               })}
-              onSelect={(payCurrency) =>
-                handleProviderSelect(PaymentProvider.NOWPAYMENTS, payCurrency)
-              }
+              onSelect={() => handleProviderSelect(PaymentProvider.NOWPAYMENTS)}
             />
           </Div>
         </DialogContent>

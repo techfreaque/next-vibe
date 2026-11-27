@@ -417,10 +417,6 @@ export const translations: typeof enTranslations = {
         label: "Servizio di pagamento",
         description: "Scegli come pagare",
       },
-      payCurrency: {
-        label: "Criptovaluta",
-        description: "Moneta con cui paghi (solo pagamento in cripto)",
-      },
       catalogProductId: {
         label: "Prodotto del catalogo",
         description: "Link a un prodotto di catalogo per questo abbonamento",
@@ -459,7 +455,7 @@ export const translations: typeof enTranslations = {
     recentCardAuthFailure: "Recente autenticazione della carta non riuscita",
     checkoutProviders: "Metodi di pagamento disponibili",
     nowPaymentsAcceptsCards: "Il checkout crypto accetta carte",
-    cryptoCoins: "Criptovalute e minimi",
+    cryptoMinUsd: "Minimo cripto (USD)",
     trialStart: "Data di inizio del processo",
     trialEnd: "Data di fine prova",
     success: "Operazione di successo",
@@ -784,6 +780,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       nowpayments: "NowPayments",
       stripe: "Stripe",
+      whop: "Whop",
     },
   },
 

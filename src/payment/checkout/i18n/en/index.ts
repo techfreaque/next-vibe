@@ -32,12 +32,6 @@ export const translations = {
         description: "Choose how you want to pay",
         placeholder: "Select payment provider",
       },
-      payCurrency: {
-        label: "Crypto coin",
-        description:
-          "Coin to pay with. Leave empty to pick on the payment page.",
-        placeholder: "Pick a coin",
-      },
       metadata: {
         label: "Metadata",
         description: "Additional metadata for the checkout session",
@@ -191,6 +185,7 @@ export const translations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NowPayments",
+      whop: "Whop",
     },
   },
 
@@ -200,32 +195,15 @@ export const translations = {
     yearly: "Yearly",
   },
   availability: {
+    whopCardLabel: "Card",
+    whopCardDescription: "Visa, Mastercard and more. Secure checkout by Whop.",
     cardPaused: "Card payments are paused for now. Crypto works right away.",
     cardPausedError:
       "Card payments are paused for now. Pick crypto to finish checkout.",
     nowpaymentsCardLabel: "Card or crypto (NOWPayments)",
     nowpaymentsCardDescription:
       "Visa, Mastercard, Apple Pay, Google Pay, or Bitcoin, Ethereum and more",
-    cryptoPickCoin: "Pick a coin",
-    cryptoCoinUnavailable:
-      "That coin is not available right now. Pick another one.",
-    cryptoCoinBelowMinimum:
-      "This amount is below that coin's minimum. Pick another coin.",
     cryptoAmountBelowMinimum:
       "This amount is below the crypto minimum. Add a pack or pick a bigger plan.",
-  },
-  cryptoCoin: {
-    btc: "Bitcoin (BTC)",
-    eth: "Ethereum (ETH)",
-    usdtTrc20: "USDT (TRON)",
-    usdtErc20: "USDT (Ethereum)",
-    usdtBsc: "USDT (BNB Chain)",
-    usdc: "USDC (Ethereum)",
-    sol: "Solana (SOL)",
-    ltc: "Litecoin (LTC)",
-    xmr: "Monero (XMR)",
-    doge: "Dogecoin (DOGE)",
-    trx: "TRON (TRX)",
-    bnbBsc: "BNB (BNB Chain)",
   },
 };

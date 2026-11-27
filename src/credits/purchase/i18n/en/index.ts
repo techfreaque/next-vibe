@@ -3,6 +3,7 @@ export const translations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NowPayments",
+      whop: "Whop",
     },
   },
   post: {
@@ -33,11 +34,6 @@ export const translations = {
       nowpaymentsDescription: "Pay with Bitcoin, Ethereum, and more",
       cryptoMinimumDisabled:
         "Minimum {{min}} packs required for crypto payments",
-    },
-    payCurrency: {
-      label: "Crypto Coin",
-      description: "Coin to pay with (crypto only)",
-      placeholder: "Pick a coin",
     },
     checkoutUrl: {
       content: "Checkout URL",

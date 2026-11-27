@@ -76,4 +76,64 @@ export const {
       "https://api.nowpayments.io/v1",
     ] as const,
   },
+
+  // Whop (card)
+  WHOP_ENVIRONMENT: {
+    schema: z.enum(["production", "sandbox"]).optional().default("production"),
+    example: "production",
+    comment:
+      "Whop (card payments). production = api.whop.com with WHOP_API_KEY / WHOP_WEBHOOK_SECRET; sandbox = sandbox-api.whop.com (test cards, no real money) with WHOP_SANDBOX_API_KEY / WHOP_SANDBOX_WEBHOOK_SECRET. Use sandbox on dev machines.",
+    commented: true,
+    fieldType: "select" as const,
+    options: ["production", "sandbox"] as const,
+  },
+  WHOP_API_KEY: {
+    schema: z.string().min(1).optional(),
+    example: "your_whop_account_api_key",
+    comment:
+      "Whop production account API key (dashboard, Developer, API keys). Whop shows as card checkout once the key and the webhook secret of the active environment are set.",
+    commented: true,
+  },
+  WHOP_WEBHOOK_SECRET: {
+    schema: z.string().min(1).optional(),
+    example: "ws_your_whop_webhook_secret",
+    comment:
+      "Signing secret (ws_...) of the production Whop webhook pointing at https://<domain>/api/en-GLOBAL/payment/providers/whop/webhook.",
+    commented: true,
+  },
+  WHOP_COMPANY_ID: {
+    schema: z.string().min(1).optional(),
+    example: "biz_your_account_id",
+    comment:
+      "Optional: Whop account id (biz_...) that owns the products. Looked up from the API key when unset.",
+    commented: true,
+  },
+  WHOP_SANDBOX_API_KEY: {
+    schema: z.string().min(1).optional(),
+    example: "your_whop_sandbox_api_key",
+    comment:
+      "Whop sandbox account API key (sandbox.whop.com), used when WHOP_ENVIRONMENT=sandbox.",
+    commented: true,
+  },
+  WHOP_SANDBOX_WEBHOOK_SECRET: {
+    schema: z.string().min(1).optional(),
+    example: "ws_your_whop_sandbox_webhook_secret",
+    comment:
+      "Signing secret of the sandbox Whop webhook, used when WHOP_ENVIRONMENT=sandbox.",
+    commented: true,
+  },
+  WHOP_SANDBOX_COMPANY_ID: {
+    schema: z.string().min(1).optional(),
+    example: "biz_your_sandbox_account_id",
+    comment:
+      "Optional: sandbox account id. Looked up from the sandbox key when unset.",
+    commented: true,
+  },
+  WHOP_CHECKOUT_PAUSED: {
+    schema: z.enum(["true", "false"]).optional().default("false"),
+    example: "false",
+    comment:
+      "Stop offering Whop for new checkouts. Existing Whop memberships keep renewing.",
+    commented: true,
+  },
 });

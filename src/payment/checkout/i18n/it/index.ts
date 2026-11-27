@@ -34,12 +34,6 @@ export const translations: typeof enTranslations = {
         description: "Scegli come pagare",
         placeholder: "Seleziona il servizio di pagamento",
       },
-      payCurrency: {
-        label: "Criptovaluta",
-        description:
-          "Moneta con cui paghi. Lascia vuoto per sceglierla nella pagina di pagamento.",
-        placeholder: "Scegli una moneta",
-      },
       metadata: {
         label: "Metadati",
         description: "Metadati aggiuntivi per la sessione di pagamento",
@@ -193,6 +187,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NowPayments",
+      whop: "Whop",
     },
   },
 
@@ -202,6 +197,9 @@ export const translations: typeof enTranslations = {
     yearly: "Annuale",
   },
   availability: {
+    whopCardLabel: "Carta",
+    whopCardDescription:
+      "Visa, Mastercard e altre. Pagamento sicuro tramite Whop.",
     cardPaused:
       "I pagamenti con carta sono sospesi per ora. Con le criptovalute paghi subito.",
     cardPausedError:
@@ -209,26 +207,7 @@ export const translations: typeof enTranslations = {
     nowpaymentsCardLabel: "Carta o criptovalute (NOWPayments)",
     nowpaymentsCardDescription:
       "Visa, Mastercard, Apple Pay, Google Pay oppure Bitcoin, Ethereum e altre",
-    cryptoPickCoin: "Scegli una moneta",
-    cryptoCoinUnavailable:
-      "Questa moneta ora non è disponibile. Scegline un'altra.",
-    cryptoCoinBelowMinimum:
-      "Questo importo è sotto il minimo di questa moneta. Scegline un'altra.",
     cryptoAmountBelowMinimum:
       "Questo importo è sotto il minimo per le criptovalute. Aggiungi un pacchetto o scegli un piano più grande.",
-  },
-  cryptoCoin: {
-    btc: "Bitcoin (BTC)",
-    eth: "Ethereum (ETH)",
-    usdtTrc20: "USDT (TRON)",
-    usdtErc20: "USDT (Ethereum)",
-    usdtBsc: "USDT (BNB Chain)",
-    usdc: "USDC (Ethereum)",
-    sol: "Solana (SOL)",
-    ltc: "Litecoin (LTC)",
-    xmr: "Monero (XMR)",
-    doge: "Dogecoin (DOGE)",
-    trx: "TRON (TRX)",
-    bnbBsc: "BNB (BNB Chain)",
   },
 };

@@ -82,6 +82,7 @@ import {
   PaymentMethodType,
   type PaymentMethodTypeValue,
   PaymentProvider,
+  type PaymentProviderValue,
   PaymentStatus,
 } from "./enum";
 import type { PaymentT } from "./i18n";
@@ -97,6 +98,7 @@ import type {
 import { stripeAdminTools } from "./providers/stripe/admin";
 import { StripeProvider } from "./providers/stripe/repository";
 import type { CreditPackCheckoutSession, WebhookData } from "./providers/types";
+import { PROVIDER_SUBSCRIPTION_STATE_EVENT } from "./providers/whop/events";
 import type {
   PaymentRefundRequestOutput,
   PaymentRefundResponseOutput,
@@ -370,6 +372,20 @@ export class PaymentRepository {
       });
     }
 
+    if (subscription[0].provider === PaymentProvider.WHOP) {
+      // Whop hosts card updates, receipts and cancellation per membership.
+      const { WhopProvider, WHOP_ORDERS_URL } =
+        await import("./providers/whop/repository");
+      const membershipId = subscription[0].providerSubscriptionId;
+      return success({
+        success: true,
+        customerPortalUrl: membershipId
+          ? await new WhopProvider().getManageUrl(membershipId)
+          : WHOP_ORDERS_URL,
+        message: null,
+      });
+    }
+
     // Default to Stripe portal
     return stripeAdminTools.createCustomerPortal(userId, data, locale, logger);
   }
@@ -388,9 +404,7 @@ export class PaymentRepository {
     signature: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    provider:
-      | typeof PaymentProvider.STRIPE
-      | typeof PaymentProvider.NOWPAYMENTS = PaymentProvider.STRIPE,
+    provider: typeof PaymentProviderValue = PaymentProvider.STRIPE,
   ): Promise<ResponseType<{ received: boolean }>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -601,6 +615,18 @@ export class PaymentRepository {
           }
           break;
         }
+        case PROVIDER_SUBSCRIPTION_STATE_EVENT: {
+          // Whop membership changes (activated, cancel at period end
+          // flipped, deactivated): the payload is the full state.
+          const { SubscriptionRepository } =
+            await import("../subscription/repository");
+          await SubscriptionRepository.handleProviderSubscriptionState(
+            eventData,
+            logger,
+            locale,
+          );
+          break;
+        }
         default:
           logger.debug("Unhandled webhook event type", {
             eventType: event.type,
@@ -655,9 +681,7 @@ export class PaymentRepository {
   private static async handleChargeReversal(
     eventType: string,
     data: WebhookData,
-    provider:
-      | typeof PaymentProvider.STRIPE
-      | typeof PaymentProvider.NOWPAYMENTS,
+    provider: typeof PaymentProviderValue,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     const { PaymentClawbackRepository } = await import("./refund/clawback");
@@ -666,7 +690,9 @@ export class PaymentRepository {
       paymentIntentId: isNowPayments ? null : (data.payment_intent ?? null),
       // NOWPayments: data.id is the invoice id = paymentTransactions.providerSessionId
       providerSessionId: isNowPayments ? data.id : null,
-      customerId: isNowPayments ? null : (data.customer ?? null),
+      // Only Stripe has a customer id column to fall back on.
+      customerId:
+        provider === PaymentProvider.STRIPE ? (data.customer ?? null) : null,
       chargeCreatedAt: data.created ? new Date(data.created * 1000) : null,
       sourceRef: data.id,
     };
@@ -1098,9 +1124,7 @@ export class PaymentRepository {
     data: WebhookData,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    provider:
-      | typeof PaymentProvider.STRIPE
-      | typeof PaymentProvider.NOWPAYMENTS,
+    provider: typeof PaymentProviderValue,
   ): Promise<ResponseType<void>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -1160,7 +1184,7 @@ export class PaymentRepository {
             amount: (data.amount_total / 100).toFixed(2),
             currency: settledCurrency,
             mode:
-              provider === PaymentProvider.STRIPE &&
+              provider !== PaymentProvider.NOWPAYMENTS &&
               (data.subscription || type === "subscription")
                 ? CheckoutMode.SUBSCRIPTION
                 : CheckoutMode.PAYMENT,
@@ -1208,8 +1232,19 @@ export class PaymentRepository {
 
       // Stripe's settled total includes discounts and local currency pricing.
       // NOWPayments checkouts store their fiat price when the invoice is opened.
+      // Whop reports its settled total too; a settlement currency we do not
+      // book keeps the checkout price (the variant's own amount).
       let settlement;
       if (
+        transaction.provider === PaymentProvider.WHOP &&
+        settledCurrency &&
+        typeof data.amount_total === "number"
+      ) {
+        settlement = {
+          amount: (data.amount_total / 100).toFixed(2),
+          currency: settledCurrency,
+        };
+      } else if (
         transaction.provider === PaymentProvider.STRIPE &&
         transaction.mode !== CheckoutMode.SETUP
       ) {

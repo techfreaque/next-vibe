@@ -228,6 +228,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NOWPayments",
+      whop: "Whop",
     },
     paymentStatus: {
       pending: "En attente",

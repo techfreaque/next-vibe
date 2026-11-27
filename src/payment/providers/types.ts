@@ -152,9 +152,14 @@ export interface PaymentProvider {
     }>
   >;
 
+  /**
+   * atPeriodEnd=true keeps the paid period running and stops the next
+   * renewal; false ends the subscription now.
+   */
   cancelSubscription(
     subscriptionId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    atPeriodEnd: boolean,
   ): Promise<ResponseType<void>>;
 }

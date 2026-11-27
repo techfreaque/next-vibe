@@ -412,10 +412,6 @@ export const translations: typeof enTranslations = {
         label: "Proveedor de pagos",
         description: "Elige cómo pagar",
       },
-      payCurrency: {
-        label: "Criptomoneda",
-        description: "Moneda con la que pagas (solo pago con cripto)",
-      },
       catalogProductId: {
         label: "Producto del catálogo",
         description: "Enlace a un producto de catálogo para esta suscripción",
@@ -454,7 +450,7 @@ export const translations: typeof enTranslations = {
     recentCardAuthFailure: "Fallo reciente de autenticación de la tarjeta",
     checkoutProviders: "Métodos de pago disponibles",
     nowPaymentsAcceptsCards: "El pago cripto acepta tarjetas",
-    cryptoCoins: "Criptomonedas y mínimos",
+    cryptoMinUsd: "Mínimo cripto (USD)",
     trialStart: "Fecha de inicio del juicio",
     trialEnd: "Fecha final del juicio",
     success: "Operación con éxito",
@@ -777,6 +773,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       nowpayments: "NowPayments",
       stripe: "Stripe",
+      whop: "Whop",
     },
   },
 

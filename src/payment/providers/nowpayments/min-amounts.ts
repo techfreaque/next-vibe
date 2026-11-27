@@ -1,11 +1,13 @@
 /**
- * Live NOWPayments per-coin minimums (USD, fee paid by the buyer).
+ * Live NOWPayments crypto floor: the lowest per-coin minimum (USD, fee paid
+ * by the buyer) across NOWPAYMENTS_FLOOR_COIN_CODES that are enabled in the
+ * Partner Profile.
  *
- * Read from `GET /merchant/coins` (coins enabled in the Partner Profile) and
- * `GET /min-amount` per offered coin. Cached for CACHE_TTL_MS; a stale cache
- * is served at once and refreshed in the background, so a page read never
- * waits on NOWPayments more than once per process. Fail-open: unknown
- * minimums return null and callers fall back to CRYPTO_FALLBACK_MIN_USD.
+ * Read from `GET /merchant/coins` and `GET /min-amount` per probed coin.
+ * Cached for CACHE_TTL_MS; a stale cache is served at once and refreshed in
+ * the background, so a page read never waits on NOWPayments more than once per
+ * process. Fail-open: unknown returns null and callers fall back to
+ * CRYPTO_FALLBACK_MIN_USD.
  */
 
 import "server-only";
@@ -24,11 +26,8 @@ import { z } from "zod";
 import type { ProductIds } from "../../../products/repository-client";
 import {
   cryptoAmountUsd,
-  CryptoCoinDB,
-  type CryptoCoinMinimum,
   cryptoMinimumUsd,
-  effectiveCoinMinimumUsd,
-  NOWPAYMENTS_COIN_CODES,
+  NOWPAYMENTS_FLOOR_COIN_CODES,
 } from "../../checkout/crypto-coins";
 import { scopedTranslation as checkoutScopedTranslation } from "../../checkout/i18n";
 import { paymentEnv } from "../../env";
@@ -42,19 +41,18 @@ const MIN_AMOUNT_CONCURRENCY = 3;
 /** Longest a cold read may hold a request before it answers "unknown". */
 const COLD_WAIT_MS = 3000;
 
-interface MinimumsCache {
-  minimums: CryptoCoinMinimum[] | null;
+interface MinimumCache {
+  /** Lowest coin minimum in USD, null while unknown. */
+  lowestMinUsd: number | null;
   at: number;
 }
 
-let cache: MinimumsCache | null = null;
-let inFlight: Promise<CryptoCoinMinimum[] | null> | null = null;
+let cache: MinimumCache | null = null;
+let inFlight: Promise<number | null> | null = null;
 
-/** Drops the cache, or seeds it with fixed minimums (tests). */
-export function resetCryptoMinimumsCache(
-  minimums?: CryptoCoinMinimum[] | null,
-): void {
-  cache = minimums === undefined ? null : { minimums, at: Date.now() };
+/** Drops the cache, or seeds it with a fixed lowest minimum (tests). */
+export function resetCryptoMinimumCache(lowestMinUsd?: number | null): void {
+  cache = lowestMinUsd === undefined ? null : { lowestMinUsd, at: Date.now() };
   inFlight = null;
 }
 
@@ -79,46 +77,45 @@ async function getJson<TSchema extends z.ZodType>(
   return parsed.success ? parsed.data : null;
 }
 
-async function fetchMinimums(
+async function fetchLowestMinimum(
   logger: EndpointLogger,
-): Promise<CryptoCoinMinimum[] | null> {
+): Promise<number | null> {
   try {
     const merchant = await getJson("/merchant/coins", merchantCoinsSchema);
     const selected = merchant?.selectedCurrencies;
-    // Unknown selection: offer every coin we list, NOWPayments still checks.
+    // Unknown selection: probe every listed coin, NOWPayments still checks.
     const enabled = selected
       ? new Set(selected.map((code) => code.toLowerCase()))
       : null;
-    // A few at a time: NOWPayments rate-limits bursts (429).
-    const results: (CryptoCoinMinimum | null)[] = [];
-    for (let i = 0; i < CryptoCoinDB.length; i += MIN_AMOUNT_CONCURRENCY) {
-      const batch = CryptoCoinDB.slice(i, i + MIN_AMOUNT_CONCURRENCY);
-      results.push(
-        ...(await Promise.all(
-          batch.map(async (coin): Promise<CryptoCoinMinimum | null> => {
-            const code = NOWPAYMENTS_COIN_CODES[coin];
-            if (enabled && !enabled.has(code)) {
-              return null;
-            }
-            const data = await getJson(
-              `/min-amount?currency_from=${code}&currency_to=${code}&fiat_equivalent=usd&is_fee_paid_by_user=true`,
-              minAmountSchema,
-            ).catch(() => null);
-            return data ? { coin, minUsd: data.fiat_equivalent } : null;
-          }),
-        )),
-      );
-    }
-    const minimums = results.filter(
-      (minimum): minimum is CryptoCoinMinimum => minimum !== null,
+    const codes = NOWPAYMENTS_FLOOR_COIN_CODES.filter(
+      (code) => !enabled || enabled.has(code),
     );
+    // A few at a time: NOWPayments rate-limits bursts (429).
+    const minimums: number[] = [];
+    for (let i = 0; i < codes.length; i += MIN_AMOUNT_CONCURRENCY) {
+      const batch = codes.slice(i, i + MIN_AMOUNT_CONCURRENCY);
+      const results = await Promise.all(
+        batch.map((code) =>
+          getJson(
+            `/min-amount?currency_from=${code}&currency_to=${code}&fiat_equivalent=usd&is_fee_paid_by_user=true`,
+            minAmountSchema,
+          ).catch(() => null),
+        ),
+      );
+      for (const data of results) {
+        if (data) {
+          minimums.push(data.fiat_equivalent);
+        }
+      }
+    }
     if (minimums.length === 0) {
       logger.warn("NOWPayments returned no coin minimums", {
         merchantCoinsRead: merchant !== null,
+        probedCoins: codes.length,
       });
       return null;
     }
-    return minimums;
+    return Math.min(...minimums);
   } catch (error) {
     logger.warn("NOWPayments coin minimums read failed", {
       error: parseError(error).message,
@@ -127,12 +124,12 @@ async function fetchMinimums(
   }
 }
 
-function refresh(logger: EndpointLogger): Promise<CryptoCoinMinimum[] | null> {
+function refresh(logger: EndpointLogger): Promise<number | null> {
   if (!inFlight) {
-    inFlight = fetchMinimums(logger)
-      .then((minimums) => {
-        cache = { minimums, at: Date.now() };
-        return minimums;
+    inFlight = fetchLowestMinimum(logger)
+      .then((lowestMinUsd) => {
+        cache = { lowestMinUsd, at: Date.now() };
+        return lowestMinUsd;
       })
       .finally(() => {
         inFlight = null;
@@ -142,21 +139,21 @@ function refresh(logger: EndpointLogger): Promise<CryptoCoinMinimum[] | null> {
 }
 
 /**
- * Offered coins with their USD minimums, null while unknown. `wait` makes a
- * cold read wait for the API (checkout guard); page reads pass false and take
- * whatever is cached within COLD_WAIT_MS.
+ * Lowest coin minimum in USD, null while unknown. `wait` makes a cold read
+ * wait for the API (checkout guard); page reads pass false and take whatever
+ * is cached within COLD_WAIT_MS.
  */
-export async function getCryptoCoinMinimums(
+export async function getLowestCryptoMinimumUsd(
   logger: EndpointLogger,
   { wait }: { wait: boolean },
-): Promise<CryptoCoinMinimum[] | null> {
+): Promise<number | null> {
   const configured = Boolean(paymentEnv.NOWPAYMENTS_API_KEY);
   if (cache) {
-    const ttl = cache.minimums ? CACHE_TTL_MS : FAILURE_TTL_MS;
+    const ttl = cache.lowestMinUsd === null ? FAILURE_TTL_MS : CACHE_TTL_MS;
     if (configured && Date.now() - cache.at >= ttl) {
       void refresh(logger);
     }
-    return cache.minimums;
+    return cache.lowestMinUsd;
   }
   if (!configured) {
     return null;
@@ -173,73 +170,55 @@ export async function getCryptoCoinMinimums(
   ]);
 }
 
-function isOfferedCoin(value: string): value is (typeof CryptoCoinDB)[number] {
-  return CryptoCoinDB.some((coin) => coin === value);
+/**
+ * Crypto floor (USD, headroom included) for the buy dialogs: the same value
+ * the checkout guard compares against.
+ */
+export async function getCryptoMinimumUsd(
+  logger: EndpointLogger,
+): Promise<number> {
+  return cryptoMinimumUsd(
+    await getLowestCryptoMinimumUsd(logger, { wait: false }),
+  );
 }
 
 /**
- * Checks a crypto checkout against the coin minimums before an invoice is
- * created. Returns the NOWPayments `pay_currency` for the picked coin, or null
- * when the buyer picks on the hosted page. Fails (400) when the amount is
- * below what the picked coin, or every coin, accepts: the hosted page would
- * otherwise stall on that coin.
+ * Checks a crypto checkout before an invoice is created. The buyer picks the
+ * coin on the NOWPayments page (coins below their own minimum are refused
+ * there), so this only fails (400) when the amount is below what every coin
+ * accepts.
  */
-export async function resolveCryptoPayCurrency(
+export async function checkCryptoAmount(
   params: {
     productId: ProductIds;
     interval: PaymentInterval;
     quantity: number;
-    payCurrency: string | undefined;
   },
   locale: CountryLanguage,
   logger: EndpointLogger,
-): Promise<ResponseType<string | null>> {
+): Promise<ResponseType<void>> {
+  // With fiat on, the hosted page also takes cards: no coin floor applies.
+  if (paymentEnv.NOWPAYMENTS_FIAT_ENABLED === "true") {
+    return success();
+  }
   const { t } = checkoutScopedTranslation.scopedT(locale);
   const amountUsd = cryptoAmountUsd(
     params.productId,
     params.interval,
     params.quantity,
   );
-  const minimums = await getCryptoCoinMinimums(logger, { wait: true });
-  const picked = params.payCurrency;
-  if (picked !== undefined && !isOfferedCoin(picked)) {
-    return fail({
-      message: t("availability.cryptoCoinUnavailable"),
-      errorType: ErrorResponseTypes.BAD_REQUEST,
-    });
-  }
-  if (picked !== undefined) {
-    // No minimum known for the coin (API hiccup, not read yet): trust the
-    // pick, NOWPayments has the last word. The dialog lists only known coins.
-    const minimum = minimums?.find((entry) => entry.coin === picked);
-    if (minimum && effectiveCoinMinimumUsd(minimum) > amountUsd) {
-      logger.info("Crypto checkout refused: below coin minimum", {
-        coin: picked,
-        amountUsd,
-        minUsd: minimum.minUsd,
-      });
-      return fail({
-        message: t("availability.cryptoCoinBelowMinimum"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
-    }
-    return success(NOWPAYMENTS_COIN_CODES[picked]);
-  }
-  // With fiat on, the hosted page also takes cards: no coin floor applies.
-  if (paymentEnv.NOWPAYMENTS_FIAT_ENABLED === "true") {
-    return success(null);
-  }
-  const lowest = cryptoMinimumUsd(minimums);
-  if (amountUsd < lowest) {
+  const lowestMinUsd = await getLowestCryptoMinimumUsd(logger, { wait: true });
+  const floorUsd = cryptoMinimumUsd(lowestMinUsd);
+  if (amountUsd < floorUsd) {
     logger.info("Crypto checkout refused: below every coin minimum", {
       amountUsd,
-      lowestUsd: lowest,
-      minimumsKnown: minimums !== null,
+      floorUsd,
+      minimumsKnown: lowestMinUsd !== null,
     });
     return fail({
       message: t("availability.cryptoAmountBelowMinimum"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
-  return success(null);
+  return success();
 }

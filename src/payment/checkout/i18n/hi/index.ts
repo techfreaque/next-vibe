@@ -31,11 +31,6 @@ export const translations: typeof enTranslations = {
         description: "चुनें कि आप कैसे पेमेंट करना चाहते हैं",
         placeholder: "पेमेंट प्रोवाइडर चुनें",
       },
-      payCurrency: {
-        label: "क्रिप्टो कॉइन",
-        description: "जिस कॉइन से पेमेंट करना है। खाली छोड़ें तो पेमेंट पेज पर चुनें।",
-        placeholder: "कॉइन चुनें",
-      },
       metadata: {
         label: "मेटाडेटा",
         description: "चेकआउट सेशन के लिए अतिरिक्त मेटाडेटा",
@@ -183,6 +178,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NowPayments",
+      whop: "Whop",
     },
   },
 
@@ -191,31 +187,15 @@ export const translations: typeof enTranslations = {
     yearly: "सालाना",
   },
   availability: {
+    whopCardLabel: "कार्ड",
+    whopCardDescription: "Visa, Mastercard और भी कई। Whop से सुरक्षित चेकआउट।",
     cardPaused: "कार्ड पेमेंट अभी कुछ समय के लिए बंद है। क्रिप्टो से तुरंत पेमेंट करें।",
     cardPausedError:
       "कार्ड पेमेंट अभी कुछ समय के लिए बंद है। खरीदारी पूरी करने के लिए क्रिप्टो चुनें।",
     nowpaymentsCardLabel: "कार्ड या क्रिप्टो (NOWPayments)",
     nowpaymentsCardDescription:
       "Visa, Mastercard, Apple Pay, Google Pay या Bitcoin, Ethereum और दूसरे",
-    cryptoPickCoin: "कॉइन चुनें",
-    cryptoCoinUnavailable: "यह कॉइन अभी उपलब्ध नहीं है। कोई दूसरा चुनें।",
-    cryptoCoinBelowMinimum:
-      "यह राशि इस कॉइन की न्यूनतम सीमा से कम है। कोई दूसरा कॉइन चुनें।",
     cryptoAmountBelowMinimum:
       "यह राशि क्रिप्टो की न्यूनतम सीमा से कम है। एक पैक और जोड़ें या बड़ा प्लान चुनें।",
-  },
-  cryptoCoin: {
-    btc: "Bitcoin (BTC)",
-    eth: "Ethereum (ETH)",
-    usdtTrc20: "USDT (TRON)",
-    usdtErc20: "USDT (Ethereum)",
-    usdtBsc: "USDT (BNB Chain)",
-    usdc: "USDC (Ethereum)",
-    sol: "Solana (SOL)",
-    ltc: "Litecoin (LTC)",
-    xmr: "Monero (XMR)",
-    doge: "Dogecoin (DOGE)",
-    trx: "TRON (TRX)",
-    bnbBsc: "BNB (BNB Chain)",
   },
 };

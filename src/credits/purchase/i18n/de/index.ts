@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NowPayments",
+      whop: "Whop",
     },
   },
   post: {
@@ -35,11 +36,6 @@ export const translations: typeof enTranslations = {
       nowpaymentsDescription: "Mit Bitcoin, Ethereum und mehr bezahlen",
       cryptoMinimumDisabled:
         "Mindestens {{min}} Pakete für Krypto-Zahlungen erforderlich",
-    },
-    payCurrency: {
-      label: "Kryptowährung",
-      description: "Coin für die Zahlung (nur Krypto)",
-      placeholder: "Coin wählen",
     },
     checkoutUrl: {
       content: "Checkout-URL",

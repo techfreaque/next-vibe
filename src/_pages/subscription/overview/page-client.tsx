@@ -40,7 +40,13 @@ function PaymentResultBanner({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: subscriptionT } = subscriptionScopedTranslation.scopedT(locale);
 
-  const paymentStatus = searchParams.get("payment");
+  // Whop appends its own `payment` (pay_ id) and `status` to the return
+  // URL; a failed or canceled Whop checkout must not show "success".
+  const whopStatus = searchParams.get("status");
+  const paymentStatus =
+    whopStatus === "failed" || whopStatus === "canceled"
+      ? "canceled"
+      : searchParams.get("payment");
   const paymentType =
     searchParams.get("type") === "credits" ? "credits" : "subscription";
   const logger = useLogger();

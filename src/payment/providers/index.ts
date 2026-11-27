@@ -7,6 +7,7 @@ import { PaymentProvider as PaymentProviderEnum } from "../enum";
 import { NOWPaymentsProvider } from "./nowpayments/repository";
 import { StripeProvider } from "./stripe/repository";
 import type { PaymentProvider } from "./types";
+import { WhopProvider } from "./whop/repository";
 
 export * from "./types";
 
@@ -15,6 +16,7 @@ const providers = new Map<typeof PaymentProviderValue, PaymentProvider>();
 // Register payment providers using enum keys (matching DB-stored values)
 providers.set(PaymentProviderEnum.STRIPE, new StripeProvider());
 providers.set(PaymentProviderEnum.NOWPAYMENTS, new NOWPaymentsProvider());
+providers.set(PaymentProviderEnum.WHOP, new WhopProvider());
 
 export function getPaymentProvider(
   name: typeof PaymentProviderValue,

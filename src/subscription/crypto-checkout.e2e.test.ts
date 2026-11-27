@@ -1,12 +1,13 @@
 /**
- * E2E: crypto checkout lists only coins that accept the amount. Starter
- * monthly ($8) used to be card-only; with live NOWPayments minimums it takes
- * the coins whose minimum fits, and the picked coin goes to checkout.
+ * E2E: crypto checkout goes straight to the NOWPayments invoice page, where
+ * the buyer picks any coin. No coin step in our dialog. Starter monthly ($8)
+ * used to be card-only; it is above the lowest coin minimum, so it takes
+ * crypto.
  *
- * GET /subscription is patched at the browser (card paused + fixed coin
- * minimums) so the coin list is deterministic. The checkout leg is real: the
- * dev server holds a NOWPayments SANDBOX key and checks the pick against the
- * sandbox minimums, nowpayments.io itself is stubbed. Requires `vibe dev`.
+ * GET /subscription is patched at the browser (card paused + a fixed crypto
+ * floor) so the dialog is deterministic. The checkout leg is real: the dev
+ * server holds a NOWPayments SANDBOX key and creates the invoice there without
+ * pay_currency; nowpayments.io itself is stubbed. Requires `vibe dev`.
  */
 
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
@@ -19,11 +20,7 @@ import {
 import type { Page } from "playwright";
 import { describe, expect } from "vitest";
 
-import {
-  CryptoCoin,
-  type CryptoCoinMinimum,
-} from "@/payment/checkout/crypto-coins";
-import { scopedTranslation as checkoutScopedTranslation } from "@/payment/checkout/i18n";
+import { cryptoMinimumUsd } from "@/payment/checkout/crypto-coins";
 import { PaymentProvider } from "@/payment/enum";
 import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
 import { getSubscriptionTiers, ProductIds } from "@/products/repository-client";
@@ -38,17 +35,10 @@ const SUBSCRIPTION_READ = /\/api\/[^/]+\/subscription(\?.*)?$/;
 
 const { t } = scopedTranslation.scopedT(defaultLocale);
 const { t: tProducts } = productsScopedTranslation.scopedT(defaultLocale);
-const { t: tCheckout } = checkoutScopedTranslation.scopedT(defaultLocale);
 const tiers = getSubscriptionTiers(defaultLocale);
 
-// Live NOWPayments minimums 2026-11-27 (USD, fee paid by the buyer).
-const COINS: CryptoCoinMinimum[] = [
-  { coin: CryptoCoin.BTC, minUsd: 6.94 },
-  { coin: CryptoCoin.ETH, minUsd: 6.48 },
-  { coin: CryptoCoin.USDT_TRC20, minUsd: 16.5 },
-  { coin: CryptoCoin.LTC, minUsd: 6.29 },
-  { coin: CryptoCoin.XMR, minUsd: 12.62 },
-];
+// Lowest live NOWPayments minimum 2026-11-27 (LTC, USD, fee paid by buyer).
+const CRYPTO_MIN_USD = cryptoMinimumUsd(6.29);
 
 async function serveCryptoOnly(page: Page): Promise<void> {
   await page.route(SUBSCRIPTION_READ, (route) =>
@@ -59,7 +49,7 @@ async function serveCryptoOnly(page: Page): Promise<void> {
             data: {
               hasSubscription: false,
               checkoutProviders: [PaymentProvider.NOWPAYMENTS],
-              cryptoCoins: COINS,
+              cryptoMinUsd: CRYPTO_MIN_USD,
             },
           },
         })
@@ -67,15 +57,15 @@ async function serveCryptoOnly(page: Page): Promise<void> {
   );
 }
 
-describe("E2E: crypto coin checkout", () => {
-  const e2e = useE2E("subscription/crypto-coins");
+describe("E2E: crypto checkout", () => {
+  const e2e = useE2E("subscription/crypto-checkout");
 
   e2e.it(
-    "offers Starter monthly via crypto with only the coins above their minimum",
+    "sends Starter monthly straight to the NOWPayments invoice page",
     async (fixtures) => {
       const { page } = fixtures;
       const created = await createTestUser(
-        fixtures.uniqueEmail("crypto-coins"),
+        fixtures.uniqueEmail("crypto-checkout"),
       );
       expect(created.success, JSON.stringify(created)).toBe(true);
       if (!created.success) {
@@ -121,29 +111,28 @@ describe("E2E: crypto coin checkout", () => {
         .click();
 
       const dialog = page.getByRole("dialog");
-      const coins = dialog.getByTestId("crypto-coin-option");
-      await coins.first().waitFor();
-      expect(await coins.allInnerTexts()).toEqual([
-        tCheckout(CryptoCoin.BTC),
-        tCheckout(CryptoCoin.ETH),
-        tCheckout(CryptoCoin.LTC),
-      ]);
+      const option = dialog.getByTestId("crypto-checkout-option");
+      await option.waitFor();
+      // One button to the hosted page: no coin list, no minimum notice.
+      expect(await dialog.getByTestId("crypto-coin-option").count()).toBe(0);
       expect(await dialog.getByTestId("crypto-below-minimum").count()).toBe(0);
+      const crypto = option.getByRole("button", {
+        name: t("buy.provider.nowpayments"),
+      });
+      expect(await crypto.isDisabled()).toBe(false);
 
       const call = await fixtures.capture(
         subscriptionCreateEndpoints.POST,
         async () => {
-          await coins
-            .filter({ hasText: tCheckout(CryptoCoin.BTC) })
-            .click();
+          await crypto.click();
         },
       );
       expect(call.requestBody).toMatchObject({
         plan: SubscriptionPlan.SUBSCRIPTION,
         billingInterval: BillingInterval.MONTHLY,
         provider: PaymentProvider.NOWPAYMENTS,
-        payCurrency: CryptoCoin.BTC,
       });
+      expect(call.requestBody).not.toHaveProperty("payCurrency");
       expect(call.response.success, JSON.stringify(call.response)).toBe(true);
       if (!call.response.success) {
         return;

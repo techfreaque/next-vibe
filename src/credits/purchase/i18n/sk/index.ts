@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NowPayments",
+      whop: "Whop",
     },
   },
   post: {
@@ -36,11 +37,6 @@ export const translations: typeof enTranslations = {
         "Zaplať Bitcoinom, Ethereom alebo ďalšími kryptomenami",
       cryptoMinimumDisabled:
         "Pri platbe kryptomenou je minimálny počet balíkov {{min}}",
-    },
-    payCurrency: {
-      label: "Kryptomena",
-      description: "Mena na platbu (len kryptomeny)",
-      placeholder: "Vyber menu",
     },
     checkoutUrl: {
       content: "URL platby",

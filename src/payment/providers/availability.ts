@@ -12,6 +12,9 @@
  *   currently make live charges"). Checked at most once per
  *   ACCOUNT_CHECK_TTL_MS and fail-open, so a Stripe API hiccup never hides a
  *   working provider.
+ *
+ * Whop (card) is offered only once the API key and webhook secret of the
+ * active WHOP_ENVIRONMENT are set and WHOP_CHECKOUT_PAUSED is not true.
  */
 
 import "server-only";
@@ -33,6 +36,7 @@ import {
 } from "../enum";
 import { paymentEnv } from "../env";
 import { StripeProvider } from "./stripe/repository";
+import { isWhopConfigured } from "./whop/config";
 
 const ACCOUNT_CHECK_TTL_MS = 5 * 60 * 1000;
 
@@ -53,6 +57,8 @@ export interface CheckoutProviderInputs {
   stripePaused: boolean;
   /** Stripe account `charges_enabled`; null when unknown (fail-open). */
   stripeChargesEnabled: boolean | null;
+  /** Whop keys present and WHOP_CHECKOUT_PAUSED not set. */
+  whopAvailable: boolean;
 }
 
 /** Pure decision, exported for tests. Order matches PaymentProviderDB. */
@@ -61,9 +67,20 @@ export function resolveCheckoutProviders(
 ): (typeof PaymentProviderValue)[] {
   const stripeOff =
     inputs.stripePaused || inputs.stripeChargesEnabled === false;
-  return PaymentProviderDB.filter(
-    (provider) => !(provider === PaymentProvider.STRIPE && stripeOff),
-  );
+  return PaymentProviderDB.filter((provider) => {
+    if (provider === PaymentProvider.STRIPE) {
+      return !stripeOff;
+    }
+    if (provider === PaymentProvider.WHOP) {
+      return inputs.whopAvailable;
+    }
+    return true;
+  });
+}
+
+/** Whop can open checkouts: configured and not paused by the operator. */
+export function isWhopCheckoutAvailable(): boolean {
+  return isWhopConfigured() && paymentEnv.WHOP_CHECKOUT_PAUSED !== "true";
 }
 
 /**
@@ -123,6 +140,7 @@ export async function getCheckoutProviders(
     stripeChargesEnabled: stripePaused
       ? null
       : await getStripeChargesEnabled(logger),
+    whopAvailable: isWhopCheckoutAvailable(),
   });
 }
 

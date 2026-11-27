@@ -53,20 +53,49 @@ it("drops Stripe when paused by env or when the account has charges disabled", (
   const all = [PaymentProvider.STRIPE, PaymentProvider.NOWPAYMENTS];
   const cryptoOnly = [PaymentProvider.NOWPAYMENTS];
   expect(
-    resolveCheckoutProviders({ stripePaused: false, stripeChargesEnabled: true }),
+    resolveCheckoutProviders({ stripePaused: false, stripeChargesEnabled: true, whopAvailable: false }),
   ).toEqual(all);
   expect(
-    resolveCheckoutProviders({ stripePaused: false, stripeChargesEnabled: null }),
+    resolveCheckoutProviders({ stripePaused: false, stripeChargesEnabled: null, whopAvailable: false }),
   ).toEqual(all);
   expect(
     resolveCheckoutProviders({
       stripePaused: false,
       stripeChargesEnabled: false,
+      whopAvailable: false,
     }),
   ).toEqual(cryptoOnly);
   expect(
-    resolveCheckoutProviders({ stripePaused: true, stripeChargesEnabled: true }),
+    resolveCheckoutProviders({ stripePaused: true, stripeChargesEnabled: true, whopAvailable: false }),
   ).toEqual(cryptoOnly);
+});
+
+it("offers Whop as card checkout only when configured, also while Stripe is paused", () => {
+  expect(
+    resolveCheckoutProviders({
+      stripePaused: false,
+      stripeChargesEnabled: false,
+      whopAvailable: true,
+    }),
+  ).toEqual([PaymentProvider.NOWPAYMENTS, PaymentProvider.WHOP]);
+  expect(
+    resolveCheckoutProviders({
+      stripePaused: false,
+      stripeChargesEnabled: true,
+      whopAvailable: true,
+    }),
+  ).toEqual([
+    PaymentProvider.STRIPE,
+    PaymentProvider.NOWPAYMENTS,
+    PaymentProvider.WHOP,
+  ]);
+  expect(
+    resolveCheckoutProviders({
+      stripePaused: true,
+      stripeChargesEnabled: null,
+      whopAvailable: false,
+    }),
+  ).not.toContain(PaymentProvider.WHOP);
 });
 
 it("refuses a Stripe checkout while the account reports charges disabled, and caches the check", async () => {

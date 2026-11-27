@@ -204,8 +204,6 @@ export class SubscriptionCheckoutRepository {
             productId: tierProductId,
             interval,
             provider: data.provider || PaymentProvider.STRIPE,
-            // Crypto: checked against the coin minimums by the provider.
-            ...(data.payCurrency ? { payCurrency: data.payCurrency } : {}),
           },
         },
         customerResult.data.customerId,

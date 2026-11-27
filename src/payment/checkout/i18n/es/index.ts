@@ -34,12 +34,6 @@ export const translations: typeof enTranslations = {
         description: "Elige cómo pagar",
         placeholder: "Selecciona el proveedor de pagos",
       },
-      payCurrency: {
-        label: "Criptomoneda",
-        description:
-          "Moneda con la que pagas. Déjalo vacío para elegirla en la página de pago.",
-        placeholder: "Elige una moneda",
-      },
       metadata: {
         label: "Metadatos",
         description: "Metadatos adicionales de la sesión de pago",
@@ -193,6 +187,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NowPayments",
+      whop: "Whop",
     },
   },
 
@@ -202,6 +197,8 @@ export const translations: typeof enTranslations = {
     yearly: "Anual",
   },
   availability: {
+    whopCardLabel: "Tarjeta",
+    whopCardDescription: "Visa, Mastercard y más. Pago seguro con Whop.",
     cardPaused:
       "Los pagos con tarjeta están en pausa por ahora. Con criptomonedas pagas al instante.",
     cardPausedError:
@@ -209,25 +206,7 @@ export const translations: typeof enTranslations = {
     nowpaymentsCardLabel: "Tarjeta o criptomonedas (NOWPayments)",
     nowpaymentsCardDescription:
       "Visa, Mastercard, Apple Pay, Google Pay o Bitcoin, Ethereum y más",
-    cryptoPickCoin: "Elige una moneda",
-    cryptoCoinUnavailable: "Esa moneda no está disponible ahora. Elige otra.",
-    cryptoCoinBelowMinimum:
-      "Este importe no llega al mínimo de esa moneda. Elige otra.",
     cryptoAmountBelowMinimum:
       "Este importe no llega al mínimo para cripto. Añade un paquete o elige un plan mayor.",
-  },
-  cryptoCoin: {
-    btc: "Bitcoin (BTC)",
-    eth: "Ethereum (ETH)",
-    usdtTrc20: "USDT (TRON)",
-    usdtErc20: "USDT (Ethereum)",
-    usdtBsc: "USDT (BNB Chain)",
-    usdc: "USDC (Ethereum)",
-    sol: "Solana (SOL)",
-    ltc: "Litecoin (LTC)",
-    xmr: "Monero (XMR)",
-    doge: "Dogecoin (DOGE)",
-    trx: "TRON (TRX)",
-    bnbBsc: "BNB (BNB Chain)",
   },
 };

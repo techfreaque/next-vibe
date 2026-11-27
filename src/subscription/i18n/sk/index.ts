@@ -412,10 +412,6 @@ export const translations: typeof enTranslations = {
         label: "Poskytovateľ platby",
         description: "Vyber poskytovateľa platby",
       },
-      payCurrency: {
-        label: "Kryptomena",
-        description: "Mena na platbu (len platba kryptomenou)",
-      },
       catalogProductId: {
         label: "Produkt katalógu",
         description: "Prepojenie na produkt v katalógu pre toto predplatné",
@@ -454,7 +450,7 @@ export const translations: typeof enTranslations = {
     recentCardAuthFailure: "Nedávno neúspešné overenie karty",
     checkoutProviders: "Dostupné spôsoby platby",
     nowPaymentsAcceptsCards: "Krypto platba prijíma karty",
-    cryptoCoins: "Kryptomeny a minimálne sumy",
+    cryptoMinUsd: "Minimum pre krypto (USD)",
     trialStart: "Začiatok skúšobného obdobia",
     trialEnd: "Koniec skúšobného obdobia",
     success: "Operácia bola úspešná",
@@ -776,6 +772,7 @@ export const translations: typeof enTranslations = {
     paymentProvider: {
       nowpayments: "NowPayments",
       stripe: "Stripe",
+      whop: "Whop",
     },
   },
 

@@ -7,8 +7,8 @@
  *   a link to every plan on the buy page.
  * - Live plan: a pack (one tap to checkout) and the next tier up, switched in
  *   place after an inline confirm (it charges the prorated difference).
- * Crypto needs a coin pick (only coins above their minimum), so it lives on
- * the buy page.
+ * Crypto (coin picked on the NOWPayments page, small amounts switched off)
+ * lives on the buy page.
  *
  * Used where a signed-in user runs dry: the chat's out-of-credits card and the
  * credits header on the subscription pages. Guests never see this (every
@@ -40,6 +40,7 @@ import { useState } from "react";
 
 import purchaseDefinitions from "@/credits/purchase/definition";
 import { PaymentProvider } from "@/payment/enum";
+import { resolveCardCheckoutProvider } from "@/payment/providers/card-provider";
 import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
 import {
   getPricingParams,
@@ -137,9 +138,11 @@ export function CreditOffers({
 
   // Card checkout paused (e.g. Stripe account on hold): the quick tiles open
   // the buy page, which offers the providers that still work.
-  const cardCheckoutPaused =
-    subscriptionRead?.data?.checkoutProviders !== undefined &&
-    !subscriptionRead.data.checkoutProviders.includes(PaymentProvider.STRIPE);
+  // Whop takes over the quick card checkout while Stripe is paused.
+  const cardProvider = resolveCardCheckoutProvider(
+    subscriptionRead?.data?.checkoutProviders,
+  );
+  const cardCheckoutPaused = cardProvider === null;
   const openBuyPage = (pendingKey: Pending): void => {
     setPending(pendingKey);
     assignUrl(`/${locale}/subscription/buy`);
@@ -158,7 +161,7 @@ export function CreditOffers({
         requestData: {
           quantity: 1,
           productId: ProductIds.CREDIT_PACK,
-          provider: PaymentProvider.STRIPE,
+          provider: cardProvider ?? PaymentProvider.STRIPE,
         },
       }),
     );
@@ -176,7 +179,7 @@ export function CreditOffers({
         requestData: {
           plan: tier.planId,
           billingInterval: BillingInterval.MONTHLY,
-          provider: PaymentProvider.STRIPE,
+          provider: cardProvider ?? PaymentProvider.STRIPE,
         },
       }),
     );

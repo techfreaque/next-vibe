@@ -806,6 +806,7 @@ export class StripeProvider implements PaymentProvider {
     subscriptionId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    atPeriodEnd: boolean,
   ): Promise<ResponseType<void>> {
     const { t: tCancel } = scopedTranslation.scopedT(locale);
     const stripeClient = StripeProvider.getStripe();
@@ -816,9 +817,21 @@ export class StripeProvider implements PaymentProvider {
       });
     }
     try {
-      await stripeClient.subscriptions.cancel(subscriptionId);
+      // "Cancel at period end" must not end the subscription now:
+      // subscriptions.cancel ends it at once and the deleted webhook then
+      // marks the row CANCELED while the user still has paid time left.
+      if (atPeriodEnd) {
+        await stripeClient.subscriptions.update(subscriptionId, {
+          cancel_at_period_end: true,
+        });
+      } else {
+        await stripeClient.subscriptions.cancel(subscriptionId);
+      }
 
-      logger.info("Canceled Stripe subscription", { subscriptionId });
+      logger.info("Canceled Stripe subscription", {
+        subscriptionId,
+        atPeriodEnd,
+      });
 
       return success();
     } catch (error) {
