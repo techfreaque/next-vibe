@@ -1,7 +1,6 @@
 import "server-only";
 
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { Buffer } from "node:buffer";
 
 import type { SendMailOptions } from "nodemailer";
 
@@ -10,32 +9,29 @@ import {
   EMAIL_LOGO_CONTENT_TYPE,
   EMAIL_LOGO_FILENAME,
   EMAIL_LOGO_SRC,
-  withHostedEmailLogo,
 } from "./email-logo";
+import { EMAIL_LOGO_BASE64 } from "./email-logo-data";
 
-export async function prepareEmailLogo(html: string | undefined): Promise<{
+/** The logo bytes are bundled in the code, so reading can never fail. */
+export function getEmailLogoBytes(): Buffer {
+  return Buffer.from(EMAIL_LOGO_BASE64, "base64");
+}
+
+export function prepareEmailLogo(html: string | undefined): {
   html: string | undefined;
   logo?: Buffer;
-}> {
+} {
   if (!html?.includes(`src="${EMAIL_LOGO_SRC}"`)) {
     return { html };
   }
-
-  try {
-    const logo = await readFile(
-      join(process.cwd(), "public", "images", EMAIL_LOGO_FILENAME),
-    );
-    return { html, logo };
-  } catch {
-    return { html: withHostedEmailLogo(html) };
-  }
+  return { html, logo: getEmailLogoBytes() };
 }
 
-export async function prepareSmtpEmailLogo(html: string | undefined): Promise<{
+export function prepareSmtpEmailLogo(html: string | undefined): {
   html: string | undefined;
   attachments?: SendMailOptions["attachments"];
-}> {
-  const prepared = await prepareEmailLogo(html);
+} {
+  const prepared = prepareEmailLogo(html);
   if (!prepared.logo) {
     return { html: prepared.html };
   }

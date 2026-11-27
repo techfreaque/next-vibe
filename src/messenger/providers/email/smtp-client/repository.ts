@@ -840,7 +840,7 @@ export class SmtpRepository {
       );
 
       const resolvedSenderName = account.fromName ?? params.senderName;
-      const preparedLogo = await prepareSmtpEmailLogo(params.html);
+      const preparedLogo = prepareSmtpEmailLogo(params.html);
       const mergedAttachments = [
         ...(preparedLogo.attachments ?? []),
         ...(params.attachments ?? []).map((att) => ({

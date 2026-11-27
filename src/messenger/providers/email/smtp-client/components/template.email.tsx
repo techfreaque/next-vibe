@@ -250,7 +250,7 @@ export function EmailTemplate({
         </Container>
 
         {/* Tracking pixel at the end of email */}
-        <TrackedPixel tracking={tracking} />
+        <TrackedPixel />
       </Body>
     </Html>
   );

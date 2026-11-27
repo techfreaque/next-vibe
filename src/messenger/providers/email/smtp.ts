@@ -37,10 +37,10 @@ import { LocalStateProvider } from "../local-state-base";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { toImapShape } from "./imap-client/db";
 import { isMailSinkActive } from "./mail-sink";
-import { withHostedEmailLogo } from "./smtp-client/email-logo";
 import { scopedTranslation as smtpScopedTranslation } from "./smtp-client/i18n";
 import type { SmtpSelectionCriteria } from "./smtp-client/repository";
 import { SmtpRepository } from "./smtp-client/repository";
+import { buildSentCopy } from "./smtp-client/sent-copy";
 
 // Well-known system user UUID - used for service-layer sends (not tied to a real user)
 const SYSTEM_UUID = "00000000-0000-0000-0000-000000000001";
@@ -194,17 +194,7 @@ export class SmtpMessengerProvider extends LocalStateProvider {
 
     const account = toImapShape(rawAccount);
     const date = new Date();
-    const rawMessage = [
-      `From: ${msg.from}`,
-      `To: ${msg.to}`,
-      `Subject: ${msg.subject}`,
-      `Date: ${date.toUTCString()}`,
-      `Message-ID: ${msg.messageId}`,
-      `MIME-Version: 1.0`,
-      `Content-Type: text/html; charset=utf-8`,
-      ``,
-      withHostedEmailLogo(msg.html),
-    ].join("\r\n");
+    const rawMessage = await buildSentCopy({ ...msg, date });
 
     const targetMailbox: string = sentPath;
     await new Promise<void>((resolve, reject) => {
@@ -221,7 +211,7 @@ export class SmtpMessengerProvider extends LocalStateProvider {
 
       imap.once("ready", () => {
         imap.append(
-          Buffer.from(rawMessage),
+          rawMessage,
           { mailbox: targetMailbox, flags: ["\\Seen"], date },
           (err) => {
             imap.end();

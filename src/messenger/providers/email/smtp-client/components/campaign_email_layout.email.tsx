@@ -139,7 +139,7 @@ export function CampaignEmailLayout({
             </div>
           </Section>
         </Container>
-        <TrackedPixel tracking={tracking} />
+        <TrackedPixel />
       </Body>
     </Html>
   );

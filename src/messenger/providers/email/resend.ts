@@ -92,7 +92,7 @@ export class ResendMessengerProvider extends SendOnlyProvider {
         "noreply@example.com";
       const fromName = input.senderName ?? account?.name ?? "Messenger";
 
-      const { html, logo } = await prepareEmailLogo(input.html);
+      const { html, logo } = prepareEmailLogo(input.html);
       const headers = input.unsubscribeUrl
         ? buildListUnsubscribeHeaders(input.to, input.unsubscribeUrl)
         : undefined;

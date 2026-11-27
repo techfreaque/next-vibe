@@ -10,7 +10,6 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { getTemplate } from "@/generated/email";
 import { buildListUnsubscribeHeaders } from "@/messenger/providers/email/list-unsubscribe";
 import { createTrackingContext } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
-import { EMAIL_LOGO_FALLBACK_PATH } from "@/messenger/providers/email/smtp-client/email-logo";
 import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
 import { getTemplateSubject } from "@/messenger/registry/template";
 
@@ -30,14 +29,11 @@ const locales: CountryLanguage[] = [
   "en-IN",
   "hi-IN",
 ];
-const logoUrl = new URL(
-  EMAIL_LOGO_FALLBACK_PATH,
-  coreClientEnv.NEXT_PUBLIC_APP_URL,
-);
 
 function expectUnclippedEmail(html: string): void {
   expect(html).toContain('src="cid:logo@unbottled.ai"');
-  expect(html).not.toContain(logoUrl.href);
+  expect(html).not.toMatch(/(?:src|href)="https?:\/\/[^"]*\.(?:png|jpe?g|gif|svg|webp)/);
+  expect(html).not.toContain("/tracking/pixel");
   expect(html).not.toContain("data:image/");
   expect(Buffer.byteLength(html, "utf8")).toBeLessThan(100_000);
 }

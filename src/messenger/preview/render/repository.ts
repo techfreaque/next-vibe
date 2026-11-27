@@ -22,7 +22,8 @@ import { getTemplate } from "@/generated/email/index";
 
 import type { EmailsT } from "../../i18n";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
-import { withHostedEmailLogo } from "../../providers/email/smtp-client/email-logo";
+import { withPreviewEmailLogo } from "../../providers/email/smtp-client/email-logo";
+import { EMAIL_LOGO_BASE64 } from "../../providers/email/smtp-client/email-logo-data";
 import {
   getTemplateSubject,
   renderTemplateComponent,
@@ -113,7 +114,8 @@ export class EmailPreviewRenderRepository {
       }
 
       // Render to HTML
-      const html = withHostedEmailLogo(await render(jsx));
+      // data: URI is for this browser preview only, never for sent mail
+      const html = withPreviewEmailLogo(await render(jsx), EMAIL_LOGO_BASE64);
 
       const subject = getTemplateSubject(template, locale, data.props);
 

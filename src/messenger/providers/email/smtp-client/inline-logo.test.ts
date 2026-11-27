@@ -3,11 +3,10 @@ import { Buffer } from "node:buffer";
 
 import { expect, test } from "bun:test";
 import { simpleParser } from "mailparser";
-import { coreClientEnv } from "next-vibe/core/env-client";
 import { createTransport } from "nodemailer";
 
-import { EMAIL_LOGO_FALLBACK_PATH, withHostedEmailLogo } from "./email-logo";
-import { prepareSmtpEmailLogo } from "./inline-logo";
+import { buildSentCopy } from "./sent-copy";
+import { getEmailLogoBytes, prepareSmtpEmailLogo } from "./inline-logo";
 
 const html = '<p>Hello</p><img src="cid:logo@unbottled.ai" alt="unbottled.ai">';
 
@@ -20,7 +19,7 @@ test.each([false, true])(
       to: "recipient@example.invalid",
       subject: "Logo MIME test",
       text: withText ? "Hello" : undefined,
-      ...(await prepareSmtpEmailLogo(html)),
+      ...(prepareSmtpEmailLogo(html)),
     });
     assert(
       Buffer.isBuffer(message),
@@ -56,16 +55,36 @@ test.each([false, true])(
   },
 );
 
-test("a hosted fallback and HTML without the logo need no attachment", async () => {
-  const hosted = withHostedEmailLogo(html);
-  const url = new URL(
-    EMAIL_LOGO_FALLBACK_PATH,
-    coreClientEnv.NEXT_PUBLIC_APP_URL,
-  );
-  expect(hosted).toContain(`src="${url.href}"`);
-  expect(hosted).not.toContain("cid:");
-  expect(await prepareSmtpEmailLogo(hosted)).toEqual({ html: hosted });
-  expect(await prepareSmtpEmailLogo("<p>Hello</p>")).toEqual({
+test("the logo is bundled, so no remote URL is ever produced", () => {
+  const prepared = prepareSmtpEmailLogo(html);
+  expect(prepared.html).toBe(html);
+  expect(prepared.html).not.toMatch(/src="https?:/);
+  expect(prepared.attachments).toHaveLength(1);
+  expect(prepareSmtpEmailLogo("<p>Hello</p>")).toEqual({
     html: "<p>Hello</p>",
   });
+});
+
+test("the bundled logo matches public/images/unbottled-email-logo.png", async () => {
+  const file = await Bun.file("public/images/unbottled-email-logo.png").bytes();
+  expect(Buffer.compare(getEmailLogoBytes(), Buffer.from(file))).toBe(0);
+});
+
+test("the IMAP Sent copy is multipart/related with the inline cid logo", async () => {
+  const raw = await buildSentCopy({
+    from: "sender@example.invalid",
+    to: "recipient@example.invalid",
+    subject: "Sent copy",
+    html,
+    messageId: "<sent-copy@example.invalid>",
+    date: new Date("2026-11-27T10:00:00Z"),
+  });
+  const text = raw.toString("utf8");
+  expect(text).toContain('multipart/related; type="text/html"');
+  expect(text).toContain("Content-ID: <logo@unbottled.ai>");
+  expect(text).toContain("Message-ID: <sent-copy@example.invalid>");
+  expect(text).not.toMatch(/https?:\/\/[^\s"]*\.png/);
+  const parsed = await simpleParser(raw, { skipImageLinks: true });
+  expect(parsed.html).toContain('src="cid:logo@unbottled.ai"');
+  expect(parsed.attachments).toHaveLength(1);
 });

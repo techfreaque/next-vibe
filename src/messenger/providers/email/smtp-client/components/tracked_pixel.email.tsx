@@ -1,50 +1,11 @@
 /**
  * TrackedPixel Component
- * Invisible tracking pixel for email open tracking
+ * Intentionally renders nothing: emails contain no remote resources (Max,
+ * 2026-11-27), so there is no open-tracking pixel. Kept so layouts stay unchanged.
  */
 
-import { Img } from "@react-email/img";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { JSX } from "react";
 
-import { generateTrackingPixelUrl } from "@/leads/tracking/utils";
-
-import { type TrackingContext } from "./tracking_context.email";
-
-/**
- * TrackedPixel Component Props
- */
-interface TrackedPixelProps {
-  tracking: TrackingContext;
-}
-
-/**
- * TrackedPixel Component
- * Invisible tracking pixel for email open tracking
- */
-export function TrackedPixel({
-  tracking,
-}: TrackedPixelProps): JSX.Element | null {
-  // Only render if tracking context is provided
-  if (!tracking?.leadId && !tracking?.userId) {
-    return null;
-  }
-
-  const pixelUrl = generateTrackingPixelUrl(
-    tracking.leadId,
-    tracking.userId,
-    tracking.campaignId,
-    tracking.baseUrl || envClient.NEXT_PUBLIC_APP_URL,
-    tracking.locale,
-  );
-
-  return (
-    <Img
-      src={pixelUrl}
-      width="1"
-      height="1"
-      style={{ display: "none" }}
-      alt=""
-    />
-  );
+export function TrackedPixel(): JSX.Element | null {
+  return null;
 }
