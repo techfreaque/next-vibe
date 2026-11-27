@@ -101,6 +101,7 @@ function LinkGenerator({
   const [urlInput, setUrlInput] = useState("");
   const logger = useWidgetLogger();
   const [copiedLinkGen, setCopiedLinkGen] = useState(false);
+  const [manualLink, setManualLink] = useState<string | null>(null);
 
   const generatedPath = extractPath(urlInput);
   const hasInput = generatedPath.length > 0;
@@ -110,44 +111,56 @@ function LinkGenerator({
       return;
     }
     const trackUrl = `${getCurrentOrigin()}/track?ref=${code}&url=${encodeURIComponent(generatedPath)}`;
-    await copyToClipboard(trackUrl, logger);
-    setCopiedLinkGen(true);
-    setTimeout(() => {
-      setCopiedLinkGen(false);
-    }, 2000);
+    const copied = await copyToClipboard(trackUrl, logger);
+    setManualLink(copied ? null : trackUrl);
+    setCopiedLinkGen(copied);
+    if (copied) {
+      setTimeout(() => {
+        setCopiedLinkGen(false);
+      }, 2000);
+    }
   }, [code, generatedPath, hasInput, logger]);
 
   return (
-    <Div className="flex items-center gap-2">
-      <Div className="relative flex-1">
+    <Div className="flex min-w-0 flex-1 flex-col gap-2">
+      <Div className="flex items-center gap-2">
         <Input
           type="text"
           value={urlInput}
           onChange={(e) => {
             setUrlInput(e.target.value);
+            setManualLink(null);
           }}
           placeholder={t("codes.list.widget.linkGenPlaceholder")}
           className="h-11 font-mono text-xs sm:h-10"
         />
+        <Button
+          variant="outline"
+          className="h-11 shrink-0 gap-1.5 sm:h-10"
+          disabled={!hasInput}
+          onClick={handleCopyGenerated}
+        >
+          {copiedLinkGen ? (
+            <>
+              <Check className="h-4 w-4 text-success" />
+              {t("codes.list.widget.linkGenCopied")}
+            </>
+          ) : (
+            <>
+              <Copy className="h-4 w-4" />
+              {t("codes.list.widget.linkGenCopy")}
+            </>
+          )}
+        </Button>
       </Div>
-      <Button
-        variant="outline"
-        className="h-11 shrink-0 gap-1.5 sm:h-10"
-        disabled={!hasInput}
-        onClick={handleCopyGenerated}
-      >
-        {copiedLinkGen ? (
-          <>
-            <Check className="h-4 w-4 text-success" />
-            {t("codes.list.widget.linkGenCopied")}
-          </>
-        ) : (
-          <>
-            <Copy className="h-4 w-4" />
-            {t("codes.list.widget.linkGenCopy")}
-          </>
-        )}
-      </Button>
+      {manualLink && (
+        <Input
+          readOnly
+          value={manualLink}
+          aria-label={t("codes.list.widget.linkGenCopy")}
+          className="h-10 font-mono text-xs"
+        />
+      )}
     </Div>
   );
 }
@@ -178,15 +191,23 @@ export function ReferralCodesListContainer(): React.JSX.Element {
   const locale = useWidgetLocale();
   const isToolsPage = useIsToolsPage();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [manualCopy, setManualCopy] = useState<{
+    code: string;
+    url: string;
+  } | null>(null);
   const [linkCode, setLinkCode] = useState<string | null>(null);
   const logger = useWidgetLogger();
 
   const handleCopy = async (code: string): Promise<void> => {
-    await copyToClipboard(`${getCurrentOrigin()}/track?ref=${code}`, logger);
-    setCopiedCode(code);
-    setTimeout(() => {
-      setCopiedCode(null);
-    }, 2000);
+    const url = `${getCurrentOrigin()}/track?ref=${code}`;
+    const copied = await copyToClipboard(url, logger);
+    setManualCopy(copied ? null : { code, url });
+    setCopiedCode(copied ? code : null);
+    if (copied) {
+      setTimeout(() => {
+        setCopiedCode((current) => (current === code ? null : current));
+      }, 2000);
+    }
   };
 
   const header = isToolsPage ? (
@@ -331,6 +352,16 @@ export function ReferralCodesListContainer(): React.JSX.Element {
             )}
           </Button>
         </Div>
+        {manualCopy?.code === code.code && (
+          <Div className="col-span-full min-w-0">
+            <Input
+              readOnly
+              value={manualCopy.url}
+              aria-label={t("codes.list.widget.copy")}
+              className="h-10 font-mono text-xs"
+            />
+          </Div>
+        )}
       </Div>
     );
   };

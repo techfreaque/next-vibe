@@ -249,7 +249,7 @@ const { GET } = createEndpoint({
       default: {
         result: {
           id: "456e7890-e89b-12d3-a456-426614174000",
-          companyId: "00000000-0000-0000-0000-000000000001",
+          companyId: "00000000-0000-4000-8000-000000000001",
           companyName: "Tatra Ledger Studio",
           orderCount: 4,
           receivingCount: 2,

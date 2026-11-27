@@ -144,8 +144,8 @@ export function CurrencySelectFieldWidget<
                 onValueChange={(value) => formField.onChange(value)}
                 value={
                   formField.value !== undefined && formField.value !== null
-                    ? formField.value
-                    : undefined
+                    ? String(formField.value)
+                    : ""
                 }
                 disabled={isDisabled || field.disabled || field.readonly}
                 name={formField.name}

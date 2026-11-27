@@ -1,6 +1,7 @@
 "use client";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { toIntlLocale } from "next-vibe/core/i18n/core/language-utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { Button } from "next-vibe/ui/components/button";
@@ -295,6 +296,7 @@ export function AssistantMessageActions({
         (promptTokens !== null && promptTokens !== undefined) ||
         (completionTokens !== null && completionTokens !== undefined)) && (
         <StatsBar
+          locale={locale}
           creditCost={creditCost ?? null}
           promptTokens={promptTokens ?? null}
           completionTokens={completionTokens ?? null}
@@ -311,6 +313,7 @@ export function AssistantMessageActions({
 }
 
 function StatsBar({
+  locale,
   creditCost,
   promptTokens,
   completionTokens,
@@ -321,6 +324,7 @@ function StatsBar({
   pipelineSteps,
   t,
 }: {
+  locale: CountryLanguage;
   creditCost: number | null;
   promptTokens: number | null;
   completionTokens: number | null;
@@ -338,6 +342,7 @@ function StatsBar({
 }): React.JSX.Element {
   const [tokensOpen, setTokensOpen] = useState(false);
   const [timingOpen, setTimingOpen] = useState(false);
+  const numberLocale = toIntlLocale(locale);
 
   const cachedPercent =
     cachedInputTokens && promptTokens && cachedInputTokens <= promptTokens
@@ -368,7 +373,9 @@ function StatsBar({
               }}
             >
               •{" "}
-              {((promptTokens ?? 0) + (completionTokens ?? 0)).toLocaleString()}{" "}
+              {((promptTokens ?? 0) + (completionTokens ?? 0)).toLocaleString(
+                numberLocale,
+              )}{" "}
               {t("widget.common.assistantMessageActions.tokens")}
               {cachedPercent !== null &&
                 ` · ${cachedPercent}% ${t("widget.common.assistantMessageActions.cached")}`}
@@ -397,7 +404,7 @@ function StatsBar({
                   {t("widget.common.assistantMessageActions.inputTokens")}
                 </Span>
                 <Span className="font-mono tabular-nums">
-                  {(promptTokens ?? 0).toLocaleString()}
+                  {(promptTokens ?? 0).toLocaleString(numberLocale)}
                 </Span>
               </Div>
               <Div className="flex justify-between gap-4">
@@ -405,7 +412,7 @@ function StatsBar({
                   {t("widget.common.assistantMessageActions.outputTokens")}
                 </Span>
                 <Span className="font-mono tabular-nums">
-                  {(completionTokens ?? 0).toLocaleString()}
+                  {(completionTokens ?? 0).toLocaleString(numberLocale)}
                 </Span>
               </Div>
               {cachedInputTokens !== null && cachedInputTokens > 0 && (
@@ -414,7 +421,7 @@ function StatsBar({
                     {t("widget.common.assistantMessageActions.cachedTokens")}
                   </Span>
                   <Span className="font-mono tabular-nums text-emerald-500/80">
-                    {cachedInputTokens.toLocaleString()}
+                    {cachedInputTokens.toLocaleString(numberLocale)}
                     {cachedPercent !== null && ` (${cachedPercent}%)`}
                   </Span>
                 </Div>
@@ -427,7 +434,7 @@ function StatsBar({
                     )}
                   </Span>
                   <Span className="font-mono tabular-nums text-sky-500/80">
-                    {cacheWriteTokens.toLocaleString()}
+                    {cacheWriteTokens.toLocaleString(numberLocale)}
                   </Span>
                 </Div>
               )}

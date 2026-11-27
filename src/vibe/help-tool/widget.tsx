@@ -680,6 +680,7 @@ export function HelpToolsWidget(): JSX.Element {
       endpointDef = await resolveCatalogEndpoint(alias);
     } catch (error) {
       logger.warn("Could not load catalog endpoint", {
+        alias,
         error: parseError(error).message,
       });
     }
