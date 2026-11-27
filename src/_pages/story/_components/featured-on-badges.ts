@@ -182,6 +182,16 @@ export const FEATURED_ON_BADGES: readonly FeaturedOnBadge[] = [
     height: 50,
   },
   {
+    // Free listing (accepted by James 2026-11-27) is verified on
+    // https://agenthunter.io/submit by a followed link to agenthunter.io on
+    // this site. Href is their official embed link (utm campaign = our name).
+    kind: "text",
+    slug: "agenthunter",
+    name: "AgentHunter",
+    href: "https://www.agenthunter.io?utm_source=badge&utm_medium=embed&utm_campaign=unbottled-ai",
+    rel: "noopener",
+  },
+  {
     kind: "text",
     slug: "aitooltrek",
     name: "AI Tool Trek",
