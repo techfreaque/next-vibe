@@ -720,6 +720,8 @@ export const translations = {
       uploadFile: "Attach files",
       attachedFiles: "Attached Files",
       addMore: "Add More",
+      unreadable:
+        "Your browser couldn't read an attachment. Remove it and select the file again.",
     },
   },
   outOfCredits: {

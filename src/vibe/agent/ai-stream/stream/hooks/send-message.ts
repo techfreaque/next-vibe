@@ -8,6 +8,7 @@ import { success } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { toast } from "next-vibe/ui/hooks/use-toast";
 import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 
@@ -21,6 +22,8 @@ import pathDefinitions from "../../../chat/threads/[threadId]/messages/path/defi
 import threadsDefinition from "../../../chat/threads/definition";
 import type { FavoriteConfig } from "../../../skills/favorites/db";
 import type { ChatModelId } from "../../models";
+import { scopedTranslation } from "../i18n";
+import { findUnreadableAttachment } from "./attachment-readability";
 import { getAudioQueue } from "./audio-queue";
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
@@ -103,6 +106,28 @@ export async function sendMessage(
   });
 
   try {
+    if (params.attachments.length > 0) {
+      sendStage = "check-attachments";
+      const failed = await findUnreadableAttachment(params.attachments);
+      if (failed) {
+        logger.error("Chat attachment is unreadable before send", {
+          sendStage,
+          errorName: failed.errorName,
+          attachmentIndex: failed.index,
+          attachmentBytes: failed.bytes,
+          attachmentCount: params.attachments.length,
+          rootFolderId: currentRootFolderId,
+        });
+        const { t } = scopedTranslation.scopedT(locale);
+        toast({
+          description: t("input.attachments.unreadable"),
+          variant: "destructive",
+        });
+        return { success: false, createdThreadId: null };
+      }
+      sendStage = "prepare-thread";
+    }
+
     // Determine thread ID to use
     let threadIdToUse: string | null;
     const hasToolConfirmations =

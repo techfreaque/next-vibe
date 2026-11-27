@@ -740,6 +740,8 @@ export const translations: typeof enTranslations = {
       uploadFile: "File di aggancio",
       attachedFiles: "File allegati",
       addMore: "Aggiungi altro",
+      unreadable:
+        "Il browser non ha potuto leggere un allegato. Rimuovilo e seleziona di nuovo il file.",
     },
   },
   outOfCredits: {

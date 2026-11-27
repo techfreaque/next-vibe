@@ -730,6 +730,8 @@ export const translations: typeof enTranslations = {
       uploadFile: "Joindre des fichiers",
       attachedFiles: "Fichiers joints",
       addMore: "Ajouter",
+      unreadable:
+        "Ton navigateur n’a pas pu lire une pièce jointe. Retire-la, puis sélectionne à nouveau le fichier.",
     },
   },
   outOfCredits: {

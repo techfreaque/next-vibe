@@ -177,9 +177,10 @@ export async function saveDraftAttachments(
       return;
     }
 
-    // Convert files to serializable format
+    // A file picker handle can outlive its backing file. Keep the readable
+    // attachments in the draft when a peer can no longer be opened.
     stage = "file-read";
-    const serializableFiles = await Promise.all(
+    const fileReads = await Promise.allSettled(
       files.map(async (file): Promise<SerializableFile> => ({
         name: file.name,
         type: file.type,
@@ -188,6 +189,23 @@ export async function saveDraftAttachments(
         data: await fileToBase64(file),
       })),
     );
+    const serializableFiles: SerializableFile[] = [];
+    for (const [attachmentIndex, result] of fileReads.entries()) {
+      if (result.status === "fulfilled") {
+        serializableFiles.push(result.value);
+      } else {
+        logger.error("Chat draft attachment is unreadable", {
+          stage,
+          errorName: result.reason instanceof Error ? result.reason.name : null,
+          attachmentIndex,
+          attachmentCount: files.length,
+        });
+      }
+    }
+    // Keep the last saved snapshot if none of the current handles can be read.
+    if (serializableFiles.length === 0) {
+      return;
+    }
 
     // Base64 attachments are MBs: IndexedDB on web, never localStorage
     stage = "storage";
@@ -198,7 +216,7 @@ export async function saveDraftAttachments(
     );
     logger.debug("Chat Input Autosave", "Saved draft attachments", {
       storageKey,
-      fileCount: files.length,
+      fileCount: serializableFiles.length,
     });
   } catch (error) {
     logger.error("Chat Input Autosave", "Failed to save draft attachments", {

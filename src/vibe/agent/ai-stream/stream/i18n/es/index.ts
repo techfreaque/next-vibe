@@ -735,6 +735,8 @@ export const translations: typeof enTranslations = {
       uploadFile: "Adjuntar archivos",
       attachedFiles: "Archivos adjuntos",
       addMore: "Añadir más",
+      unreadable:
+        "Tu navegador no pudo leer un archivo adjunto. Quítalo y vuelve a seleccionar el archivo.",
     },
   },
   outOfCredits: {

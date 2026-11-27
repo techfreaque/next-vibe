@@ -713,6 +713,8 @@ export const translations: typeof enTranslations = {
       uploadFile: "Załącz pliki",
       attachedFiles: "Załączone pliki",
       addMore: "Dodaj więcej",
+      unreadable:
+        "Przeglądarka nie mogła odczytać załącznika. Usuń go i wybierz plik ponownie.",
     },
   },
   outOfCredits: {

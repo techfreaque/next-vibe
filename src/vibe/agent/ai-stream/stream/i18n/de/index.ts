@@ -721,6 +721,8 @@ export const translations: typeof enTranslations = {
       uploadFile: "Dateien anhängen",
       attachedFiles: "Angehängte Dateien",
       addMore: "Weitere hinzufügen",
+      unreadable:
+        "Dein Browser konnte einen Anhang nicht lesen. Entferne ihn und wähle die Datei erneut aus.",
     },
   },
   outOfCredits: {

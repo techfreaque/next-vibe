@@ -725,6 +725,8 @@ export const translations: typeof enTranslations = {
       uploadFile: "Pripojiť súbory",
       attachedFiles: "Pripojené súbory",
       addMore: "Pridať ďalšie",
+      unreadable:
+        "Prehliadač nedokázal prečítať prílohu. Odstráň ju a znova vyber súbor.",
     },
   },
   outOfCredits: {
