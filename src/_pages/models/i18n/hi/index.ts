@@ -22,8 +22,11 @@ export const translations: typeof enTranslations = {
       titleMin: "{{model}} चैट ऑनलाइन",
       titleUncensored: "{{model}} अनसेंसर्ड चैट ऑनलाइन | {{appName}}",
       titleUncensoredShort: "{{model}} अनसेंसर्ड चैट ऑनलाइन",
-      titleLegacy: "{{model}} कीमत और कॉन्टेक्स्ट (पुराना) | {{appName}}",
-      titleLegacyShort: "{{model}} कीमत और कॉन्टेक्स्ट (पुराना)",
+      titleLegacy: "{{model}} (अब {{successor}}): चैट ऑनलाइन | {{appName}}",
+      titleLegacyShort: "{{model}} (अब {{successor}}): चैट ऑनलाइन",
+      titleLegacyMin: "{{model}}, अब {{successor}}: चैट ऑनलाइन",
+      titleLegacyNoSuccessor: "{{model}}: कीमत, कॉन्टेक्स्ट और विकल्प | {{appName}}",
+      titleLegacyNoSuccessorShort: "{{model}}: कीमत, कॉन्टेक्स्ट और विकल्प",
       description:
         "{{lab}} के {{model}} से ऑनलाइन चैट करें, कुछ इंस्टॉल नहीं, या API से: हर 1M टोकन पर {{input}} इनपुट, {{output}} आउटपुट, {{context}} कॉन्टेक्स्ट। {{hook}}",
       descriptionFlat:
@@ -430,7 +433,7 @@ export const translations: typeof enTranslations = {
     heading: "और पढ़ें",
     landings: {
       uncensored: {
-        title: "ब्राउज़र में अनसेंसर्ड AI चैट",
+        title: "अनसेंसर्ड AI: बिना फ़िल्टर वाले सभी मॉडल एक जगह",
         excerpt:
           "हर अनसेंसर्ड मॉडल एक लिस्ट में: कॉन्टेक्स्ट, हर मैसेज की कीमत और सीधा चैट लिंक।",
       },

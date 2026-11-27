@@ -230,19 +230,136 @@ export function listSitemapUrls(
   return urls;
 }
 
-export function buildSitemapXml(
+/**
+ * Child sitemaps by page type, one per type and locale, so Search Console
+ * reports indexing per type and language instead of one 5,000-URL blob.
+ */
+export const SITEMAP_TYPES = [
+  "story",
+  "blog",
+  "models",
+  "compare",
+  "skills",
+  "docs",
+] as const;
+export type SitemapType = (typeof SITEMAP_TYPES)[number];
+
+/** Page type of a locale-less sitemap path. */
+export function sitemapType(path: string): SitemapType {
+  if (path === "/story/blog" || path.startsWith("/story/blog/")) {
+    return "blog";
+  }
+  if (
+    path === "/models/compare" ||
+    path.startsWith("/models/compare/") ||
+    path.startsWith("/story/compare/")
+  ) {
+    return "compare";
+  }
+  if (
+    path === "/models" ||
+    path.startsWith("/models/") ||
+    path === "/create" ||
+    path.startsWith("/create/")
+  ) {
+    return "models";
+  }
+  if (path === "/skills" || path.startsWith("/skill/")) {
+    return "skills";
+  }
+  if (path === "/help" || path === "/docs" || path.startsWith("/docs/")) {
+    return "docs";
+  }
+  return "story";
+}
+
+/** One child sitemap: a page type in one locale. */
+export interface SitemapPart {
+  type: SitemapType;
+  locale: CountryLanguage;
+}
+
+/** Child sitemap URL (served by /sitemap.xml itself). */
+export function sitemapPartUrl(base: string, part: SitemapPart): string {
+  const query = new URLSearchParams({ type: part.type, locale: part.locale });
+  return `${base.replace(/\/+$/, "")}/sitemap.xml?${query.toString()}`;
+}
+
+/** Parse `?type=&locale=`; null when either is missing or unknown. */
+export function parseSitemapPart(params: URLSearchParams): SitemapPart | null {
+  const type = SITEMAP_TYPES.find((value) => value === params.get("type"));
+  const locale = sitemapLocales().find(
+    (value) => value === params.get("locale"),
+  );
+  return type && locale ? { type, locale } : null;
+}
+
+/**
+ * Sitemap index: every non-empty type x locale child, with the newest
+ * lastmod of its pages when any page has one.
+ */
+export function buildSitemapIndexXml(
   availability: AgentEnvAvailability,
   skillPages: readonly SitemapSkillPage[] = [],
   baseUrl: string = publicBaseUrl(),
 ): string {
   const base = baseUrl.replace(/\/+$/, "");
-  const locales = sitemapLocales();
+  const newest = new Map<SitemapType, string | null>();
+  for (const entry of collectSitemapEntries(availability, skillPages)) {
+    const type = sitemapType(entry.path);
+    const current = newest.get(type) ?? null;
+    newest.set(
+      type,
+      entry.lastmod !== null && (current === null || entry.lastmod > current)
+        ? entry.lastmod
+        : current,
+    );
+  }
+  const lines: string[] = [
+    `<?xml version="1.0" encoding="UTF-8"?>`,
+    `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
+  ];
+  for (const type of SITEMAP_TYPES) {
+    if (!newest.has(type)) {
+      continue;
+    }
+    const lastmod = newest.get(type) ?? null;
+    for (const locale of sitemapLocales()) {
+      lines.push(`  <sitemap>`);
+      lines.push(
+        `    <loc>${escapeXml(sitemapPartUrl(base, { type, locale }))}</loc>`,
+      );
+      if (lastmod !== null) {
+        lines.push(`    <lastmod>${lastmod}</lastmod>`);
+      }
+      lines.push(`  </sitemap>`);
+    }
+  }
+  lines.push(`</sitemapindex>`, ``);
+  return lines.join("\n");
+}
+
+/**
+ * A urlset with hreflang alternates: every page in every SEO locale, or only
+ * one child sitemap's pages when `part` is given.
+ */
+export function buildSitemapXml(
+  availability: AgentEnvAvailability,
+  skillPages: readonly SitemapSkillPage[] = [],
+  baseUrl: string = publicBaseUrl(),
+  part: SitemapPart | null = null,
+): string {
+  const base = baseUrl.replace(/\/+$/, "");
+  const locales = part === null ? sitemapLocales() : [part.locale];
   const lines: string[] = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
   ];
 
   for (const entry of collectSitemapEntries(availability, skillPages)) {
+    if (part !== null && sitemapType(entry.path) !== part.type) {
+      continue;
+    }
     const languageUrls = seoLanguageAlternates(base, entry.path);
     const alternates = Object.entries(languageUrls).map(
       ([language, url]) =>

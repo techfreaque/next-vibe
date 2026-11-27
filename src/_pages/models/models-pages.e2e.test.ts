@@ -289,7 +289,13 @@ describe("E2E: model pages", () => {
   );
 
   e2e.it("sitemap.xml is valid and lists model pages", async ({ page, baseUrl }) => {
-    const response = await page.request.get(`${baseUrl}/sitemap.xml`);
+    const index = await page.request.get(`${baseUrl}/sitemap.xml`);
+    expect(index.status()).toBe(200);
+    expect(await index.text()).toContain("<sitemapindex");
+    // Child sitemap: model pages in the default locale.
+    const response = await page.request.get(
+      `${baseUrl}/sitemap.xml?type=models&locale=${defaultLocale}`,
+    );
     expect(response.status()).toBe(200);
     expect(response.headers()["content-type"]).toContain("xml");
     const xml = await response.text();

@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { coreEnv } from "next-vibe/core/env";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { canonicalSeoLocale } from "next-vibe/core/i18n/core/seo-locales";
 import { VibeMode } from "next-vibe/env/env-util";
 import { SetupStatusRepository } from "next-vibe/env/settings/setup-status";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -67,7 +68,8 @@ export async function tanstackLoader({
     redirect(`/${locale}/threads/${DefaultFolderId.PRIVATE}/new`);
   }
 
-  permanentRedirect(`/${locale}/story`);
+  // Bare locale roots consolidate on the canonical locale's story page.
+  permanentRedirect(`/${canonicalSeoLocale(locale)}/story`);
 }
 
 export function TanstackPage(): never {

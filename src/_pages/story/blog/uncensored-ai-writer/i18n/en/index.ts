@@ -153,7 +153,7 @@ export const translations = {
     },
     bestLink: "The best uncensored LLM, picked by job",
     jailbreakLink: "Why jailbreaking ChatGPT for fiction keeps failing",
-    chatLink: "Uncensored AI chat in your browser",
+    chatLink: "Unfiltered AI in your browser: every uncensored model",
   },
   cta: {
     title: "Write the chapter you have been avoiding.",

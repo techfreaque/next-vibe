@@ -9,7 +9,18 @@
 
 import type { CountryLanguage } from "./config";
 
-/** Indexable locales - regional variants share a canonical page per language. */
+/**
+ * Indexable locales - regional variants share a canonical page per language.
+ *
+ * English: en-GLOBAL is the one English canonical (hreflang "en" and
+ * x-default). en-US serves the same text, prices (USD) and number format, so
+ * it canonicalizes to en-GLOBAL and stays out of hreflang and the sitemap
+ * (Google already folded en-US into en-GLOBAL). en-IN stays self-canonical in
+ * the hreflang cluster: it really differs (lakh/crore digit grouping in every
+ * price, credit and context number, India defaults, sibling of hi-IN), and
+ * hreflang lets Google serve it to Indian searchers while en-GLOBAL keeps the
+ * rest of the English signals.
+ */
 export const SEO_LOCALES: readonly CountryLanguage[] = [
   "de-DE",
   "pl-PL",
@@ -18,7 +29,6 @@ export const SEO_LOCALES: readonly CountryLanguage[] = [
   "es-ES",
   "sk-SK",
   "en-GLOBAL",
-  "en-US",
   "en-IN",
   "hi-IN",
 ];
@@ -62,7 +72,8 @@ export function seoLanguageAlternates(
 /**
  * Canonical locale for any served locale: itself when indexable, otherwise
  * the language's GLOBAL locale if indexable, else the language's first
- * indexable locale (de-US -> de-DE, en-PL -> en-GLOBAL), else the default.
+ * indexable locale (de-US -> de-DE, en-PL -> en-GLOBAL, en-US -> en-GLOBAL),
+ * else the default.
  */
 export function canonicalSeoLocale(locale: CountryLanguage): CountryLanguage {
   if (SEO_LOCALES.includes(locale)) {

@@ -743,7 +743,7 @@ export const translations: typeof enTranslations = {
     platform: {
       title: "Piattaforma",
       features: "Caratteristiche",
-      featuresUncensoredAi: "Chat IA senza censura",
+      featuresUncensoredAi: "AI senza censura",
       featuresAbliterated: "Modelli IA abliterated",
       featuresSelfHosted: "Agente sul tuo computer",
       featuresApiDocs: "Documentazione API",

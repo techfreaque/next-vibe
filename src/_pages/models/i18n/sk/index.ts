@@ -22,8 +22,13 @@ export const translations: typeof enTranslations = {
       titleMin: "{{model}} čet online",
       titleUncensored: "{{model}} čet online bez cenzúry | {{appName}}",
       titleUncensoredShort: "{{model}} čet online bez cenzúry",
-      titleLegacy: "{{model}}: cena a kontext (archív) | {{appName}}",
-      titleLegacyShort: "{{model}}: cena a kontext (archív)",
+      titleLegacy:
+        "{{model}} (nahradil ho {{successor}}): čet online | {{appName}}",
+      titleLegacyShort: "{{model}} (nahradil ho {{successor}}): čet online",
+      titleLegacyMin: "{{model}}, teraz {{successor}}: čet online",
+      titleLegacyNoSuccessor:
+        "{{model}}: cena, kontext a alternatívy | {{appName}}",
+      titleLegacyNoSuccessorShort: "{{model}}: cena, kontext a alternatívy",
       description:
         "Četujte s {{model}} od {{lab}} online, bez inštalácie, alebo cez API: vstup {{input}}, výstup {{output}} za 1M tokenov, kontext {{context}}. {{hook}}",
       descriptionFlat:
@@ -443,7 +448,7 @@ export const translations: typeof enTranslations = {
     heading: "Čítaj ďalej",
     landings: {
       uncensored: {
-        title: "AI chat bez cenzúry v prehliadači",
+        title: "AI bez cenzúry: všetky nefiltrované modely na jednom mieste",
         excerpt:
           "Všetky modely bez cenzúry na jednom mieste. Kontextové okno, cena za správu a priamy odkaz na chat.",
       },

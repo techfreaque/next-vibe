@@ -20,8 +20,13 @@ export const translations = {
       titleMin: "{{model}} chat online",
       titleUncensored: "{{model}} chat online, uncensored | {{appName}}",
       titleUncensoredShort: "{{model}} chat online, uncensored",
-      titleLegacy: "{{model}} price & context (legacy) | {{appName}}",
-      titleLegacyShort: "{{model}} price & context (legacy)",
+      titleLegacy:
+        "{{model}} (replaced by {{successor}}): chat online | {{appName}}",
+      titleLegacyShort: "{{model}} (replaced by {{successor}}): chat online",
+      titleLegacyMin: "{{model}}, now {{successor}}: chat online",
+      titleLegacyNoSuccessor:
+        "{{model}}: price, context and alternatives | {{appName}}",
+      titleLegacyNoSuccessorShort: "{{model}}: price, context and alternatives",
       description:
         "Chat with {{model}} by {{lab}} online, no install, or via API: {{input}} input, {{output}} output per 1M tokens, {{context}} context. {{hook}}",
       descriptionFlat:
@@ -431,7 +436,7 @@ export const translations = {
     heading: "Read more",
     landings: {
       uncensored: {
-        title: "Uncensored AI chat in your browser",
+        title: "Uncensored AI: every unfiltered model in one list",
         excerpt:
           "Every uncensored model in one list: context, price per message and a direct chat link.",
       },

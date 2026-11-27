@@ -721,7 +721,7 @@ export const translations: typeof enTranslations = {
     platform: {
       title: "प्लेटफ़ॉर्म",
       features: "फ़ीचर्स",
-      featuresUncensoredAi: "अनसेंसर्ड AI चैट",
+      featuresUncensoredAi: "अनसेंसर्ड AI",
       featuresAbliterated: "Abliterated AI चैट",
       featuresSelfHosted: "सेल्फ़-होस्टेड एजेंट",
       featuresApiDocs: "API डॉक्स",

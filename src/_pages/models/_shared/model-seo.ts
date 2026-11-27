@@ -184,12 +184,23 @@ export function chatModelMeta(
     successor: facts.successor?.name ?? "",
   };
   if (facts.isLegacy) {
+    // Retired pages still rank for the model name: lead with it and the
+    // successor ("GPT-5 (replaced by GPT-6.1): chat online"), never a
+    // "(legacy)" label that tells searchers to skip the result.
     return {
-      title: fitTitle(
-        t("meta.model.titleLegacy", vars),
-        t("meta.model.titleLegacyShort", vars),
-        t("meta.model.titleMin", vars),
-      ),
+      title:
+        facts.successor === null
+          ? fitTitle(
+              t("meta.model.titleLegacyNoSuccessor", vars),
+              t("meta.model.titleLegacyNoSuccessorShort", vars),
+              t("meta.model.titleMin", vars),
+            )
+          : fitTitle(
+              t("meta.model.titleLegacy", vars),
+              t("meta.model.titleLegacyShort", vars),
+              t("meta.model.titleLegacyMin", vars),
+              t("meta.model.titleMin", vars),
+            ),
       description:
         facts.successor === null
           ? fitDescription(

@@ -727,7 +727,7 @@ export const translations = {
     platform: {
       title: "Platform",
       features: "Features",
-      featuresUncensoredAi: "Uncensored AI chat",
+      featuresUncensoredAi: "Uncensored AI",
       featuresAbliterated: "Abliterated AI chat",
       featuresSelfHosted: "Self-Hosted Agent",
       featuresApiDocs: "API docs",

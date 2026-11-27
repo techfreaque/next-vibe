@@ -17,9 +17,13 @@ import {
 import { listMediaFacts } from "../../models/_shared/model-media-facts";
 import { BLOG_POST_DATES } from "../../story/blog/posts-meta";
 import {
+  buildSitemapIndexXml,
   buildSitemapXml,
   collectSitemapEntries,
+  parseSitemapPart,
   SITEMAP_STATIC_PATHS,
+  SITEMAP_TYPES,
+  sitemapType,
 } from "./build-sitemap";
 import * as rootRoute from "./root-route";
 
@@ -114,15 +118,66 @@ describe("sitemap.xml", () => {
 
   test("GET serves model pages whenever a chat provider key is configured", async () => {
     const availability = await getEnvAvailability();
-    const response = await rootRoute.GET();
-    expect(response.status).toBe(200);
-    const xml = await response.text();
-    const modelLocs = locs(xml).filter((url) => url.includes("/models/"));
-    const skillLocs = locs(xml).filter((url) => url.includes("/skill/"));
-    expect(skillLocs.length).toBeGreaterThan(0);
+    const index = await rootRoute.GET(
+      new Request("http://localhost/sitemap.xml"),
+    );
+    expect(index.status).toBe(200);
+    const children = locs(await index.text());
+    expect(children.length).toBeGreaterThan(0);
+    const fetchChild = async (type: string): Promise<string[]> => {
+      const child = children.find((url) =>
+        url.endsWith(`?type=${type}&amp;locale=en-GLOBAL`),
+      );
+      if (!child) {
+        return [];
+      }
+      const query = child.slice(child.indexOf("?")).replaceAll("&amp;", "&");
+      const response = await rootRoute.GET(
+        new Request(`http://localhost/sitemap.xml${query}`),
+      );
+      expect(response.status).toBe(200);
+      return locs(await response.text());
+    };
+    expect((await fetchChild("skills")).length).toBeGreaterThan(0);
     if (listModelFacts(availability).length > 0) {
-      expect(modelLocs.length).toBeGreaterThan(0);
+      expect((await fetchChild("models")).length).toBeGreaterThan(0);
     }
+    const unknown = await rootRoute.GET(
+      new Request("http://localhost/sitemap.xml?type=nope&locale=en-GLOBAL"),
+    );
+    expect(unknown.status).toBe(404);
+    const nonCanonical = await rootRoute.GET(
+      new Request("http://localhost/sitemap.xml?type=blog&locale=en-US"),
+    );
+    expect(nonCanonical.status).toBe(404);
+  });
+
+  test("index splits every URL into exactly one type x locale child", () => {
+    const skillPages = [{ id: "community-skill", updatedAt: null }];
+    const full = locs(buildSitemapXml(ALL, skillPages, BASE));
+    const index = buildSitemapIndexXml(ALL, skillPages, BASE);
+    expect(index).toContain("<sitemapindex");
+    const children = locs(index);
+    expect(children.length).toBe(SITEMAP_TYPES.length * SEO_LOCALES.length);
+    const union: string[] = [];
+    for (const child of children) {
+      const params = new URL(child.replaceAll("&amp;", "&")).searchParams;
+      const part = parseSitemapPart(params);
+      if (!part) {
+        expect.unreachable(`unparseable child ${child}`);
+      }
+      const urls = locs(buildSitemapXml(ALL, skillPages, BASE, part));
+      expect(urls.length, child).toBeGreaterThan(0);
+      for (const url of urls) {
+        expect(url.startsWith(`${BASE}/${part.locale}/`), url).toBe(true);
+        const path = new URL(url).pathname.slice(part.locale.length + 1);
+        expect(sitemapType(path), url).toBe(part.type);
+      }
+      union.push(...urls);
+    }
+    expect(union.toSorted()).toEqual(full.toSorted());
+    // en-US canonicalizes to en-GLOBAL: never listed.
+    expect(full.some((url) => url.startsWith(`${BASE}/en-US/`))).toBe(false);
   });
 
   test("omits redirecting paths and skill IDs that do not resolve as landing pages", () => {

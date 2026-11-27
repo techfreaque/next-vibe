@@ -22,8 +22,13 @@ export const translations: typeof enTranslations = {
       titleMin: "{{model}} czat online",
       titleUncensored: "{{model}} czat online bez cenzury | {{appName}}",
       titleUncensoredShort: "{{model}} czat online bez cenzury",
-      titleLegacy: "{{model}}: cena i kontekst (starsza wersja) | {{appName}}",
-      titleLegacyShort: "{{model}}: cena i kontekst (starsza wersja)",
+      titleLegacy:
+        "{{model}} (zastąpił go {{successor}}): czat online | {{appName}}",
+      titleLegacyShort: "{{model}} (zastąpił go {{successor}}): czat online",
+      titleLegacyMin: "{{model}}, teraz {{successor}}: czat online",
+      titleLegacyNoSuccessor:
+        "{{model}}: cena, kontekst i alternatywy | {{appName}}",
+      titleLegacyNoSuccessorShort: "{{model}}: cena, kontekst i alternatywy",
       description:
         "Rozmawiaj z {{model}} od {{lab}} online, bez instalacji, albo przez API: {{input}} wejście, {{output}} wyjście za 1M tokenów, kontekst {{context}}. {{hook}}",
       descriptionFlat:
@@ -443,7 +448,7 @@ export const translations: typeof enTranslations = {
     heading: "Czytaj dalej",
     landings: {
       uncensored: {
-        title: "Czat AI bez cenzury w przeglądarce",
+        title: "AI bez cenzury: wszystkie modele bez filtrów w jednym miejscu",
         excerpt:
           "Wszystkie modele bez cenzury w jednym miejscu: kontekst, cena za wiadomość i bezpośredni link do czatu.",
       },

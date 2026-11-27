@@ -132,8 +132,9 @@ describe("E2E: story home", () => {
       }
 
       // Primary CTA goes straight into the product
+      // (the final composer URL, no redirect hop: e32ebdfb21)
       expect(await primaryCta(page).getAttribute("href")).toBe(
-        `/${defaultLocale}/threads`,
+        `/${defaultLocale}/threads/incognito/new`,
       );
 
       // "Explore" opens the unbottled story below the split, in place

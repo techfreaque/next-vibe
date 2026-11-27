@@ -88,7 +88,7 @@ export const translations = {
       "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter. Plans from {{subPrice}} a month. Uncensored models unlock after a one-time 18+ confirmation.",
     open: "Open source: the whole platform is on GitHub and actively developed. Self-host it if you want your own instance.",
     weak: "Where we are weaker: no flat all-in plan, and video costs real credits here too. FreedomGPT's free start with no account is as easy as ours.",
-    hubLink: "Uncensored AI chat: all models, with context and price",
+    hubLink: "Uncensored AI: every unfiltered model, with context and price",
     abliteratedLink: "Abliterated models you can chat with in the browser",
     libertyLink: "See FreedomGPT Liberty on {{appName}}",
     ownLink: "See {{ownModel}}",

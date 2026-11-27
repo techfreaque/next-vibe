@@ -137,14 +137,7 @@ describe.skipIf(!origin)("public page SEO contract", () => {
     test(
       `initial HTML for ${locale}`,
       async () => {
-        const sitemap = await getPage("/sitemap.xml");
-        expect(sitemap.status).toBe(200);
-        const xml = await sitemap.text();
-        const sitemapUrls = new Set(
-          [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
-            (match) => match[1] ?? "",
-          ),
-        );
+        const sitemapUrls = await listSitemapUrls();
         const canonicalOrigin = new URL([...sitemapUrls][0] ?? "").origin;
         const paths = [...sitemapUrls]
           .map((url) => new URL(url).pathname)
@@ -215,7 +208,84 @@ describe.skipIf(!origin)("public page SEO contract", () => {
       `/${locale}/story/compare/uncensored-ai-platforms`,
     );
   }, 60_000);
+
+  test("old routes, bare locales and non-canonical roots redirect in one hop", async () => {
+    const cases: [string, number, string][] = [
+      ["/", 307, "/en-GLOBAL/story"],
+      ["/en-GLOBAL", 308, "/en-GLOBAL/story"],
+      ["/en-US", 308, "/en-GLOBAL/story"],
+      ["/de-US", 308, "/de-DE/story"],
+      ["/de-GLOBAL", 308, "/de-DE/story"],
+      ["/de", 308, "/de-DE/story"],
+      ["/en-GLOBAL/about-us", 308, "/en-GLOBAL/story/about-us"],
+      ["/de-PL/privacy-policy", 308, "/de-DE/story/privacy-policy"],
+      ["/en-US/terms-of-service", 308, "/en-GLOBAL/story/terms-of-service"],
+      ["/en-PL/imprint", 308, "/en-GLOBAL/story/imprint"],
+      ["/de-DE/contact", 308, "/de-DE/help"],
+      ["/en-US/login", 308, "/en-US/user/login"],
+      ["/en-DE/reset-password", 308, "/en-DE/user/reset-password"],
+      ["/en-PL/story/docs/patterns/database.md", 308, "/en-GLOBAL/story/framework"],
+      ["/v1/audio", 307, "/en-GLOBAL/docs/api"],
+    ];
+    for (const [path, status, location] of cases) {
+      const response = await getPage(path);
+      expect(response.status, path).toBe(status);
+      const target = new URL(response.headers.get("location") ?? "", origin);
+      expect(target.pathname, path).toBe(location);
+      const final = await getPage(`${target.pathname}${target.search}`);
+      expect([200, 307].includes(final.status), `${path} -> ${location}`).toBe(
+        true,
+      );
+      if (final.status === 307) {
+        // Only app pages may redirect again (guest login/chat routing).
+        expect(location, path).toMatch(/\/(?:user|threads)\//);
+      }
+    }
+    // en-US serves, but canonicalizes to en-GLOBAL and is not an alternate.
+    const enUs = await getPage("/en-US/story/uncensored-ai");
+    expect(enUs.status).toBe(200);
+    const head = await inspectHtml(await enUs.text());
+    expect(head.canonicals.map((url) => new URL(url).pathname)).toEqual([
+      "/en-GLOBAL/story/uncensored-ai",
+    ]);
+    expect(head.alternates["en-US"]).toBeUndefined();
+  }, 120_000);
 });
+
+function locs(xml: string): string[] {
+  return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
+    (match[1] ?? "").replaceAll("&amp;", "&"),
+  );
+}
+
+let sitemapUrlsOnce: Promise<Set<string>> | undefined;
+
+/** Every page URL: the sitemap index, then each child sitemap (once). */
+function listSitemapUrls(): Promise<Set<string>> {
+  sitemapUrlsOnce ??= fetchSitemapUrls().catch((error: Error) => {
+    // A timed-out fetch must not fail every later locale too.
+    sitemapUrlsOnce = undefined;
+    throw error;
+  });
+  return sitemapUrlsOnce;
+}
+
+async function fetchSitemapUrls(): Promise<Set<string>> {
+  const index = await getPage("/sitemap.xml");
+  expect(index.status).toBe(200);
+  const xml = await index.text();
+  expect(xml).toContain("<sitemapindex");
+  const urls = new Set<string>();
+  for (const child of locs(xml)) {
+    const { pathname, search } = new URL(child);
+    const response = await getPage(`${pathname}${search}`);
+    expect(response.status, child).toBe(200);
+    for (const url of locs(await response.text())) {
+      urls.add(url);
+    }
+  }
+  return urls;
+}
 
 function getPage(path: string): Promise<Response> {
   // This exercises browser documents, including response codes and raw SEO metadata.

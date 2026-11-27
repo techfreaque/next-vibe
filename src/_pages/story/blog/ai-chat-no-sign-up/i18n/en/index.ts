@@ -135,7 +135,7 @@ export const translations = {
       q: "What happens when my free credits run out?",
       a: "Wait for next month's allowance, or create a free account and verify your email for up to {{freeCredits}} credits a month. Credits you already spent as a guest that month count toward that total.",
     },
-    chatLink: "Uncensored AI chat in your browser",
+    chatLink: "Unfiltered AI in your browser: every uncensored model",
     chatgptLink: "A ChatGPT alternative with uncensored models",
   },
   cta: {

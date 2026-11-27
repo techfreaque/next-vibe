@@ -8,6 +8,7 @@
 import { describe, expect, it } from "bun:test";
 import { NextRequest } from "next-vibe/ui/lib/request";
 
+import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
 import { INDEXNOW_KEY_PATH } from "@/seo/indexnow/constants";
 
 import { languageConfig } from "../../../../core/i18n";
@@ -199,6 +200,36 @@ describe("middleware locale redirect", () => {
     expect(res.headers.get("location")).toBe(
       "http://localhost:3000/en-GLOBAL/user/referral?ref=abc&utm_source=x",
     );
+  });
+
+  it("resolves bare locales and old routes in one hop", async () => {
+    const cases: [string, number, string][] = [
+      ["/", 307, "/en-GLOBAL/story"],
+      ["/de-US", 308, "/de-DE/story"],
+      ["/en-US/", 308, "/en-GLOBAL/story"],
+      ["/de-DE", 308, "/de-DE/story"],
+      ["/de", 308, "/de-DE/story"],
+      ["/en-us", 308, "/en-GLOBAL/story"],
+      ["/de-PL/about-us", 308, "/de-DE/story/about-us"],
+      ["/de-pl/about-us", 308, "/de-DE/story/about-us"],
+      ["/en-US/login?next=x", 308, "/en-US/user/login?next=x"],
+      ["/login", 307, "/en-GLOBAL/user/login"],
+      ["/v1/audio", 307, "/en-GLOBAL/docs/api"],
+      ["/de-GLOBAL/contact", 308, "/de-DE/help"],
+    ];
+    for (const [path, status, location] of cases) {
+      const res = await middleware(request(path), options);
+      expect(res.status, path).toBe(status);
+      expect(res.headers.get("location"), path).toBe(
+        `http://localhost:3000${location}`,
+      );
+    }
+    // Signed-in visitors: the locale page decides (chat), no story redirect.
+    const signedIn = await middleware(
+      request("/de-DE", { cookie: `${AUTH_TOKEN_COOKIE_NAME}=x` }),
+      options,
+    );
+    expect(signedIn.headers.get("location")).toBeNull();
   });
 
   it("passes the model changelog feed through to the root handler", async () => {

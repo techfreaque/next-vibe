@@ -87,7 +87,7 @@ export const translations = {
       "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter. Plans from {{subPrice}} a month. Uncensored models unlock after a one-time 18+ confirmation.",
     api: "API: the same models over OpenAI and Anthropic compatible endpoints. Any plan from {{apiSubPrice}} a month unlocks it.",
     weak: "Where we are weaker: no flat plan, every message costs credits by model, and Gab lists {{gabModels}} models where we run {{modelCount}}. Gab's credit packs work without a plan; ours top up an active plan and never expire.",
-    hubLink: "Uncensored AI chat: all models, with context and price",
+    hubLink: "Uncensored AI: every unfiltered model, with context and price",
     abliteratedLink: "Abliterated models you can chat with in the browser",
     ownLink: "See {{ownModel}}",
     aryaLink: "See Gab AI Arya on {{appName}}",

@@ -66,7 +66,7 @@ export const translations = {
       "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter. Plans from {{subPrice}} a month. Credit packs top up an active plan and never expire.",
     api: "API: the same models over OpenAI and Anthropic compatible endpoints. Any plan from {{apiSubPrice}} a month unlocks it.",
     weak: "Where we are weaker: no flat unlimited plan. Every message costs credits, and the price depends on the model you pick.",
-    hubLink: "Uncensored AI chat: all models, with context and price",
+    hubLink: "Uncensored AI: every unfiltered model, with context and price",
     ownLink: "See {{ownModel}}",
   },
   list: {

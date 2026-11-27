@@ -133,7 +133,7 @@ export const translations = {
     },
     alternativeLink: "A ChatGPT alternative without filters: model picks",
     refusalLink: "Which AI actually answers? The refusal index",
-    chatLink: "Uncensored AI chat in your browser",
+    chatLink: "Unfiltered AI in your browser: every uncensored model",
   },
   cta: {
     title: "Skip the jailbreak. Ask the question.",

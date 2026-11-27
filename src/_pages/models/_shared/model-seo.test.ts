@@ -137,9 +137,29 @@ describe("model page titles and descriptions", () => {
   test("current chat titles lead with '<model> chat online'", () => {
     for (const facts of listModelFacts(ALL)) {
       const title = chatModelMeta(facts, "en-US").title;
-      expect(title.startsWith(`${facts.name} chat online`)).toBe(
-        !facts.isLegacy,
-      );
+      if (!facts.isLegacy) {
+        expect(title.startsWith(`${facts.name} chat online`)).toBe(true);
+      }
+    }
+  });
+
+  test("retired titles lead with the model and name the successor, never 'legacy'", () => {
+    const labels = /legacy|veraltet|starsza wersja|modelo anterior|ancien|modello precedente|archív|पुराना/i;
+    for (const locale of LOCALES) {
+      for (const facts of listModelFacts(ALL)) {
+        if (!facts.isLegacy) {
+          continue;
+        }
+        const { title } = chatModelMeta(facts, locale);
+        expect(title, title).not.toMatch(labels);
+        expect(title.includes(facts.name), title).toBe(true);
+        if (
+          facts.successor !== null &&
+          facts.name.length + facts.successor.name.length <= 30
+        ) {
+          expect(title.includes(facts.successor.name), title).toBe(true);
+        }
+      }
     }
   });
 

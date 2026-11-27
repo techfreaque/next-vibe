@@ -192,7 +192,7 @@ describe("robots.txt rules", () => {
     });
     expect(metadata.robots).toEqual(NOINDEX_FOLLOW_ROBOTS);
     expect(metadata.alternates?.canonical).toMatch(
-      /\/en-US\/threads\/incognito\/new$/,
+      /\/en-GLOBAL\/threads\/incognito\/new$/,
     );
   });
 

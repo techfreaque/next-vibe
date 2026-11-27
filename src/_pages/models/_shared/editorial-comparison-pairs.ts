@@ -99,6 +99,13 @@ export const UNBIASED_CHATBOT_PAIRS: readonly EditorialModelPair[] = [
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
 ];
 
+export const GROK_ALTERNATIVE_PAIRS: readonly EditorialModelPair[] = [
+  [ChatModelId.GROK_4_7, ChatModelId.GLM_5_3_UNCENSORED],
+  [ChatModelId.GROK_4_7, ChatModelId.KIMI_K3_1_PRO_UNCENSORED],
+  [ChatModelId.GROK_4_7, ChatModelId.UNCENSORED_LM_V1_2],
+  [ChatModelId.GROK_4_7, ChatModelId.GPT_6_2_SOL],
+];
+
 export const WRITING_PAIRS: readonly EditorialModelPair[] = [
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.DRUMMER_ARTEMIS_31B],
@@ -136,6 +143,7 @@ export const EDITORIAL_COMPARISON_PAIRS: readonly EditorialModelPair[] = [
   ...DEEPSEEK_PAIRS,
   ...COMPATIBLE_API_PAIRS,
   ...UNBIASED_CHATBOT_PAIRS,
+  ...GROK_ALTERNATIVE_PAIRS,
   ...WRITING_PAIRS,
   ...HOSTED_MODEL_PAIRS,
   ...UNCENSORED_USE_CASE_PAIRS,

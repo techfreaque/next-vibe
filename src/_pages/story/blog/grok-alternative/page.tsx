@@ -24,6 +24,7 @@ import { JsonLd } from "next-vibe/ui/components/json-ld";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { GROK_ALTERNATIVE_PAIRS } from "@/_pages/models/_shared/editorial-comparison-pairs";
 import {
   createPageHref,
   listMediaFacts,
@@ -84,12 +85,8 @@ const NEEDS: readonly (readonly [NeedKey, ChatModelId])[] = [
 ];
 
 /** Grok against the uncensored picks, then against a mainstream model. */
-const PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [GROK_ID, ChatModelId.GLM_5_3_UNCENSORED],
-  [GROK_ID, ChatModelId.KIMI_K3_1_PRO_UNCENSORED],
-  [GROK_ID, ChatModelId.UNCENSORED_LM_V1_2],
-  [GROK_ID, ChatModelId.GPT_6_2_SOL],
-];
+/** Registered as editorial pairs so every linked comparison is in the sitemap. */
+const PAIRS = GROK_ALTERNATIVE_PAIRS;
 
 const KEEP_STEPS: readonly ("ask" | "switch" | "compare")[] = [
   "ask",

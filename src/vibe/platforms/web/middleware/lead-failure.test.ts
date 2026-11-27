@@ -56,9 +56,11 @@ it("limits public fallback to anonymous read-only documents and keeps real DB er
   const report = captureErrors();
   const create = spyOn(leadOps, "createAnonymousLead");
   for (const [path, method, cookie, operation, reason, status] of [
-    ["/en-US", "GET", "", "insert", "Query read timeout", 200],
-    ["/en-US/", "HEAD", "", "insert", "Query read timeout", 200],
-    ["/en-US?ref=fixture", "GET", "", "insert", "Query read timeout", 503],
+    // Bare locale roots redirect guests to the story page before any lead
+    // work (locale-redirect.test.ts), so the fallback is checked on pages.
+    ["/en-US/models", "GET", "", "insert", "Query read timeout", 200],
+    ["/en-US/story/", "HEAD", "", "insert", "Query read timeout", 200],
+    ["/en-US/story?ref=fixture", "GET", "", "insert", "Query read timeout", 200],
     [
       "/en-US/tools?cat=ai",
       "GET",

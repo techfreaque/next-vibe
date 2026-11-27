@@ -11,10 +11,12 @@ import {
   CSRF_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
 } from "@/env/constants";
+import { legacyRedirectPath, pathAfterLocale } from "@/seo/legacy-routes";
 
 import { repairMangledStorageUrl } from "../../../agent/chat/storage/storage-url";
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { canonicalSeoLocale } from "../../../core/i18n/core/seo-locales";
 import { parseError } from "../../../core/utils/parse-error";
 import { Environment, VibeMode } from "../../../env/env-util";
 import { SetupStatusRepository } from "../../../env/settings/setup-status";
@@ -172,28 +174,73 @@ export async function middleware(
     });
   }
 
+  // Guests on the web build land on the story page, never on a bare locale.
+  const storyHome =
+    coreEnv.NEXT_PUBLIC_VIBE_MODE !== VibeMode.AGENT &&
+    !request.cookies.has(AUTH_TOKEN_COOKIE_NAME) &&
+    !SetupStatusRepository.isPending();
+  const isApiPath = path === "/api" || path.startsWith("/api/");
+
   // Step 1: Locale redirect. A locale-shaped first segment (/en/, /fr-FR/,
   // /en-us/) is REPLACED by the negotiated locale, any other path is prefixed.
   // One redirect, query string kept (?ref= track links survive).
   const localeRedirect = detectLocale(request, options);
   if (localeRedirect) {
     const destination = buildLocaleRedirectPath(path, localeRedirect);
-    const directStory =
-      path === "/" &&
-      coreEnv.NEXT_PUBLIC_VIBE_MODE !== VibeMode.AGENT &&
-      !request.cookies.has(AUTH_TOKEN_COOKIE_NAME) &&
-      !SetupStatusRepository.isPending();
-    const redirectUrl = new URL(
-      directStory ? `${destination}/story` : destination,
-      publicOrigin,
-    );
+    // `/` negotiates the visitor's locale (cookie, browser, country): a
+    // temporary redirect, straight to that locale's story page.
+    if (path === "/") {
+      const rootUrl = new URL(
+        storyHome ? `${destination}/story` : destination,
+        publicOrigin,
+      );
+      rootUrl.search = request.nextUrl.search;
+      return NextResponseClass.redirect(rootUrl);
+    }
+    // Old routes and bare locales resolve in this same hop. The redirect is
+    // permanent when the target no longer depends on negotiation: a casing
+    // fix or a bare language (/de -> /de-DE), or a canonical-locale target
+    // for a supported language (/de-us/about-us -> /de-DE/story/about-us).
+    const legacyTarget = isApiPath
+      ? null
+      : legacyRedirectPath(
+          localeRedirect.locale,
+          pathAfterLocale(destination, localeRedirect.locale),
+          { storyHome },
+        );
+    const sameLanguage =
+      localeRedirect.replaceSegment &&
+      localeRedirect.locale.split("-")[0] ===
+        (path.split("/").find(Boolean) ?? "").slice(0, 2).toLowerCase();
+    const permanent =
+      localeRedirect.permanent ||
+      (sameLanguage &&
+        legacyTarget !== null &&
+        legacyTarget.startsWith(
+          `/${canonicalSeoLocale(localeRedirect.locale)}/`,
+        ));
+    const redirectUrl = new URL(legacyTarget ?? destination, publicOrigin);
     redirectUrl.search = request.nextUrl.search;
-    return NextResponseClass.redirect(redirectUrl);
+    return NextResponseClass.redirect(redirectUrl, permanent ? 308 : 307);
   }
 
   // Step 2: Extract locale from path for leadId middleware
   const locale =
     (extractLocaleFromPath(path) as CountryLanguage) || options.defaultLocale;
+
+  // Old routes (/<locale>/about-us, /<locale>/login) and bare locale roots
+  // (/de-US -> /de-DE/story): one permanent hop to the current page.
+  const legacyTarget = isApiPath
+    ? null
+    : legacyRedirectPath(locale, pathAfterLocale(path, locale), {
+        storyHome,
+      });
+  if (legacyTarget !== null && legacyTarget !== path) {
+    return NextResponseClass.redirect(
+      new URL(`${legacyTarget}${request.nextUrl.search}`, publicOrigin),
+      308,
+    );
+  }
 
   if (
     path === `/${locale}/story/compare` ||

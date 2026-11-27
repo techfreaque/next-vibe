@@ -148,7 +148,7 @@ export const translations = {
       q: "Are abliterated models truly uncensored?",
       a: "They stop refusing, but they keep their base model's training and worldview. {{ownModel}} is different: it is trained on books and documents banned from the mainstream internet, resulting in a model with contrary political opinions.",
     },
-    chatLink: "Uncensored AI chat in your browser",
+    chatLink: "Unfiltered AI in your browser: every uncensored model",
     platformsLink: "Uncensored AI platforms compared, local runners included",
   },
   cta: {

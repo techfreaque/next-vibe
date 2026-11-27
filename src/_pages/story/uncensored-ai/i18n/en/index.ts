@@ -1,6 +1,6 @@
 export const translations = {
-  title: "Uncensored AI chat in your browser",
-  metaTitle: "Uncensored AI chat online, no sign-up | {{appName}}",
+  title: "Uncensored AI: unfiltered models in your browser",
+  metaTitle: "Uncensored AI: unfiltered models, no sign-up | {{appName}}",
   description:
     "Try an uncensored AI chatbot in your browser with free guest credits. Compare models by context window and estimated cost, or start chatting right away.",
   keywords:

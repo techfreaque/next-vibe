@@ -22,8 +22,14 @@ export const translations: typeof enTranslations = {
       titleMin: "{{model}} online chatten",
       titleUncensored: "{{model}} unzensiert online chatten | {{appName}}",
       titleUncensoredShort: "{{model}} unzensiert online chatten",
-      titleLegacy: "{{model}}: Preis & Kontext (veraltet) | {{appName}}",
-      titleLegacyShort: "{{model}}: Preis & Kontext (veraltet)",
+      titleLegacy:
+        "{{model}} (ersetzt durch {{successor}}): online chatten | {{appName}}",
+      titleLegacyShort:
+        "{{model}} (ersetzt durch {{successor}}): online chatten",
+      titleLegacyMin: "{{model}}, jetzt {{successor}}: online chatten",
+      titleLegacyNoSuccessor:
+        "{{model}}: Preis, Kontext und Alternativen | {{appName}}",
+      titleLegacyNoSuccessorShort: "{{model}}: Preis, Kontext und Alternativen",
       description:
         "{{model}} von {{lab}} im Browser chatten, ohne Installation, oder per API: {{input}} Input, {{output}} Output pro 1M Token, {{context}} Kontext. {{hook}}",
       descriptionFlat:
@@ -441,7 +447,7 @@ export const translations: typeof enTranslations = {
     heading: "Weiterlesen",
     landings: {
       uncensored: {
-        title: "Unzensierter KI-Chat im Browser",
+        title: "Unzensierte KI: alle ungefilterten Modelle auf einen Blick",
         excerpt:
           "Alle unzensierten Modelle auf einen Blick: Kontext, Preis pro Nachricht und direkter Chat-Link.",
       },

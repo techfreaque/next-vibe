@@ -64,6 +64,11 @@ function normalizeLocaleFormat(locale: string): string {
 export interface LocaleRedirect {
   locale: CountryLanguage;
   replaceSegment: boolean;
+  /**
+   * The target never depends on cookie, browser or country (casing fix, bare
+   * language): safe as a permanent redirect.
+   */
+  permanent: boolean;
 }
 
 /** Locale-shaped segment: xx-YY / xx_YY / xx-GLOBAL (any casing). */
@@ -284,7 +289,7 @@ export function detectLocale(
       // Correct casing -> no redirect; wrong casing (en-us) -> fix it
       return localeSegment === matchedLocale
         ? null
-        : { locale: matchedLocale, replaceSegment: true };
+        : { locale: matchedLocale, replaceSegment: true, permanent: true };
     }
 
     const isLanguageOnly =
@@ -300,6 +305,7 @@ export function detectLocale(
         return {
           locale: findLocale(supportedLocales, canonical) ?? fallback,
           replaceSegment: true,
+          permanent: true,
         };
       }
     }
@@ -316,6 +322,7 @@ export function detectLocale(
             supportedLanguages.has(language) ? language : undefined,
           ),
         replaceSegment: true,
+        permanent: false,
       };
     }
   }
@@ -328,6 +335,7 @@ export function detectLocale(
       cookieName,
     ),
     replaceSegment: false,
+    permanent: false,
   };
 }
 

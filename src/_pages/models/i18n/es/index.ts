@@ -24,8 +24,12 @@ export const translations: typeof enTranslations = {
       titleUncensored: "Chatea con {{model}} online sin censura | {{appName}}",
       titleUncensoredShort: "Chatea con {{model}} online sin censura",
       titleLegacy:
-        "{{model}}: precio y contexto (modelo anterior) | {{appName}}",
-      titleLegacyShort: "{{model}}: precio y contexto (modelo anterior)",
+        "{{model}} (sustituido por {{successor}}): chat online | {{appName}}",
+      titleLegacyShort: "{{model}} (sustituido por {{successor}}): chat online",
+      titleLegacyMin: "{{model}}, ahora {{successor}}: chat online",
+      titleLegacyNoSuccessor:
+        "{{model}}: precio, contexto y alternativas | {{appName}}",
+      titleLegacyNoSuccessorShort: "{{model}}: precio, contexto y alternativas",
       description:
         "Chatea con {{model}} de {{lab}} online, sin instalar nada, o por API: {{input}} de entrada y {{output}} de salida por 1M de tokens, contexto de {{context}}. {{hook}}",
       descriptionFlat:
@@ -450,7 +454,7 @@ export const translations: typeof enTranslations = {
     heading: "Más información",
     landings: {
       uncensored: {
-        title: "Chat de IA sin censura en tu navegador",
+        title: "IA sin censura: todos los modelos sin filtros en una lista",
         excerpt:
           "Todos los modelos sin censura en una lista: contexto, precio por mensaje y enlace directo al chat.",
       },
