@@ -120,6 +120,17 @@ describe("cheapest route per model", () => {
     }
   });
 
+  it("prefers OpenUncensored for GLM 5.3 and DeepSeek V4.1 Flash when configured", () => {
+    for (const id of [
+      ChatModelId.GLM_5_3_UNCENSORED,
+      ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
+    ]) {
+      expect(
+        getChatModelForUser(id, publicUser, withOpenUncensored).apiProvider,
+      ).toBe(ApiProvider.OPENUNCENSORED);
+    }
+  });
+
   it("never routes to OpenUncensored without its key", () => {
     for (const id of modelsWithOpenUncensored) {
       const picked = getChatModelForUser(id, publicUser, directOnly);

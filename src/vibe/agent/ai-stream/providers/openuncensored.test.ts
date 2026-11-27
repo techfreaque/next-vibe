@@ -1,18 +1,23 @@
 /**
  * OpenUncensored chat provider: the request goes to api.openuncensored.com
- * with the "cheapest" routing strategy, and the real per-call cost
- * (`ou.cost_usd`, documented in openuncensored.com/agents.md) is surfaced as
- * provider metadata so the turn bills real cost x markup. No network: the
- * provider fetch is faked.
+ * with the "cheapest" routing strategy. Non-streaming uses the provider's
+ * reported cost. Streaming uses the final usage and serving host's tariff.
  */
 
 import { describe, expect, it } from "bun:test";
-import { generateText, streamText } from "ai";
+import { generateText, streamText, tool } from "ai";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { z } from "zod";
 
-import { readStepUpstreamCost } from "../repository/loop/token-accumulator";
-import { createOpenUncensored, OPENUNCENSORED_BASE_URL } from "./openuncensored";
+import { OPENUNCENSORED_BASE_URL } from "../../models/model-prices/providers/openuncensored";
+import { ApiProvider, upstreamCostToCredits } from "../../models/models";
+import { ChatModelId, chatModelOptionsPool } from "../models";
+import {
+  readStepUpstreamCost,
+  TokenAccumulator,
+} from "../repository/loop/token-accumulator";
+import { createOpenUncensored } from "./openuncensored";
 import { readOpenUncensoredCostUsd } from "./shared/upstream-cost";
 
 const logger = createEndpointLogger(false, defaultLocale);
@@ -20,23 +25,34 @@ const logger = createEndpointLogger(false, defaultLocale);
 interface SeenRequest {
   url: string;
   headers: Headers;
+  body: BodyInit | null | undefined;
 }
 
 function fakeFetch(
   seen: SeenRequest[],
-  respond: () => Response,
+  respond: (request: SeenRequest) => Response,
 ): typeof globalThis.fetch {
   const handler = (
     input: RequestInfo | URL,
     init?: RequestInit,
   ): Promise<Response> => {
-    seen.push({ url: String(input), headers: new Headers(init?.headers) });
-    return Promise.resolve(respond());
+    const request = {
+      url: String(input),
+      headers: new Headers(init?.headers),
+      body: init?.body,
+    };
+    seen.push(request);
+    return Promise.resolve(respond(request));
   };
   return Object.assign(handler, { preconnect: fetch.preconnect });
 }
 
 const USAGE = { prompt_tokens: 12, completion_tokens: 3, total_tokens: 15 };
+const BILLING_ROUTE = chatModelOptionsPool.find(
+  (option) =>
+    option.id === ChatModelId.GLM_5_3_UNCENSORED &&
+    option.apiProvider === ApiProvider.OPENUNCENSORED,
+);
 
 describe("readOpenUncensoredCostUsd", () => {
   it("reads ou.cost_usd, ignores missing or zero costs", () => {
@@ -85,7 +101,8 @@ describe("OpenUncensored chat model", () => {
     );
   });
 
-  it("streaming: cost from the chunk that carries it", async () => {
+  it("streams usage and bills the host that served the response", async () => {
+    const seen: SeenRequest[] = [];
     const chunks = [
       {
         id: "c",
@@ -99,9 +116,29 @@ describe("OpenUncensored chat model", () => {
         object: "chat.completion.chunk",
         created: 1,
         model: "m",
-        choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
-        usage: USAGE,
-        ou: { cost_usd: 0.0000188 },
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: "call_1",
+                  type: "function",
+                  function: { name: "lookup", arguments: "{}" },
+                },
+              ],
+            },
+            finish_reason: "tool_calls",
+          },
+        ],
+      },
+      {
+        choices: [],
+        usage: {
+          ...USAGE,
+          prompt_tokens_details: { cached_tokens: 2 },
+        },
       },
     ];
     const body = `${chunks
@@ -109,20 +146,122 @@ describe("OpenUncensored chat model", () => {
       .join("")}data: [DONE]\n\n`;
     const provider = createOpenUncensored(
       logger,
+      fakeFetch(seen, ({ url }) =>
+        url.endsWith("/chat/completions")
+          ? new Response(body, {
+              headers: {
+                "content-type": "text/event-stream",
+                "X-OU-Model": "glm-5.3-uncensored",
+                "X-OU-Provider": "served-host",
+              },
+            })
+          : Response.json({
+              id: "glm-5.3-uncensored",
+              providers: [
+                {
+                  name: "cheapest-host",
+                  status: "online",
+                  pricing: { input_per_mtok: 0.1, output_per_mtok: 0.2 },
+                },
+                {
+                  name: "served-host",
+                  status: "degraded",
+                  pricing: {
+                    input_per_mtok: 1,
+                    output_per_mtok: 2,
+                    cache_read_per_mtok: 0.25,
+                  },
+                },
+              ],
+            }),
+      ),
+    );
+    const result = streamText({
+      model: provider.chat("requested-alias"),
+      prompt: "Hi",
+      tools: { lookup: tool({ inputSchema: z.object({}) }) },
+    });
+    expect(await result.text).toBe("Hi");
+    expect(await result.toolCalls).toMatchObject([{ toolName: "lookup" }]);
+    expect((await result.usage).inputTokens).toBe(12);
+    const requestBody = seen[0]?.body;
+    expect(
+      typeof requestBody === "string" ? JSON.parse(requestBody) : null,
+    ).toMatchObject({ stream: true, stream_options: { include_usage: true } });
+    expect(seen[1]?.url).toBe(
+      `${OPENUNCENSORED_BASE_URL}/models/glm-5.3-uncensored`,
+    );
+    expect(seen[1]?.headers.has("authorization")).toBe(false);
+
+    const metadata = await result.providerMetadata;
+    const upstream = readStepUpstreamCost(metadata);
+    expect(upstream.provider).toBe("served-host");
+    const costUsd = (10 * 1 + 2 * 0.25 + 3 * 2) / 1_000_000;
+    expect(upstream.costUsd).toBeCloseTo(costUsd, 12);
+
+    if (!BILLING_ROUTE) {
+      expect.unreachable("missing OpenUncensored GLM 5.3 route");
+    }
+    const charge = TokenAccumulator.chargeSingleCall(
+      BILLING_ROUTE,
+      {
+        inputTokens: 12,
+        outputTokens: 3,
+        cachedInputTokens: 2,
+        cacheWriteTokens: 0,
+      },
+      metadata,
+      logger,
+    );
+    expect(charge.credits).toBe(upstreamCostToCredits(costUsd));
+    expect(charge.credits).toBeGreaterThan(0);
+    expect(charge.upstreamCost).toMatchObject({
+      billingBasis: "upstream_cost",
+      upstreamProvider: "served-host",
+    });
+  });
+
+  it("keeps delivered text billable when the usage chunk is missing", async () => {
+    if (!BILLING_ROUTE) {
+      expect.unreachable("missing OpenUncensored GLM 5.3 route");
+    }
+    const chunk = {
+      choices: [{ index: 0, delta: { content: "Hi" }, finish_reason: "stop" }],
+    };
+    const provider = createOpenUncensored(
+      logger,
       fakeFetch(
         [],
         () =>
-          new Response(body, {
+          new Response(`data: ${JSON.stringify(chunk)}\n\ndata: [DONE]\n\n`, {
             headers: { "content-type": "text/event-stream" },
           }),
       ),
     );
-    const result = streamText({ model: provider.chat("m"), prompt: "Hi" });
+    const result = streamText({
+      model: provider.chat(BILLING_ROUTE.providerModel),
+      prompt: "Hi",
+    });
     expect(await result.text).toBe("Hi");
-    expect((await result.usage).inputTokens).toBe(12);
-    expect(readStepUpstreamCost(await result.providerMetadata).costUsd).toBe(
-      0.0000188,
+    const usage = await result.usage;
+    const metadata = await result.providerMetadata;
+    expect(usage.outputTokens).toBe(1);
+    expect(readStepUpstreamCost(metadata).reportedUsage).toMatchObject({
+      estimatedOutput: true,
+    });
+
+    const charge = TokenAccumulator.chargeSingleCall(
+      BILLING_ROUTE,
+      {
+        inputTokens: usage.inputTokens ?? 0,
+        outputTokens: usage.outputTokens ?? 0,
+        cachedInputTokens: 0,
+        cacheWriteTokens: 0,
+      },
+      metadata,
+      logger,
     );
+    expect(charge.credits).toBeGreaterThan(0);
   });
 
   it("no reported cost: listed-price fallback (no cost metadata)", async () => {

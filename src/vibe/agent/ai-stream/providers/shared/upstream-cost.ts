@@ -9,8 +9,8 @@
  *   response body and on the last stream chunk.
  * - Venice: `cost.usd` on the response body and on the usage-only stream chunk.
  *   Paid in DIEM, `usd` is 0: no cost is reported then (listed-price fallback).
- * - OpenUncensored: `ou.cost_usd` (the serving provider's cost) on the
- *   response body and on the stream chunk that carries it.
+ * - OpenUncensored: `ou.cost_usd` on non-streamed response bodies. Streams
+ *   use the serving host's tariff and reported usage instead.
  *
  * Only a finite cost > 0 counts; anything else is "no cost reported".
  */
@@ -95,7 +95,7 @@ export function readVeniceCostUsd(
   return parsed.success ? positiveCost(parsed.data.cost?.usd) : null;
 }
 
-/** USD an OpenUncensored response (body or stream chunk) reports, null when none. */
+/** USD an OpenUncensored non-streamed response reports, null when none. */
 export function readOpenUncensoredCostUsd(
   body: Parameters<MetadataExtractor["extractMetadata"]>[0]["parsedBody"],
 ): number | null {
@@ -105,10 +105,7 @@ export function readOpenUncensoredCostUsd(
 
 /** Provider metadata carrying a real upstream cost (undefined when none). */
 export function upstreamCostMetadata(
-  provider:
-    | ApiProvider.NANO_GPT
-    | ApiProvider.VENICE_AI
-    | ApiProvider.OPENUNCENSORED,
+  provider: ApiProvider.NANO_GPT | ApiProvider.VENICE_AI,
   costUsd: number | null,
 ): { [key: string]: { usage: { cost: number } } } | undefined {
   return costUsd === null
@@ -148,31 +145,6 @@ export const nanoGptCostExtractor: MetadataExtractor = {
           }
         );
       },
-    };
-  },
-};
-
-/**
- * OpenUncensored metadata extractor: the cost of the call from `ou.cost_usd`
- * on the response body or on whichever stream chunk carries it (the last one
- * wins). No cost reported = listed-price fallback.
- */
-export const openUncensoredCostExtractor: MetadataExtractor = {
-  extractMetadata: ({ parsedBody }) =>
-    Promise.resolve(
-      upstreamCostMetadata(
-        ApiProvider.OPENUNCENSORED,
-        readOpenUncensoredCostUsd(parsedBody),
-      ),
-    ),
-  createStreamExtractor: () => {
-    let costUsd: number | null = null;
-    return {
-      processChunk: (parsedChunk): void => {
-        costUsd = readOpenUncensoredCostUsd(parsedChunk) ?? costUsd;
-      },
-      buildMetadata: () =>
-        upstreamCostMetadata(ApiProvider.OPENUNCENSORED, costUsd),
     };
   },
 };

@@ -84,9 +84,9 @@ export interface TurnCharge {
  * Providers that report the real charge of a call:
  * OpenRouter (`usage.cost`; it load-balances a model across endpoints up to
  * ~5x pricier than the cheapest one we list), NanoGPT (`usage.cost` /
- * `x_nanogpt_pricing`), Venice (`cost.usd`) and OpenUncensored
- * (`ou.cost_usd`). The NanoGPT, Venice and OpenUncensored providers surface it as provider metadata `{ <apiProvider>: { usage: { cost } } }`,
- * the same shape OpenRouter uses.
+ * `x_nanogpt_pricing`), Venice (`cost.usd`) and OpenUncensored (reported
+ * `ou.cost_usd` or final usage at the serving host's tariff). Providers
+ * surface it as metadata `{ <apiProvider>: { usage: { cost } } }`.
  */
 const UPSTREAM_COST_PROVIDERS: ReadonlySet<ApiProvider> = new Set([
   ApiProvider.OPENROUTER,
@@ -313,8 +313,7 @@ export function estimateCutOffStepCost(
 
 /**
  * A step's real upstream usage.cost + serving endpoint from provider metadata
- * (OpenRouter, or the NanoGPT / Venice cost the providers attach under their
- * ApiProvider key). OpenRouter wins when several are present.
+ * under the ApiProvider key. OpenRouter wins when several are present.
  */
 export function readStepUpstreamCost(
   providerMetadata: ProviderMetadata | undefined,

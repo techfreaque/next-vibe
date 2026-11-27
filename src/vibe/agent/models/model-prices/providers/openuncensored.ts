@@ -36,7 +36,7 @@ import {
   type TokenPriceEntry,
 } from "./token-price-collector";
 
-const MODEL_API_URL = "https://api.openuncensored.com/v1/models";
+export const OPENUNCENSORED_BASE_URL = "https://api.openuncensored.com/v1";
 
 const hostSchema = z.object({
   name: z.string(),
@@ -76,28 +76,22 @@ function referencePrice(host: PricedHost): number {
   );
 }
 
-/** Hosts a tool-calling chat turn can land on, with a billable price. */
-function servingHosts(hosts: readonly OpenUncensoredHost[]): PricedHost[] {
-  const priced: PricedHost[] = [];
-  for (const host of hosts) {
-    const pricing = host.pricing;
-    if (
-      host.status !== "online" ||
-      host.supports_tools === false ||
-      pricing?.known === false ||
-      typeof pricing?.input_per_mtok !== "number" ||
-      typeof pricing.output_per_mtok !== "number"
-    ) {
-      continue;
-    }
-    priced.push({
-      name: host.name,
-      input: pricing.input_per_mtok,
-      output: pricing.output_per_mtok,
-      cacheRead: pricing.cache_read_per_mtok ?? undefined,
-    });
+/** Read a published tariff independently of the host's availability. */
+function readHostPrice(host: OpenUncensoredHost): PricedHost | undefined {
+  const pricing = host.pricing;
+  if (
+    pricing?.known === false ||
+    typeof pricing?.input_per_mtok !== "number" ||
+    typeof pricing.output_per_mtok !== "number"
+  ) {
+    return undefined;
   }
-  return priced;
+  return {
+    name: host.name,
+    input: pricing.input_per_mtok,
+    output: pricing.output_per_mtok,
+    cacheRead: pricing.cache_read_per_mtok ?? undefined,
+  };
 }
 
 /**
@@ -107,21 +101,30 @@ function servingHosts(hosts: readonly OpenUncensoredHost[]): PricedHost[] {
 export function cheapestServingHost(
   hosts: readonly OpenUncensoredHost[],
 ): PricedHost | undefined {
-  return servingHosts(hosts).toSorted(
-    (a, b) => referencePrice(a) - referencePrice(b),
-  )[0];
+  return hosts
+    .filter((host) => host.status === "online" && host.supports_tools !== false)
+    .map(readHostPrice)
+    .filter((host) => host !== undefined)
+    .toSorted((a, b) => referencePrice(a) - referencePrice(b))[0];
 }
+
+type CatalogLookup =
+  | { ok: true; model: z.infer<typeof modelSchema> }
+  | { ok: false; reason: string };
 
 type ModelLookup =
   | { ok: true; entry: TokenPriceEntry; host: string }
   | { ok: false; reason: string };
 
-async function fetchModel(providerModel: string): Promise<ModelLookup> {
-  const url = `${MODEL_API_URL}/${encodeURIComponent(providerModel)}`;
+async function fetchModelCatalog(
+  providerModel: string,
+  fetchImpl: typeof globalThis.fetch,
+): Promise<CatalogLookup> {
+  const url = `${OPENUNCENSORED_BASE_URL}/models/${encodeURIComponent(providerModel)}`;
   try {
-    // oxlint-disable-next-line restricted/no-raw-fetch -- external API
-    const response = await fetch(url, {
+    const response = await fetchImpl(url, {
       headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(5_000),
     });
     if (!response.ok) {
       return { ok: false, reason: `${url} responded with ${response.status}` };
@@ -130,38 +133,61 @@ async function fetchModel(providerModel: string): Promise<ModelLookup> {
     if (!parsed.success) {
       return { ok: false, reason: `${url} returned an unexpected shape` };
     }
-    const model = parsed.data;
-    if (model.available === false) {
-      return { ok: false, reason: `${providerModel} is unavailable` };
-    }
-    const hosts = (model.providers ?? []).filter(
-      (host): host is OpenUncensoredHost => host !== null,
-    );
-    const cheapest = cheapestServingHost(hosts);
-    if (!cheapest) {
-      return {
-        ok: false,
-        reason: `${providerModel}: no online host with tool calls and a known price`,
-      };
-    }
-    const inputs: Modality[] = model.tags?.includes("vision")
-      ? ["text", "image"]
-      : ["text"];
-    return {
-      ok: true,
-      host: cheapest.name,
-      entry: {
-        input: cheapest.input,
-        output: cheapest.output,
-        cacheRead: cheapest.cacheRead,
-        contextWindow: model.context_length ?? undefined,
-        inputs,
-        outputs: ["text"],
-      },
-    };
+    return { ok: true, model: parsed.data };
   } catch (err) {
     return { ok: false, reason: `${url}: ${parseError(err).message}` };
   }
+}
+
+/** Look up the host that already served the call, irrespective of current status. */
+export async function fetchOpenUncensoredHostPrice(
+  providerModel: string,
+  hostName: string,
+  fetchImpl: typeof globalThis.fetch,
+): Promise<PricedHost | undefined> {
+  const lookup = await fetchModelCatalog(providerModel, fetchImpl);
+  if (!lookup.ok) {
+    return undefined;
+  }
+  const host = lookup.model.providers?.find(
+    (entry) => entry?.name.toLowerCase() === hostName.toLowerCase(),
+  );
+  return host ? readHostPrice(host) : undefined;
+}
+
+async function fetchModel(providerModel: string): Promise<ModelLookup> {
+  const lookup = await fetchModelCatalog(providerModel, fetch);
+  if (!lookup.ok) {
+    return lookup;
+  }
+  const { model } = lookup;
+  if (model.available === false) {
+    return { ok: false, reason: `${providerModel} is unavailable` };
+  }
+  const cheapest = cheapestServingHost(
+    (model.providers ?? []).filter((host) => host !== null),
+  );
+  if (!cheapest) {
+    return {
+      ok: false,
+      reason: `${providerModel}: no online host with tool calls and a known price`,
+    };
+  }
+  const inputs: Modality[] = model.tags?.includes("vision")
+    ? ["text", "image"]
+    : ["text"];
+  return {
+    ok: true,
+    host: cheapest.name,
+    entry: {
+      input: cheapest.input,
+      output: cheapest.output,
+      cacheRead: cheapest.cacheRead,
+      contextWindow: model.context_length ?? undefined,
+      inputs,
+      outputs: ["text"],
+    },
+  };
 }
 
 export class OpenUncensoredPriceFetcher extends PriceFetcher {
