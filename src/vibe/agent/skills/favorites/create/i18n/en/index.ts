@@ -23,6 +23,10 @@ export const translations = {
       label: "Create Favorite",
       loadingText: "Creating...",
     },
+    addModeButton: {
+      label: "Add mode",
+      loadingText: "Adding...",
+    },
     useWithoutSavingButton: {
       label: "Use Without Saving",
       loadingText: "Applying...",

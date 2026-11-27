@@ -439,6 +439,14 @@ export const translations: typeof enTranslations = {
         now: "मौजूदा मोड: {{mode}}",
         runsOn: "इस पर चलता है",
         allModes: "सभी मोड",
+        addMode: {
+          title: "मोड जोड़ें",
+          subtitle: "कोई भी मॉडल चुनें और उसे अपना बनाएँ।",
+          dialogTitle: "{{name}} के लिए नया मोड",
+          dialogDescription:
+            "{{name}} वही रहेगा, मॉडल आप चुनें। एक बार सेव करें, जब चाहें स्विच करें।",
+          personalSummary: "आपका अपना मोड, {{mode}} पर आधारित।",
+        },
         fix: {
           politics: "राजनीति पर बात? {{mode}} पर जाएँ",
           complex: "जटिल काम? {{mode}} पर जाएँ",

@@ -49,6 +49,8 @@ interface FavoriteStub {
   id: string;
   skillId: string;
   position: number;
+  customVariantName?: string | null;
+  modelId?: string | null;
 }
 let favoritesStub: FavoriteStub[] = [];
 void mock.module("../../../../skills/favorites/hooks/hooks", () => ({
@@ -137,5 +139,30 @@ describe("new-chat spotlight", () => {
     expect(markup).toContain("Current mode:");
     expect(markup).toContain('aria-label="All modes"');
     expect(markup).toContain('aria-current="true"');
+  });
+
+  it("ends the mode grid with the add-a-mode tile", () => {
+    const markup = renderSpotlight("thea");
+    expect(markup).toContain("Add a mode");
+    expect(markup).toContain("Pick any model and make it yours.");
+  });
+
+  it("lists the user's own mode for this companion", () => {
+    favoritesStub = [
+      {
+        id: "fav-mine",
+        skillId: "thea",
+        position: 0,
+        customVariantName: "My Thea",
+        modelId: null,
+      },
+    ];
+    try {
+      const markup = renderSpotlight("thea");
+      expect(markup).toContain("My Thea");
+      expect(markup).toContain("Your own mode, built on");
+    } finally {
+      favoritesStub = [];
+    }
   });
 });

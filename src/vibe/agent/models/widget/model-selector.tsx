@@ -2581,7 +2581,9 @@ export function ModelSelectorTrigger({
                 </Badge>
               )}
             </Div>
-            <Div className="flex items-center gap-1">
+            {/* Wraps in narrow cards (2-up grid on a phone): the price
+                drops to its own line instead of spilling past the border. */}
+            <Div className="flex min-w-0 flex-wrap items-center gap-x-1">
               <Span className="text-[11px] text-muted-foreground">
                 {modelProviders[resolvedModel.provider]?.name ??
                   resolvedModel.provider}

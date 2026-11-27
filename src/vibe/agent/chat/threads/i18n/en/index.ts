@@ -440,6 +440,14 @@ export const translations = {
         now: "Current mode: {{mode}}",
         runsOn: "Runs on",
         allModes: "All modes",
+        addMode: {
+          title: "Add a mode",
+          subtitle: "Pick any model and make it yours.",
+          dialogTitle: "New mode for {{name}}",
+          dialogDescription:
+            "{{name}} stays. You pick the model. Save it once, switch to it any time.",
+          personalSummary: "Your own mode, built on {{mode}}.",
+        },
         fix: {
           politics: "Politics? Switch to {{mode}}",
           complex: "Complex task? Switch to {{mode}}",

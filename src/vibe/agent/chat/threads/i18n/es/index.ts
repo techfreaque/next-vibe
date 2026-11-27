@@ -445,14 +445,21 @@ export const translations: typeof enTranslations = {
       spotlight: {
         adultsOnly: "18+",
         title: "Elige cómo funciona {{name}}.",
-        subtitle:
-          "Cada modo ejecuta un modelo diferente. O simplemente escribir para empezar.",
+        subtitle: "Cada modo usa un modelo distinto. O escribe y empieza.",
         now: "Modo actual: {{mode}}",
-        runsOn: "Corresponde",
+        runsOn: "Funciona con",
         allModes: "Todos los modos",
+        addMode: {
+          title: "Añadir un modo",
+          subtitle: "Elige cualquier modelo y hazlo tuyo.",
+          dialogTitle: "Nuevo modo para {{name}}",
+          dialogDescription:
+            "{{name}} sigue igual, el modelo lo eliges tú. Guárdalo una vez y cambia cuando quieras.",
+          personalSummary: "Tu propio modo, basado en {{mode}}.",
+        },
         fix: {
-          politics: "¿Política? Cambiar a {{mode}}",
-          complex: "¿Una tarea compleja? Cambiar a {{mode}}",
+          politics: "¿Política? Cambia a {{mode}}",
+          complex: "¿Tarea compleja? Cambia a {{mode}}",
         },
       },
       single: {

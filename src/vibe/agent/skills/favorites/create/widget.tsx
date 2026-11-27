@@ -14,6 +14,7 @@ import { Mic } from "next-vibe/ui/components/icons/Mic";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
 import { Span } from "next-vibe/ui/components/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -100,6 +101,7 @@ import { NO_SKILL_ID } from "../../constants";
 import { ModelSelectionType } from "../../enum";
 import { scopedTranslation as skillsScopedTranslation } from "../../i18n";
 import { pickSkillVariant } from "../../pick-variant";
+import { useIsAddMode } from "./add-mode-context";
 import type definition from "./definition";
 
 /**
@@ -126,6 +128,7 @@ export function FavoriteCreateContainer({
   const navigate = useWidgetNavigation();
   const createResult = useWidgetValue<typeof definition.POST>();
   const [isApplying, setIsApplying] = useState(false);
+  const isAddMode = useIsAddMode();
   const [activeSelector, setActiveSelector] = useState<
     | "chat"
     | "voice"
@@ -356,7 +359,13 @@ export function FavoriteCreateContainer({
   return (
     <Div className="flex flex-col gap-0">
       {/* Top Actions: Back + Use Without Saving + Save */}
-      <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
+      <Div
+        className={cn(
+          "flex flex-row gap-2 px-4 pt-4 pb-4",
+          // Embedded: the host scrolls, so the actions stay in reach
+          isAddMode && "sticky top-0 z-10 bg-background",
+        )}
+      >
         {activeSelector !== null ? (
           <Button
             type="button"
@@ -383,13 +392,22 @@ export function FavoriteCreateContainer({
         <SubmitButtonWidget<typeof definition.POST>
           field={{
             ...children.submitButton,
+            ...(isAddMode
+              ? { loadingText: "post.addModeButton.loadingText" as const }
+              : {}),
             size: "sm",
             className: "h-8 text-xs",
           }}
+          label={isAddMode ? t("post.addModeButton.label") : undefined}
         />
       </Div>
       {/* Scrollable Form Container */}
-      <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
+      <Div
+        className={cn(
+          "group px-4 pb-4",
+          !isAddMode && "overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]",
+        )}
+      >
         {activeSelector === "chat" && form ? (
           <ModelSelector
             modelSelection={favoriteModelSelection}
@@ -760,7 +778,7 @@ export function FavoriteCreateContainer({
                       variantId
                         ? (() => {
                             const skill = DEFAULT_SKILLS.find(
-                              (s) => s.id === skillId,
+                              (s) => s.id === plainSkillId,
                             );
                             const variant = skill?.variants?.find(
                               (v) => v.id === variantId,

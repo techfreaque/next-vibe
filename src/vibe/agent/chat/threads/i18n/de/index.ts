@@ -449,6 +449,14 @@ export const translations: typeof enTranslations = {
         now: "Aktueller Modus: {{mode}}",
         runsOn: "Läuft auf",
         allModes: "Alle Modi",
+        addMode: {
+          title: "Modus hinzufügen",
+          subtitle: "Wähl ein beliebiges Modell und mach es zu deinem.",
+          dialogTitle: "Neuer Modus für {{name}}",
+          dialogDescription:
+            "{{name}} bleibt, das Modell bestimmst du. Einmal speichern, jederzeit umschalten.",
+          personalSummary: "Dein eigener Modus auf Basis von {{mode}}.",
+        },
         fix: {
           politics: "Politik? Wechsle zu {{mode}}",
           complex: "Komplexe Aufgabe? Wechsle zu {{mode}}",

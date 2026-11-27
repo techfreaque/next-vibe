@@ -316,6 +316,8 @@ export class ChatFavoritesRepositoryClient {
       const newConfig: StoredLocalFavorite = {
         id,
         skillId: data.skillId, // store as-is (merged format)
+        // The label the guest typed: dropping it lost the mode's name on reload
+        customVariantName: data.customVariantName ?? null,
         voiceModelSelection: data.voiceModelSelection ?? null,
         modelSelection: data.modelSelection ?? null,
         customIcon: null,

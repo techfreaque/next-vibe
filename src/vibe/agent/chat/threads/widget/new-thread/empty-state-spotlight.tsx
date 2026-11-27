@@ -29,6 +29,7 @@ import { Image as ImageIcon } from "next-vibe/ui/components/icons/Image";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { PenTool } from "next-vibe/ui/components/icons/PenTool";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
@@ -43,7 +44,7 @@ import {
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX, ReactNode, RefObject } from "react";
-import { useRef } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 
 import type { DefaultFolderId } from "../../../../../core/execution-context";
 import {
@@ -62,6 +63,7 @@ import {
 } from "../../../../skills/config";
 import { NO_SKILL_ID } from "../../../../skills/constants";
 import { ModelSelectionType } from "../../../../skills/enum";
+import type { FavoriteCard } from "../../../../skills/favorites/definition";
 import { useChatFavorites } from "../../../../skills/favorites/hooks/hooks";
 import {
   scopedTranslation as skillsScopedTranslation,
@@ -73,6 +75,11 @@ import { useChatSettings } from "../../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../../settings/repository-client";
 import { formatSkillId, parseSkillId } from "../../../slugify";
 import { scopedTranslation, type ThreadsT } from "../../i18n";
+
+/** Loaded on first open: the create form is heavy and most visits never add a mode. */
+const AddModeDialog = lazy(() =>
+  import("./add-mode-dialog").then((mod) => ({ default: mod.AddModeDialog })),
+);
 
 /* ========================================================================== *
  * CAPABILITIES
@@ -170,6 +177,8 @@ interface ModeView {
   weak: string;
   isDefault: boolean;
   isActive: boolean;
+  /** Set for the user's own modes (a favorite with its own model). */
+  favoriteId: string | null;
 }
 
 interface CompanionView {
@@ -280,8 +289,73 @@ function buildModes(params: {
       ...resolveModeCopy({ variant, use, t, tSkills }),
       isDefault,
       isActive: variant.id === activeId,
+      favoriteId: null,
     };
   });
+}
+
+/**
+ * The user's own modes for this skill: favorites that run a model of their
+ * own (or carry their own name) instead of a stock variant's pick. Added with
+ * the "Add a mode" tile or the selector's "Add variant".
+ */
+function buildPersonalModes(params: {
+  skill: Skill;
+  favorites: readonly FavoriteCard[];
+  activeFavoriteId: string | null;
+  t: ThreadsT;
+  tSkills: SkillsT;
+  user: ReturnType<typeof useWidgetUser>;
+  availability: ReturnType<typeof useProviderAvailability>;
+}): ModeView[] {
+  const { skill, favorites, activeFavoriteId, t, tSkills, user, availability } =
+    params;
+  const modes: ModeView[] = [];
+  for (const favorite of favorites.toSorted(
+    (a, b) => a.position - b.position,
+  )) {
+    const { skillId: baseId, variantId } = parseSkillId(favorite.skillId);
+    if (baseId !== skill.id) {
+      continue;
+    }
+    const variant =
+      (variantId ? skill.variants.find((v) => v.id === variantId) : null) ??
+      skill.variants.find((v) => v.isDefault) ??
+      skill.variants[0];
+    if (!variant) {
+      continue;
+    }
+    const stockModel = resolveVariantModel(variant, user, availability);
+    const customName = favorite.customVariantName ?? null;
+    const ownModel =
+      favorite.modelId !== null &&
+      favorite.modelId !== undefined &&
+      favorite.modelId !== stockModel?.id;
+    if (!customName && !ownModel) {
+      continue;
+    }
+    const model = favorite.modelId ? getChatModelById(favorite.modelId) : null;
+    const use: Use = (model ? USE_BY_MODEL[model.id] : undefined) ?? "general";
+    const baseName = tSkills(variant.variantName);
+    modes.push({
+      variantId: `favorite:${favorite.id}`,
+      composite: favorite.skillId,
+      name: customName ?? model?.name ?? baseName,
+      modelId: model?.id ?? null,
+      modelName: model?.name ?? null,
+      modelIcon: model?.icon ?? null,
+      use,
+      summary: t("widget.emptyState.spotlight.addMode.personalSummary", {
+        mode: baseName,
+      }),
+      good: t(`widget.emptyState.use.${use}.good`),
+      weak: t(`widget.emptyState.use.${use}.weak`),
+      isDefault: false,
+      isActive: favorite.id === activeFavoriteId,
+      favoriteId: favorite.id,
+    });
+  }
+  return modes;
 }
 
 function rankOf(use: Use): number {
@@ -701,6 +775,52 @@ interface SpotlightBodyProps {
   fallbackCompanion: CompanionOption | null;
   onSelectMode: (mode: ModeView) => void;
   onSelectCompanion: (skillId: string) => void;
+  onAddMode: () => void;
+}
+
+/**
+ * Last cell of the mode grid: add a mode of your own. Same shape as a mode
+ * row (marker column, icon tile, two lines) so it fills an odd grid's blank
+ * cell cleanly, styled like a mode row with muted text: it is an action, not a mode.
+ */
+function AddModeTile({
+  t,
+  span,
+  onClick,
+}: {
+  t: ThreadsT;
+  span: boolean;
+  onClick: () => void;
+}): JSX.Element {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="unset"
+      onClick={onClick}
+      className={cn(
+        "group h-auto w-full items-center justify-start gap-3 whitespace-normal rounded-xl border border-transparent px-2 py-1.5 text-left font-normal hover:bg-foreground/[0.04] dark:hover:bg-foreground/[0.06]",
+        span && "sm:col-span-2",
+        INTERACTIVE,
+      )}
+    >
+      {/* Keeps the icon column aligned with the radio rows above. */}
+      <Span aria-hidden="true" className="h-[18px] w-[18px] shrink-0" />
+      <Span
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${USE_CHIP_CLASS} transition-colors group-hover:text-foreground`}
+      >
+        <Plus className="h-4 w-4" />
+      </Span>
+      <Span className="flex min-w-0 flex-1 flex-col">
+        <Span className="text-sm font-semibold text-foreground/80 group-hover:text-foreground">
+          {t("widget.emptyState.spotlight.addMode.title")}
+        </Span>
+        <Span className="line-clamp-2 text-xs text-muted-foreground">
+          {t("widget.emptyState.spotlight.addMode.subtitle")}
+        </Span>
+      </Span>
+    </Button>
+  );
 }
 
 function SpotlightBody({
@@ -709,15 +829,22 @@ function SpotlightBody({
   fallbackCompanion,
   onSelectMode,
   onSelectCompanion,
+  onAddMode,
 }: SpotlightBodyProps): JSX.Element {
   const { active } = view;
   const single = view.modes.length === 1;
-  // Stable order: switching modes never reshuffles the list.
-  const all = view.modes.toSorted(
-    (a, b) =>
-      rankOf(a.use) - rankOf(b.use) ||
-      Number(b.isDefault) - Number(a.isDefault),
-  );
+  // Stable order: switching modes never reshuffles the list. The user's own
+  // modes follow the stock ones, in the order they were added.
+  const all = [
+    ...view.modes
+      .filter((m) => m.favoriteId === null)
+      .toSorted(
+        (a, b) =>
+          rankOf(a.use) - rankOf(b.use) ||
+          Number(b.isDefault) - Number(a.isDefault),
+      ),
+    ...view.modes.filter((m) => m.favoriteId !== null),
+  ];
   const fix = fixFor(view.modes, active);
 
   return (
@@ -805,7 +932,7 @@ function SpotlightBody({
               aria-label={t("widget.emptyState.spotlight.allModes")}
               className="mt-1.5 grid grid-cols-1 gap-1 sm:grid-cols-2"
             >
-              {all.map((m, index) => (
+              {all.map((m) => (
                 <Button
                   key={m.variantId}
                   type="button"
@@ -820,10 +947,6 @@ function SpotlightBody({
                   }}
                   className={cn(
                     "group h-auto w-full items-center justify-start gap-3 whitespace-normal rounded-xl border px-2 py-1.5 text-left font-normal",
-                    // An odd last mode spans both columns: no empty cell
-                    index === all.length - 1 &&
-                      all.length % 2 === 1 &&
-                      "sm:col-span-2",
                     INTERACTIVE,
                     m.isActive
                       ? "cursor-default border-primary/50 bg-primary/[0.07] hover:bg-primary/[0.07] motion-safe:active:scale-100 dark:border-primary/60 dark:bg-primary/[0.12] dark:hover:bg-primary/[0.12]"
@@ -871,6 +994,13 @@ function SpotlightBody({
                   </Span>
                 </Button>
               ))}
+              {/* Fills an odd grid's blank cell; spans both columns when
+                  the modes already fill every row. */}
+              <AddModeTile
+                t={t}
+                span={all.length % 2 === 0}
+                onClick={onAddMode}
+              />
             </Div>
           </Div>
         </Div>
@@ -962,6 +1092,9 @@ export function SpotlightEmptyState({
     logger,
   );
   const scrollRef = useRef<DivRefObject | null>(null);
+  const [addModeOpen, setAddModeOpen] = useState(false);
+  // The lazy dialog mounts on first open and stays, so closing animates.
+  const [addModeMounted, setAddModeMounted] = useState(false);
 
   // Until settings say which skill is selected, show a placeholder instead of
   // guessing: guessing the default companion flashed Thea's card for people
@@ -996,15 +1129,30 @@ export function SpotlightEmptyState({
   const parsed = parseSkillId(effectiveSkillId);
   const skill = DEFAULT_SKILLS.find((s) => s.id === parsed.skillId);
 
+  const activeFavoriteId = settings?.activeFavoriteId ?? null;
+
   const buildCompanionView = (target: Skill): CompanionView | null => {
-    const modes = buildModes({
+    const personal = favoritesLoading
+      ? []
+      : buildPersonalModes({
+          skill: target,
+          favorites,
+          activeFavoriteId,
+          t,
+          tSkills,
+          user,
+          availability,
+        });
+    const personalActive = personal.some((m) => m.isActive);
+    const stock = buildModes({
       skill: target,
       activeVariantId: parsed.variantId,
       t,
       tSkills,
       user,
       availability,
-    });
+    }).map((m) => (personalActive ? { ...m, isActive: false } : m));
+    const modes = [...stock, ...personal];
     const active = modes.find((m) => m.isActive) ?? modes[0];
     if (!active) {
       return null;
@@ -1068,10 +1216,19 @@ export function SpotlightEmptyState({
    * for this skill+variant (keeps the selector's active badge right); else the
    * composite id, which the server resolves to the matching favorite row.
    */
+  const personalIds = new Set(
+    view.kind === "companion"
+      ? view.modes.flatMap((m) => (m.favoriteId ? [m.favoriteId] : []))
+      : [],
+  );
   const selectMode = (mode: ModeView): void => {
-    const favorite = favorites.find((f) => f.skillId === mode.composite);
+    const favorite = mode.favoriteId
+      ? favorites.find((f) => f.id === mode.favoriteId)
+      : favorites.find(
+          (f) => f.skillId === mode.composite && !personalIds.has(f.id),
+        );
     void ChatSettingsRepositoryClient.selectFavorite({
-      favoriteId: favorite?.id ?? mode.composite,
+      favoriteId: favorite?.id ?? mode.favoriteId ?? mode.composite,
       modelId: favorite?.modelId ?? mode.modelId,
       skillId: mode.composite,
       logger,
@@ -1111,6 +1268,10 @@ export function SpotlightEmptyState({
               fallbackCompanion={fallbackCompanion}
               onSelectMode={selectMode}
               onSelectCompanion={selectCompanion}
+              onAddMode={() => {
+                setAddModeMounted(true);
+                setAddModeOpen(true);
+              }}
             />
           ) : view.kind === "none" ? (
             <CompanionPicker
@@ -1124,6 +1285,25 @@ export function SpotlightEmptyState({
           )}
         </Div>
       </Div>
+      {view.kind === "companion" && skill && addModeMounted ? (
+        <Suspense fallback={null}>
+          <AddModeDialog
+            open={addModeOpen}
+            onOpenChange={setAddModeOpen}
+            locale={locale}
+            skillId={view.active.composite}
+            companionName={view.name}
+            icon={skill.icon}
+            voiceModelSelection={
+              skill.variants.find(
+                (v) => v.id === parseSkillId(view.active.composite).variantId,
+              )?.voiceModelSelection ??
+              skill.variants.find((v) => v.isDefault)?.voiceModelSelection ??
+              null
+            }
+          />
+        </Suspense>
+      ) : null}
     </Shell>
   );
 }

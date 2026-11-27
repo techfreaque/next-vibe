@@ -450,6 +450,14 @@ export const translations: typeof enTranslations = {
         now: "Aktuálny režim: {{mode}}",
         runsOn: "Používa model",
         allModes: "Všetky režimy",
+        addMode: {
+          title: "Pridať režim",
+          subtitle: "Vyber si ľubovoľný model a nastav ho po svojom.",
+          dialogTitle: "Nový režim: {{name}}",
+          dialogDescription:
+            "{{name}} zostáva, model vyberáš ty. Raz ulož a prepínaj, kedy chceš.",
+          personalSummary: "Tvoj vlastný režim, postavený na: {{mode}}.",
+        },
         fix: {
           politics: "Politika? Prepni na {{mode}}",
           complex: "Zložitá úloha? Prepni na {{mode}}",

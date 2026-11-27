@@ -25,6 +25,10 @@ export const translations: typeof enTranslations = {
       label: "पसंदीदा बनाएँ",
       loadingText: "बन रहा है...",
     },
+    addModeButton: {
+      label: "मोड जोड़ें",
+      loadingText: "जोड़ा जा रहा है...",
+    },
     useWithoutSavingButton: {
       label: "बिना सेव किए इस्तेमाल करें",
       loadingText: "लागू हो रहा है...",

@@ -25,6 +25,10 @@ export const translations: typeof enTranslations = {
       label: "Crear Favorito",
       loadingText: "Creando...",
     },
+    addModeButton: {
+      label: "Añadir modo",
+      loadingText: "Añadiendo...",
+    },
     useWithoutSavingButton: {
       label: "Uso sin ahorro",
       loadingText: "Aplicando...",

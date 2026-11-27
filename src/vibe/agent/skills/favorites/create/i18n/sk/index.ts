@@ -25,6 +25,10 @@ export const translations: typeof enTranslations = {
       label: "Vytvoriť obľúbenú konfiguráciu",
       loadingText: "Vytvára sa…",
     },
+    addModeButton: {
+      label: "Pridať režim",
+      loadingText: "Pridávam...",
+    },
     useWithoutSavingButton: {
       label: "Použiť bez uloženia",
       loadingText: "Používa sa nastavenie…",
