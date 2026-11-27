@@ -102675,17 +102675,20 @@
                   "type": "enum",
                   "entries": {
                     "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                 },
                 "options": [
                   "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
                 ]
               }
             },
@@ -102704,121 +102707,10 @@
             {
               "value": "enums.paymentProvider.nowpayments",
               "label": "enums.paymentProvider.nowpayments"
-            }
-          ],
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "payCurrency": {
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "enum",
-                  "entries": {
-                    "cryptoCoin.btc": "cryptoCoin.btc",
-                    "cryptoCoin.eth": "cryptoCoin.eth",
-                    "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                    "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                    "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                    "cryptoCoin.usdc": "cryptoCoin.usdc",
-                    "cryptoCoin.sol": "cryptoCoin.sol",
-                    "cryptoCoin.ltc": "cryptoCoin.ltc",
-                    "cryptoCoin.xmr": "cryptoCoin.xmr",
-                    "cryptoCoin.doge": "cryptoCoin.doge",
-                    "cryptoCoin.trx": "cryptoCoin.trx",
-                    "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                  }
-                },
-                "type": "enum",
-                "enum": {
-                  "cryptoCoin.btc": "cryptoCoin.btc",
-                  "cryptoCoin.eth": "cryptoCoin.eth",
-                  "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                  "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                  "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                  "cryptoCoin.usdc": "cryptoCoin.usdc",
-                  "cryptoCoin.sol": "cryptoCoin.sol",
-                  "cryptoCoin.ltc": "cryptoCoin.ltc",
-                  "cryptoCoin.xmr": "cryptoCoin.xmr",
-                  "cryptoCoin.doge": "cryptoCoin.doge",
-                  "cryptoCoin.trx": "cryptoCoin.trx",
-                  "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                },
-                "options": [
-                  "cryptoCoin.btc",
-                  "cryptoCoin.eth",
-                  "cryptoCoin.usdtTrc20",
-                  "cryptoCoin.usdtErc20",
-                  "cryptoCoin.usdtBsc",
-                  "cryptoCoin.usdc",
-                  "cryptoCoin.sol",
-                  "cryptoCoin.ltc",
-                  "cryptoCoin.xmr",
-                  "cryptoCoin.doge",
-                  "cryptoCoin.trx",
-                  "cryptoCoin.bnbBsc"
-                ]
-              }
-            },
-            "type": "optional"
-          },
-          "type": "form_field",
-          "fieldType": "select",
-          "label": "Criptovaluta",
-          "description": "Moneta con cui paghi (solo cripto)",
-          "placeholder": "Scegli una moneta",
-          "options": [
-            {
-              "value": "cryptoCoin.btc",
-              "label": "post.payCurrency.label"
             },
             {
-              "value": "cryptoCoin.eth",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.usdtTrc20",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.usdtErc20",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.usdtBsc",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.usdc",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.sol",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.ltc",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.xmr",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.doge",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.trx",
-              "label": "post.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.bnbBsc",
-              "label": "post.payCurrency.label"
+              "value": "enums.paymentProvider.whop",
+              "label": "enums.paymentProvider.whop"
             }
           ],
           "usage": {
@@ -247618,17 +247510,20 @@
                         "type": "enum",
                         "entries": {
                           "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                          "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                          "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                          "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                         }
                       },
                       "type": "enum",
                       "enum": {
                         "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                       },
                       "options": [
                         "enums.paymentProvider.stripe",
-                        "enums.paymentProvider.nowpayments"
+                        "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop"
                       ]
                     },
                     "merchantId": {
@@ -247727,17 +247622,20 @@
                       "type": "enum",
                       "entries": {
                         "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                       }
                     },
                     "type": "enum",
                     "enum": {
                       "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                     },
                     "options": [
                       "enums.paymentProvider.stripe",
-                      "enums.paymentProvider.nowpayments"
+                      "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop"
                     ]
                   },
                   "merchantId": {
@@ -248637,17 +248535,20 @@
               "type": "enum",
               "entries": {
                 "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                "enums.paymentProvider.whop": "enums.paymentProvider.whop"
               }
             },
             "type": "enum",
             "enum": {
               "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-              "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+              "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+              "enums.paymentProvider.whop": "enums.paymentProvider.whop"
             },
             "options": [
               "enums.paymentProvider.stripe",
-              "enums.paymentProvider.nowpayments"
+              "enums.paymentProvider.nowpayments",
+              "enums.paymentProvider.whop"
             ]
           },
           "options": [
@@ -249593,6 +249494,10 @@
             {
               "value": "enums.paymentProvider.nowpayments",
               "label": "enums.paymentProvider.nowpayments"
+            },
+            {
+              "value": "enums.paymentProvider.whop",
+              "label": "enums.paymentProvider.whop"
             }
           ],
           "columns": 3,
@@ -249604,17 +249509,20 @@
                   "type": "enum",
                   "entries": {
                     "STRIPE": "enums.paymentProvider.stripe",
-                    "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                    "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                    "WHOP": "enums.paymentProvider.whop"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "STRIPE": "enums.paymentProvider.stripe",
-                  "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                  "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                  "WHOP": "enums.paymentProvider.whop"
                 },
                 "options": [
                   "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
                 ]
               }
             },
@@ -249849,17 +249757,20 @@
                         "type": "enum",
                         "entries": {
                           "STRIPE": "enums.paymentProvider.stripe",
-                          "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                          "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                          "WHOP": "enums.paymentProvider.whop"
                         }
                       },
                       "type": "enum",
                       "enum": {
                         "STRIPE": "enums.paymentProvider.stripe",
-                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                        "WHOP": "enums.paymentProvider.whop"
                       },
                       "options": [
                         "enums.paymentProvider.stripe",
-                        "enums.paymentProvider.nowpayments"
+                        "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop"
                       ]
                     }
                   },
@@ -251255,17 +251166,20 @@
                         "type": "enum",
                         "entries": {
                           "STRIPE": "enums.paymentProvider.stripe",
-                          "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                          "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                          "WHOP": "enums.paymentProvider.whop"
                         }
                       },
                       "type": "enum",
                       "enum": {
                         "STRIPE": "enums.paymentProvider.stripe",
-                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                        "WHOP": "enums.paymentProvider.whop"
                       },
                       "options": [
                         "enums.paymentProvider.stripe",
-                        "enums.paymentProvider.nowpayments"
+                        "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop"
                       ]
                     },
                     "mode": {
@@ -251445,17 +251359,20 @@
                       "type": "enum",
                       "entries": {
                         "STRIPE": "enums.paymentProvider.stripe",
-                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                        "WHOP": "enums.paymentProvider.whop"
                       }
                     },
                     "type": "enum",
                     "enum": {
                       "STRIPE": "enums.paymentProvider.stripe",
-                      "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                      "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                      "WHOP": "enums.paymentProvider.whop"
                     },
                     "options": [
                       "enums.paymentProvider.stripe",
-                      "enums.paymentProvider.nowpayments"
+                      "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop"
                     ]
                   },
                   "mode": {
@@ -255596,6 +255513,10 @@
             {
               "value": "enums.paymentProvider.nowpayments",
               "label": "enums.paymentProvider.nowpayments"
+            },
+            {
+              "value": "enums.paymentProvider.whop",
+              "label": "enums.paymentProvider.whop"
             }
           ],
           "schema": {
@@ -255606,137 +255527,24 @@
                   "type": "enum",
                   "entries": {
                     "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                 },
                 "options": [
                   "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
                 ]
               }
             },
             "type": "default"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "payCurrency": {
-          "type": "form_field",
-          "fieldType": "select",
-          "label": "Criptovaluta",
-          "description": "Moneta con cui paghi. Lascia vuoto per sceglierla nella pagina di pagamento.",
-          "placeholder": "Scegli una moneta",
-          "columns": 12,
-          "options": [
-            {
-              "value": "cryptoCoin.btc",
-              "label": "cryptoCoin.btc"
-            },
-            {
-              "value": "cryptoCoin.eth",
-              "label": "cryptoCoin.eth"
-            },
-            {
-              "value": "cryptoCoin.usdtTrc20",
-              "label": "cryptoCoin.usdtTrc20"
-            },
-            {
-              "value": "cryptoCoin.usdtErc20",
-              "label": "cryptoCoin.usdtErc20"
-            },
-            {
-              "value": "cryptoCoin.usdtBsc",
-              "label": "cryptoCoin.usdtBsc"
-            },
-            {
-              "value": "cryptoCoin.usdc",
-              "label": "cryptoCoin.usdc"
-            },
-            {
-              "value": "cryptoCoin.sol",
-              "label": "cryptoCoin.sol"
-            },
-            {
-              "value": "cryptoCoin.ltc",
-              "label": "cryptoCoin.ltc"
-            },
-            {
-              "value": "cryptoCoin.xmr",
-              "label": "cryptoCoin.xmr"
-            },
-            {
-              "value": "cryptoCoin.doge",
-              "label": "cryptoCoin.doge"
-            },
-            {
-              "value": "cryptoCoin.trx",
-              "label": "cryptoCoin.trx"
-            },
-            {
-              "value": "cryptoCoin.bnbBsc",
-              "label": "cryptoCoin.bnbBsc"
-            }
-          ],
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "enum",
-                  "entries": {
-                    "cryptoCoin.btc": "cryptoCoin.btc",
-                    "cryptoCoin.eth": "cryptoCoin.eth",
-                    "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                    "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                    "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                    "cryptoCoin.usdc": "cryptoCoin.usdc",
-                    "cryptoCoin.sol": "cryptoCoin.sol",
-                    "cryptoCoin.ltc": "cryptoCoin.ltc",
-                    "cryptoCoin.xmr": "cryptoCoin.xmr",
-                    "cryptoCoin.doge": "cryptoCoin.doge",
-                    "cryptoCoin.trx": "cryptoCoin.trx",
-                    "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                  }
-                },
-                "type": "enum",
-                "enum": {
-                  "cryptoCoin.btc": "cryptoCoin.btc",
-                  "cryptoCoin.eth": "cryptoCoin.eth",
-                  "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                  "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                  "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                  "cryptoCoin.usdc": "cryptoCoin.usdc",
-                  "cryptoCoin.sol": "cryptoCoin.sol",
-                  "cryptoCoin.ltc": "cryptoCoin.ltc",
-                  "cryptoCoin.xmr": "cryptoCoin.xmr",
-                  "cryptoCoin.doge": "cryptoCoin.doge",
-                  "cryptoCoin.trx": "cryptoCoin.trx",
-                  "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                },
-                "options": [
-                  "cryptoCoin.btc",
-                  "cryptoCoin.eth",
-                  "cryptoCoin.usdtTrc20",
-                  "cryptoCoin.usdtErc20",
-                  "cryptoCoin.usdtBsc",
-                  "cryptoCoin.usdc",
-                  "cryptoCoin.sol",
-                  "cryptoCoin.ltc",
-                  "cryptoCoin.xmr",
-                  "cryptoCoin.doge",
-                  "cryptoCoin.trx",
-                  "cryptoCoin.bnbBsc"
-                ]
-              }
-            },
-            "type": "optional"
           },
           "usage": {
             "request": "data"
@@ -284965,6 +284773,10 @@
             {
               "value": "enums.paymentProvider.nowpayments",
               "label": "enums.paymentProvider.nowpayments"
+            },
+            {
+              "value": "enums.paymentProvider.whop",
+              "label": "enums.paymentProvider.whop"
             }
           ],
           "includeInCacheKey": true,
@@ -284976,17 +284788,20 @@
                   "type": "enum",
                   "entries": {
                     "STRIPE": "enums.paymentProvider.stripe",
-                    "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                    "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                    "WHOP": "enums.paymentProvider.whop"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "STRIPE": "enums.paymentProvider.stripe",
-                  "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                  "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                  "WHOP": "enums.paymentProvider.whop"
                 },
                 "options": [
                   "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
                 ]
               }
             },
@@ -285425,17 +285240,20 @@
                     "type": "enum",
                     "entries": {
                       "STRIPE": "enums.paymentProvider.stripe",
-                      "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                      "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                      "WHOP": "enums.paymentProvider.whop"
                     }
                   },
                   "type": "enum",
                   "enum": {
                     "STRIPE": "enums.paymentProvider.stripe",
-                    "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                    "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                    "WHOP": "enums.paymentProvider.whop"
                   },
                   "options": [
                     "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop"
                   ]
                 },
                 "usage": {
@@ -285930,17 +285748,20 @@
                         "type": "enum",
                         "entries": {
                           "STRIPE": "enums.paymentProvider.stripe",
-                          "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                          "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                          "WHOP": "enums.paymentProvider.whop"
                         }
                       },
                       "type": "enum",
                       "enum": {
                         "STRIPE": "enums.paymentProvider.stripe",
-                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                        "WHOP": "enums.paymentProvider.whop"
                       },
                       "options": [
                         "enums.paymentProvider.stripe",
-                        "enums.paymentProvider.nowpayments"
+                        "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop"
                       ]
                     }
                   },
@@ -286833,6 +286654,287 @@
     "category": "payments",
     "tags": ["payment", "admin"],
     "aliases": ["stripe-prices-ensure"],
+    "credits": 0
+  },
+  {
+    "toolName": "whop-catalog-sync",
+    "title": "Sincronizza catalogo Whop",
+    "titleShort": "Catalogo Whop",
+    "description": "Crea ogni piano e pacchetto di crediti nell'account Whop collegato: un prodotto per piano, una variante per intervallo, valuta e prezzo, ritrovata tramite la nostra chiave nei metadati. Idempotente. La prova a vuoto elenca cosa esiste e cosa manca.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "dryRun": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Prova a vuoto",
+          "description": "Elenca le varianti senza creare nulla",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  }
+                },
+                "type": "optional"
+              }
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "formAlert": {
+          "schemaType": "widget",
+          "type": "form_alert",
+          "usage": {
+            "request": "data"
+          }
+        },
+        "dryRunApplied": {
+          "type": "text",
+          "label": "Prova a vuoto",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "environment": {
+          "type": "text",
+          "label": "Ambiente Whop",
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "production": "production",
+                "sandbox": "sandbox"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "production": "production",
+              "sandbox": "sandbox"
+            },
+            "options": ["production", "sandbox"]
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "accountId": {
+          "type": "text",
+          "label": "Account Whop",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "existing": {
+          "type": "text",
+          "label": "Già presenti",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "created": {
+          "type": "text",
+          "label": "Create ora",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "missing": {
+          "type": "text",
+          "label": "Mancanti",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "variants": {
+          "type": "container",
+          "title": "Varianti",
+          "child": {
+            "type": "container",
+            "layoutType": "grid",
+            "columns": 12,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "key": {
+                "type": "text",
+                "label": "Chiave",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "variantId": {
+                "type": "text",
+                "label": "ID variante",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "productId": {
+                "type": "text",
+                "label": "Prodotto Whop",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "amount": {
+                "type": "text",
+                "label": "Importo",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "status": {
+                "type": "text",
+                "label": "Stato",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "existing": "existing",
+                      "created": "created",
+                      "missing": "missing"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "existing": "existing",
+                    "created": "created",
+                    "missing": "missing"
+                  },
+                  "options": ["existing", "created", "missing"]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "purchaseUrl": {
+                "type": "text",
+                "label": "Link di acquisto",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "payments",
+    "tags": ["payment", "admin"],
+    "aliases": ["whop-catalog-sync"],
     "credits": 0
   },
   {
@@ -321194,17 +321296,20 @@
                         "type": "enum",
                         "entries": {
                           "STRIPE": "enums.paymentProvider.stripe",
-                          "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                          "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                          "WHOP": "enums.paymentProvider.whop"
                         }
                       },
                       "type": "enum",
                       "enum": {
                         "STRIPE": "enums.paymentProvider.stripe",
-                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments"
+                        "NOWPAYMENTS": "enums.paymentProvider.nowpayments",
+                        "WHOP": "enums.paymentProvider.whop"
                       },
                       "options": [
                         "enums.paymentProvider.stripe",
-                        "enums.paymentProvider.nowpayments"
+                        "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop"
                       ]
                     },
                     "usage": {
@@ -326215,17 +326320,20 @@
                   "type": "enum",
                   "entries": {
                     "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                 },
                 "options": [
                   "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
                 ]
               }
             },
@@ -327422,17 +327530,20 @@
                     "type": "enum",
                     "entries": {
                       "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                     }
                   },
                   "type": "enum",
                   "enum": {
                     "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                   },
                   "options": [
                     "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop"
                   ]
                 },
                 "usage": {
@@ -327861,6 +327972,10 @@
             {
               "value": "enums.paymentProvider.nowpayments",
               "label": "enums.paymentProvider.nowpayments"
+            },
+            {
+              "value": "enums.paymentProvider.whop",
+              "label": "enums.paymentProvider.whop"
             }
           ],
           "schema": {
@@ -327871,136 +327986,24 @@
                   "type": "enum",
                   "entries": {
                     "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                 },
                 "options": [
                   "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
                 ]
               }
             },
             "type": "default"
-          },
-          "hidden": true,
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "payCurrency": {
-          "type": "form_field",
-          "fieldType": "select",
-          "label": "Criptovaluta",
-          "description": "Moneta con cui paghi (solo pagamento in cripto)",
-          "options": [
-            {
-              "value": "cryptoCoin.btc",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.eth",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.usdtTrc20",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.usdtErc20",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.usdtBsc",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.usdc",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.sol",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.ltc",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.xmr",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.doge",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.trx",
-              "label": "form.fields.payCurrency.label"
-            },
-            {
-              "value": "cryptoCoin.bnbBsc",
-              "label": "form.fields.payCurrency.label"
-            }
-          ],
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "enum",
-                  "entries": {
-                    "cryptoCoin.btc": "cryptoCoin.btc",
-                    "cryptoCoin.eth": "cryptoCoin.eth",
-                    "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                    "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                    "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                    "cryptoCoin.usdc": "cryptoCoin.usdc",
-                    "cryptoCoin.sol": "cryptoCoin.sol",
-                    "cryptoCoin.ltc": "cryptoCoin.ltc",
-                    "cryptoCoin.xmr": "cryptoCoin.xmr",
-                    "cryptoCoin.doge": "cryptoCoin.doge",
-                    "cryptoCoin.trx": "cryptoCoin.trx",
-                    "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                  }
-                },
-                "type": "enum",
-                "enum": {
-                  "cryptoCoin.btc": "cryptoCoin.btc",
-                  "cryptoCoin.eth": "cryptoCoin.eth",
-                  "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                  "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                  "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                  "cryptoCoin.usdc": "cryptoCoin.usdc",
-                  "cryptoCoin.sol": "cryptoCoin.sol",
-                  "cryptoCoin.ltc": "cryptoCoin.ltc",
-                  "cryptoCoin.xmr": "cryptoCoin.xmr",
-                  "cryptoCoin.doge": "cryptoCoin.doge",
-                  "cryptoCoin.trx": "cryptoCoin.trx",
-                  "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                },
-                "options": [
-                  "cryptoCoin.btc",
-                  "cryptoCoin.eth",
-                  "cryptoCoin.usdtTrc20",
-                  "cryptoCoin.usdtErc20",
-                  "cryptoCoin.usdtBsc",
-                  "cryptoCoin.usdc",
-                  "cryptoCoin.sol",
-                  "cryptoCoin.ltc",
-                  "cryptoCoin.xmr",
-                  "cryptoCoin.doge",
-                  "cryptoCoin.trx",
-                  "cryptoCoin.bnbBsc"
-                ]
-              }
-            },
-            "type": "optional"
           },
           "hidden": true,
           "usage": {
@@ -336517,17 +336520,20 @@
                       "type": "enum",
                       "entries": {
                         "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                       }
                     },
                     "type": "enum",
                     "enum": {
                       "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                     },
                     "options": [
                       "enums.paymentProvider.stripe",
-                      "enums.paymentProvider.nowpayments"
+                      "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop"
                     ]
                   }
                 },
@@ -336537,17 +336543,20 @@
                     "type": "enum",
                     "entries": {
                       "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                     }
                   },
                   "type": "enum",
                   "enum": {
                     "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                   },
                   "options": [
                     "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop"
                   ]
                 }
               }
@@ -336579,145 +336588,19 @@
           },
           "schemaType": "primitive"
         },
-        "cryptoCoins": {
+        "cryptoMinUsd": {
           "type": "text",
-          "label": "Criptovalute e minimi",
+          "label": "Minimo cripto (USD)",
           "schema": {
             "def": {
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "array",
-                  "element": {
-                    "def": {
-                      "type": "object",
-                      "shape": {
-                        "coin": {
-                          "def": {
-                            "type": "enum",
-                            "entries": {
-                              "cryptoCoin.btc": "cryptoCoin.btc",
-                              "cryptoCoin.eth": "cryptoCoin.eth",
-                              "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                              "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                              "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                              "cryptoCoin.usdc": "cryptoCoin.usdc",
-                              "cryptoCoin.sol": "cryptoCoin.sol",
-                              "cryptoCoin.ltc": "cryptoCoin.ltc",
-                              "cryptoCoin.xmr": "cryptoCoin.xmr",
-                              "cryptoCoin.doge": "cryptoCoin.doge",
-                              "cryptoCoin.trx": "cryptoCoin.trx",
-                              "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                            }
-                          },
-                          "type": "enum",
-                          "enum": {
-                            "cryptoCoin.btc": "cryptoCoin.btc",
-                            "cryptoCoin.eth": "cryptoCoin.eth",
-                            "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                            "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                            "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                            "cryptoCoin.usdc": "cryptoCoin.usdc",
-                            "cryptoCoin.sol": "cryptoCoin.sol",
-                            "cryptoCoin.ltc": "cryptoCoin.ltc",
-                            "cryptoCoin.xmr": "cryptoCoin.xmr",
-                            "cryptoCoin.doge": "cryptoCoin.doge",
-                            "cryptoCoin.trx": "cryptoCoin.trx",
-                            "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                          },
-                          "options": [
-                            "cryptoCoin.btc",
-                            "cryptoCoin.eth",
-                            "cryptoCoin.usdtTrc20",
-                            "cryptoCoin.usdtErc20",
-                            "cryptoCoin.usdtBsc",
-                            "cryptoCoin.usdc",
-                            "cryptoCoin.sol",
-                            "cryptoCoin.ltc",
-                            "cryptoCoin.xmr",
-                            "cryptoCoin.doge",
-                            "cryptoCoin.trx",
-                            "cryptoCoin.bnbBsc"
-                          ]
-                        },
-                        "minUsd": {
-                          "def": {
-                            "type": "number",
-                            "checks": []
-                          },
-                          "type": "number",
-                          "isFinite": true
-                        }
-                      }
-                    },
-                    "type": "object"
-                  }
+                  "type": "number",
+                  "checks": []
                 },
-                "type": "array",
-                "element": {
-                  "def": {
-                    "type": "object",
-                    "shape": {
-                      "coin": {
-                        "def": {
-                          "type": "enum",
-                          "entries": {
-                            "cryptoCoin.btc": "cryptoCoin.btc",
-                            "cryptoCoin.eth": "cryptoCoin.eth",
-                            "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                            "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                            "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                            "cryptoCoin.usdc": "cryptoCoin.usdc",
-                            "cryptoCoin.sol": "cryptoCoin.sol",
-                            "cryptoCoin.ltc": "cryptoCoin.ltc",
-                            "cryptoCoin.xmr": "cryptoCoin.xmr",
-                            "cryptoCoin.doge": "cryptoCoin.doge",
-                            "cryptoCoin.trx": "cryptoCoin.trx",
-                            "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                          }
-                        },
-                        "type": "enum",
-                        "enum": {
-                          "cryptoCoin.btc": "cryptoCoin.btc",
-                          "cryptoCoin.eth": "cryptoCoin.eth",
-                          "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
-                          "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
-                          "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
-                          "cryptoCoin.usdc": "cryptoCoin.usdc",
-                          "cryptoCoin.sol": "cryptoCoin.sol",
-                          "cryptoCoin.ltc": "cryptoCoin.ltc",
-                          "cryptoCoin.xmr": "cryptoCoin.xmr",
-                          "cryptoCoin.doge": "cryptoCoin.doge",
-                          "cryptoCoin.trx": "cryptoCoin.trx",
-                          "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
-                        },
-                        "options": [
-                          "cryptoCoin.btc",
-                          "cryptoCoin.eth",
-                          "cryptoCoin.usdtTrc20",
-                          "cryptoCoin.usdtErc20",
-                          "cryptoCoin.usdtBsc",
-                          "cryptoCoin.usdc",
-                          "cryptoCoin.sol",
-                          "cryptoCoin.ltc",
-                          "cryptoCoin.xmr",
-                          "cryptoCoin.doge",
-                          "cryptoCoin.trx",
-                          "cryptoCoin.bnbBsc"
-                        ]
-                      },
-                      "minUsd": {
-                        "def": {
-                          "type": "number",
-                          "checks": []
-                        },
-                        "type": "number",
-                        "isFinite": true
-                      }
-                    }
-                  },
-                  "type": "object"
-                }
+                "type": "number",
+                "isFinite": true
               }
             },
             "type": "optional"
@@ -336738,17 +336621,20 @@
                   "type": "enum",
                   "entries": {
                     "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop": "enums.paymentProvider.whop"
                 },
                 "options": [
                   "enums.paymentProvider.stripe",
-                  "enums.paymentProvider.nowpayments"
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
                 ]
               }
             },
@@ -337060,6 +336946,687 @@
     "instanceId": "local",
     "category": "payments",
     "tags": ["abbonamento", "fatturazione", "- No."],
+    "credits": 0
+  },
+  {
+    "toolName": "subscription-provider-switch",
+    "title": "Sposta il tuo piano",
+    "titleShort": "Sposta piano",
+    "description": "Mostra se il tuo piano con carta può passare al nuovo fornitore di pagamento e quando lì inizia la fatturazione.",
+    "fields": {
+      "usage": {
+        "response": true
+      },
+      "children": {
+        "offer": {
+          "type": "badge",
+          "label": "Offerta",
+          "enumOptions": [
+            {
+              "value": "enums.offer.available",
+              "label": "enums.offer.available"
+            },
+            {
+              "value": "enums.offer.planNotSupported",
+              "label": "enums.offer.planNotSupported"
+            },
+            {
+              "value": "enums.offer.notEligible",
+              "label": "enums.offer.notEligible"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "AVAILABLE": "enums.offer.available",
+                "PLAN_NOT_SUPPORTED": "enums.offer.planNotSupported",
+                "NOT_ELIGIBLE": "enums.offer.notEligible"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "AVAILABLE": "enums.offer.available",
+              "PLAN_NOT_SUPPORTED": "enums.offer.planNotSupported",
+              "NOT_ELIGIBLE": "enums.offer.notEligible"
+            },
+            "options": [
+              "enums.offer.available",
+              "enums.offer.planNotSupported",
+              "enums.offer.notEligible"
+            ]
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "targetProvider": {
+          "type": "text",
+          "label": "Nuovo fornitore",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                },
+                "options": [
+                  "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "plan": {
+          "type": "text",
+          "label": "Piano",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "SUBSCRIPTION": "enums.plan.subscription",
+                    "PLUS": "enums.plan.plus",
+                    "PRO": "enums.plan.pro",
+                    "ULTRA": "enums.plan.ultra"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "SUBSCRIPTION": "enums.plan.subscription",
+                  "PLUS": "enums.plan.plus",
+                  "PRO": "enums.plan.pro",
+                  "ULTRA": "enums.plan.ultra"
+                },
+                "options": [
+                  "enums.plan.subscription",
+                  "enums.plan.plus",
+                  "enums.plan.pro",
+                  "enums.plan.ultra"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "billingInterval": {
+          "type": "text",
+          "label": "Frequenza di fatturazione",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "MONTHLY": "enums.billing.monthly",
+                    "YEARLY": "enums.billing.yearly"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "MONTHLY": "enums.billing.monthly",
+                  "YEARLY": "enums.billing.yearly"
+                },
+                "options": ["enums.billing.monthly", "enums.billing.yearly"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "pastDue": {
+          "type": "text",
+          "label": "Pagamento scaduto",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "deadline": {
+          "type": "text",
+          "label": "Piano attivo fino al",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "date"
+                      },
+                      "type": "date"
+                    },
+                    {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "out": {
+                  "def": {
+                    "type": "transform"
+                  },
+                  "type": "transform"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "billingStartAt": {
+          "type": "text",
+          "label": "Nuova fatturazione dal",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "date"
+                      },
+                      "type": "date"
+                    },
+                    {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "out": {
+                  "def": {
+                    "type": "transform"
+                  },
+                  "type": "transform"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "firstPeriodEnd": {
+          "type": "text",
+          "label": "Fine del primo nuovo periodo",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "date"
+                      },
+                      "type": "date"
+                    },
+                    {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "out": {
+                  "def": {
+                    "type": "transform"
+                  },
+                  "type": "transform"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "carryOver": {
+          "type": "badge",
+          "label": "Riporto del tempo pagato",
+          "enumOptions": [
+            {
+              "value": "enums.carryOver.extendFirstPeriod",
+              "label": "enums.carryOver.extendFirstPeriod"
+            },
+            {
+              "value": "enums.carryOver.deferredStart",
+              "label": "enums.carryOver.deferredStart"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "EXTEND_FIRST_PERIOD": "enums.carryOver.extendFirstPeriod",
+                    "DEFERRED_START": "enums.carryOver.deferredStart"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "EXTEND_FIRST_PERIOD": "enums.carryOver.extendFirstPeriod",
+                  "DEFERRED_START": "enums.carryOver.deferredStart"
+                },
+                "options": [
+                  "enums.carryOver.extendFirstPeriod",
+                  "enums.carryOver.deferredStart"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "payments",
+    "tags": ["Abbonamento", "Fatturazione"],
+    "aliases": ["subscription-provider-switch"],
+    "credits": 0
+  },
+  {
+    "toolName": "subscription-provider-switch-start",
+    "title": "Avvia lo spostamento del piano",
+    "titleShort": "Sposta piano",
+    "description": "Apre il pagamento presso il nuovo fornitore per il tuo piano attuale. Il vecchio piano con carta si ferma una volta pagato il nuovo. Nessun doppio addebito.",
+    "fields": {
+      "usage": {
+        "response": true
+      },
+      "children": {
+        "checkoutUrl": {
+          "type": "text",
+          "label": "Link di pagamento",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "sessionId": {
+          "type": "text",
+          "label": "Sessione di pagamento",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "payments",
+    "tags": ["Abbonamento", "Fatturazione"],
+    "aliases": ["subscription-provider-switch-start"],
     "credits": 0
   },
   {
@@ -421240,80 +421807,20 @@
   },
   {
     "toolName": "coding-agent",
-    "title": "Run Coding Agent",
+    "title": "Avvia agente di programmazione",
     "titleShort": "Agente di programmazione",
-    "description": "Eseguire un compito agente di codifica. Modalità Batch (DEFAULT): viene eseguito senza testa e restituisce l'output. Modalità interattiva: apre una sessione terminale dal vivo - il risultato viene rispedito automaticamente quando la sessione termina.",
+    "description": "Esegue un compito con Claude Code, OpenCode, Codex o Antigravity. Indica un nome per salvare e riprendere la conversazione con guida in tempo reale, oppure attiva interactiveMode=true per aprire un terminale.",
     "fields": {
       "usage": {
         "request": "data",
         "response": true
       },
       "children": {
-        "prompt": {
-          "type": "form_field",
-          "fieldType": "textarea",
-          "label": "Prompt",
-          "description": "Il compito o la domanda di inviare all'agente di codifica. Essere specifici - includere i percorsi di file, il contesto e il formato di output previsto.",
-          "columns": 12,
-          "schema": {
-            "def": {
-              "type": "string",
-              "checks": [{}]
-            },
-            "type": "string"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "provider": {
-          "type": "form_field",
-          "fieldType": "select",
-          "label": "Fornitore",
-          "description": "Quale agente di codifica CLI da usare. claude-code utilizza lo Claude CLI; open-code utilizza l'OpenCode CLI.",
-          "columns": 6,
-          "options": [
-            {
-              "value": "claude-code",
-              "label": "codingAgent.run.post.fields.provider.options.claudeCode"
-            },
-            {
-              "value": "open-code",
-              "label": "codingAgent.run.post.fields.provider.options.openCode"
-            }
-          ],
-          "schema": {
-            "def": {
-              "type": "default",
-              "innerType": {
-                "def": {
-                  "type": "enum",
-                  "entries": {
-                    "claude-code": "claude-code",
-                    "open-code": "open-code"
-                  }
-                },
-                "type": "enum",
-                "enum": {
-                  "claude-code": "claude-code",
-                  "open-code": "open-code"
-                },
-                "options": ["claude-code", "open-code"]
-              }
-            },
-            "type": "default"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "model": {
+        "name": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Modello",
-          "description": "Modello da usare. Per Claude Code: modello ID (ad esempio claude-sonnet-4-6). Per OpenCode: provider/modello (ad esempio antropologico/claude-sonnet-4-6). Lasciare vuoto per impostazione predefinita.",
+          "label": "Nome agente",
+          "description": "Nome persistente facoltativo (da 1 a 40 lettere, cifre, trattini o trattini bassi). Riusare il nome riprende la conversazione.",
           "columns": 6,
           "schema": {
             "def": {
@@ -421332,11 +421839,255 @@
           },
           "schemaType": "primitive"
         },
+        "prompt": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Compito",
+          "description": "Il compito o la domanda da inviare all'agente. Indica percorsi file, contesto e verifiche attese.",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "promptFile": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "File del compito",
+          "description": "Percorso del file di istruzioni relativo alla cartella corrente. Alternativa al testo diretto.",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "provider": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Provider",
+          "description": "CLI da usare: claude-code, open-code, codex o antigravity. Predefinito codex per nuovi agenti con nome, claude-code per esecuzioni senza nome.",
+          "columns": 6,
+          "options": [
+            {
+              "value": "claude-code",
+              "label": "claude-code"
+            },
+            {
+              "value": "open-code",
+              "label": "open-code"
+            },
+            {
+              "value": "codex",
+              "label": "codex"
+            },
+            {
+              "value": "antigravity",
+              "label": "antigravity"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "CLAUDE_CODE": "claude-code",
+                    "OPEN_CODE": "open-code",
+                    "CODEX": "codex",
+                    "ANTIGRAVITY": "antigravity"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "CLAUDE_CODE": "claude-code",
+                  "OPEN_CODE": "open-code",
+                  "CODEX": "codex",
+                  "ANTIGRAVITY": "antigravity"
+                },
+                "options": ["claude-code", "open-code", "codex", "antigravity"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "model": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Modello",
+          "description": "ID modello del provider. Lascia vuoto per il predefinito (Antigravity usa Gemini 4 Neon High, Codex usa gpt-6.2-sol).",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "effort": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Livello di ragionamento",
+          "description": "Livello di ragionamento per Codex o Antigravity (es. low, medium, high).",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "sandbox": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Sandbox Codex",
+          "description": "Isolamento file per Codex (read-only, workspace-write o danger-full-access).",
+          "columns": 6,
+          "options": [
+            {
+              "value": "read-only",
+              "label": "read-only"
+            },
+            {
+              "value": "workspace-write",
+              "label": "workspace-write"
+            },
+            {
+              "value": "danger-full-access",
+              "label": "danger-full-access"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "READ_ONLY": "read-only",
+                    "WORKSPACE_WRITE": "workspace-write",
+                    "FULL_ACCESS": "danger-full-access"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "READ_ONLY": "read-only",
+                  "WORKSPACE_WRITE": "workspace-write",
+                  "FULL_ACCESS": "danger-full-access"
+                },
+                "options": [
+                  "read-only",
+                  "workspace-write",
+                  "danger-full-access"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "cwd": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Cartella di lavoro",
+          "description": "Cartella in cui lavora l'agente. Predefinita la cartella corrente.",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "fresh": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Nuova conversazione",
+          "description": "Avvia una nuova conversazione invece di riprendere il thread salvato per questo nome.",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "taskTitle": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Titolo della missione",
-          "description": "Titolo breve per l'archiviazione di questa attività (ad esempio 'Fix login bug'). Auto-generato dal prompt se omesso.",
+          "label": "Titolo del compito",
+          "description": "Titolo breve per archiviare il compito. Generato automaticamente dal prompt se omesso.",
           "columns": 12,
           "schema": {
             "def": {
@@ -421359,7 +422110,7 @@
           "type": "form_field",
           "fieldType": "boolean",
           "label": "Modalità interattiva",
-          "description": "falso (DEFAULT): viene eseguito senza testa e restituisce tutto l'output quando fatto. true: apre una finestra terminale per una sessione live - il risultato viene rispedito automaticamente quando la sessione termina.",
+          "description": "false (PREDEFINITO): esegue senza interfaccia e restituisce l'output. true: apre una finestra terminale dal vivo e invia il risultato al termine.",
           "columns": 6,
           "schema": {
             "def": {
@@ -421405,7 +422156,7 @@
         },
         "output": {
           "type": "text",
-          "label": "Produzione",
+          "label": "Output",
           "schema": {
             "def": {
               "type": "string"
@@ -421419,7 +422170,7 @@
         },
         "durationMs": {
           "type": "text",
-          "label": "Durata (m)",
+          "label": "Durata (ms)",
           "schema": {
             "def": {
               "type": "number",
@@ -421427,6 +422178,77 @@
             },
             "type": "number",
             "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "nameOut": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "threadId": {
+          "type": "text",
+          "label": "ID conversazione",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "status": {
+          "type": "text",
+          "label": "Stato",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "completed": "completed",
+                    "interrupted": "interrupted"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "completed": "completed",
+                  "interrupted": "interrupted"
+                },
+                "options": ["completed", "interrupted"]
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -421502,7 +422324,506 @@
     "instanceId": "local",
     "category": "ai",
     "tags": ["Compiti"],
-    "aliases": ["coding-agent", "claude-code", "claude", "open-code"],
+    "aliases": [
+      "coding-agent",
+      "subagent-run",
+      "claude-code",
+      "claude",
+      "open-code",
+      "codex",
+      "antigravity"
+    ],
+    "credits": 0
+  },
+  {
+    "toolName": "coding-agent-interrupt",
+    "title": "Interrompi agente di programmazione",
+    "titleShort": "Interrompi agente",
+    "description": "Ferma il turno attivo di un agente Codex o Antigravity. Riusa il nome più tardi per riprendere la conversazione.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "name": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Nome agente",
+          "description": "Nome persistente facoltativo (da 1 a 40 lettere, cifre, trattini o trattini bassi). Riusare il nome riprende la conversazione.",
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [
+                {
+                  "def": {
+                    "type": "custom",
+                    "check": "custom"
+                  },
+                  "type": "custom"
+                }
+              ]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "interrupted": {
+          "type": "text",
+          "label": "Interruzione inviata",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Compiti"],
+    "aliases": ["coding-agent-interrupt", "agent-interrupt"],
+    "credits": 0
+  },
+  {
+    "toolName": "coding-agent-list",
+    "title": "Elenca agenti di programmazione",
+    "titleShort": "Elenca agenti",
+    "description": "Elenca gli agenti attivi e salvati. Indica un nome per vedere stato, registro recente e ultima risposta.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "name": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Nome agente",
+          "description": "Nome persistente facoltativo (da 1 a 40 lettere, cifre, trattini o trattini bassi). Riusare il nome riprende la conversazione.",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "custom",
+                        "check": "custom"
+                      },
+                      "type": "custom"
+                    }
+                  ]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "lines": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Righe del registro",
+          "description": "Numero di righe finali del registro da includere per un singolo agente.",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "agents": {
+          "type": "container",
+          "label": "Agenti",
+          "child": {
+            "type": "container",
+            "layoutType": "stacked",
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "name": {
+                "type": "text",
+                "label": "Nome agente",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "provider": {
+                "type": "text",
+                "label": "Provider",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "CLAUDE_CODE": "claude-code",
+                      "OPEN_CODE": "open-code",
+                      "CODEX": "codex",
+                      "ANTIGRAVITY": "antigravity"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "CLAUDE_CODE": "claude-code",
+                    "OPEN_CODE": "open-code",
+                    "CODEX": "codex",
+                    "ANTIGRAVITY": "antigravity"
+                  },
+                  "options": [
+                    "claude-code",
+                    "open-code",
+                    "codex",
+                    "antigravity"
+                  ]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "status": {
+                "type": "text",
+                "label": "Stato",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "IDLE": "idle",
+                      "RUNNING": "running",
+                      "COMPLETED": "completed",
+                      "INTERRUPTED": "interrupted",
+                      "FAILED": "failed"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "IDLE": "idle",
+                    "RUNNING": "running",
+                    "COMPLETED": "completed",
+                    "INTERRUPTED": "interrupted",
+                    "FAILED": "failed"
+                  },
+                  "options": [
+                    "idle",
+                    "running",
+                    "completed",
+                    "interrupted",
+                    "failed"
+                  ]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "threadId": {
+                "type": "text",
+                "label": "ID conversazione",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "cwd": {
+                "type": "text",
+                "label": "Cartella di lavoro",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "startedAt": {
+                "type": "text",
+                "label": "Avvio",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "finishedAt": {
+                "type": "text",
+                "label": "Fine",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        },
+        "tail": {
+          "type": "text",
+          "label": "Registro recente",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "lastMessage": {
+          "type": "text",
+          "label": "Ultima risposta",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "lastError": {
+          "type": "text",
+          "label": "Ultimo errore",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Compiti"],
+    "aliases": ["coding-agent-list", "agent-list", "agent-status"],
+    "credits": 0
+  },
+  {
+    "toolName": "coding-agent-say",
+    "title": "Guida agente di programmazione",
+    "titleShort": "Guida agente",
+    "description": "Invia un messaggio durante il turno a un agente Codex o Antigravity attivo. A turno concluso, riusa il nome con coding-agent per continuare.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "name": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Nome agente",
+          "description": "Nome persistente facoltativo (da 1 a 40 lettere, cifre, trattini o trattini bassi). Riusare il nome riprende la conversazione.",
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [
+                {
+                  "def": {
+                    "type": "custom",
+                    "check": "custom"
+                  },
+                  "type": "custom"
+                }
+              ]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "message": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Messaggio",
+          "description": "Indicazione da inviare al turno in corso.",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "messageFile": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "File del messaggio",
+          "description": "Percorso del file con il messaggio, relativo alla cartella corrente.",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "delivered": {
+          "type": "text",
+          "label": "Consegnato",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Compiti"],
+    "aliases": ["coding-agent-say", "agent-say"],
     "credits": 0
   },
   {

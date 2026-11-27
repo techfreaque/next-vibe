@@ -81,6 +81,11 @@ import {
 import { smsEnv, smsEnvExamples, smsEnvSchema } from "../../sms/env";
 import { sshEnv, sshEnvExamples, sshEnvSchema } from "../../ssh/env";
 import {
+  providerSwitchEnv,
+  providerSwitchEnvExamples,
+  providerSwitchEnvSchema,
+} from "../../subscription/provider-switch/env";
+import {
   cortexEnv,
   cortexEnvExamples,
   cortexEnvSchema,
@@ -245,6 +250,11 @@ export const envModules: Record<
   },
   sms: { env: smsEnv, schema: smsEnvSchema, examples: smsEnvExamples },
   ssh: { env: sshEnv, schema: sshEnvSchema, examples: sshEnvExamples },
+  providerSwitch: {
+    env: providerSwitchEnv,
+    schema: providerSwitchEnvSchema,
+    examples: providerSwitchEnvExamples,
+  },
   cortex: {
     env: cortexEnv,
     schema: cortexEnvSchema,
@@ -320,6 +330,7 @@ export const envSchema = apiKeysEnvSchema
   .merge(paymentEnvSchema)
   .merge(smsEnvSchema)
   .merge(sshEnvSchema)
+  .merge(providerSwitchEnvSchema)
   .merge(cortexEnvSchema)
   .merge(agentEnvSchema)
   .merge(coreEnvSchema)
