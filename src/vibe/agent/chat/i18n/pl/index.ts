@@ -942,6 +942,8 @@ export const translations: typeof enTranslations = {
         "DeepSeek V4.1 Flash Uncensored - DeepSeek V4.1 Flash bez odmów, serwowany przez Venice.ai. Prawdziwe możliwości, zero moralizowania, z narzędziami. Kontekst 1M tokenów.",
       drummerArtemis31b:
         "Artemis 31B - Fine-tune Gemmy 4 od TheDrummera do roleplayu. Mroczne sceny, dosadna fikcja, postacie, które nie wypadają z roli. Tani, kontekst 262K, czyta obrazy, wywołuje narzędzia.",
+      hermes4405b:
+        "Hermes 4 405B - tuning Llama 3.1 405B od Nous Research. Słucha promptu systemowego, rzadko odmawia, rozumuje, gdy trzeba. Fikcja i roleplay, kontekst 131K, bez wywołań narzędzi.",
       grokImagineImage2:
         "Grok Imagine Image 2.0 - Najnowszy model generowania obrazów xAI z lepszą wiernością i jakością.",
       recraftV41:

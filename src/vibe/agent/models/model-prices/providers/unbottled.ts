@@ -1,7 +1,8 @@
 /**
  * Unbottled AI price fetcher
  *
- * For each model, reads the primary (cheapest non-UNBOTTLED) provider entry,
+ * For each model, reads the static primary provider entry (cheapest public
+ * non-UNBOTTLED route, see compareStaticPrimaryRoutes),
  * applies 30% markup to all cost fields, and emits a typed ProviderEntryOperation.
  * All non-cost fields (supportedResolutions, minDurationSeconds, etc.) are copied verbatim.
  *
@@ -25,7 +26,11 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
-import { chatModelDefinitions, ChatModelId } from "../../../ai-stream/models";
+import {
+  chatModelDefinitions,
+  ChatModelId,
+  compareStaticPrimaryRoutes,
+} from "../../../ai-stream/models";
 import {
   imageGenModelDefinitions,
   ImageGenModelId,
@@ -364,9 +369,12 @@ export class UnbottledPriceFetcher extends PriceFetcher {
       for (const [modelId, def] of Object.entries(defs)) {
         totalModels++;
 
-        const primaryProvider = def.providers.find(
-          (p) => p.apiProvider !== ApiProvider.UNBOTTLED,
-        );
+        // The relay resells the route the cloud bills by default: the
+        // static primary (public before route-only/admin-only, cheapest
+        // first), never just the first row in definition order.
+        const primaryProvider = def.providers
+          .filter((p) => p.apiProvider !== ApiProvider.UNBOTTLED)
+          .toSorted(compareStaticPrimaryRoutes)[0];
         if (!primaryProvider) {
           continue;
         }

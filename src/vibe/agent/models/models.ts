@@ -663,6 +663,11 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "TheDrummer",
     icon: "theater",
   },
+  nousResearch: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Nous Research",
+    icon: "brain",
+  },
   freedomGPT: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "FreedomGPT",

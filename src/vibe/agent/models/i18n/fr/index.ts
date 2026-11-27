@@ -405,6 +405,7 @@ export const translations: typeof enTranslations = {
     META_MUSE_EMBER: "Meta Muse Ember",
     VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED: "DeepSeek V4.1 Flash Uncensored",
     DRUMMER_ARTEMIS_31B: "Artemis 31B",
+    HERMES_4_405B: "Hermes 4 405B",
     GPT_6_2_SOL: "GPT-6.2 Sol",
     GPT_6_2_ASTRA: "GPT-6.2 Astra",
     SUPERGEMMA_4_26B: "SuperGemma4 26B Uncensored",

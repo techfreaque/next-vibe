@@ -940,6 +940,8 @@ export const translations: typeof enTranslations = {
         "DeepSeek V4.1 Flash Uncensored. Variant DeepSeek V4.1 Flash s odstráneným odmietaním cez Venice.ai. Zachováva výkon aj volanie nástrojov a odpovedá bez poučovania. Kontext: 1 milión tokenov.",
       drummerArtemis31b:
         "Artemis 31B. Model Gemma 4 doladený autorom TheDrummer na hranie rolí. Zvláda temné scény, explicitnú fikciu a zachováva spôsob reči postáv. Má nízku cenu, kontext 262 000 tokenov, podporuje obrázky a volanie nástrojov.",
+      hermes4405b:
+        "Hermes 4 405B - ladenie Llama 3.1 405B od Nous Research. Počúva systémový prompt, odmieta zriedka, keď treba, uvažuje. Fikcia a roleplay, kontext 131K, bez volania nástrojov.",
       grokImagineImage2:
         "Grok Imagine Image 2.0. Obrazový model od xAI presnejšie dodržiava zadanie a vytvára kvalitnejšie obrázky.",
       recraftV41:
