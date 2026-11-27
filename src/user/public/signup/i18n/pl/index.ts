@@ -239,7 +239,7 @@ export const translations: typeof enTranslations = {
         "Zapisz się do newslettera: +{{credits}} darmowych kredytów co miesiąc",
       hint: "Nowe modele i wiadomości o produkcie co kilka tygodni. Możesz zrezygnować w każdej chwili.",
       tooltip:
-        "Po potwierdzeniu adresu dostajesz co miesiąc {{credits}} dodatkowych kredytów, łącznie {{total}}, dopóki subskrybujesz newsletter.",
+        "Kliknij link w powitalnym mailu newslettera, a co miesiąc dostaniesz {{credits}} dodatkowych kredytów, łącznie {{total}}, dopóki subskrybujesz newsletter.",
     },
 
     referralCode: {

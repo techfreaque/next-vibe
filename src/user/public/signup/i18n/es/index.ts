@@ -236,7 +236,7 @@ export const translations: typeof enTranslations = {
         "Suscríbete al boletín y recibe +{{credits}} créditos gratis cada mes",
       hint: "Nuevos modelos y novedades del producto cada pocas semanas. Cancela cuando quieras.",
       tooltip:
-        "Confirma tu correo para recibir {{credits}} créditos extra cada mes, {{total}} en total, mientras sigas suscrito.",
+        "Pulsa el enlace del correo de bienvenida del boletín y recibe {{credits}} créditos extra cada mes, {{total}} en total, mientras sigas suscrito.",
     },
     acceptTerms: {
       label: "Acepto los términos y condiciones",

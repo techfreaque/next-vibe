@@ -88,6 +88,15 @@ export interface FreeResetMetadata {
   daysSinceLastReset: number;
   previousPeriodStart?: string;
   newPeriodStart?: string;
+  /**
+   * Why the free credits were zeroed outside a monthly reset, e.g.
+   * "anti_farming_revoke" (admin cleanup of a signup farm, 2026-11-27).
+   */
+  reason?: string;
+  /** Account whose pool was revoked */
+  userId?: string;
+  /** Idempotency key (uq_transactions_grant_key) */
+  grantKey?: string;
 }
 
 export interface PurchaseMetadata {

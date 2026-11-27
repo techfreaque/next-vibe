@@ -531,6 +531,11 @@ export class SignupRepository {
       await import("@/leads/growth/repository");
     await GrowthJourneyRepository.attachUser(leadId, userId, logger);
 
+    // Log-only farming signals (random plus-tag, name + browser cluster)
+    const { recordSignupSignals } =
+      await import("@/credits/anti-farming/signup-signals");
+    await recordSignupSignals({ userId, email }, logger);
+
     // Link referral code if provided manually in form
     const { ReferralRepository } = await import("../../../referral/repository");
     if (trimmedReferralCode) {
@@ -824,8 +829,8 @@ export class SignupRepository {
   }
 
   /**
-   * Apply the saved newsletter opt-in to the address just confirmed.
-   * Its credit allowance uses the existing verified subscription rules.
+   * Apply the saved newsletter opt-in to the address just confirmed and mail
+   * the welcome email: its confirmation link unlocks the bonus credits.
    */
   private static async subscribeToNewsletterAtSignup(
     email: string,
@@ -858,10 +863,19 @@ export class SignupRepository {
         });
         return;
       }
-      const { NewsletterConfirmRepository } =
-        await import("@/newsletter/confirm/repository");
-      await NewsletterConfirmRepository.confirmForVerifiedAccount(
-        { userId: account.id, email, linkIssuedAt: new Date() },
+      // The subscription is live now, but its bonus credits wait for the
+      // confirmation click in the welcome email: auto-confirming it here
+      // handed every farmed account the newsletter tier (2026-11-27).
+      const { sendNewsletterWelcomeMail } =
+        await import("@/newsletter/subscribe/welcome-mail");
+      await sendNewsletterWelcomeMail(
+        {
+          email,
+          subscriptionId: subscribed.data.subscriptionId,
+          leadId: account.leadId,
+          userId: account.id,
+        },
+        locale,
         logger,
       );
       logger.debug("Signup: newsletter opt-in subscribed", {

@@ -10,7 +10,9 @@
  *   FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn = lead 20 + user 20
  *   = 40 base.
  * - User pool +FREE_CREDIT_ALLOWANCE.newsletterBonus once it holds a CONFIRMED
- *   newsletter subscription (double opt-in link clicked): 40 -> 90. Account first:
+ *   newsletter subscription (double opt-in link clicked; signup no longer
+ *   auto-confirms it) and its network still has a newsletter slot this month
+ *   (anti-farming/quota.ts resolveNewsletterBonus): 40 -> 90. Account first:
  *   guest pools never get the bonus. A guest's confirmed subscription stays on its
  *   lead and starts counting the moment that lead joins a user pool (signup/login).
  *
@@ -25,7 +27,7 @@
 
 import "server-only";
 
-import { and, eq, inArray, isNotNull, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, or } from "drizzle-orm";
 import { db } from "next-vibe/database";
 
 import { newsletterSubscriptions } from "@/newsletter/db";
@@ -160,16 +162,17 @@ export function computeFreeTopUp({
 }
 
 /**
- * Does the pool hold a confirmed, active newsletter subscription?
+ * When the pool's confirmed, active newsletter subscription was confirmed
+ * (the earliest one), or null when it has none.
  * Matched by the claiming lead (any lead in the pool) or by the pool's user.
  */
-export async function poolHasConfirmedNewsletter({
+export async function poolNewsletterConfirmedAt({
   userId,
   leadIds,
 }: {
   userId: string | null;
   leadIds: string[];
-}): Promise<boolean> {
+}): Promise<Date | null> {
   const owners = [
     leadIds.length > 0
       ? inArray(newsletterSubscriptions.leadId, leadIds)
@@ -178,11 +181,11 @@ export async function poolHasConfirmedNewsletter({
   ].filter((c) => c !== undefined);
 
   if (owners.length === 0) {
-    return false;
+    return null;
   }
 
   const [row] = await db
-    .select({ id: newsletterSubscriptions.id })
+    .select({ confirmedAt: newsletterSubscriptions.confirmedAt })
     .from(newsletterSubscriptions)
     .where(
       and(
@@ -194,7 +197,16 @@ export async function poolHasConfirmedNewsletter({
         or(...owners),
       ),
     )
+    .orderBy(asc(newsletterSubscriptions.confirmedAt))
     .limit(1);
 
-  return row !== undefined;
+  return row?.confirmedAt ?? null;
+}
+
+/** Does the pool hold a confirmed, active newsletter subscription? */
+export async function poolHasConfirmedNewsletter(params: {
+  userId: string | null;
+  leadIds: string[];
+}): Promise<boolean> {
+  return (await poolNewsletterConfirmedAt(params)) !== null;
 }

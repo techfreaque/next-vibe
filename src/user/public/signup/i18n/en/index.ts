@@ -227,7 +227,7 @@ export const translations = {
         "Join the newsletter: +{{credits}} free credits every month",
       hint: "New models and product news every few weeks. Unsubscribe anytime.",
       tooltip:
-        "Confirm your email to get {{credits}} extra credits each month, {{total}} in total, for as long as you stay subscribed.",
+        "Click the link in the newsletter welcome email to get {{credits}} extra credits each month, {{total}} in total, for as long as you stay subscribed.",
     },
     acceptTerms: {
       label: "I accept the terms",

@@ -8,6 +8,15 @@
  *   trying each month, a purchase lifts the block)
  * - guest free spend from the signup IP in the 24 h before signup counts once
  *   against the new account
+ * - hosting/VPN networks (DB-IP ASN, src/leads/geo/asn) additionally get
+ *   ACCOUNT_POOLS_PER_HOSTING_ASN_PER_DAY new account pools per ASN per day,
+ *   so rotating /24s inside one provider does not reset the budget
+ * - an account sharing an exact IP AND user agent with an account granted in
+ *   the IP_LINK_WINDOW_DAYS before it shares that account's pool (gets none)
+ * - the newsletter bonus needs a slot in its network's monthly newsletter
+ *   budget (NEWSLETTER_BONUSES_PER_NETWORK_PER_MONTH)
+ * - an admin-revoked pool (farm cleanup, kind account_revoked) gets no free
+ *   tiers until the account buys credits
  */
 
 import "server-only";
@@ -20,25 +29,38 @@ import {
   inArray,
   isNotNull,
   lte,
+  ne,
   notInArray,
   or,
   sql,
 } from "drizzle-orm";
+import { isPrivateAddress } from "next-vibe/core/utils/ssrf-guard";
 import { db } from "next-vibe/database";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { ipPoolKey, ipSubnetKey } from "next-vibe/identity/lead/ip-key";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { hostingAsnForIp } from "@/leads/geo/asn/lookup";
+
 import { creditPacks, creditTransactions, creditWallets } from "../db";
 import { CreditPackType, CreditTransactionType } from "../enum";
+import { poolNewsletterConfirmedAt } from "../free-allowance";
 import {
+  ACCOUNT_POOLS_PER_HOSTING_ASN_PER_DAY,
   ACCOUNT_POOLS_PER_SUBNET_PER_MONTH,
   FREE_POOL_CLAIMS_START,
   GUEST_POOLS_PER_SUBNET_PER_DAY,
+  IP_LINK_WINDOW_DAYS,
+  NEWSLETTER_BONUS_CLAIMS_START,
+  NEWSLETTER_BONUSES_PER_NETWORK_PER_MONTH,
   SIGNUP_GUEST_SPEND_LOOKBACK_HOURS,
 } from "./config";
-import { type FreePoolClaimKind, freePoolClaims } from "./db";
+import {
+  type AntiFarmingEventKind,
+  type FreePoolClaimKind,
+  freePoolClaims,
+} from "./db";
 import { recordAntiFarmingEvent } from "./events";
 
 /** Why an account pool gets (or does not get) its free tiers */
@@ -139,24 +161,159 @@ async function claimSlot(
   }
   if (!granted) {
     await recordAntiFarmingEvent(
-      {
-        kind:
-          kind === "account" ? "subnet_account_limit" : "subnet_guest_limit",
-        subnet,
-      },
+      { kind: CLAIM_LIMIT_EVENT[kind], subnet },
       logger,
     );
   }
   return granted;
 }
 
+/** Event recorded when a claim of this kind is refused */
+const CLAIM_LIMIT_EVENT: Record<FreePoolClaimKind, AntiFarmingEventKind> = {
+  account: "subnet_account_limit",
+  account_asn: "asn_account_limit",
+  guest: "subnet_guest_limit",
+  newsletter: "newsletter_network_limit",
+  account_revoked: "subnet_account_limit",
+};
+
+/** Budget key of a hosting/VPN network, or null for any other network */
+async function hostingNetworkKey(
+  ip: string | null,
+  logger: EndpointLogger,
+): Promise<string | null> {
+  if (!ip || isPrivateAddress(ip)) {
+    return null;
+  }
+  const asn = await hostingAsnForIp(ip, logger);
+  return asn ? `asn:${String(asn)}` : null;
+}
+
+/** The pool's claim of this kind for this period, if any */
+async function existingClaim(
+  kind: FreePoolClaimKind,
+  period: string,
+  poolKey: string,
+): Promise<{ granted: boolean } | undefined> {
+  const [row] = await db
+    .select({ granted: freePoolClaims.granted })
+    .from(freePoolClaims)
+    .where(
+      and(
+        eq(freePoolClaims.kind, kind),
+        eq(freePoolClaims.period, period),
+        eq(freePoolClaims.poolKey, poolKey),
+      ),
+    )
+    .limit(1);
+  return row;
+}
+
+/** Did the account ever get a granted claim of this kind? */
+async function everGrantedClaim(
+  kind: FreePoolClaimKind,
+  poolKey: string,
+): Promise<boolean> {
+  const [row] = await db
+    .select({ id: freePoolClaims.id })
+    .from(freePoolClaims)
+    .where(
+      and(
+        eq(freePoolClaims.kind, kind),
+        eq(freePoolClaims.poolKey, poolKey),
+        eq(freePoolClaims.granted, true),
+      ),
+    )
+    .limit(1);
+  return row !== undefined;
+}
+
+/** Did the account ever buy credits (one-off pack or subscription)? */
+async function hasPurchased(userId: string): Promise<boolean> {
+  const [purchase] = await db
+    .select({ id: creditPacks.id })
+    .from(creditPacks)
+    .innerJoin(creditWallets, eq(creditWallets.id, creditPacks.walletId))
+    .where(
+      and(
+        eq(creditWallets.userId, userId),
+        inArray(creditPacks.type, [
+          CreditPackType.PERMANENT,
+          CreditPackType.SUBSCRIPTION,
+        ]),
+      ),
+    )
+    .limit(1);
+  return purchase !== undefined;
+}
+
 /**
- * Account free access: verified email, then the subnet's monthly budget.
- * Every account needs a verified email. Accounts created before
- * FREE_POOL_CLAIMS_START skip the subnet budget; while unverified they keep
- * only what they were already granted this period
- * ({@link grandfatheredUnverifiedCap}). Accounts that ever bought credits are
- * never budgeted. A budgeted account keeps its slot for good.
+ * Another account, created in the IP_LINK_WINDOW_DAYS before this one and
+ * already granted its free pool, that shares an exact IP (IPv4 /32, IPv6 /64)
+ * AND the same user agent with any of this account's leads.
+ * Loopback/private IPs and leads without a user agent never link.
+ */
+export async function findIpLinkedGrantedAccount(
+  userId: string,
+  createdAt: Date,
+): Promise<string | null> {
+  const mine = await db
+    .selectDistinct({ ip: leadIp, userAgent: leads.userAgent })
+    .from(userLeadLinks)
+    .innerJoin(leads, eq(leads.id, userLeadLinks.leadId))
+    .where(
+      and(
+        eq(userLeadLinks.userId, userId),
+        isNotNull(leadIp),
+        isNotNull(leads.userAgent),
+      ),
+    );
+  const since = new Date(
+    createdAt.getTime() - IP_LINK_WINDOW_DAYS * 24 * 3_600_000,
+  );
+  for (const { ip, userAgent } of mine) {
+    const key = ipPoolKey(ip);
+    if (!ip || !key || !userAgent || isPrivateAddress(ip)) {
+      continue;
+    }
+    const [hit] = await db
+      .select({ userId: users.id })
+      .from(userLeadLinks)
+      .innerJoin(leads, eq(leads.id, userLeadLinks.leadId))
+      .innerJoin(users, eq(users.id, userLeadLinks.userId))
+      .where(
+        and(
+          ne(userLeadLinks.userId, userId),
+          gte(users.createdAt, since),
+          lte(users.createdAt, createdAt),
+          eq(leads.userAgent, userAgent),
+          or(sql`${leads.metadata}->>'ipKey' = ${key}`, eq(leadIp, ip)),
+          sql`EXISTS (
+            SELECT 1 FROM ${freePoolClaims}
+            WHERE ${freePoolClaims.kind} = 'account'
+              AND ${freePoolClaims.granted}
+              AND ${freePoolClaims.poolKey} = 'user:' || ${users.id}::text
+          )`,
+        ),
+      )
+      .limit(1);
+    if (hit) {
+      return hit.userId;
+    }
+  }
+  return null;
+}
+
+/**
+ * Account free access, in order: verified email; accounts created before
+ * FREE_POOL_CLAIMS_START are never budgeted (while unverified they keep only
+ * what they were already granted this period, see
+ * {@link grandfatheredUnverifiedCap}); an admin-revoked pool stays empty until
+ * a purchase; a granted slot is kept for good; buyers are never budgeted.
+ * A new pool then needs: no exact IP + user agent link to an account granted
+ * in the IP_LINK_WINDOW_DAYS before it, a slot in its hosting ASN's daily
+ * budget (hosting/VPN networks only; a refused account retries the next day),
+ * and a slot in its subnet's monthly budget (retried each month).
  */
 export async function resolveAccountFreeAccess(
   userId: string,
@@ -178,53 +335,144 @@ export async function resolveAccountFreeAccess(
     return "active";
   }
   const poolKey = `user:${userId}`;
-  const [everGranted] = await db
-    .select({ id: freePoolClaims.id })
-    .from(freePoolClaims)
-    .where(
-      and(
-        eq(freePoolClaims.kind, "account"),
-        eq(freePoolClaims.poolKey, poolKey),
-        eq(freePoolClaims.granted, true),
-      ),
-    )
-    .limit(1);
-  if (everGranted) {
+  // Farm cleanup: a revoked pool has no free tiers until the account buys
+  if (await everRevoked(poolKey)) {
+    return (await hasPurchased(userId)) ? "active" : "subnetLimit";
+  }
+  if (await everGrantedClaim("account", poolKey)) {
     return "active";
   }
-  const [purchase] = await db
-    .select({ id: creditPacks.id })
-    .from(creditPacks)
-    .innerJoin(creditWallets, eq(creditWallets.id, creditPacks.walletId))
-    .where(
-      and(
-        eq(creditWallets.userId, userId),
-        inArray(creditPacks.type, [
-          CreditPackType.PERMANENT,
-          CreditPackType.SUBSCRIPTION,
-        ]),
-      ),
-    )
-    .limit(1);
-  if (purchase) {
+  if (await hasPurchased(userId)) {
     return "active";
   }
-  const subnet = ipSubnetKey(await accountSignupIp(userId));
+  const signupIp = await accountSignupIp(userId);
+  const subnet = ipSubnetKey(signupIp);
   if (!subnet) {
     // No IP on record: nothing to budget against
     return "active";
+  }
+  const now = new Date();
+  const month = monthPeriod(now);
+  // This month's verdict stands (cheap path for every later balance read)
+  const decided = await existingClaim("account", month, poolKey);
+  if (decided) {
+    return decided.granted ? "active" : "subnetLimit";
+  }
+  // Same person, second account: exact IP + same browser as a granted account
+  const linkedTo = await findIpLinkedGrantedAccount(userId, user.createdAt);
+  if (linkedTo) {
+    await db
+      .insert(freePoolClaims)
+      .values({
+        kind: "account",
+        subnet,
+        period: month,
+        poolKey,
+        granted: false,
+      })
+      .onConflictDoNothing();
+    await recordAntiFarmingEvent({ kind: "ip_link_limit", subnet }, logger);
+    logger.info("Free pool shared with an IP-linked account", {
+      userId,
+      linkedTo,
+    });
+    return "subnetLimit";
+  }
+  // Hosting/VPN networks: a daily budget for the whole ASN comes first, so a
+  // refusal there never uses up a slot of the subnet budget
+  const asnKey = await hostingNetworkKey(signupIp, logger);
+  if (asnKey) {
+    const asnGranted = await claimSlot(
+      {
+        kind: "account_asn",
+        subnet: asnKey,
+        period: dayPeriod(now),
+        poolKey,
+        limit: ACCOUNT_POOLS_PER_HOSTING_ASN_PER_DAY,
+      },
+      logger,
+    );
+    if (!asnGranted) {
+      return "subnetLimit";
+    }
   }
   const granted = await claimSlot(
     {
       kind: "account",
       subnet,
-      period: monthPeriod(new Date()),
+      period: month,
       poolKey,
       limit: ACCOUNT_POOLS_PER_SUBNET_PER_MONTH,
     },
     logger,
   );
   return granted ? "active" : "subnetLimit";
+}
+
+/** Was the account's free pool revoked by an admin (farm cleanup)? */
+async function everRevoked(poolKey: string): Promise<boolean> {
+  const [row] = await db
+    .select({ id: freePoolClaims.id })
+    .from(freePoolClaims)
+    .where(
+      and(
+        eq(freePoolClaims.kind, "account_revoked"),
+        eq(freePoolClaims.poolKey, poolKey),
+      ),
+    )
+    .limit(1);
+  return row !== undefined;
+}
+
+/**
+ * Does the account get its newsletter bonus? Needs a confirmed subscription
+ * (the double opt-in link clicked). A subscription confirmed since
+ * NEWSLETTER_BONUS_CLAIMS_START on an account created under the anti-farming
+ * rules also needs a slot in its network's monthly newsletter budget
+ * (NEWSLETTER_BONUSES_PER_NETWORK_PER_MONTH; network = hosting ASN, else the
+ * signup subnet). A granted bonus stays; a purchase skips the budget.
+ * Loopback/private signup IPs are exempt.
+ */
+export async function resolveNewsletterBonus(
+  { userId, leadIds }: { userId: string; leadIds: string[] },
+  logger: EndpointLogger,
+): Promise<boolean> {
+  const confirmedAt = await poolNewsletterConfirmedAt({ userId, leadIds });
+  if (!confirmedAt) {
+    return false;
+  }
+  if (confirmedAt < NEWSLETTER_BONUS_CLAIMS_START) {
+    return true;
+  }
+  if (!(await isBudgetedAccount(userId))) {
+    return true;
+  }
+  const poolKey = `user:${userId}`;
+  if (await everGrantedClaim("newsletter", poolKey)) {
+    return true;
+  }
+  if (await hasPurchased(userId)) {
+    return true;
+  }
+  const signupIp = await accountSignupIp(userId);
+  if (!signupIp || isPrivateAddress(signupIp)) {
+    return true;
+  }
+  const network =
+    (await hostingNetworkKey(signupIp, logger)) ?? ipSubnetKey(signupIp);
+  if (!network) {
+    return true;
+  }
+  return await claimSlot(
+    {
+      kind: "newsletter",
+      subnet: network,
+      period: monthPeriod(new Date()),
+      poolKey,
+      limit: NEWSLETTER_BONUSES_PER_NETWORK_PER_MONTH,
+    },
+    logger,
+  );
 }
 
 /**

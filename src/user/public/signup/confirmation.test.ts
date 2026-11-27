@@ -22,6 +22,8 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { scopedTranslation as creditTranslation } from "@/credits/i18n";
 import { PublicCapRepository } from "@/credits/public-cap/repository";
 import { CreditRepository } from "@/credits/repository";
+import { scopedTranslation as newsletterConfirmTranslation } from "@/newsletter/confirm/i18n";
+import { NewsletterConfirmRepository } from "@/newsletter/confirm/repository";
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { referralCodes, userReferrals } from "@/referral/db";
 
@@ -253,18 +255,27 @@ describe("pending signup", () => {
       true,
     );
     expect(favorites.some((f) => f.skillId === "hermes" && f.customVariantName === "My companion")).toBe(true);
-    const after = await CreditRepository.getBalance(
-      {
-        isPublic: false,
-        id: account.id,
-        leadId: user.leadId,
-        roles: [UserPermissionRole.CUSTOMER],
-      },
+    const accountUser = {
+      isPublic: false as const,
+      id: account.id,
+      leadId: user.leadId,
+      roles: [UserPermissionRole.CUSTOMER],
+    };
+    // Subscribed at signup; the bonus waits for the welcome email's link
+    const after = await CreditRepository.getBalance(accountUser, logger, creditsT, defaultLocale);
+    expect(after.success && after.data.free).toBe(40 - 3);
+    const [subscription] = await db
+      .select()
+      .from(newsletterSubscriptions)
+      .where(eq(newsletterSubscriptions.email, account.email));
+    expect(subscription?.confirmedAt).toBeNull();
+    await NewsletterConfirmRepository.confirm(
+      { token: subscription?.confirmationToken ?? "" },
       logger,
-      creditsT,
-      defaultLocale,
+      newsletterConfirmTranslation.scopedT(defaultLocale).t,
     );
-    expect(after.success && after.data.free).toBe(90 - 3);
+    const confirmedBalance = await CreditRepository.getBalance(accountUser, logger, creditsT, defaultLocale);
+    expect(confirmedBalance.success && confirmedBalance.data.free).toBe(90 - 3);
     expect((await act({ token: inbox[1].token })).success).toBe(false);
   }, 60000);
 

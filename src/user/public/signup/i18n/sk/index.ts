@@ -232,7 +232,7 @@ export const translations: typeof enTranslations = {
       checkboxLabel: "Odber noviniek: každý mesiac +{{credits}} kred. zdarma",
       hint: "Nové modely a novinky z aplikácie každých pár týždňov. Odber môžeš kedykoľvek zrušiť.",
       tooltip:
-        "Potvrď e-mail. Kým odoberáš novinky, získaš každý mesiac {{credits}} kred. navyše, spolu {{total}} kred.",
+        "Klikni na odkaz v uvítacom e-maile newslettera. Kým odoberáš novinky, získaš každý mesiac {{credits}} kred. navyše, spolu {{total}} kred.",
     },
     acceptTerms: {
       label: "Prijímam podmienky",

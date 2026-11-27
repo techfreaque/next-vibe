@@ -8,7 +8,8 @@ export const translations = {
       tag: "Geo IP",
       container: {
         title: "Geo IP database",
-        description: "IP to country data by DB-IP (CC BY 4.0)",
+        description:
+          "IP to country and ASN data by DB-IP (CC BY 4.0). Hosting ASN list: bad-asn-list (MIT)",
       },
       fields: {
         force: {
@@ -20,6 +21,7 @@ export const translations = {
       response: {
         status: "Status",
         version: "Release",
+        asnVersion: "ASN release",
         v4Ranges: "IPv4 ranges",
         v6Ranges: "IPv6 ranges",
         backfilled: "Leads resolved",

@@ -21,7 +21,10 @@ import type {
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
-import { antiFarmingEvents, shadowEventKinds } from "../../anti-farming/db";
+import {
+  antiFarmingEvents,
+  nonBlockingEventKinds,
+} from "../../anti-farming/db";
 
 export class QueryCreditsFarmingBlockedRepository {
   static async queryCreditsFarmingBlocked(data: {
@@ -46,7 +49,7 @@ export class QueryCreditsFarmingBlockedRepository {
       .from(antiFarmingEvents)
       .where(
         and(
-          notInArray(antiFarmingEvents.kind, [...shadowEventKinds]),
+          notInArray(antiFarmingEvents.kind, [...nonBlockingEventKinds]),
           gte(antiFarmingEvents.createdAt, range.from),
           lte(antiFarmingEvents.createdAt, range.to),
         ),

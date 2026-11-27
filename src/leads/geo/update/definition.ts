@@ -64,6 +64,11 @@ const { POST } = createEndpoint({
         label: "update.post.response.version",
         schema: z.string().nullable(),
       }),
+      asnVersion: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "update.post.response.asnVersion",
+        schema: z.string().nullable(),
+      }),
       v4Ranges: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "update.post.response.v4Ranges",
@@ -137,6 +142,7 @@ const { POST } = createEndpoint({
       default: {
         status: GeoUpdateStatus.CURRENT,
         version: "2026-11",
+        asnVersion: "2026-11",
         v4Ranges: 362998,
         v6Ranges: 369662,
         backfilled: 2000,

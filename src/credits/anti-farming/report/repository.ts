@@ -32,6 +32,7 @@ import {
   SIGNUP_GUEST_SPEND_LOOKBACK_HOURS,
   SIGNUPS_PER_SUBNET_PER_DAY,
 } from "../config";
+import { nonBlockingEventKinds } from "../db";
 import { protectionEnv } from "../env";
 import type { AntiFarmingReportResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -89,11 +90,17 @@ export class AntiFarmingReportRepository {
      * account claims (current month) and guest claims (window).
      * `where` + `order` pick the rows and ranking for the two subnet tables.
      */
+    // Signals and markers are not blocked attempts
+    const notBlocking = sql.join(
+      nonBlockingEventKinds.map((kind) => sql`${kind}`),
+      sql`, `,
+    );
     const subnetQuery = (where: SQL, order: SQL): SQL => sql`
       WITH ev AS (
         SELECT subnet, count(*) AS blocked, max(created_at) AS last_ev
         FROM anti_farming_events
         WHERE subnet IS NOT NULL AND created_at >= ${since}
+          AND kind NOT IN (${notBlocking})
         GROUP BY subnet
       ),
       cl AS (
@@ -149,7 +156,7 @@ export class AntiFarmingReportRepository {
           }
         >(sql`
           SELECT
-            count(*) FILTER (WHERE kind NOT IN ('shadow_crawler','shadow_cluster','shadow_model')) AS total,
+            count(*) FILTER (WHERE kind NOT IN (${notBlocking})) AS total,
             count(*) FILTER (WHERE kind = 'shadow_crawler') AS shadow_crawler,
             count(*) FILTER (WHERE kind = 'shadow_cluster') AS shadow_cluster,
             count(*) FILTER (WHERE kind = 'shadow_model') AS shadow_model,

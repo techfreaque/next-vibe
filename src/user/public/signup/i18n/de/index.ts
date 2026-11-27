@@ -243,7 +243,7 @@ export const translations: typeof enTranslations = {
         "Newsletter abonnieren: +{{credits}} Gratis-Credits jeden Monat",
       hint: "Alle paar Wochen neue Modelle und Produktnews. Jederzeit abbestellbar.",
       tooltip:
-        "Bestätige deine Adresse und du erhältst monatlich {{credits}} zusätzliche Credits, insgesamt {{total}}, solange du den Newsletter abonniert hast.",
+        "Ein Klick auf den Link in der Newsletter-Willkommensmail bringt dir monatlich {{credits}} zusätzliche Credits, insgesamt {{total}}, solange du den Newsletter abonniert hast.",
     },
 
     referralCode: {

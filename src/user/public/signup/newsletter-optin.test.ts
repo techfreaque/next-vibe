@@ -17,6 +17,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import newsletterConfirmEndpoints from "@/newsletter/confirm/definition";
 import { NewsletterConfirmRepository } from "@/newsletter/confirm/repository";
 import creditBonusEndpoints from "@/newsletter/credit-bonus/definition";
 import { NewsletterCreditOffer } from "@/newsletter/credit-bonus/enum";
@@ -116,6 +117,16 @@ async function freeBalance(user: JwtPayloadType): Promise<number> {
   return res.success ? res.data.free : -1;
 }
 
+async function confirmNewsletter(token: string): Promise<void> {
+  const res = await sendTestRequest({
+    toolExecutionContext: undefined,
+    endpoint: newsletterConfirmEndpoints.POST,
+    data: { token },
+    user: admin,
+  });
+  expect(res.success, JSON.stringify(res)).toBe(true);
+}
+
 async function verify(token: string, leadId: string): Promise<void> {
   const res = await sendTestRequest({
     toolExecutionContext: undefined,
@@ -157,22 +168,25 @@ describe("signup newsletter opt-in", () => {
     expect(await getOffer(user)).toBe(NewsletterCreditOffer.AVAILABLE);
   }, 60_000);
 
-  it("ticked: signup confirmation activates the newsletter bonus once", async () => {
+  it("ticked: subscribed at signup, the bonus waits for the welcome email click", async () => {
     const { user, email } = await signup("on", true);
     const [sub] = await subscriptionsFor(email);
     expect(sub?.userId).toBe(user.id);
     expect(sub?.status).toBe(NewsletterSubscriptionStatus.SUBSCRIBED);
-    expect(sub?.confirmedAt).toBeInstanceOf(Date);
-    expect(await getOffer(user)).toBe(NewsletterCreditOffer.ACTIVE);
-    const token = createVerificationToken(user.id, email) ?? "";
-    await verify(token, user.leadId);
+    // Signup no longer auto-confirms: the welcome email carries the link
+    expect(sub?.confirmedAt).toBeNull();
+    expect(sub?.confirmationToken).toBeTruthy();
+    expect(await getOffer(user)).toBe(NewsletterCreditOffer.PENDING_CONFIRMATION);
+    expect(await freeBalance(user)).toBe(userBase);
+
+    await confirmNewsletter(sub?.confirmationToken ?? "");
     const [confirmed] = await subscriptionsFor(email);
-    expect(confirmed?.confirmedAt).not.toBeNull();
+    expect(confirmed?.confirmedAt).toBeInstanceOf(Date);
     expect(await getOffer(user)).toBe(NewsletterCreditOffer.ACTIVE);
     expect(await freeBalance(user)).toBe(userBase + FREE_CREDIT_ALLOWANCE.newsletterBonus);
 
     // Second click changes nothing; the bonus is not stacked
-    await verify(token, user.leadId);
+    await confirmNewsletter(sub?.confirmationToken ?? "");
     expect(await freeBalance(user)).toBe(userBase + FREE_CREDIT_ALLOWANCE.newsletterBonus);
 
     // Unsubscribed after having the bonus: never offered again

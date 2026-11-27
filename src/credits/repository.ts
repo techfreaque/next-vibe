@@ -105,6 +105,7 @@ import {
   isBudgetedAccount,
   isGuestPoolBlocked,
   resolveAccountFreeAccess,
+  resolveNewsletterBonus,
   signupCarryoverGrantKey,
   signupGuestCarryover,
 } from "./anti-farming/quota";
@@ -150,7 +151,6 @@ import {
   computeLegacyFreeAllowance,
   FREE_GRANT_TIER_VERSION,
   type FreeTier,
-  poolHasConfirmedNewsletter,
 } from "./free-allowance";
 import {
   packFundingType,
@@ -1378,10 +1378,10 @@ export class CreditRepository {
 
     // Account tiers need a verified email and a slot in the subnet's budget
     const access = await resolveAccountFreeAccess(userId, logger);
-    // Newsletter bonus is account-only
+    // Newsletter bonus is account-only, one new bonus per network per month
     const hasConfirmedNewsletter =
       access === "active"
-        ? await poolHasConfirmedNewsletter({ userId, leadIds })
+        ? await resolveNewsletterBonus({ userId, leadIds }, logger)
         : false;
     const accountInput = { isUserPool: true, hasConfirmedNewsletter };
     // What the pre-2026-11 rules granted stays until the next refill

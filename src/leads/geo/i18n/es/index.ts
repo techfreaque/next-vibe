@@ -10,7 +10,8 @@ export const translations: typeof enTranslations = {
       tag: "Geo IP",
       container: {
         title: "Base Geo IP",
-        description: "Datos de IP a país de DB-IP (CC BY 4.0)",
+        description:
+          "Datos de IP a país y ASN de DB-IP (CC BY 4.0). Lista de ASN de hosting: bad-asn-list (MIT)",
       },
       fields: {
         force: {
@@ -21,6 +22,7 @@ export const translations: typeof enTranslations = {
       response: {
         status: "Estado",
         version: "Versión",
+        asnVersion: "Versión ASN",
         v4Ranges: "Rangos IPv4",
         v6Ranges: "Rangos IPv6",
         backfilled: "Prospectos completados",

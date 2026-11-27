@@ -20,6 +20,8 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { DatabaseError, type QueryResultRow } from "pg";
 
+import { buildAsnTable, encodeAsnTable } from "../asn/compact";
+import { ASN_SOURCE_ID, invalidateAsnCache } from "../asn/lookup";
 import { buildGeoTable, encodeGeoTable, lookupCountry } from "../compact";
 import { geoIpDatabases } from "../db";
 import { GeoUpdateStatus } from "../enum";
@@ -40,6 +42,11 @@ export function geoReleaseUrl(version: string): string {
   return `https://download.db-ip.com/free/dbip-country-lite-${version}.csv.gz`;
 }
 
+/** DB-IP publishes `dbip-asn-lite-YYYY-MM.csv.gz` alongside the country file. */
+export function asnReleaseUrl(version: string): string {
+  return `https://download.db-ip.com/free/dbip-asn-lite-${version}.csv.gz`;
+}
+
 /** This month and the previous one (the new file can lag the 1st). */
 export function geoReleaseCandidates(now: Date): string[] {
   const month = (offset: number): string => {
@@ -54,10 +61,11 @@ export function geoReleaseCandidates(now: Date): string[] {
 async function download(
   version: string,
   logger: EndpointLogger,
+  url: (version: string) => string = geoReleaseUrl,
 ): Promise<Buffer | null> {
   try {
     // oxlint-disable-next-line restricted/no-raw-fetch -- external API
-    const response = await fetch(geoReleaseUrl(version), {
+    const response = await fetch(url(version), {
       signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
     });
     if (!response.ok) {
@@ -83,7 +91,9 @@ interface StoredRelease {
   v6Ranges: number;
 }
 
-async function storedRelease(): Promise<StoredRelease | null> {
+async function storedRelease(
+  sourceId: string = GEO_SOURCE_ID,
+): Promise<StoredRelease | null> {
   const [row] = await db
     .select({
       version: geoIpDatabases.version,
@@ -91,7 +101,7 @@ async function storedRelease(): Promise<StoredRelease | null> {
       v6Ranges: geoIpDatabases.v6Ranges,
     })
     .from(geoIpDatabases)
-    .where(sql`${geoIpDatabases.id} = ${GEO_SOURCE_ID}`)
+    .where(sql`${geoIpDatabases.id} = ${sourceId}`)
     .limit(1);
   return row ?? null;
 }
@@ -120,6 +130,68 @@ export async function storeGeoRelease(
     v4Ranges: values.v4Ranges,
     v6Ranges: values.v6Ranges,
   };
+}
+
+/**
+ * Store an ASN release from the gzipped DB-IP ASN CSV. Only hosting / VPN
+ * ranges are kept (see ../asn/hosting-asns.ts). Exported for tests.
+ */
+export async function storeAsnRelease(
+  version: string,
+  csvGz: Buffer,
+): Promise<StoredRelease> {
+  const table = buildAsnTable(gunzipSync(csvGz).toString("utf8"));
+  const data = gzipSync(encodeAsnTable(table), { level: 9 }).toString("base64");
+  const values = {
+    version,
+    data,
+    v4Ranges: table.v4Starts.length,
+    v6Ranges: table.v6Hi.length,
+    updatedAt: new Date(),
+  };
+  await db
+    .insert(geoIpDatabases)
+    .values({ id: ASN_SOURCE_ID, ...values })
+    .onConflictDoUpdate({ target: geoIpDatabases.id, set: values });
+  invalidateAsnCache();
+  return {
+    version,
+    v4Ranges: values.v4Ranges,
+    v6Ranges: values.v6Ranges,
+  };
+}
+
+/**
+ * Keep the hosting ASN table current: one download per month, like the
+ * country table. A failure never fails the run (the anti-farming ASN budget
+ * just falls back to the per-subnet budget); returns the stored version.
+ */
+async function updateAsnRelease(
+  force: boolean,
+  logger: EndpointLogger,
+): Promise<string | null> {
+  try {
+    const stored = await storedRelease(ASN_SOURCE_ID);
+    const candidates = geoReleaseCandidates(new Date());
+    for (const version of candidates) {
+      if (!force && stored?.version === version) {
+        return stored.version;
+      }
+      const file = await download(version, logger, asnReleaseUrl);
+      if (file) {
+        const release = await storeAsnRelease(version, file);
+        logger.info("ASN table updated", { ...release });
+        return release.version;
+      }
+    }
+    logger.warn("ASN release not available", {
+      candidates: candidates.join(","),
+    });
+    return stored?.version ?? null;
+  } catch (error) {
+    logger.error("ASN table update failed", parseError(error));
+    return null;
+  }
 }
 
 /** Lead IP: typed column first, middleware leads keep it in metadata. */
@@ -283,11 +355,14 @@ export class GeoUpdateRepository {
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
+      stage = "updateAsnRelease";
+      const asnVersion = await updateAsnRelease(data.force, logger);
       stage = "backfillLeadCountries";
       const backfill = await backfillLeadCountries(logger);
       return success({
         status,
         version: release.version,
+        asnVersion,
         v4Ranges: release.v4Ranges,
         v6Ranges: release.v6Ranges,
         ...backfill,
