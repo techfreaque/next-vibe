@@ -2773,7 +2773,7 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["chart-of-accounts", "reports", "profit-loss"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.partnerAdmin"],
     aliases: [],
-    title: "Profit &quot; Loss &quot;",
+    title: "Pérdidas y ganancias",
     titleShort: "PL",
     description:
       "Ingresos vs. gastos para un rango de fechas. Muestra ganancias brutas, ganancias operativas y beneficios netos.",
@@ -3431,7 +3431,7 @@ export const endpointsMeta: EndpointMeta[] = [
       "Formulario de contacto",
       "Contáctanos",
       "Comunicación de contacto",
-      "Ayuda &quot; Apoyo",
+      "Ayuda y soporte",
     ],
     requiresConfirmation: true,
     examples: {
@@ -5029,12 +5029,6 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.mcpOff",
     ],
     aliases: [],
-    admin: {
-      configuredWhen: [
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY"],
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY_FILE"],
-      ],
-    },
     title: "Cuentas bancarias conectadas",
     titleShort: "Cuentas bancarias conectadas",
     description:
@@ -5060,12 +5054,7 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.mcpOff",
     ],
     aliases: [],
-    admin: {
-      configuredWhen: [
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY"],
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY_FILE"],
-      ],
-    },
+    admin: { role: "record" },
     title: "Sincronizar movimientos bancarios",
     titleShort: "Sincronizar movimientos bancarios",
     description:
@@ -5110,7 +5099,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Conectar un banco",
     titleShort: "Conectar un banco",
     description:
-      "Elige el banco y la cuenta contable. Tu banco autoriza el acceso de lectura durante un máximo de 180 días.",
+      "Autoriza el acceso de solo lectura. Cuando vuelvas, elige las operaciones comerciales que quieres guardar y revisa la vista previa.",
     icon: "link",
     category: "finance",
     subCategory: "Bank reconciliation",
@@ -5121,14 +5110,14 @@ export const endpointsMeta: EndpointMeta[] = [
           companyId: "00000000-0000-4000-8000-000000000001",
           ledgerAccountId: "00000000-0000-4000-8000-000000000002",
           bankCountry: "DE",
-          bankName: "C24 Bank",
+          bankName: "C24",
           personal: true,
         },
       },
       responses: {
         default: {
           url: "https://auth.enablebanking.com/ais/start",
-          authorizedBank: "C24 Bank",
+          authorizedBank: "C24",
           authorizedLedgerAccount: "Operating bank account",
         },
       },
@@ -5406,8 +5395,8 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["finance", "bank", "list"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
-    title: "Movimientos pendientes de conciliar",
-    titleShort: "Movimientos pendientes de conciliar",
+    title: "Transacciones bancarias",
+    titleShort: "Transacciones bancarias",
     description:
       "Revisa los movimientos importados y vincúlalos con asientos contabilizados.",
     icon: "list",
@@ -6484,7 +6473,7 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.aiToolOff",
     ],
     aliases: [],
-    title: "Suscribirse &quot; Obtener acceso &quot;",
+    title: "Suscríbete y consigue acceso",
     titleShort: "Suscribirme",
     description:
       "Presenta tus datos para unirte a la lista del creador y obtener acceso a esta habilidad",
@@ -6505,7 +6494,7 @@ export const endpointsMeta: EndpointMeta[] = [
           captured: true,
           nextStep: "signup",
           signupUrl:
-            "/en-GLOBAL/user/sign-up?ref=creatorcode&email=alex%40example.com&firstName=Alex",
+            "/en-GLOBAL/user/signup?ref=creatorcode&email=alex%40example.com&firstName=Alex",
         },
       },
     },
@@ -31422,7 +31411,7 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.webOff",
     ],
     aliases: ["re"],
-    title: "Reconstrucción &quot; Reini &quot;",
+    title: "Reconstruir y reiniciar",
     titleShort: "Rebuild",
     description:
       "Recompilar la aplicación y hot-restart el servidor running Next.js. Ejecuta 6 pasos en secuencia: 1) generación de códigos, 2) verificación vibe (código de calidad), 3) Next.js construcción de producción, 4) migración de bases de datos, 5) visualización de bases de datos, 6) hot-restart a través SIGUSR1. El control de vibración bloquea la construcción si hay errores - use 'vibe check' o la herramienta de verificación MCP para ver detalles. WARNING : La respuesta HTTP puede ser cortada porque el servidor se reinicia antes de que la respuesta termine.",
@@ -33034,15 +33023,15 @@ export const endpointsMeta: EndpointMeta[] = [
     examples: {
       responses: {
         basic: {
-          status: "HEALTHY",
+          status: "pulse.health.healthy",
           lastPulseAt: "2023-07-21T12:00:00Z",
-          successRate: 95,
+          successRate: 9500,
           totalExecutions: 1000,
         },
         success: {
-          status: "HEALTHY",
+          status: "pulse.health.healthy",
           lastPulseAt: "2023-07-21T12:00:00Z",
-          successRate: 95,
+          successRate: 9500,
           totalExecutions: 1000,
         },
       },
@@ -33837,7 +33826,7 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.productionOff",
     ],
     aliases: [],
-    title: "Construir &quot; Empujar imagen",
+    title: "Construir y Empujar imagen",
     titleShort: "Imagen de empuje",
     description:
       "Construir la imagen Docker de producción y entregarla al registro o directamente a un servidor a través de SSH, por lo que el servidor de despliegue sólo tira (o ya tiene) en lugar de construirla",

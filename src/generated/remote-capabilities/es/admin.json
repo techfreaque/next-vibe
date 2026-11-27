@@ -157,7 +157,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -168,7 +168,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -183,7 +183,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -194,7 +194,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -51405,9 +51405,9 @@
         "accountId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Cuenta ID",
+          "label": "Cuenta",
           "description": "La cuenta para desactivar",
-          "placeholder": "Cuenta UUID",
+          "placeholder": "Selecciona una cuenta",
           "columns": 12,
           "schema": {
             "def": {
@@ -57579,8 +57579,9 @@
         "companyId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Company ID",
+          "label": "Empresa",
           "description": "Empresa para abrir el período",
+          "placeholder": "Selecciona una empresa",
           "columns": 12,
           "schema": {
             "def": {
@@ -62088,7 +62089,7 @@
   },
   {
     "toolName": "coa-profit-loss",
-    "title": "Profit &quot; Loss &quot;",
+    "title": "Pérdidas y ganancias",
     "titleShort": "PL",
     "description": "Ingresos vs. gastos para un rango de fechas. Muestra ganancias brutas, ganancias operativas y beneficios netos.",
     "fields": {
@@ -71543,7 +71544,7 @@
       "Formulario de contacto",
       "Contáctanos",
       "Comunicación de contacto",
-      "Ayuda &quot; Apoyo"
+      "Ayuda y soporte"
     ],
     "aliases": ["contact-form"],
     "credits": 0
@@ -72807,7 +72808,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -72818,7 +72819,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -72833,7 +72834,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -72844,7 +72845,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -105432,7 +105433,7 @@
     "toolName": "connect-bank",
     "title": "Conectar un banco",
     "titleShort": "Conectar un banco",
-    "description": "Elige el banco y la cuenta contable. Tu banco autoriza el acceso de lectura durante un máximo de 180 días.",
+    "description": "Autoriza el acceso de solo lectura. Cuando vuelvas, elige las operaciones comerciales que quieres guardar y revisa la vista previa.",
     "fields": {
       "usage": {
         "request": "data",
@@ -105482,7 +105483,7 @@
         "bankCountry": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Código de país del banco",
+          "label": "País del banco",
           "schema": {
             "def": {
               "type": "string",
@@ -107756,8 +107757,8 @@
   },
   {
     "toolName": "bank-statement-lines",
-    "title": "Movimientos pendientes de conciliar",
-    "titleShort": "Movimientos pendientes de conciliar",
+    "title": "Transacciones bancarias",
+    "titleShort": "Transacciones bancarias",
     "description": "Revisa los movimientos importados y vincúlalos con asientos contabilizados.",
     "fields": {
       "usage": {
@@ -125605,6 +125606,7 @@
         "provider": {
           "type": "text",
           "label": "Proveedor",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "string"
@@ -129768,6 +129770,7 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       }
                     },
@@ -129779,9 +129782,10 @@
                       "IT": "it",
                       "ES": "es",
                       "SK": "sk",
+                      "HI": "hi",
                       "EN": "en"
                     },
-                    "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                    "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
                   },
                   "usage": {
                     "response": true
@@ -131300,7 +131304,7 @@
             },
             "identity": {
               "type": "container",
-              "title": "Dispositivo &quot; identidad &quot;",
+              "title": "Dispositivo y identidad",
               "description": "Seguimiento de la identidad y la información del dispositivo",
               "layoutType": "grid",
               "columns": 2,
@@ -134307,6 +134311,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -134322,6 +134330,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -134333,9 +134342,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               }
             },
             "type": "optional"
@@ -135640,6 +135650,7 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       }
                     },
@@ -135651,9 +135662,10 @@
                       "IT": "it",
                       "ES": "es",
                       "SK": "sk",
+                      "HI": "hi",
                       "EN": "en"
                     },
-                    "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                    "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
                   },
                   "usage": {
                     "response": true
@@ -148912,6 +148924,10 @@
                 {
                   "value": "sk",
                   "label": "languages.sk"
+                },
+                {
+                  "value": "hi",
+                  "label": "languages.hi"
                 }
               ],
               "schema": {
@@ -148924,6 +148940,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -148935,9 +148952,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               },
               "usage": {
                 "request": "data"
@@ -154951,7 +154969,7 @@
         },
         "locationPreferences": {
           "type": "container",
-          "title": "Lugar &quot; Preferencias",
+          "title": "Ubicación y preferencias",
           "description": "Preferencias geográficas y lingüísticas",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -156111,6 +156129,10 @@
                 {
                   "value": "sk",
                   "label": "languages.sk"
+                },
+                {
+                  "value": "hi",
+                  "label": "languages.hi"
                 }
               ],
               "schema": {
@@ -156123,6 +156145,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -156134,9 +156157,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               },
               "usage": {
                 "request": "data"
@@ -178001,6 +178025,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "columns": 6,
@@ -178017,6 +178045,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -178028,9 +178057,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               }
             },
             "type": "optional"
@@ -185109,6 +185139,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -185121,6 +185155,7 @@
                 "IT": "it",
                 "ES": "es",
                 "SK": "sk",
+                "HI": "hi",
                 "EN": "en"
               }
             },
@@ -185132,9 +185167,10 @@
               "IT": "it",
               "ES": "es",
               "SK": "sk",
+              "HI": "hi",
               "EN": "en"
             },
-            "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+            "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
           },
           "usage": {
             "request": "data"
@@ -186630,18 +186666,26 @@
     "titleShort": "Editar trabajo de importación",
     "description": "Actualizar la configuración del trabajo de importación",
     "fields": {
-      "type": "container",
-      "title": "Actualizar Configuración de empleo",
-      "description": "Modificar la configuración del trabajo de importación",
-      "layoutType": "stacked",
       "usage": {
         "request": "data&urlPathParams",
         "response": true
       },
       "children": {
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "response": true
+          },
+          "type": "navigate_button",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
         "jobId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "fileName",
           "label": "Job ID",
           "description": "Unico identificador para el trabajo de importación",
           "columns": 12,
@@ -186672,7 +186716,7 @@
           "children": {
             "batchSize": {
               "type": "form_field",
-              "fieldType": "number",
+              "fieldType": "int",
               "label": "Tamaño del lote",
               "description": "Número de filas para procesar en cada lote",
               "placeholder": "100",
@@ -186684,7 +186728,20 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [{}, {}]
+                      "checks": [
+                        {
+                          "def": {
+                            "type": "number",
+                            "check": "number_format",
+                            "abort": false,
+                            "format": "safeint"
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        {},
+                        {}
+                      ]
                     },
                     "type": "number",
                     "isFinite": true
@@ -186699,7 +186756,7 @@
             },
             "maxRetries": {
               "type": "form_field",
-              "fieldType": "number",
+              "fieldType": "int",
               "label": "Max Retries",
               "description": "Número máximo de intentos de reingreso para filas fallidas",
               "placeholder": "3",
@@ -186711,7 +186768,20 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [{}, {}]
+                      "checks": [
+                        {
+                          "def": {
+                            "type": "number",
+                            "check": "number_format",
+                            "abort": false,
+                            "format": "safeint"
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        {},
+                        {}
+                      ]
                     },
                     "type": "number",
                     "isFinite": true
@@ -187567,6 +187637,7 @@
           "schemaType": "object"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -187582,18 +187653,26 @@
     "titleShort": "Eliminar el trabajo de importación",
     "description": "Eliminar un trabajo de importación específico",
     "fields": {
-      "type": "container",
-      "title": "Eliminar el trabajo de importación",
-      "description": "Confirmación de la supresión del trabajo de importación",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
       },
       "children": {
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "response": true
+          },
+          "type": "navigate_button",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
         "jobId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "fileName",
           "label": "Job ID",
           "description": "Identificador único para el trabajo de importación para eliminar",
           "columns": 12,
@@ -187653,6 +187732,7 @@
           "schemaType": "object"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -187858,10 +187938,14 @@
     "description": "Proceso pendiente de trabajo de importación CSV",
     "fields": {
       "type": "container",
-      "title": "Configuración del Proceso de Importación",
-      "description": "Configurar los parámetros del proceso de importación",
+      "title": "Trabajos de importación de procesos",
+      "description": "Proceso pendiente de trabajo de importación CSV",
       "layoutType": "grid",
       "columns": 12,
+      "adminForm": {
+        "sectionTitle": "import.process.post.container.title",
+        "submitText": "import.process.post.title"
+      },
       "usage": {
         "request": "data",
         "response": true
@@ -187948,6 +188032,7 @@
           "label": "Self Task ID",
           "description": "Tareas internas ID para autolimpieza después del procesamiento",
           "columns": 6,
+          "hidden": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -188078,6 +188163,7 @@
           }
         },
         "filters": {
+          "schemaType": "object-optional",
           "type": "container",
           "title": "Filtros",
           "description": "Opciones de filtro para trabajos de importación",
@@ -188213,8 +188299,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "jobs": {
           "type": "container",
@@ -190054,7 +190139,7 @@
         "statusFilters": {
           "schemaType": "object-optional",
           "type": "container",
-          "title": "Estado &quot; Filtros de campaña",
+          "title": "Estado y Filtros de campaña",
           "description": "Filtro por estado, etapa de campaña y fuente",
           "layoutType": "grid",
           "columns": 6,
@@ -192156,6 +192241,10 @@
                 {
                   "value": "sk",
                   "label": "languages.sk"
+                },
+                {
+                  "value": "hi",
+                  "label": "languages.hi"
                 }
               ],
               "schema": {
@@ -192174,6 +192263,7 @@
                             "IT": "it",
                             "ES": "es",
                             "SK": "sk",
+                            "HI": "hi",
                             "EN": "en"
                           }
                         },
@@ -192185,9 +192275,19 @@
                           "IT": "it",
                           "ES": "es",
                           "SK": "sk",
+                          "HI": "hi",
                           "EN": "en"
                         },
-                        "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                        "options": [
+                          "de",
+                          "pl",
+                          "fr",
+                          "it",
+                          "es",
+                          "sk",
+                          "hi",
+                          "en"
+                        ]
                       }
                     },
                     "type": "array",
@@ -192201,6 +192301,7 @@
                           "IT": "it",
                           "ES": "es",
                           "SK": "sk",
+                          "HI": "hi",
                           "EN": "en"
                         }
                       },
@@ -192212,9 +192313,19 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       },
-                      "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                      "options": [
+                        "de",
+                        "pl",
+                        "fr",
+                        "it",
+                        "es",
+                        "sk",
+                        "hi",
+                        "en"
+                      ]
                     }
                   }
                 },
@@ -194729,6 +194840,10 @@
                       {
                         "value": "sk",
                         "label": "languages.sk"
+                      },
+                      {
+                        "value": "hi",
+                        "label": "languages.hi"
                       }
                     ],
                     "schema": {
@@ -194741,6 +194856,7 @@
                           "IT": "it",
                           "ES": "es",
                           "SK": "sk",
+                          "HI": "hi",
                           "EN": "en"
                         }
                       },
@@ -194752,9 +194868,19 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       },
-                      "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                      "options": [
+                        "de",
+                        "pl",
+                        "fr",
+                        "it",
+                        "es",
+                        "sk",
+                        "hi",
+                        "en"
+                      ]
                     },
                     "usage": {
                       "response": true
@@ -200810,6 +200936,7 @@
                             "IT": "it",
                             "ES": "es",
                             "SK": "sk",
+                            "HI": "hi",
                             "EN": "en"
                           }
                         },
@@ -200821,9 +200948,19 @@
                           "IT": "it",
                           "ES": "es",
                           "SK": "sk",
+                          "HI": "hi",
                           "EN": "en"
                         },
-                        "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                        "options": [
+                          "de",
+                          "pl",
+                          "fr",
+                          "it",
+                          "es",
+                          "sk",
+                          "hi",
+                          "en"
+                        ]
                       },
                       "status": {
                         "def": {
@@ -204283,6 +204420,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "columns": 4,
@@ -204300,6 +204441,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -204312,9 +204454,20 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["all", "de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": [
+                  "all",
+                  "de",
+                  "pl",
+                  "fr",
+                  "it",
+                  "es",
+                  "sk",
+                  "hi",
+                  "en"
+                ]
               }
             },
             "type": "default"
@@ -212401,6 +212554,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -212419,6 +212576,7 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       }
                     },
@@ -212430,9 +212588,10 @@
                       "IT": "it",
                       "ES": "es",
                       "SK": "sk",
+                      "HI": "hi",
                       "EN": "en"
                     },
-                    "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                    "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
                   }
                 },
                 "type": "array",
@@ -212446,6 +212605,7 @@
                       "IT": "it",
                       "ES": "es",
                       "SK": "sk",
+                      "HI": "hi",
                       "EN": "en"
                     }
                   },
@@ -212457,9 +212617,10 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   },
-                  "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                  "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
                 }
               }
             },
@@ -215246,6 +215407,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -215257,9 +215419,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               }
             },
             "type": "array",
@@ -215273,6 +215436,7 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 }
               },
@@ -215284,9 +215448,10 @@
                 "IT": "it",
                 "ES": "es",
                 "SK": "sk",
+                "HI": "hi",
                 "EN": "en"
               },
-              "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+              "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
             }
           },
           "usage": {
@@ -218979,6 +219144,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -218994,6 +219163,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -219005,9 +219175,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               }
             },
             "type": "array",
@@ -219021,6 +219192,7 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 }
               },
@@ -219032,9 +219204,10 @@
                 "IT": "it",
                 "ES": "es",
                 "SK": "sk",
+                "HI": "hi",
                 "EN": "en"
               },
-              "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+              "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
             }
           },
           "usage": {
@@ -236684,6 +236857,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -236696,6 +236873,7 @@
                 "it": "it",
                 "es": "es",
                 "sk": "sk",
+                "hi": "hi",
                 "en": "en"
               }
             },
@@ -236707,9 +236885,10 @@
               "it": "it",
               "es": "es",
               "sk": "sk",
+              "hi": "hi",
               "en": "en"
             },
-            "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+            "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
           },
           "usage": {
             "request": "data"
@@ -238110,6 +238289,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -238122,6 +238305,7 @@
                 "it": "it",
                 "es": "es",
                 "sk": "sk",
+                "hi": "hi",
                 "en": "en"
               }
             },
@@ -238133,9 +238317,10 @@
               "it": "it",
               "es": "es",
               "sk": "sk",
+              "hi": "hi",
               "en": "en"
             },
-            "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+            "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
           },
           "usage": {
             "request": "data"
@@ -248935,7 +249120,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -248946,7 +249131,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -248961,7 +249146,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -248972,7 +249157,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -275018,6 +275203,7 @@
           "fieldType": "text",
           "label": "Referencia del comprador",
           "description": "Introduce la referencia que te dio el comprador. Si es una entidad pública alemana, usa su Leitweg-ID.",
+          "includeInCacheKey": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -319274,7 +319460,7 @@
         "searchFilters": {
           "schemaType": "object-optional",
           "type": "container",
-          "title": "Búsqueda &quot; Filtros",
+          "title": "Búsqueda y Filtros",
           "description": "Suscripciones de filtros",
           "layoutType": "grid",
           "columns": 3,
@@ -321070,7 +321256,7 @@
         "searchFilters": {
           "schemaType": "object-optional",
           "type": "container",
-          "title": "Búsqueda &quot; Filtros",
+          "title": "Búsqueda y Filtros",
           "description": "Compras de filtros",
           "layoutType": "grid",
           "columns": 3,
@@ -322266,7 +322452,7 @@
         "searchFilters": {
           "schemaType": "object-optional",
           "type": "container",
-          "title": "Búsqueda &quot; Filtros",
+          "title": "Búsqueda y Filtros",
           "description": "Datos de referencia del filtro",
           "layoutType": "grid",
           "columns": 3,
@@ -322431,6 +322617,7 @@
           }
         },
         "sortingOptions": {
+          "schemaType": "object-optional",
           "type": "container",
           "title": "Clasificación",
           "description": "Configurar la clasificación de resultados",
@@ -322536,8 +322723,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "formAlert": {
           "schemaType": "widget",
@@ -323080,10 +323266,8 @@
           "schemaType": "object"
         },
         "paginationInfo": {
-          "type": "container",
-          "layoutType": "horizontal",
-          "noCard": true,
-          "gap": "4",
+          "schemaType": "object",
+          "type": "pagination",
           "order": 4,
           "usage": {
             "request": "data",
@@ -323190,8 +323374,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         }
       },
       "type": "custom-widget",
@@ -323211,9 +323394,6 @@
     "titleShort": "Acción de pago",
     "description": "Aprobar, rechazar o completar una solicitud de pago",
     "fields": {
-      "type": "container",
-      "noCard": true,
-      "layoutType": "stacked",
       "usage": {
         "request": "data",
         "response": true
@@ -323222,6 +323402,7 @@
         "requestId": {
           "type": "form_field",
           "fieldType": "text",
+          "hidden": true,
           "label": "Solicitud ID",
           "description": "Solicitud de pago para procesar",
           "placeholder": "Ingrese solicitud ID...",
@@ -323369,6 +323550,7 @@
           "schemaType": "primitive"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -359158,6 +359340,10 @@
                 {
                   "value": "sk",
                   "label": "languages.sk"
+                },
+                {
+                  "value": "hi",
+                  "label": "languages.hi"
                 }
               ],
               "columns": 6,
@@ -359171,6 +359357,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -359182,9 +359369,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               },
               "usage": {
                 "request": "data"
@@ -367051,7 +367239,7 @@
         },
         "engagement": {
           "type": "container",
-          "title": "Créditos &quot; Participación",
+          "title": "Créditos y participación",
           "description": "Saldo, gastos, ganancias y actividad",
           "layoutType": "grid",
           "columns": 2,
@@ -425169,7 +425357,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Inteligencia",
-          "description": "Nivel mínimo de inteligencia. Rápido = rápido &amp; eficiente. Inteligente = calidad equilibrada. Brillante = profundo razonamiento.",
+          "description": "Nivel mínimo de inteligencia. Rápido = rápido y eficiente. Inteligente = calidad equilibrada. Brillante = profundo razonamiento.",
           "placeholder": "Cualquier inteligencia",
           "options": [
             {
@@ -429689,6 +429877,26 @@
                 },
                 "schemaType": "primitive"
               },
+              "questionHi": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "verdict": {
                 "type": "badge",
                 "label": "Vered",
@@ -430006,6 +430214,30 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Pregunta (eslovaco)",
+          "description": "Deja vacío para limpiar la traducción",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "textHi": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Pregunta (hindi)",
           "description": "Deja vacío para limpiar la traducción",
           "columns": 6,
           "schema": {
@@ -430551,6 +430783,26 @@
                 },
                 "schemaType": "primitive"
               },
+              "textHi": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "generatedBy": {
                 "type": "text",
                 "label": "Propuestas",
@@ -430883,6 +431135,30 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Pregunta (eslovaco)",
+          "description": "Traducción que se muestra en los ejemplos públicos (opcional)",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "textHi": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Pregunta (hindi)",
           "description": "Traducción que se muestra en los ejemplos públicos (opcional)",
           "columns": 6,
           "schema": {
@@ -684824,6 +685100,38 @@
             "response": true
           },
           "schemaType": "primitive"
+        },
+        "affectedFingerprints": {
+          "type": "text",
+          "label": "Huella",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
         }
       },
       "type": "custom-widget",
@@ -686429,11 +686737,6 @@
     "titleShort": "Control de salud",
     "description": "Obtenga el estado de salud del servidor y los diagnósticos",
     "fields": {
-      "type": "container",
-      "title": "Opciones de control de salud",
-      "description": "Configurar los parámetros de control de salud",
-      "layoutType": "grid",
-      "columns": 12,
       "usage": {
         "request": "data",
         "response": true
@@ -687293,6 +687596,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -693526,9 +693830,15 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  }
                 },
-                "type": "string"
+                "type": "nullable"
               }
             },
             "type": "optional"
@@ -693798,32 +694108,184 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "record",
-                  "keyType": {
+                  "type": "pipe",
+                  "in": {
                     "def": {
-                      "type": "string"
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "lazy"
+                              },
+                              "type": "lazy"
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "lazy"
+                            },
+                            "type": "lazy"
+                          }
+                        }
+                      ]
                     },
-                    "type": "string"
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "lazy"
+                            },
+                            "type": "lazy"
+                          }
+                        },
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "lazy"
+                          },
+                          "type": "lazy"
+                        }
+                      }
+                    ]
                   },
-                  "valueType": {
+                  "out": {
                     "def": {
-                      "type": "lazy"
+                      "type": "transform"
                     },
-                    "type": "lazy"
+                    "type": "transform"
                   }
                 },
-                "type": "record",
-                "keyType": {
+                "type": "pipe",
+                "in": {
                   "def": {
-                    "type": "string"
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "lazy"
+                            },
+                            "type": "lazy"
+                          }
+                        },
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "lazy"
+                          },
+                          "type": "lazy"
+                        }
+                      }
+                    ]
                   },
-                  "type": "string"
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "lazy"
+                          },
+                          "type": "lazy"
+                        }
+                      },
+                      "type": "record",
+                      "keyType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "valueType": {
+                        "def": {
+                          "type": "lazy"
+                        },
+                        "type": "lazy"
+                      }
+                    }
+                  ]
                 },
-                "valueType": {
+                "out": {
                   "def": {
-                    "type": "lazy"
+                    "type": "transform"
                   },
-                  "type": "lazy"
+                  "type": "transform"
                 }
               }
             },
@@ -695194,11 +695656,6 @@
     "titleShort": "Suprímase la tarea",
     "description": "Eliminar una tarea de cron",
     "fields": {
-      "type": "container",
-      "title": "Eliminar la tarea del hierro",
-      "description": "Eliminar una tarea del sistema",
-      "layoutType": "grid",
-      "columns": 12,
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -695207,7 +695664,7 @@
         "id": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Task ID",
+          "label": "Clave de la tarea",
           "description": "Unico identificador de la tarea para eliminar",
           "schema": {
             "def": {
@@ -695234,6 +695691,7 @@
           "schemaType": "primitive"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -703358,7 +703816,7 @@
         "id": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Task ID",
+          "label": "Clave de la tarea",
           "description": "Identificador único y estable para esta tarea (por ejemplo, 'db-salud')",
           "placeholder": "Ingrese la tarea ID...",
           "columns": 6,
@@ -703382,7 +703840,7 @@
         "routeId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Ruta ID",
+          "label": "Alias del endpoint",
           "description": "Identificador de Handler: nombre de tarea, alias de endpoint o 'cron-steps'",
           "placeholder": "Ingrese la ruta ID...",
           "columns": 12,
@@ -703401,7 +703859,7 @@
         "displayName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Nombre de pantalla",
+          "label": "Nombre visible",
           "description": "Etiquetas legibles para esta tarea",
           "placeholder": "Introduzca el nombre de la pantalla...",
           "columns": 12,
@@ -708531,7 +708989,7 @@
         "taskId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Task ID",
+          "label": "Clave de la tarea",
           "description": "El ID de la tarea de ejecutar",
           "columns": 12,
           "schema": {

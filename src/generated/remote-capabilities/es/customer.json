@@ -675,7 +675,7 @@
       "Formulario de contacto",
       "Contáctanos",
       "Comunicación de contacto",
-      "Ayuda &quot; Apoyo"
+      "Ayuda y soporte"
     ],
     "aliases": ["contact-form"],
     "credits": 0
@@ -6397,6 +6397,7 @@
         "provider": {
           "type": "text",
           "label": "Proveedor",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "string"
@@ -59100,7 +59101,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Inteligencia",
-          "description": "Nivel mínimo de inteligencia. Rápido = rápido &amp; eficiente. Inteligente = calidad equilibrada. Brillante = profundo razonamiento.",
+          "description": "Nivel mínimo de inteligencia. Rápido = rápido y eficiente. Inteligente = calidad equilibrada. Brillante = profundo razonamiento.",
           "placeholder": "Cualquier inteligencia",
           "options": [
             {
@@ -61506,6 +61507,26 @@
                 "schemaType": "primitive"
               },
               "questionSk": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionHi": {
                 "type": "text",
                 "hidden": true,
                 "schema": {
@@ -296453,7 +296474,7 @@
         "taskId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Task ID",
+          "label": "Clave de la tarea",
           "description": "El ID de la tarea de ejecutar",
           "columns": 12,
           "schema": {

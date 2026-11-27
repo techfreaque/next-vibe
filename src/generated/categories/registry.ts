@@ -179,6 +179,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Modelli",
       "es-ES": "Modelos",
       "sk-SK": "Modely",
+      "hi-IN": "मॉडल",
       "en-GLOBAL": "Models",
     },
     group: "ai",
@@ -201,6 +202,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Esplori i modelli disponibili e confronti i prezzi.",
           "es-ES": "Consulte los modelos disponibles y compare los precios.",
           "sk-SK": "Prezrite si dostupné modely a porovnajte ceny.",
+          "hi-IN": "उपलब्ध मॉडल देखें और कीमतों की तुलना करें।",
         },
         "model-catalog-scan": {
           "en-US": "New upstream models, price drift and announced shutdowns.",
@@ -218,6 +220,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Nuevos modelos de los proveedores, cambios de precio y cierres anunciados.",
           "sk-SK":
             "Nové modely poskytovateľov, zmeny cien a ohlásené vypnutia.",
+          "hi-IN": "नए अपस्ट्रीम मॉडल, कीमतों में बदलाव और घोषित शटडाउन।",
         },
         "refusal-index-leaderboard": {
           "en-US": "How often each model answers, hedges or refuses.",
@@ -229,6 +232,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Quanto spesso ogni modello risponde, divaga o rifiuta.",
           "es-ES": "Con qué frecuencia cada modelo responde, evade o se niega.",
           "sk-SK": "Ako často každý model odpovie, vyhne sa alebo odmietne.",
+          "hi-IN": "हर मॉडल कितनी बार जवाब देता है, टालता है या मना करता है।",
         },
       },
     },
@@ -245,6 +249,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Consulte los modelos disponibles y los cambios en los catálogos de proveedores.",
       "sk-SK":
         "Skontrolujte dostupnosť modelov a zmeny v katalógoch poskytovateľov.",
+      "hi-IN": "मॉडल की उपलब्धता और प्रोवाइडर कैटलॉग के बदलाव देखें।",
       "en-GLOBAL": "Browse model availability and provider catalog changes.",
     },
     adminPathPrefixes: ["vibe/agent/models"],
@@ -261,6 +266,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Agente IA",
       "es-ES": "Agente de IA",
       "sk-SK": "Agent AI",
+      "hi-IN": "AI एजेंट",
     },
     group: "ai",
     icon: "bot",
@@ -276,6 +282,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "it-IT": "IA",
         "es-ES": "IA",
         "sk-SK": "AI",
+        "hi-IN": "AI",
       },
       summary: { alias: "ai-admin-summary", scope: "platform" },
       actions: ["skill-create"],
@@ -297,6 +304,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Esplori i modelli disponibili e confronti i prezzi.",
           "es-ES": "Consulte los modelos disponibles y compare los precios.",
           "sk-SK": "Prezrite si dostupné modely a porovnajte ceny.",
+          "hi-IN": "उपलब्ध मॉडल देखें और कीमतों की तुलना करें।",
         },
         skills: {
           "en-US": "Browse reusable instructions and tools for agents.",
@@ -313,6 +321,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Explore instrucciones y herramientas reutilizables para agentes.",
           "sk-SK":
             "Prezrite si opakovane použiteľné pokyny a nástroje pre agentov.",
+          "hi-IN":
+            "एजेंट के लिए दोबारा इस्तेमाल होने वाले निर्देश और टूल देखें।",
         },
         "agent-chat-threads": {
           "en-US": "Open your saved agent conversations.",
@@ -323,6 +333,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Apra le conversazioni salvate con gli agenti.",
           "es-ES": "Abra sus conversaciones guardadas con agentes.",
           "sk-SK": "Otvorte svoje uložené konverzácie s agentmi.",
+          "hi-IN": "अपनी सेव की गई एजेंट बातचीत खोलें।",
         },
         "task-list": {
           "en-US": "Check task status and upcoming runs.",
@@ -335,6 +346,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Compruebe el estado de las tareas y sus próximas ejecuciones.",
           "sk-SK": "Skontrolujte stav úloh a ich najbližšie spustenia.",
+          "hi-IN": "टास्क स्टेटस और आने वाले रन जाँचें।",
         },
         "chat-moderation": {
           "en-US": "Reported and hidden public posts, most urgent first.",
@@ -350,6 +362,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Publicaciones públicas denunciadas u ocultas, primero las más urgentes.",
           "sk-SK":
             "Nahlásené a skryté verejné príspevky, najnaliehavejšie navrchu.",
+          "hi-IN": "रिपोर्ट किए और छिपाए गए पब्लिक पोस्ट, सबसे ज़रूरी पहले।",
         },
         "skill-moderation": {
           "en-US": "Community skills with reports, most reported first.",
@@ -364,6 +377,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Skills de la comunidad denunciadas, primero las más denunciadas.",
           "sk-SK":
             "Zručnosti komunity s hláseniami, najčastejšie nahlásené navrchu.",
+          "hi-IN":
+            "रिपोर्ट वाली कम्युनिटी स्किल, सबसे ज़्यादा रिपोर्ट वाली पहले।",
         },
       },
     },
@@ -375,6 +390,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Esplori modelli, competenze e conversazioni.",
       "es-ES": "Explore modelos, habilidades y conversaciones.",
       "sk-SK": "Prezrite si modely, zručnosti a konverzácie.",
+      "hi-IN": "मॉडल, स्किल और बातचीत देखें।",
       "en-GLOBAL": "Explore models, skills and conversations.",
     },
     createActions: ["skill-create"],
@@ -392,6 +408,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Inferenza",
           "es-ES": "Inferencia",
           "sk-SK": "Inferencia",
+          "hi-IN": "इन्फ़रेंस",
         },
       },
       Generation: {
@@ -407,6 +424,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Generazione",
           "es-ES": "Generación",
           "sk-SK": "Generovanie",
+          "hi-IN": "जनरेशन",
         },
       },
       Tools: {
@@ -422,6 +440,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Strumenti",
           "es-ES": "Herramientas",
           "sk-SK": "Nástroje",
+          "hi-IN": "टूल",
         },
       },
       Search: {
@@ -437,6 +456,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ricerca",
           "es-ES": "Búsqueda",
           "sk-SK": "Vyhľadávanie",
+          "hi-IN": "सर्च",
         },
       },
       chat: {
@@ -452,6 +472,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Chat",
           "es-ES": "Chat",
           "sk-SK": "Chat",
+          "hi-IN": "चैट",
         },
       },
       chatFavorites: {
@@ -467,6 +488,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Preferiti",
           "es-ES": "Favoritos",
           "sk-SK": "Obľúbené",
+          "hi-IN": "फ़ेवरेट",
         },
       },
       chatOrganization: {
@@ -482,6 +504,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Organizzazione",
           "es-ES": "Organización",
           "sk-SK": "Organizácia",
+          "hi-IN": "संगठन",
         },
       },
       chatSettings: {
@@ -497,6 +520,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Impostazioni chat",
           "es-ES": "Configuración del chat",
           "sk-SK": "Nastavenia chatu",
+          "hi-IN": "चैट सेटिंग्स",
         },
       },
       skillsManagement: {
@@ -512,6 +536,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Skill",
           "es-ES": "Skills",
           "sk-SK": "Zručnosti",
+          "hi-IN": "स्किल",
         },
       },
       skillsCommunity: {
@@ -527,6 +552,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Skill della community",
           "es-ES": "Skills de la comunidad",
           "sk-SK": "Zručnosti komunity",
+          "hi-IN": "कम्युनिटी स्किल",
         },
       },
       skillsModeration: {
@@ -542,6 +568,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Moderazione delle skill",
           "es-ES": "Moderación de skills",
           "sk-SK": "Moderovanie zručností",
+          "hi-IN": "स्किल मॉडरेशन",
         },
       },
       threadsManagement: {
@@ -557,6 +584,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Conversazioni",
           "es-ES": "Conversaciones",
           "sk-SK": "Konverzácie",
+          "hi-IN": "थ्रेड",
         },
       },
       threadsSharing: {
@@ -572,6 +600,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Condivisione delle conversazioni",
           "es-ES": "Conversaciones compartidas",
           "sk-SK": "Zdieľanie konverzácií",
+          "hi-IN": "थ्रेड शेयरिंग",
         },
       },
       threadsSearch: {
@@ -587,6 +616,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ricerca nelle conversazioni",
           "es-ES": "Búsqueda de conversaciones",
           "sk-SK": "Vyhľadávanie konverzácií",
+          "hi-IN": "थ्रेड सर्च",
         },
       },
       messagesModerating: {
@@ -602,6 +632,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Messaggi",
           "es-ES": "Mensajes",
           "sk-SK": "Správy",
+          "hi-IN": "मैसेज",
         },
       },
       messagesSearch: {
@@ -617,6 +648,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ricerca nei messaggi",
           "es-ES": "Búsqueda de mensajes",
           "sk-SK": "Vyhľadávanie správ",
+          "hi-IN": "मैसेज सर्च",
         },
       },
       messagesFiles: {
@@ -632,6 +664,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Allegati dei messaggi",
           "es-ES": "Archivos de mensajes",
           "sk-SK": "Súbory v správach",
+          "hi-IN": "मैसेज फ़ाइलें",
         },
       },
       tasksCron: {
@@ -647,6 +680,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Attività pianificate",
           "es-ES": "Tareas programadas",
           "sk-SK": "Naplánované úlohy",
+          "hi-IN": "शेड्यूल टास्क",
         },
       },
     },
@@ -663,6 +697,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Cortex",
       "es-ES": "Cortex",
       "sk-SK": "Cortex",
+      "hi-IN": "Cortex",
     },
     group: "ai",
     icon: "brain",
@@ -684,6 +719,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Toda la estructura de carpetas de la memoria de la IA de un vistazo.",
           "sk-SK": "Celá štruktúra priečinkov pamäte AI na jeden pohľad.",
+          "hi-IN": "AI मेमोरी का पूरा फ़ोल्डर स्ट्रक्चर एक नज़र में।",
         },
         "cortex-search": {
           "en-US": "Find any file by name or content.",
@@ -694,6 +730,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Trovi qualsiasi file per nome o contenuto.",
           "es-ES": "Encuentre cualquier archivo por nombre o contenido.",
           "sk-SK": "Nájdite ľubovoľný súbor podľa názvu alebo obsahu.",
+          "hi-IN": "नाम या कंटेंट से कोई भी फ़ाइल खोजें।",
         },
         "cortex-terminals": {
           "en-US": "Open terminal sessions and where each one is.",
@@ -704,6 +741,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Sessioni di terminale aperte e la loro cartella corrente.",
           "es-ES": "Sesiones de terminal abiertas y su carpeta actual.",
           "sk-SK": "Otvorené relácie terminálu a ich aktuálne priečinky.",
+          "hi-IN": "खुले टर्मिनल सेशन और हर एक कहाँ है।",
         },
       },
     },
@@ -716,6 +754,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Sfogli file e cartelle nella memoria dell’IA.",
       "es-ES": "Explore los archivos y carpetas de la memoria de la IA.",
       "sk-SK": "Prezerajte si súbory a priečinky v pamäti AI.",
+      "hi-IN": "AI मेमोरी में फ़ाइलें और फ़ोल्डर देखें।",
     },
   },
   {
@@ -729,6 +768,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Contatti e collaborazioni",
       "es-ES": "Prospección y colaboraciones",
       "sk-SK": "Oslovovanie a spolupráce",
+      "hi-IN": "आउटरीच और डील",
       "en-GLOBAL": "Outreach and deals",
     },
     group: "analytics",
@@ -758,6 +798,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Cada contacto propuesto, en qué punto está y qué devolvieron los acuerdos.",
           "sk-SK": "Každý oslovený kontakt, jeho stav a čo dohody priniesli.",
+          "hi-IN":
+            "हर संपर्क जिसे पिच किया गया, उसकी स्थिति और किन डील से पैसा वापस आया।",
         },
         "growth-campaign-links": {
           "en-US": "Tagged links per channel with visits, signups and payers.",
@@ -775,6 +817,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Enlaces etiquetados por canal, con visitas, registros y pagadores.",
           "sk-SK":
             "Označené odkazy podľa kanála s návštevami, registráciami a platiacimi.",
+          "hi-IN":
+            "हर चैनल के टैग किए लिंक, विज़िट, साइनअप और पेमेंट करने वालों के साथ।",
         },
         "growth-channel-spend-list": {
           "en-US": "Spend per channel and the cost of each paying user.",
@@ -786,6 +830,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES": "Gasto por canal y coste de cada usuario de pago.",
           "sk-SK":
             "Výdavky podľa kanála a cena každého platiaceho používateľa.",
+          "hi-IN": "हर चैनल का खर्च और हर पेमेंट करने वाले यूज़र की लागत।",
         },
       },
     },
@@ -803,6 +848,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Siga los acuerdos con creadores, los enlaces de campañas y los costes de marketing.",
       "sk-SK":
         "Sledujte spolupráce s tvorcami, odkazy kampaní a marketingové náklady.",
+      "hi-IN": "क्रिएटर डील, कैंपेन लिंक और मार्केटिंग खर्च ट्रैक करें।",
       "en-GLOBAL": "Track creator deals, campaign links and marketing costs.",
     },
     adminPathPrefixes: ["leads/outreach", "leads/growth"],
@@ -819,6 +865,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Analisi",
       "es-ES": "Analítica",
       "sk-SK": "Analytika",
+      "hi-IN": "एनालिटिक्स",
     },
     group: "analytics",
     icon: "bar-chart-2",
@@ -858,6 +905,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Tráfico, registros, pagadores, ingresos y coste de IA en cualquier periodo.",
           "sk-SK":
             "Návštevnosť, registrácie, platiaci, tržby a náklady na AI za ľubovoľné obdobie.",
+          "hi-IN":
+            "किसी भी अवधि का ट्रैफ़िक, साइनअप, पेमेंट करने वाले, रेवेन्यू और AI खर्च।",
         },
         "acquisition-report": {
           "en-US": "See which sources bring visitors, leads and signups.",
@@ -871,6 +920,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES": "Vea qué fuentes traen visitas, leads y registros.",
           "sk-SK":
             "Pozrite si, ktoré zdroje prinášajú návštevy, leady a registrácie.",
+          "hi-IN": "देखें कौन से सोर्स विज़िटर, लीड और साइनअप लाते हैं।",
         },
         "funnel-report": {
           "en-US": "Find where visitors drop off before they pay.",
@@ -881,6 +931,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Scopra dove i visitatori abbandonano prima di pagare.",
           "es-ES": "Detecte dónde abandonan los visitantes antes de pagar.",
           "sk-SK": "Zistite, kde návštevníci odpadávajú pred platbou.",
+          "hi-IN": "पता करें कि विज़िटर पेमेंट से पहले कहाँ छोड़ देते हैं।",
         },
         "vibe-sense-graphs": {
           "en-US": "Build and run metric graphs on live platform data.",
@@ -892,6 +943,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Crei ed esegua grafi di metriche sui dati in tempo reale.",
           "es-ES": "Cree y ejecute grafos de métricas con datos en vivo.",
           "sk-SK": "Zostavte a spúšťajte grafy metrík nad živými dátami.",
+          "hi-IN": "लाइव प्लेटफ़ॉर्म डेटा पर मेट्रिक ग्राफ़ बनाएँ और चलाएँ।",
         },
       },
     },
@@ -903,6 +955,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Segua acquisizione, ricavi e andamento operativo.",
       "es-ES": "Consulte la captación, los ingresos y la evolución operativa.",
       "sk-SK": "Sledujte získavanie zákazníkov, výnosy a prevádzkové výsledky.",
+      "hi-IN": "नए यूज़र, रेवेन्यू और ऑपरेटिंग ट्रेंड ट्रैक करें।",
       "en-GLOBAL": "Track acquisition, revenue and operating trends.",
     },
     subcategories: {
@@ -919,6 +972,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Attività",
           "es-ES": "Negocio",
           "sk-SK": "Podnikanie",
+          "hi-IN": "बिज़नेस",
         },
       },
       "Vibe Sense": {
@@ -934,6 +988,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Vibe Sense",
           "es-ES": "Vibe Sense",
           "sk-SK": "Vibe Sense",
+          "hi-IN": "Vibe Sense",
         },
       },
       Indicators: {
@@ -949,6 +1004,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Indicatori",
           "es-ES": "Indicadores",
           "sk-SK": "Ukazovatele",
+          "hi-IN": "इंडिकेटर",
         },
       },
       Evaluators: {
@@ -964,6 +1020,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Valutatori",
           "es-ES": "Evaluadores",
           "sk-SK": "Vyhodnocovanie",
+          "hi-IN": "इवैल्युएटर",
         },
       },
       Transformers: {
@@ -979,6 +1036,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Trasformatori",
           "es-ES": "Transformadores",
           "sk-SK": "Transformácie",
+          "hi-IN": "ट्रांसफ़ॉर्मर",
         },
       },
       leadsData: {
@@ -994,6 +1052,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati sui contatti commerciali",
           "es-ES": "Datos de prospectos",
           "sk-SK": "Údaje o potenciálnych zákazníkoch",
+          "hi-IN": "लीड डेटा",
         },
       },
       usersData: {
@@ -1009,6 +1068,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati degli utenti",
           "es-ES": "Datos de usuarios",
           "sk-SK": "Údaje o používateľoch",
+          "hi-IN": "यूज़र डेटा",
         },
       },
       messengerData: {
@@ -1024,6 +1084,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati di messaggistica",
           "es-ES": "Datos de mensajería",
           "sk-SK": "Údaje o správach",
+          "hi-IN": "मैसेंजर डेटा",
         },
       },
       paymentsData: {
@@ -1039,6 +1100,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati sui pagamenti",
           "es-ES": "Datos de pagos",
           "sk-SK": "Údaje o platbách",
+          "hi-IN": "पेमेंट डेटा",
         },
       },
       creditsData: {
@@ -1054,6 +1116,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati sui crediti",
           "es-ES": "Datos de créditos",
           "sk-SK": "Údaje o kreditoch",
+          "hi-IN": "क्रेडिट डेटा",
         },
       },
       subscriptionsData: {
@@ -1069,6 +1132,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati sugli abbonamenti",
           "es-ES": "Datos de suscripciones",
           "sk-SK": "Údaje o predplatnom",
+          "hi-IN": "सब्सक्रिप्शन डेटा",
         },
       },
       referralData: {
@@ -1084,6 +1148,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati sugli inviti",
           "es-ES": "Datos de referidos",
           "sk-SK": "Údaje o odporúčaniach",
+          "hi-IN": "रेफ़रल डेटा",
         },
       },
       newsletterData: {
@@ -1099,6 +1164,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati della newsletter",
           "es-ES": "Datos del boletín",
           "sk-SK": "Údaje o newsletteri",
+          "hi-IN": "न्यूज़लेटर डेटा",
         },
       },
       chatData: {
@@ -1114,6 +1180,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati delle chat",
           "es-ES": "Datos del chat",
           "sk-SK": "Údaje o chatoch",
+          "hi-IN": "चैट डेटा",
         },
       },
       systemData: {
@@ -1129,6 +1196,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati di sistema",
           "es-ES": "Datos del sistema",
           "sk-SK": "Systémové údaje",
+          "hi-IN": "सिस्टम डेटा",
         },
       },
       financeData: {
@@ -1144,6 +1212,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Dati finanziari",
           "es-ES": "Datos financieros",
           "sk-SK": "Finančné údaje",
+          "hi-IN": "फ़ाइनेंस डेटा",
         },
       },
     },
@@ -1160,6 +1229,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Newsletter",
       "es-ES": "Boletín",
       "sk-SK": "Newsletter",
+      "hi-IN": "न्यूज़लेटर",
     },
     group: "analytics",
     icon: "send",
@@ -1189,6 +1259,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Enviados, abiertos, clics y rebotes por recorrido e idioma.",
           "sk-SK":
             "Odoslané, otvorené, kliknuté a nedoručené podľa cesty a jazyka.",
+          "hi-IN":
+            "हर जर्नी और भाषा के हिसाब से भेजे, खोले, क्लिक और बाउंस हुए।",
         },
         "campaign-queue": {
           "en-US": "Leads waiting for their next campaign email.",
@@ -1199,6 +1271,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Lead in attesa della prossima email della campagna.",
           "es-ES": "Leads a la espera de su próximo correo de campaña.",
           "sk-SK": "Leady čakajúce na ďalší e-mail kampane.",
+          "hi-IN": "अगले कैंपेन ईमेल का इंतज़ार कर रहे लीड।",
         },
         lifecycle: {
           "en-US":
@@ -1214,6 +1287,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Recorridos, inscripciones y conversiones, con el interruptor de emergencia.",
           "sk-SK": "Cesty, zápisy a konverzie s núdzovým vypínačom.",
+          "hi-IN": "जर्नी, एनरोलमेंट और कन्वर्ज़न, किल स्विच के साथ।",
         },
         "campaign-journey-variants": {
           "en-US": "The email journeys leads can be enrolled in.",
@@ -1226,6 +1300,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Los recorridos de correo en los que se puede inscribir a los leads.",
           "sk-SK": "E-mailové cesty, do ktorých možno zaradiť leady.",
+          "hi-IN": "वे ईमेल जर्नी जिनमें लीड जोड़े जा सकते हैं।",
         },
       },
     },
@@ -1244,6 +1319,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Consulte los suscriptores, las campañas programadas y los resultados de los envíos.",
       "sk-SK":
         "Skontrolujte odberateľov, plánované kampane a výsledky doručovania.",
+      "hi-IN": "सब्सक्राइबर, शेड्यूल किए कैंपेन और डिलीवरी के नतीजे देखें।",
     },
     subcategories: {
       emailCampaignsStats: {
@@ -1259,6 +1335,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Statistiche campagne",
           "es-ES": "Estadísticas de campañas",
           "sk-SK": "Štatistiky kampaní",
+          "hi-IN": "कैंपेन आँकड़े",
         },
       },
       emailCampaignsProcessing: {
@@ -1274,6 +1351,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Campagne",
           "es-ES": "Campañas",
           "sk-SK": "Kampane",
+          "hi-IN": "कैंपेन",
         },
       },
       emailCampaignsJourneys: {
@@ -1289,6 +1367,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Percorsi",
           "es-ES": "Secuencias",
           "sk-SK": "Komunikačné scenáre",
+          "hi-IN": "जर्नी",
         },
       },
       emailCampaignsQueue: {
@@ -1304,6 +1383,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Coda",
           "es-ES": "Cola",
           "sk-SK": "Front",
+          "hi-IN": "कतार",
         },
       },
       Subscriptions: {
@@ -1319,6 +1399,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Abbonamenti",
           "es-ES": "Suscripciones",
           "sk-SK": "Predplatné",
+          "hi-IN": "सब्सक्रिप्शन",
         },
       },
     },
@@ -1335,6 +1416,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Pagamenti",
       "es-ES": "Pagos",
       "sk-SK": "Platby",
+      "hi-IN": "पेमेंट",
     },
     group: "billing",
     icon: "credit-card",
@@ -1373,6 +1455,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES": "Ingresos por procesador, plan y divisa, con MRR y bajas.",
           "sk-SK":
             "Tržby podľa spracovateľa, plánu a meny vrátane MRR a odchodov.",
+          "hi-IN":
+            "प्रोसेसर, प्लान और करेंसी के हिसाब से रेवेन्यू, MRR और चर्न के साथ।",
         },
         "payment-processor": {
           "en-US": "Checkouts, renewals, failed payments and webhook runs.",
@@ -1384,6 +1468,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Checkout, rinnovi, pagamenti falliti e webhook ricevuti.",
           "es-ES": "Pagos, renovaciones, cobros fallidos y webhooks recibidos.",
           "sk-SK": "Platby, obnovenia, neúspešné platby a prijaté webhooky.",
+          "hi-IN": "चेकआउट, रिन्यूअल, फ़ेल पेमेंट और वेबहुक रन।",
         },
         "processor-accounting": {
           "en-US": "Match processor payouts and fees to your books.",
@@ -1398,6 +1483,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Concilie liquidaciones y comisiones de los procesadores con la contabilidad.",
           "sk-SK": "Spárujte výplaty a poplatky spracovateľov s účtovníctvom.",
+          "hi-IN": "प्रोसेसर पेआउट और फ़ीस को अपने खातों से मिलाएँ।",
         },
         "products-catalog-list": {
           "en-US": "Plans, credit packs and goods you sell.",
@@ -1408,6 +1494,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Piani, pacchetti di crediti e prodotti che vende.",
           "es-ES": "Planes, paquetes de créditos y productos que vende.",
           "sk-SK": "Plány, balíky kreditov a tovar, ktorý predávate.",
+          "hi-IN": "आपके बेचे जाने वाले प्लान, क्रेडिट पैक और सामान।",
         },
       },
     },
@@ -1423,6 +1510,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES":
         "Revise los pagos, los reembolsos y las liquidaciones de los procesadores.",
       "sk-SK": "Sledujte platby, refundácie a zúčtovanie platieb.",
+      "hi-IN": "पेमेंट, रिफ़ंड और प्रोसेसर सेटलमेंट ट्रैक करें।",
       "en-GLOBAL": "Track payments, refunds and processor settlement.",
     },
     subcategories: {
@@ -1439,6 +1527,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Transazioni",
           "es-ES": "Transacciones",
           "sk-SK": "Transakcie",
+          "hi-IN": "ट्रांज़ैक्शन",
         },
       },
       Providers: {
@@ -1454,6 +1543,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fornitori",
           "es-ES": "Proveedores",
           "sk-SK": "Poskytovatelia platieb",
+          "hi-IN": "प्रोवाइडर",
         },
       },
     },
@@ -1470,6 +1560,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Abbonamenti",
       "es-ES": "Suscripciones",
       "sk-SK": "Predplatné",
+      "hi-IN": "सब्सक्रिप्शन",
     },
     group: "billing",
     icon: "refresh-cw",
@@ -1499,6 +1590,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Tutti gli abbonamenti con piano, stato e rinnovo.",
           "es-ES": "Todas las suscripciones con plan, estado y renovación.",
           "sk-SK": "Všetky predplatné s plánom, stavom a dátumom obnovenia.",
+          "hi-IN": "हर सब्सक्रिप्शन, प्लान, स्टेटस और रिन्यूअल तारीख के साथ।",
         },
         "subscription-admin-stats": {
           "en-US": "Subscription, credit and referral revenue in one view.",
@@ -1514,6 +1606,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Ingresos de suscripciones, créditos y referidos de un vistazo.",
           "sk-SK":
             "Tržby z predplatného, kreditov a odporúčaní na jednom mieste.",
+          "hi-IN": "सब्सक्रिप्शन, क्रेडिट और रेफ़रल रेवेन्यू एक ही व्यू में।",
         },
         "subscription-admin-purchases": {
           "en-US": "Every credit pack bought, by whom and when.",
@@ -1524,6 +1617,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ogni pacchetto di crediti acquistato, da chi e quando.",
           "es-ES": "Cada paquete de créditos comprado, por quién y cuándo.",
           "sk-SK": "Každý kúpený balík kreditov, kto a kedy.",
+          "hi-IN": "हर खरीदा गया क्रेडिट पैक, किसने और कब।",
         },
         "products-catalog-list": {
           "en-US": "The plans and credit packs customers can buy.",
@@ -1535,6 +1629,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Los planes y paquetes de créditos que pueden comprar los clientes.",
           "sk-SK": "Plány a balíky kreditov, ktoré si zákazníci môžu kúpiť.",
+          "hi-IN": "वे प्लान और क्रेडिट पैक जो कस्टमर खरीद सकते हैं।",
         },
       },
     },
@@ -1549,6 +1644,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES":
         "Consulte los planes activos, las renovaciones y las cancelaciones.",
       "sk-SK": "Skontrolujte aktívne predplatné, obnovenia a zrušenia.",
+      "hi-IN": "एक्टिव प्लान, रिन्यूअल और कैंसलेशन खोजें।",
     },
     subcategories: {
       Subscriptions: {
@@ -1564,6 +1660,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Abbonamenti",
           "es-ES": "Suscripciones",
           "sk-SK": "Predplatné",
+          "hi-IN": "सब्सक्रिप्शन",
         },
       },
       Management: {
@@ -1579,6 +1676,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Gestione",
           "es-ES": "Gestión",
           "sk-SK": "Správa",
+          "hi-IN": "मैनेजमेंट",
         },
       },
       subscriptionAnalytics: {
@@ -1594,6 +1692,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Analisi",
           "es-ES": "Analítica",
           "sk-SK": "Analytika",
+          "hi-IN": "एनालिटिक्स",
         },
       },
     },
@@ -1610,6 +1709,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Crediti",
       "es-ES": "Créditos",
       "sk-SK": "Kredity",
+      "hi-IN": "क्रेडिट",
     },
     group: "billing",
     icon: "coins",
@@ -1646,6 +1746,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Gasto de créditos por modelo, función y proveedor, con margen.",
           "sk-SK":
             "Spotreba kreditov podľa modelu, funkcie a poskytovateľa vrátane marže.",
+          "hi-IN":
+            "मॉडल, फ़ीचर और प्रोवाइडर के हिसाब से क्रेडिट खर्च, मार्जिन के साथ।",
         },
         "verify-credit-grant": {
           "en-US": "Find an account and give it bonus credits.",
@@ -1656,6 +1758,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Trovi un account e gli assegni crediti bonus.",
           "es-ES": "Busque una cuenta y concédale créditos de bonificación.",
           "sk-SK": "Nájdite účet a prideľte mu bonusové kredity.",
+          "hi-IN": "अकाउंट खोजें और उसे बोनस क्रेडिट दें।",
         },
         "finance-credit-liabilities": {
           "en-US": "Paid credits customers have not used yet.",
@@ -1667,6 +1770,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Crediti pagati che i clienti non hanno ancora usato.",
           "es-ES": "Créditos pagados que los clientes aún no han usado.",
           "sk-SK": "Zaplatené kredity, ktoré zákazníci ešte nevyužili.",
+          "hi-IN": "खरीदे गए क्रेडिट जो कस्टमर ने अभी इस्तेमाल नहीं किए।",
         },
         "anti-farming-report": {
           "en-US": "Networks and email domains farming free credits.",
@@ -1680,6 +1784,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Redes y dominios de correo que explotan los créditos gratuitos.",
           "sk-SK":
             "Siete a e-mailové domény, ktoré zneužívajú bezplatné kredity.",
+          "hi-IN":
+            "फ़्री क्रेडिट की फ़ार्मिंग करने वाले नेटवर्क और ईमेल डोमेन।",
         },
         "credits-public-cap": {
           "en-US": "Today’s free-tier spend against the global cap.",
@@ -1692,6 +1798,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES": "Gasto gratuito de hoy frente al límite global.",
           "sk-SK":
             "Dnešná spotreba bezplatnej úrovne oproti globálnemu limitu.",
+          "hi-IN": "ग्लोबल लिमिट के मुकाबले आज का फ़्री-टियर खर्च।",
         },
       },
     },
@@ -1705,6 +1812,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Consulti gli acquisti di crediti, i saldi e i consumi.",
       "es-ES": "Consulte las compras de créditos, los saldos y el consumo.",
       "sk-SK": "Skontrolujte nákupy kreditov, zostatky a čerpanie.",
+      "hi-IN": "क्रेडिट खरीद, बैलेंस और इस्तेमाल देखें।",
     },
     subcategories: {
       Credits: {
@@ -1720,6 +1828,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Crediti",
           "es-ES": "Créditos",
           "sk-SK": "Kredity",
+          "hi-IN": "क्रेडिट",
         },
       },
       Management: {
@@ -1735,6 +1844,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Gestione",
           "es-ES": "Gestión",
           "sk-SK": "Správa",
+          "hi-IN": "मैनेजमेंट",
         },
       },
     },
@@ -1751,6 +1861,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Inviti",
       "es-ES": "Referidos",
       "sk-SK": "Odporúčania",
+      "hi-IN": "रेफ़रल",
     },
     group: "billing",
     icon: "share-2",
@@ -1782,6 +1893,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Clic, iscrizioni, ricavi e commissioni per ogni codice.",
           "es-ES": "Clics, registros, ingresos y comisiones de cada código.",
           "sk-SK": "Kliknutia, registrácie, tržby a provízie pre každý kód.",
+          "hi-IN": "हर कोड के क्लिक, साइनअप, रेवेन्यू और कमीशन।",
         },
         referral_admin_payouts_GET: {
           "en-US": "Approve or reject partner payout requests.",
@@ -1793,6 +1905,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Approvi o rifiuti le richieste di pagamento dei partner.",
           "es-ES": "Apruebe o rechace las solicitudes de pago de los socios.",
           "sk-SK": "Schváľte alebo zamietnite žiadosti partnerov o výplatu.",
+          "hi-IN": "पार्टनर के पेआउट अनुरोध मंज़ूर या रिजेक्ट करें।",
         },
         "referral-code-report": {
           "en-US":
@@ -1811,6 +1924,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Un código de principio a fin: titular, conversiones, ingresos y pagos.",
           "sk-SK":
             "Jeden kód od začiatku do konca: vlastník, konverzie, peniaze a výplaty.",
+          "hi-IN": "एक कोड शुरू से आखिर तक: मालिक, कन्वर्ज़न, पैसा और पेआउट।",
         },
       },
     },
@@ -1826,6 +1940,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES":
         "Revise las comisiones por recomendaciones y los pagos pendientes.",
       "sk-SK": "Skontrolujte provízie za odporúčania a sumy na vyplatenie.",
+      "hi-IN": "रेफ़रल कमाई और बाकी पेआउट देखें।",
     },
     subcategories: {
       Program: {
@@ -1841,6 +1956,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Programma",
           "es-ES": "Programa",
           "sk-SK": "Program",
+          "hi-IN": "प्रोग्राम",
         },
       },
       Payouts: {
@@ -1856,6 +1972,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Liquidazioni",
           "es-ES": "Desembolsos",
           "sk-SK": "Výplaty",
+          "hi-IN": "पेआउट",
         },
       },
     },
@@ -1871,6 +1988,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Vendite e fatture fornitori",
       "es-ES": "Ventas y facturas de proveedores",
       "sk-SK": "Predaj a prijaté faktúry",
+      "hi-IN": "बिक्री और बिल",
       "en-GLOBAL": "Sales and bills",
     },
     group: "business",
@@ -1900,6 +2018,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fatture clienti per numero, cliente e stato.",
           "es-ES": "Facturas de clientes por número, cliente y estado.",
           "sk-SK": "Faktúry zákazníkov podľa čísla, zákazníka a stavu.",
+          "hi-IN": "नंबर, कस्टमर और स्टेटस के हिसाब से कस्टमर इनवॉइस।",
         },
         "payment-bill-list": {
           "en-US": "Supplier bills to approve, pay and book.",
@@ -1911,6 +2030,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Facturas de proveedores para aprobar, pagar y contabilizar.",
           "sk-SK": "Faktúry dodávateľov na schválenie, úhradu a zaúčtovanie.",
+          "hi-IN": "मंज़ूरी, पेमेंट और बुकिंग के लिए सप्लायर बिल।",
         },
         "payment-estimate-list": {
           "en-US": "Quotes sent to customers and whether they accepted.",
@@ -1921,6 +2041,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Preventivi inviati ai clienti ed eventuale accettazione.",
           "es-ES": "Presupuestos enviados a clientes y si los aceptaron.",
           "sk-SK": "Cenové ponuky odoslané zákazníkom a či ich prijali.",
+          "hi-IN": "कस्टमर को भेजे कोटेशन और क्या उन्होंने मंज़ूर किए।",
         },
         "mail-bill-reviews": {
           "en-US":
@@ -1937,6 +2058,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Facturas y recibos llegados por correo, listos para contabilizar.",
           "sk-SK": "Faktúry a doklady z e-mailu pripravené na zaúčtovanie.",
+          "hi-IN": "ईमेल से आए इनवॉइस और रसीदें, बुक करने के लिए तैयार।",
         },
       },
     },
@@ -1954,6 +2076,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Emita facturas, registre las de proveedores y siga los presupuestos.",
       "sk-SK":
         "Vystavujte faktúry, evidujte prijaté faktúry a sledujte cenové ponuky.",
+      "hi-IN":
+        "कस्टमर इनवॉइस जारी करें, सप्लायर बिल दर्ज करें और एस्टिमेट ट्रैक करें।",
       "en-GLOBAL":
         "Issue customer invoices, enter supplier bills and track estimates.",
     },
@@ -1976,6 +2100,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fatture di vendita",
           "es-ES": "Facturas de venta",
           "sk-SK": "Vystavené faktúry",
+          "hi-IN": "सेल्स इनवॉइस",
           "en-GLOBAL": "Sales invoices",
         },
         adminPathPrefixes: ["payment/invoice"],
@@ -1992,6 +2117,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fatture fornitori",
           "es-ES": "Facturas de proveedores",
           "sk-SK": "Prijaté faktúry",
+          "hi-IN": "सप्लायर बिल",
           "en-GLOBAL": "Supplier bills",
         },
         adminPathPrefixes: ["payment/bill"],
@@ -2008,6 +2134,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Preventivi",
           "es-ES": "Presupuestos",
           "sk-SK": "Cenové ponuky",
+          "hi-IN": "कोटेशन",
           "en-GLOBAL": "Quotes",
         },
         adminPathPrefixes: ["payment/estimate"],
@@ -2024,6 +2151,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Note di credito",
           "es-ES": "Abonos",
           "sk-SK": "Dobropisy",
+          "hi-IN": "क्रेडिट नोट",
           "en-GLOBAL": "Credit notes",
         },
         adminPathPrefixes: ["payment/credit-note"],
@@ -2042,6 +2170,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Contabilità",
       "es-ES": "Contabilidad",
       "sk-SK": "Účtovníctvo",
+      "hi-IN": "अकाउंटिंग",
     },
     group: "business",
     icon: "receipt",
@@ -2071,6 +2200,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Todos los asientos contabilizados, filtrables por cuenta y fecha.",
           "sk-SK": "Všetky zaúčtované zápisy s filtrom podľa účtu a dátumu.",
+          "hi-IN": "हर पोस्ट की गई एंट्री, अकाउंट और तारीख से फ़िल्टर की हुई।",
         },
         "coa-profit-loss": {
           "en-US": "Income, expenses and profit for the period.",
@@ -2081,6 +2211,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ricavi, costi e utile del periodo.",
           "es-ES": "Ingresos, gastos y beneficio del periodo.",
           "sk-SK": "Výnosy, náklady a zisk za obdobie.",
+          "hi-IN": "अवधि की आमदनी, खर्च और मुनाफ़ा।",
         },
         "coa-balance-sheet": {
           "en-US": "Assets, liabilities and equity on any date.",
@@ -2091,6 +2222,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Attività, passività e patrimonio netto a qualsiasi data.",
           "es-ES": "Activos, pasivos y patrimonio en cualquier fecha.",
           "sk-SK": "Aktíva, záväzky a vlastné imanie k ľubovoľnému dňu.",
+          "hi-IN": "किसी भी तारीख पर एसेट, देनदारी और इक्विटी।",
         },
         "coa-receivables-aging": {
           "en-US": "Customer invoices still unpaid, grouped by age.",
@@ -2101,6 +2233,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fatture clienti non pagate, raggruppate per anzianità.",
           "es-ES": "Facturas de clientes pendientes, agrupadas por antigüedad.",
           "sk-SK": "Neuhradené faktúry zákazníkov zoskupené podľa veku.",
+          "hi-IN":
+            "अभी तक बिना पेमेंट के कस्टमर इनवॉइस, उम्र के हिसाब से ग्रुप किए।",
         },
         "coa-payables-aging": {
           "en-US": "Supplier bills you still owe, grouped by due date.",
@@ -2113,6 +2247,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Facturas de proveedores pendientes, agrupadas por vencimiento.",
           "sk-SK": "Neuhradené faktúry dodávateľov zoskupené podľa splatnosti.",
+          "hi-IN":
+            "सप्लायर बिल जो अभी चुकाने बाकी हैं, ड्यू डेट के हिसाब से ग्रुप किए।",
         },
         "coa-period-list": {
           "en-US": "Open and close accounting periods.",
@@ -2123,6 +2259,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Apra e chiuda i periodi contabili.",
           "es-ES": "Abra y cierre periodos contables.",
           "sk-SK": "Otvárajte a uzatvárajte účtovné obdobia.",
+          "hi-IN": "अकाउंटिंग अवधियाँ खोलें और बंद करें।",
         },
       },
     },
@@ -2137,6 +2274,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Revise los asientos, los saldos pendientes y los períodos abiertos.",
       "sk-SK":
         "Skontrolujte účtovné zápisy, neuhradené položky a otvorené obdobia.",
+      "hi-IN": "जर्नल, बकाया बैलेंस और खुली अवधियाँ देखें।",
       "en-GLOBAL": "Review journals, outstanding balances and open periods.",
     },
     createActions: ["coa-journal-create", "coa-period-create"],
@@ -2154,6 +2292,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Account",
           "es-ES": "Cuentas",
           "sk-SK": "Účty",
+          "hi-IN": "अकाउंट",
         },
       },
       Journal: {
@@ -2169,6 +2308,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Libro giornale",
           "es-ES": "Libro diario",
           "sk-SK": "Účtovný denník",
+          "hi-IN": "जर्नल",
         },
       },
       Ledger: {
@@ -2184,6 +2324,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Libro mastro",
           "es-ES": "Libro mayor",
           "sk-SK": "Hlavná kniha",
+          "hi-IN": "लेजर",
         },
       },
       Periods: {
@@ -2199,6 +2340,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Periodi",
           "es-ES": "Períodos",
           "sk-SK": "Účtovné obdobia",
+          "hi-IN": "अवधियाँ",
         },
       },
       Accounting: {
@@ -2214,6 +2356,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Configurazione iniziale",
           "es-ES": "Configuración inicial",
           "sk-SK": "Nastavenie",
+          "hi-IN": "सेटअप",
         },
       },
     },
@@ -2230,6 +2373,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Prodotti",
       "es-ES": "Productos",
       "sk-SK": "Produkty",
+      "hi-IN": "प्रोडक्ट",
     },
     group: "business",
     icon: "package",
@@ -2251,6 +2395,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Piani, pacchetti di crediti e prodotti che vende.",
           "es-ES": "Planes, paquetes de créditos y productos que vende.",
           "sk-SK": "Plány, balíky kreditov a tovar, ktorý predávate.",
+          "hi-IN": "आपके बेचे जाने वाले प्लान, क्रेडिट पैक और सामान।",
         },
         "products-category-list": {
           "en-US": "Groups that keep the catalog in order.",
@@ -2261,6 +2406,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "I gruppi che ordinano il catalogo.",
           "es-ES": "Los grupos que ordenan el catálogo.",
           "sk-SK": "Skupiny, ktoré udržiavajú katalóg v poriadku.",
+          "hi-IN": "कैटलॉग को व्यवस्थित रखने वाले ग्रुप।",
         },
       },
     },
@@ -2272,6 +2418,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Gestisca prodotti, servizi, piani e prezzi.",
       "es-ES": "Gestione productos, servicios, planes y precios.",
       "sk-SK": "Spravujte produkty, služby, predplatné a ceny.",
+      "hi-IN": "प्रोडक्ट, सर्विस, प्लान और कीमतें मैनेज करें।",
       "en-GLOBAL": "Manage products, services, plans and prices.",
     },
     createActions: ["products_catalog_create_POST"],
@@ -2289,6 +2436,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Catalogo",
           "es-ES": "Catálogo",
           "sk-SK": "Katalóg",
+          "hi-IN": "कैटलॉग",
         },
       },
       "Category Management": {
@@ -2304,6 +2452,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Categorie",
           "es-ES": "Categorías",
           "sk-SK": "Kategórie",
+          "hi-IN": "कैटेगरी",
         },
       },
     },
@@ -2320,6 +2469,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Punto vendita",
       "es-ES": "Punto de venta",
       "sk-SK": "Predajné miesto",
+      "hi-IN": "POS",
     },
     group: "business",
     icon: "shopping-cart",
@@ -2343,6 +2493,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Vendite in cassa per terminale, sessione e stato.",
           "es-ES": "Ventas en caja por terminal, sesión y estado.",
           "sk-SK": "Predaje v pokladni podľa terminálu, zmeny a stavu.",
+          "hi-IN": "टर्मिनल, सेशन और स्टेटस के हिसाब से काउंटर बिक्री।",
         },
         "pos-terminals": {
           "en-US": "Tills and devices that take payments.",
@@ -2353,6 +2504,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Casse e dispositivi che incassano i pagamenti.",
           "es-ES": "Cajas y dispositivos que cobran los pagos.",
           "sk-SK": "Pokladne a zariadenia, ktoré prijímajú platby.",
+          "hi-IN": "पेमेंट लेने वाले काउंटर और डिवाइस।",
         },
         "products-catalog-list": {
           "en-US": "The products your tills can sell.",
@@ -2363,6 +2515,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "I prodotti che le sue casse possono vendere.",
           "es-ES": "Los productos que pueden vender sus cajas.",
           "sk-SK": "Produkty, ktoré môžu vaše pokladne predávať.",
+          "hi-IN": "वे प्रोडक्ट जो आपके काउंटर बेच सकते हैं।",
         },
       },
     },
@@ -2377,6 +2530,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Apra la cassa, registri le vendite e chiuda il turno.",
       "es-ES": "Abra la caja, registre ventas y cierre el turno.",
       "sk-SK": "Otvorte pokladnicu, zaevidujte predaj a uzavrite zmenu.",
+      "hi-IN": "काउंटर खोलें, बिक्री दर्ज करें और शिफ़्ट बंद करें।",
     },
     createActions: ["pos_terminal_create_POST"],
     subcategories: {
@@ -2393,6 +2547,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ordini",
           "es-ES": "Pedidos",
           "sk-SK": "Objednávky",
+          "hi-IN": "ऑर्डर",
         },
       },
       "POS: Sessions": {
@@ -2408,6 +2563,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Sessioni",
           "es-ES": "Sesiones",
           "sk-SK": "Pokladničné zmeny",
+          "hi-IN": "सेशन",
         },
       },
       "POS: Terminals": {
@@ -2423,6 +2579,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Terminali",
           "es-ES": "Terminales",
           "sk-SK": "Terminály",
+          "hi-IN": "टर्मिनल",
         },
       },
       "POS: Products": {
@@ -2438,6 +2595,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Prodotti",
           "es-ES": "Productos",
           "sk-SK": "Produkty",
+          "hi-IN": "प्रोडक्ट",
         },
       },
     },
@@ -2454,6 +2612,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Inventario",
       "es-ES": "Inventario",
       "sk-SK": "Zásoby",
+      "hi-IN": "इन्वेंटरी",
     },
     group: "business",
     icon: "box",
@@ -2480,6 +2639,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Giacenze per magazzino, con avviso di scorte basse.",
           "es-ES": "Existencias por almacén, con aviso de stock bajo.",
           "sk-SK": "Zásoby v každom sklade s upozornením na nízky stav.",
+          "hi-IN": "हर वेयरहाउस का स्टॉक, कम स्टॉक की चेतावनी के साथ।",
         },
         "inventory-warehouses": {
           "en-US": "Every warehouse and stock location you run.",
@@ -2490,6 +2650,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Tutti i magazzini e i punti di stoccaggio.",
           "es-ES": "Todos sus almacenes y ubicaciones de stock.",
           "sk-SK": "Všetky sklady a skladové miesta.",
+          "hi-IN": "आपके सभी वेयरहाउस और स्टॉक लोकेशन।",
         },
         "inventory-transfers": {
           "en-US": "Stock moved between warehouses, open and done.",
@@ -2500,6 +2661,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Trasferimenti tra magazzini, aperti e completati.",
           "es-ES": "Traslados entre almacenes, abiertos y completados.",
           "sk-SK": "Presuny medzi skladmi, otvorené aj dokončené.",
+          "hi-IN": "वेयरहाउस के बीच भेजा गया स्टॉक, बाकी और पूरा।",
         },
       },
     },
@@ -2514,6 +2676,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES":
         "Controle las existencias, los movimientos y los traslados entre almacenes.",
       "sk-SK": "Sledujte stav zásob, skladové pohyby a presuny medzi skladmi.",
+      "hi-IN": "फ़िज़िकल स्टॉक, वेयरहाउस मूवमेंट और ट्रांसफ़र ट्रैक करें।",
       "en-GLOBAL": "Track physical stock, warehouse movements and transfers.",
     },
     createActions: [
@@ -2534,6 +2697,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Scorte",
           "es-ES": "Existencias",
           "sk-SK": "Stav zásob",
+          "hi-IN": "स्टॉक",
         },
       },
       "Inventory: Transfers": {
@@ -2549,6 +2713,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Trasferimenti",
           "es-ES": "Transferencias",
           "sk-SK": "Presuny zásob",
+          "hi-IN": "ट्रांसफ़र",
         },
       },
       "Inventory: Warehouses": {
@@ -2564,6 +2729,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Magazzini",
           "es-ES": "Almacenes",
           "sk-SK": "Sklady",
+          "hi-IN": "वेयरहाउस",
         },
       },
     },
@@ -2580,6 +2746,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Acquisti",
       "es-ES": "Compras",
       "sk-SK": "Nákup",
+      "hi-IN": "खरीदारी",
     },
     group: "business",
     icon: "shopping-bag",
@@ -2603,6 +2770,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ordini di acquisto per fornitore e stato.",
           "es-ES": "Pedidos de compra por proveedor y estado.",
           "sk-SK": "Nákupné objednávky podľa dodávateľa a stavu.",
+          "hi-IN": "वेंडर और स्टेटस के हिसाब से परचेज़ ऑर्डर।",
         },
         "purchasing-vendors": {
           "en-US": "The suppliers you buy from.",
@@ -2613,6 +2781,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "I fornitori da cui acquista.",
           "es-ES": "Los proveedores a los que compra.",
           "sk-SK": "Dodávatelia, od ktorých nakupujete.",
+          "hi-IN": "वे सप्लायर जिनसे आप खरीदते हैं।",
         },
         "payment-bill-list": {
           "en-US": "Bills from your vendors, ready to approve and pay.",
@@ -2624,6 +2793,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fatture dei fornitori, pronte da approvare e pagare.",
           "es-ES": "Facturas de sus proveedores, listas para aprobar y pagar.",
           "sk-SK": "Faktúry od dodávateľov pripravené na schválenie a úhradu.",
+          "hi-IN": "आपके वेंडर के बिल, मंज़ूरी और पेमेंट के लिए तैयार।",
         },
       },
     },
@@ -2635,6 +2805,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Gestisca i fornitori, gli ordini di acquisto e le consegne.",
       "es-ES": "Gestione proveedores, pedidos de compra y entregas.",
       "sk-SK": "Spravujte dodávateľov, nákupné objednávky a dodávky.",
+      "hi-IN": "सप्लायर, परचेज़ ऑर्डर और डिलीवरी मैनेज करें।",
       "en-GLOBAL": "Manage suppliers, purchase orders and deliveries.",
     },
     createActions: [
@@ -2655,6 +2826,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ordini",
           "es-ES": "Pedidos",
           "sk-SK": "Nákupné objednávky",
+          "hi-IN": "ऑर्डर",
         },
       },
       "Purchasing: Vendors": {
@@ -2670,6 +2842,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fornitori",
           "es-ES": "Proveedores",
           "sk-SK": "Dodávatelia",
+          "hi-IN": "वेंडर",
         },
       },
     },
@@ -2686,6 +2859,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Imposte",
       "es-ES": "Impuestos",
       "sk-SK": "Dane",
+      "hi-IN": "टैक्स",
     },
     group: "business",
     icon: "file-text",
@@ -2712,6 +2886,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Scelga come applicare l’IVA ai documenti.",
           "es-ES": "Elija cómo se aplica el IVA a sus documentos.",
           "sk-SK": "Vyberte, ako sa DPH uplatňuje na vaše doklady.",
+          "hi-IN": "चुनें कि आपके दस्तावेज़ों पर VAT कैसे लागू हो।",
         },
         "tax-rate-list": {
           "en-US": "The tax rates your documents can use.",
@@ -2722,6 +2897,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Le aliquote disponibili per i documenti.",
           "es-ES": "Los tipos impositivos disponibles para sus documentos.",
           "sk-SK": "Sadzby dane, ktoré môžu používať vaše doklady.",
+          "hi-IN": "वे टैक्स दरें जो आपके दस्तावेज़ इस्तेमाल कर सकते हैं।",
         },
         "coa-tax-report": {
           "en-US": "Booked VAT movements for the dates you pick.",
@@ -2733,6 +2909,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Movimenti IVA registrati nelle date scelte.",
           "es-ES": "Movimientos de IVA contabilizados en las fechas elegidas.",
           "sk-SK": "Zaúčtované pohyby DPH za zvolené obdobie.",
+          "hi-IN": "आपकी चुनी तारीखों के बुक किए VAT मूवमेंट।",
         },
         tax_report_GET: {
           "en-US": "Tax on invoices, bills and till sales, by rate.",
@@ -2746,6 +2923,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Imposta su fatture, acquisti e vendite in cassa, per aliquota.",
           "es-ES": "Impuesto en facturas, compras y ventas en caja, por tipo.",
           "sk-SK": "Daň z faktúr, nákupov a predaja v pokladni podľa sadzby.",
+          "hi-IN": "इनवॉइस, बिल और काउंटर बिक्री पर टैक्स, दर के हिसाब से।",
         },
         "tax-compliance": {
           "en-US":
@@ -2764,6 +2942,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Qué requisitos legales de su país se cumplen y qué corregir.",
           "sk-SK":
             "Ktoré zákonné požiadavky vašej krajiny spĺňate a čo opraviť.",
+          "hi-IN":
+            "आपके देश की कौन सी कानूनी ज़रूरतें पूरी हैं और क्या ठीक करना है।",
         },
         "tax-vat-return": {
           "en-US":
@@ -2782,6 +2962,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Su declaración de IVA del período, en el formato oficial de su país.",
           "sk-SK":
             "Vaše daňové priznanie k DPH za obdobie v úradnom formáte vašej krajiny.",
+          "hi-IN":
+            "अवधि का आपका VAT रिटर्न, आपके देश के आधिकारिक फ़ॉर्मेट में।",
         },
       },
     },
@@ -2795,6 +2977,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Consulti il regime fiscale, le aliquote e il riepilogo IVA.",
       "es-ES": "Revise su régimen fiscal, tipos impositivos y resumen de IVA.",
       "sk-SK": "Skontrolujte daňový režim firmy, sadzby a prehľad DPH.",
+      "hi-IN": "अपना टैक्स सिस्टम, दरें और VAT सारांश देखें।",
       "en-GLOBAL": "Review your tax regime, rates and VAT summary.",
     },
     createActions: ["tax_rate_create_POST"],
@@ -2812,6 +2995,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Aliquote fiscali",
           "es-ES": "Tasas impositivas",
           "sk-SK": "Daňové sadzby",
+          "hi-IN": "टैक्स दरें",
         },
       },
       "Tax Reports": {
@@ -2827,6 +3011,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Report",
           "es-ES": "Informes",
           "sk-SK": "Daňové výkazy",
+          "hi-IN": "रिपोर्ट",
         },
       },
     },
@@ -2843,6 +3028,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Notifiche",
       "es-ES": "Notificaciones",
       "sk-SK": "Oznámenia",
+      "hi-IN": "नोटिफ़िकेशन",
     },
     group: "business",
     icon: "bell",
@@ -2868,6 +3054,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES": "Todo lo que terminó en su ausencia, primero lo no leído.",
           "sk-SK":
             "Všetko, čo sa dokončilo počas vašej neprítomnosti, neprečítané navrchu.",
+          "hi-IN": "आपकी गैरमौजूदगी में जो भी पूरा हुआ, अनपढ़ा पहले।",
         },
       },
     },
@@ -2882,6 +3069,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Attività concluse, avvisi e risposte, prima i non letti.",
       "es-ES": "Tareas terminadas, alertas y respuestas, primero lo no leído.",
       "sk-SK": "Dokončené úlohy, upozornenia a odpovede, neprečítané navrchu.",
+      "hi-IN": "पूरे हुए काम, अलर्ट और जवाब, अनपढ़े पहले।",
     },
   },
   {
@@ -2896,6 +3084,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Messaggistica",
       "es-ES": "Mensajería",
       "sk-SK": "Správy",
+      "hi-IN": "मैसेंजर",
     },
     group: "comms",
     icon: "mail",
@@ -2929,6 +3118,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Correo recibido en la dirección de la plataforma, lo más reciente primero.",
           "sk-SK": "Pošta na adresu platformy, najnovšia navrchu.",
+          "hi-IN": "प्लेटफ़ॉर्म के पते पर भेजे गए मेल, नए पहले।",
         },
         "messenger-inbox": {
           "en-US": "Read mail in your connected mailboxes.",
@@ -2939,6 +3129,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Legga la posta delle caselle collegate.",
           "es-ES": "Lea el correo de sus buzones conectados.",
           "sk-SK": "Čítajte poštu v pripojených schránkach.",
+          "hi-IN": "अपने कनेक्टेड मेलबॉक्स में मेल पढ़ें।",
         },
         "messenger-messages": {
           "en-US": "Every email the platform sent, searchable and filtered.",
@@ -2950,6 +3141,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ogni email inviata, con ricerca e filtri.",
           "es-ES": "Cada correo enviado, con búsqueda y filtros.",
           "sk-SK": "Každý odoslaný e-mail s vyhľadávaním a filtrami.",
+          "hi-IN": "प्लेटफ़ॉर्म का भेजा हर ईमेल, सर्च और फ़िल्टर के साथ।",
         },
         "email-stats": {
           "en-US": "Sends, opens, clicks and bounces over time.",
@@ -2960,6 +3152,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Invii, aperture, clic e rimbalzi nel tempo.",
           "es-ES": "Envíos, aperturas, clics y rebotes a lo largo del tiempo.",
           "sk-SK": "Odoslané, otvorené, kliknutia a nedoručené v čase.",
+          "hi-IN": "समय के साथ भेजे, खोले, क्लिक और बाउंस हुए ईमेल।",
         },
         "messenger-accounts": {
           "en-US": "The accounts the platform sends from, on every channel.",
@@ -2973,6 +3166,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Las cuentas desde las que envía la plataforma, en todos los canales.",
           "sk-SK": "Účty, z ktorých platforma posiela, na všetkých kanáloch.",
+          "hi-IN": "हर चैनल पर वे अकाउंट जिनसे प्लेटफ़ॉर्म भेजता है।",
         },
       },
     },
@@ -2989,6 +3183,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES":
         "Gestione los buzones conectados y consulte los mensajes recibidos.",
       "sk-SK": "Spravujte pripojené schránky a čítajte prijaté správy.",
+      "hi-IN": "कनेक्टेड मेलबॉक्स मैनेज करें और आने वाले मैसेज पढ़ें।",
     },
     subcategories: {
       Accounts: {
@@ -3004,6 +3199,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Account",
           "es-ES": "Cuentas",
           "sk-SK": "Účty",
+          "hi-IN": "अकाउंट",
         },
       },
       Inbox: {
@@ -3019,6 +3215,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Posta in arrivo",
           "es-ES": "Bandeja de entrada",
           "sk-SK": "Doručená pošta",
+          "hi-IN": "इनबॉक्स",
         },
       },
       Messages: {
@@ -3034,6 +3231,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Messaggi",
           "es-ES": "Mensajes",
           "sk-SK": "Správy",
+          "hi-IN": "मैसेज",
         },
       },
       Providers: {
@@ -3049,6 +3247,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fornitori",
           "es-ES": "Proveedores",
           "sk-SK": "Poskytovatelia",
+          "hi-IN": "प्रोवाइडर",
         },
       },
     },
@@ -3064,6 +3263,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Pubblicazione",
       "es-ES": "Publicaciones",
       "sk-SK": "Publikovanie",
+      "hi-IN": "पब्लिशिंग",
       "en-GLOBAL": "Publishing",
     },
     group: "content",
@@ -3084,6 +3284,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Conversazioni pubbliche condivise con la community.",
           "es-ES": "Conversaciones públicas compartidas con la comunidad.",
           "sk-SK": "Verejné konverzácie zdieľané s komunitou.",
+          "hi-IN": "मेंबर्स के कम्युनिटी के साथ शेयर किए पब्लिक थ्रेड।",
         },
         "chat-moderation": {
           "en-US": "Reported and hidden public posts, most urgent first.",
@@ -3099,6 +3300,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Publicaciones públicas denunciadas u ocultas, primero las más urgentes.",
           "sk-SK":
             "Nahlásené a skryté verejné príspevky, najnaliehavejšie navrchu.",
+          "hi-IN": "रिपोर्ट किए और छिपाए गए पब्लिक पोस्ट, सबसे ज़रूरी पहले।",
         },
       },
     },
@@ -3112,6 +3314,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Gestisca le discussioni del forum e l’indicizzazione delle pagine.",
       "es-ES": "Gestione los debates del foro y la indexación de las páginas.",
       "sk-SK": "Spravujte diskusie vo fóre a indexovanie stránok.",
+      "hi-IN": "फ़ोरम चर्चाएँ और सर्च इंडेक्सिंग मैनेज करें।",
       "en-GLOBAL": "Manage forum discussions and search indexing.",
     },
     adminPathPrefixes: ["seo", "vibe/agent/chat/public-feed"],
@@ -3128,6 +3331,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Forum",
           "es-ES": "Foro",
           "sk-SK": "Fórum",
+          "hi-IN": "फ़ोरम",
           "en-GLOBAL": "Forum",
         },
         adminPathPrefixes: ["vibe/agent/chat/public-feed"],
@@ -3144,6 +3348,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Indicizzazione",
           "es-ES": "Indexación",
           "sk-SK": "Indexovanie stránok",
+          "hi-IN": "सर्च इंडेक्सिंग",
           "en-GLOBAL": "Search indexing",
         },
         adminPathPrefixes: ["seo"],
@@ -3161,6 +3366,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Utenti",
       "es-ES": "Usuarios",
       "sk-SK": "Používatelia",
+      "hi-IN": "यूज़र",
       "en-GLOBAL": "Users",
     },
     group: "people",
@@ -3187,6 +3393,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Cada cuenta con lo que pagó, lo que gasta y su última actividad.",
           "sk-SK": "Každý účet s platbami, spotrebou a poslednou aktivitou.",
+          "hi-IN":
+            "हर अकाउंट, उसका पेमेंट, खर्च और आखिरी बार एक्टिव होने का समय।",
         },
         "users-stats": {
           "en-US": "Who signed up, from where, and who stayed and paid.",
@@ -3198,6 +3406,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Chi si è iscritto, da dove, e chi è rimasto e ha pagato.",
           "es-ES": "Quién se registró, desde dónde, y quién se quedó y pagó.",
           "sk-SK": "Kto sa zaregistroval, odkiaľ a kto zostal a zaplatil.",
+          "hi-IN": "किसने साइन अप किया, कहाँ से, और कौन रुका और पेमेंट किया।",
         },
       },
     },
@@ -3212,6 +3421,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES": "Busque usuarios y gestione sus cuentas y permisos.",
       "sk-SK":
         "Vyhľadajte používateľov a spravujte ich účty a prístupové práva.",
+      "hi-IN": "लोग खोजें, एक्सेस देखें और यूज़र अकाउंट मैनेज करें।",
       "en-GLOBAL": "Find people, review access and manage user accounts.",
     },
     createActions: ["users-create"],
@@ -3229,6 +3439,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Account",
       "es-ES": "Cuenta",
       "sk-SK": "Účet",
+      "hi-IN": "अकाउंट",
     },
     group: "people",
     icon: "user",
@@ -3248,6 +3459,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES": "Busque usuarios y revise sus permisos de acceso.",
       "sk-SK":
         "Vyhľadajte používateľov a skontrolujte ich prístupové oprávnenia.",
+      "hi-IN": "यूज़र खोजें और उनका अकाउंट एक्सेस देखें।",
       "en-GLOBAL": "Find users and review their account access.",
     },
     subcategories: {
@@ -3264,6 +3476,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Accesso e registrazione",
           "es-ES": "Acceso y registro",
           "sk-SK": "Prihlásenie a registrácia",
+          "hi-IN": "लॉगिन और साइनअप",
         },
       },
       profile: {
@@ -3279,6 +3492,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Profilo",
           "es-ES": "Perfil",
           "sk-SK": "Profil",
+          "hi-IN": "प्रोफ़ाइल",
         },
       },
       sessions: {
@@ -3294,6 +3508,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Sessioni",
           "es-ES": "Sesiones",
           "sk-SK": "Relácie",
+          "hi-IN": "सेशन",
         },
       },
       directory: {
@@ -3309,6 +3524,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Elenco",
           "es-ES": "Directorio",
           "sk-SK": "Adresár",
+          "hi-IN": "डायरेक्टरी",
         },
       },
       manageUsers: {
@@ -3324,6 +3540,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Gestione utenti",
           "es-ES": "Gestión de usuarios",
           "sk-SK": "Správa používateľov",
+          "hi-IN": "यूज़र मैनेज करें",
         },
       },
       userStats: {
@@ -3339,6 +3556,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Iscrizioni",
           "es-ES": "Registros",
           "sk-SK": "Registrácie",
+          "hi-IN": "साइनअप",
         },
       },
       remoteInstances: {
@@ -3354,6 +3572,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Istanze remote",
           "es-ES": "Instancias remotas",
           "sk-SK": "Vzdialené inštancie",
+          "hi-IN": "रिमोट इंस्टेंस",
         },
       },
       remoteSelf: {
@@ -3369,6 +3588,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Il mio account",
           "es-ES": "Mi cuenta",
           "sk-SK": "Môj účet",
+          "hi-IN": "खुद",
         },
       },
     },
@@ -3385,6 +3605,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Contatti commerciali",
       "es-ES": "Prospectos",
       "sk-SK": "Potenciálni zákazníci",
+      "hi-IN": "लीड",
     },
     group: "people",
     icon: "target",
@@ -3412,6 +3633,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Tutti i lead con fonte, stato e fase della campagna.",
           "es-ES": "Todos los leads con origen, estado y etapa de campaña.",
           "sk-SK": "Všetky leady so zdrojom, stavom a fázou kampane.",
+          "hi-IN": "हर लीड, सोर्स, स्टेटस और कैंपेन स्टेज के साथ।",
         },
         "acquisition-report": {
           "en-US": "See which sources bring visitors, leads and signups.",
@@ -3425,6 +3647,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES": "Vea qué fuentes traen visitas, leads y registros.",
           "sk-SK":
             "Pozrite si, ktoré zdroje prinášajú návštevy, leady a registrácie.",
+          "hi-IN": "देखें कौन से सोर्स विज़िटर, लीड और साइनअप लाते हैं।",
         },
         "funnel-report": {
           "en-US": "Find where visitors drop off before they pay.",
@@ -3435,6 +3658,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Scopra dove i visitatori abbandonano prima di pagare.",
           "es-ES": "Detecte dónde abandonan los visitantes antes de pagar.",
           "sk-SK": "Zistite, kde návštevníci odpadávajú pred platbou.",
+          "hi-IN": "पता करें कि विज़िटर पेमेंट से पहले कहाँ छोड़ देते हैं।",
         },
         "abuse-report": {
           "en-US":
@@ -3453,6 +3677,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Oleadas de bots y consumo de créditos gratuitos, por red y agente.",
           "sk-SK":
             "Vlny botov a míňanie bezplatných kreditov podľa siete a prehliadača.",
+          "hi-IN":
+            "बॉट की बाढ़ और फ़्री क्रेडिट उड़ाने वाले, नेटवर्क और यूज़र एजेंट के हिसाब से।",
         },
         "leads-import-status": {
           "en-US": "Progress and errors of every CSV import.",
@@ -3463,6 +3689,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Avanzamento ed errori di ogni importazione CSV.",
           "es-ES": "Progreso y errores de cada importación CSV.",
           "sk-SK": "Priebeh a chyby každého importu CSV.",
+          "hi-IN": "हर CSV इंपोर्ट की प्रोग्रेस और एरर।",
         },
       },
     },
@@ -3479,6 +3706,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Revisa el origen, las conversiones y los prospectos más recientes.",
       "sk-SK":
         "Skontrolujte zdroje kontaktov, konverzie a najnovších potenciálnych zákazníkov.",
+      "hi-IN": "देखें कि लीड कहाँ से आए, कैसे कन्वर्ट हुए और हाल में कौन आया।",
       "en-GLOBAL":
         "Review where leads came from, how they converted and who arrived recently.",
     },
@@ -3497,6 +3725,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Analisi",
           "es-ES": "Análisis",
           "sk-SK": "Analytika",
+          "hi-IN": "एनालिटिक्स",
         },
       },
       Management: {
@@ -3512,6 +3741,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Gestione",
           "es-ES": "Gestión",
           "sk-SK": "Správa",
+          "hi-IN": "मैनेजमेंट",
         },
       },
       Import: {
@@ -3527,6 +3757,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Importazione",
           "es-ES": "Importación",
           "sk-SK": "Import",
+          "hi-IN": "इंपोर्ट",
         },
       },
       Leads: {
@@ -3542,6 +3773,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Contatti commerciali",
           "es-ES": "Prospectos",
           "sk-SK": "Potenciálni zákazníci",
+          "hi-IN": "लीड",
         },
       },
       emailCampaignsProcessing: {
@@ -3557,6 +3789,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Campagne",
           "es-ES": "Campañas",
           "sk-SK": "Kampane",
+          "hi-IN": "कैंपेन",
         },
       },
       emailCampaignsJourneys: {
@@ -3572,6 +3805,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Percorsi",
           "es-ES": "Secuencias",
           "sk-SK": "Komunikačné scenáre",
+          "hi-IN": "जर्नी",
         },
       },
       emailCampaignsQueue: {
@@ -3587,6 +3821,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Coda",
           "es-ES": "Cola",
           "sk-SK": "Front",
+          "hi-IN": "कतार",
         },
       },
       emailCampaignsStats: {
@@ -3602,6 +3837,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Statistiche campagne",
           "es-ES": "Estadísticas de campañas",
           "sk-SK": "Štatistiky kampaní",
+          "hi-IN": "कैंपेन आँकड़े",
         },
       },
       leadMagnetIntegrations: {
@@ -3617,6 +3853,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Integrazioni",
           "es-ES": "Integraciones",
           "sk-SK": "Integrácie",
+          "hi-IN": "इंटीग्रेशन",
         },
       },
       growth: {
@@ -3632,6 +3869,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Crescita",
           "es-ES": "Crecimiento",
           "sk-SK": "Rast",
+          "hi-IN": "ग्रोथ",
         },
       },
       outreach: {
@@ -3647,6 +3885,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Primi contatti",
           "es-ES": "Contacto inicial",
           "sk-SK": "Oslovovanie zákazníkov",
+          "hi-IN": "आउटरीच",
         },
       },
     },
@@ -3663,6 +3902,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Aziende",
       "es-ES": "Empresas",
       "sk-SK": "Firmy",
+      "hi-IN": "कंपनियाँ",
     },
     group: "people",
     icon: "building",
@@ -3688,6 +3928,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Passi da un’azienda all’altra e ne modifichi i dati.",
           "es-ES": "Cambie de empresa y edite sus datos.",
           "sk-SK": "Prepínajte medzi spoločnosťami a upravujte ich údaje.",
+          "hi-IN": "कंपनियों के बीच स्विच करें और उनकी जानकारी बदलें।",
         },
       },
     },
@@ -3702,6 +3943,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES":
         "Gestione las empresas, su configuración y los accesos del equipo.",
       "sk-SK": "Spravujte firmy, ich nastavenia a prístupy členov tímu.",
+      "hi-IN": "कानूनी इकाइयाँ, कंपनी सेटिंग्स और टीम एक्सेस मैनेज करें।",
       "en-GLOBAL": "Manage legal entities, company settings and team access.",
     },
     createActions: ["companies_create_POST"],
@@ -3719,6 +3961,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Aziende",
           "es-ES": "Empresas",
           "sk-SK": "Firmy",
+          "hi-IN": "कंपनियाँ",
         },
       },
       "Company Members": {
@@ -3734,6 +3977,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Membri",
           "es-ES": "Miembros",
           "sk-SK": "Členovia",
+          "hi-IN": "मेंबर",
         },
       },
     },
@@ -3750,6 +3994,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Browser",
       "es-ES": "Navegador",
       "sk-SK": "Prehliadač",
+      "hi-IN": "ब्राउज़र",
     },
     group: "platform",
     icon: "globe",
@@ -3769,6 +4014,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Pagine",
           "es-ES": "Páginas",
           "sk-SK": "Stránky",
+          "hi-IN": "पेज",
         },
       },
       Interaction: {
@@ -3784,6 +4030,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Interazione",
           "es-ES": "Interacción",
           "sk-SK": "Interakcia",
+          "hi-IN": "इंटरैक्शन",
         },
       },
       Inspection: {
@@ -3799,6 +4046,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ispezione",
           "es-ES": "Inspección",
           "sk-SK": "Kontrola",
+          "hi-IN": "जाँच",
         },
       },
       DevTools: {
@@ -3814,6 +4062,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Strumenti di sviluppo",
           "es-ES": "Herramientas de desarrollo",
           "sk-SK": "Nástroje pre vývojárov",
+          "hi-IN": "DevTools",
         },
       },
     },
@@ -3830,6 +4079,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "SSH e infrastruttura",
       "es-ES": "SSH e infraestructura",
       "sk-SK": "SSH a infraštruktúra",
+      "hi-IN": "SSH और इन्फ़्रा",
     },
     group: "platform",
     icon: "terminal",
@@ -3849,6 +4099,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Server e istanze su cui aprire una shell.",
           "es-ES": "Servidores e instancias en los que abrir una terminal.",
           "sk-SK": "Servery a inštancie, na ktorých otvoríte shell.",
+          "hi-IN": "वे सर्वर और इंस्टेंस जिन पर आप शेल खोल सकते हैं।",
         },
         ssh_linux_users_list_GET: {
           "en-US": "Login accounts on the host operating system.",
@@ -3859,6 +4110,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Account di accesso del sistema operativo host.",
           "es-ES": "Cuentas de acceso del sistema operativo del host.",
           "sk-SK": "Prihlasovacie účty v operačnom systéme hostiteľa.",
+          "hi-IN": "होस्ट ऑपरेटिंग सिस्टम के लॉगिन अकाउंट।",
         },
       },
     },
@@ -3876,6 +4128,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Abra una terminal en sus servidores y gestione sus cuentas de acceso.",
       "sk-SK":
         "Otvorte shell na svojich serveroch a spravujte prihlasovacie účty.",
+      "hi-IN": "अपने सर्वर पर शेल खोलें और उनके लॉगिन अकाउंट मैनेज करें।",
     },
     subcategories: {
       Connections: {
@@ -3891,6 +4144,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Connessioni",
           "es-ES": "Conexiones",
           "sk-SK": "Pripojenia",
+          "hi-IN": "कनेक्शन",
         },
       },
       Linux: {
@@ -3906,6 +4160,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Utenti Linux",
           "es-ES": "Usuarios de Linux",
           "sk-SK": "Používatelia Linuxu",
+          "hi-IN": "Linux यूज़र",
         },
       },
     },
@@ -3922,6 +4177,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Desktop",
       "es-ES": "Escritorio",
       "sk-SK": "Pracovná plocha",
+      "hi-IN": "डेस्कटॉप",
     },
     group: "platform",
     icon: "monitor",
@@ -3941,6 +4197,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Finestre",
           "es-ES": "Ventanas",
           "sk-SK": "Okná",
+          "hi-IN": "विंडो",
         },
       },
       Interaction: {
@@ -3956,6 +4213,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Interazione",
           "es-ES": "Interacción",
           "sk-SK": "Interakcia",
+          "hi-IN": "इंटरैक्शन",
         },
       },
       Capture: {
@@ -3971,6 +4229,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Acquisizione",
           "es-ES": "Captura",
           "sk-SK": "Snímanie",
+          "hi-IN": "कैप्चर",
         },
       },
       Inspection: {
@@ -3986,6 +4245,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Ispezione",
           "es-ES": "Inspección",
           "sk-SK": "Kontrola",
+          "hi-IN": "जाँच",
         },
       },
     },
@@ -4001,6 +4261,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Il mio account",
       "es-ES": "Mi cuenta",
       "sk-SK": "Môj účet",
+      "hi-IN": "मेरा अकाउंट",
       "en-GLOBAL": "My account",
     },
     group: "platform",
@@ -4026,6 +4287,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Modifichi nome, email e dati del profilo.",
           "es-ES": "Edite su nombre, correo y datos de perfil.",
           "sk-SK": "Upravte meno, e-mail a údaje profilu.",
+          "hi-IN": "अपना नाम, ईमेल और प्रोफ़ाइल जानकारी बदलें।",
         },
         "user-sessions": {
           "en-US":
@@ -4043,6 +4305,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Vea los dispositivos conectados y cierre la sesión en los que no reconozca.",
           "sk-SK":
             "Pozrite si prihlásené zariadenia a odhláste tie, ktorým nedôverujete.",
+          "hi-IN":
+            "साइन-इन डिवाइस देखें और जिन पर भरोसा नहीं, उन्हें साइन आउट करें।",
         },
         subscription_GET: {
           "en-US": "Check your plan, renewal date and credits.",
@@ -4054,6 +4318,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Controlli piano, data di rinnovo e crediti.",
           "es-ES": "Consulte su plan, la fecha de renovación y sus créditos.",
           "sk-SK": "Skontrolujte plán, dátum obnovenia a kredity.",
+          "hi-IN": "अपना प्लान, रिन्यूअल की तारीख और क्रेडिट जाँचें।",
         },
         payment_GET: {
           "en-US": "Your most recent payments and their status.",
@@ -4064,6 +4329,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "I suoi ultimi pagamenti e il loro stato.",
           "es-ES": "Sus pagos más recientes y su estado.",
           "sk-SK": "Vaše posledné platby a ich stav.",
+          "hi-IN": "आपके हाल के पेमेंट और उनका स्टेटस।",
         },
         user_private_me_addresses_GET: {
           "en-US": "Set the billing address printed on your invoices.",
@@ -4074,6 +4340,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Imposti l’indirizzo di fatturazione delle sue fatture.",
           "es-ES": "Defina la dirección de facturación de sus facturas.",
           "sk-SK": "Nastavte fakturačnú adresu na vašich faktúrach.",
+          "hi-IN": "इनवॉइस पर छपने वाला बिलिंग पता सेट करें।",
         },
         "api-keys": {
           "en-US": "Create and revoke keys for the API.",
@@ -4084,6 +4351,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Crei e revochi le chiavi per l’API.",
           "es-ES": "Cree y revoque claves para la API.",
           "sk-SK": "Vytvárajte a rušte kľúče k API.",
+          "hi-IN": "API के लिए कीज़ बनाएँ और रद्द करें।",
         },
       },
     },
@@ -4099,6 +4367,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES":
         "Gestione su perfil, el acceso, la facturación y sus claves API.",
       "sk-SK": "Spravujte svoj profil, prihlasovanie, fakturáciu a kľúče API.",
+      "hi-IN": "अपनी प्रोफ़ाइल, साइन-इन, बिलिंग और API कीज़ मैनेज करें।",
       "en-GLOBAL": "Manage your profile, sign-in, billing and API keys.",
     },
     adminPathPrefixes: ["user", "api-keys"],
@@ -4115,6 +4384,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fatturazione",
           "es-ES": "Facturación",
           "sk-SK": "Fakturácia",
+          "hi-IN": "बिलिंग",
           "en-GLOBAL": "Billing",
         },
         adminPaths: [
@@ -4140,6 +4410,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Stato del sistema",
       "es-ES": "Estado del sistema",
       "sk-SK": "Stav systému",
+      "hi-IN": "सिस्टम हेल्थ",
       "en-GLOBAL": "System health",
     },
     group: "system",
@@ -4170,6 +4441,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Errores sin resolver con recuento, tendencia y usuarios afectados.",
           "sk-SK":
             "Nevyriešené chyby s počtom, trendom a dotknutými používateľmi.",
+          "hi-IN": "अनसुलझे एरर, गिनती, ट्रेंड और प्रभावित यूज़र के साथ।",
         },
         "task-health": {
           "en-US": "Running tasks, recent failures and open incidents.",
@@ -4180,6 +4452,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Attività in corso, errori recenti e incidenti aperti.",
           "es-ES": "Tareas en curso, fallos recientes e incidentes abiertos.",
           "sk-SK": "Bežiace úlohy, posledné zlyhania a otvorené incidenty.",
+          "hi-IN": "चल रहे टास्क, हाल के फ़ेलियर और खुली घटनाएँ।",
         },
         health: {
           "en-US": "Server status and diagnostics right now.",
@@ -4190,6 +4463,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Stato del server e diagnostica in tempo reale.",
           "es-ES": "Estado del servidor y diagnóstico en tiempo real.",
           "sk-SK": "Aktuálny stav servera a diagnostika.",
+          "hi-IN": "अभी का सर्वर स्टेटस और डायग्नॉस्टिक्स।",
         },
         "remote-connections": {
           "en-US": "Linked instances and the health of each connection.",
@@ -4200,6 +4474,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Istanze collegate e stato di ogni connessione.",
           "es-ES": "Instancias vinculadas y el estado de cada conexión.",
           "sk-SK": "Prepojené inštancie a stav každého pripojenia.",
+          "hi-IN": "जुड़े इंस्टेंस और हर कनेक्शन की हेल्थ।",
         },
         "task-budget-caps": {
           "en-US": "Credit limits that stop runaway background tasks.",
@@ -4215,6 +4490,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Límites de créditos que detienen tareas en segundo plano descontroladas.",
           "sk-SK":
             "Limity kreditov, ktoré zastavia nekontrolované úlohy na pozadí.",
+          "hi-IN": "क्रेडिट लिमिट जो बेकाबू बैकग्राउंड टास्क रोकती हैं।",
         },
       },
     },
@@ -4233,6 +4509,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Consulta los errores abiertos, las tareas fallidas y el estado de las instancias conectadas.",
       "sk-SK":
         "Skontrolujte otvorené chyby, neúspešné naplánované úlohy a stav pripojených inštancií.",
+      "hi-IN":
+        "अनसुलझे एरर, फ़ेल होते शेड्यूल टास्क और कनेक्टेड इंस्टेंस की हेल्थ देखें।",
       "en-GLOBAL":
         "Review unresolved errors, failing scheduled tasks and connected instance health.",
     },
@@ -4254,6 +4532,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Attività pianificate",
       "es-ES": "Tareas programadas",
       "sk-SK": "Naplánované úlohy",
+      "hi-IN": "शेड्यूल किया काम",
       "en-GLOBAL": "Scheduled work",
     },
     group: "system",
@@ -4274,6 +4553,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Compruebe el estado de las tareas y sus próximas ejecuciones.",
           "sk-SK": "Skontrolujte stav úloh a ich najbližšie spustenia.",
+          "hi-IN": "टास्क स्टेटस और आने वाले रन जाँचें।",
         },
         "cron-stats": {
           "en-US": "Failing, stuck and overdue tasks with success rates.",
@@ -4289,6 +4569,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Tareas fallidas, bloqueadas o atrasadas, con tasa de éxito.",
           "sk-SK": "Zlyhané, zaseknuté a oneskorené úlohy s mierou úspešnosti.",
+          "hi-IN": "फ़ेल, अटके और लेट टास्क, सफलता दर के साथ।",
         },
         "cron-queue": {
           "en-US": "What runs next, in order of start time.",
@@ -4299,6 +4580,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Cosa parte dopo, in ordine di avvio.",
           "es-ES": "Lo que se ejecuta a continuación, por hora de inicio.",
           "sk-SK": "Čo sa spustí ďalej, podľa času spustenia.",
+          "hi-IN": "आगे क्या चलेगा, शुरू होने के समय के क्रम में।",
         },
         "cron-history": {
           "en-US": "Past runs with result, duration and errors.",
@@ -4309,6 +4591,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Esecuzioni passate con esito, durata ed errori.",
           "es-ES": "Ejecuciones anteriores con resultado, duración y errores.",
           "sk-SK": "Minulé spustenia s výsledkom, trvaním a chybami.",
+          "hi-IN": "पिछले रन, नतीजे, अवधि और एरर के साथ।",
         },
       },
     },
@@ -4320,6 +4603,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Verifichi le attività pianificate, le esecuzioni e gli errori.",
       "es-ES": "Revise las tareas programadas, las ejecuciones y los fallos.",
       "sk-SK": "Skontrolujte naplánované úlohy, ich priebeh a zlyhania.",
+      "hi-IN": "शेड्यूल किए जॉब, टास्क रन और फ़ेलियर जाँचें।",
       "en-GLOBAL": "Inspect scheduled jobs, task runs and failures.",
     },
     adminPathPrefixes: ["vibe/tasks"],
@@ -4335,6 +4619,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Istanze collegate",
       "es-ES": "Instancias conectadas",
       "sk-SK": "Pripojené inštancie",
+      "hi-IN": "कनेक्टेड इंस्टेंस",
       "en-GLOBAL": "Connected instances",
     },
     group: "system",
@@ -4359,6 +4644,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Istanze collegate e stato di ogni connessione.",
           "es-ES": "Instancias vinculadas y el estado de cada conexión.",
           "sk-SK": "Prepojené inštancie a stav každého pripojenia.",
+          "hi-IN": "जुड़े इंस्टेंस और हर कनेक्शन की हेल्थ।",
         },
       },
     },
@@ -4372,6 +4658,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "es-ES":
         "Consulte las instancias vinculadas y el estado de sus conexiones.",
       "sk-SK": "Skontrolujte pripojené inštancie a stav ich spojenia.",
+      "hi-IN": "कनेक्टेड इंस्टेंस और उनका कनेक्शन स्टेटस देखें।",
     },
     adminPathPrefixes: ["vibe/remote-connection"],
   },
@@ -4387,6 +4674,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Sistema",
       "es-ES": "Sistema",
       "sk-SK": "Systém",
+      "hi-IN": "सिस्टम",
     },
     group: "system",
     icon: "settings",
@@ -4410,6 +4698,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Configurazione dell’ambiente, raggruppata per modulo.",
           "es-ES": "Configuración del entorno, agrupada por módulo.",
           "sk-SK": "Konfigurácia prostredia zoskupená podľa modulov.",
+          "hi-IN": "एनवायरनमेंट कॉन्फ़िगरेशन, मॉड्यूल के हिसाब से ग्रुप किया।",
         },
         "vibe_env_settings_export-env_GET": {
           "en-US": "Download a production .env with a deploy checklist.",
@@ -4424,6 +4713,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Descargue un .env de producción con su lista de despliegue.",
           "sk-SK": "Stiahnite produkčný .env s kontrolným zoznamom nasadenia.",
+          "hi-IN": "डिप्लॉय चेकलिस्ट के साथ प्रोडक्शन .env डाउनलोड करें।",
         },
       },
     },
@@ -4436,6 +4726,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Impostazioni dell’ambiente e configurazione di produzione.",
       "es-ES": "Ajustes del entorno y configuración de producción.",
       "sk-SK": "Nastavenia prostredia a produkčná konfigurácia.",
+      "hi-IN": "एनवायरनमेंट सेटिंग्स और प्रोडक्शन कॉन्फ़िगरेशन।",
     },
     subcategories: {
       Generators: {
@@ -4451,6 +4742,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Generatori",
           "es-ES": "Generadores",
           "sk-SK": "Generátory",
+          "hi-IN": "जनरेटर",
         },
       },
       Build: {
@@ -4466,6 +4758,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Compilazione",
           "es-ES": "Compilación",
           "sk-SK": "Zostavenie",
+          "hi-IN": "बिल्ड",
         },
       },
       Check: {
@@ -4481,6 +4774,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Verifica",
           "es-ES": "Verificación",
           "sk-SK": "Kontrola",
+          "hi-IN": "चेक",
         },
       },
       serverManagement: {
@@ -4496,6 +4790,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Server",
           "es-ES": "Servidor",
           "sk-SK": "Server",
+          "hi-IN": "सर्वर",
         },
       },
       serverGuard: {
@@ -4511,6 +4806,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Protezione",
           "es-ES": "Protección",
           "sk-SK": "Ochrana",
+          "hi-IN": "गार्ड",
         },
       },
       serverElectron: {
@@ -4526,6 +4822,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Electron",
           "es-ES": "Electron",
           "sk-SK": "Electron",
+          "hi-IN": "Electron",
         },
       },
       settingsEnv: {
@@ -4541,6 +4838,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Impostazioni",
           "es-ES": "Configuración",
           "sk-SK": "Nastavenia",
+          "hi-IN": "सेटिंग्स",
         },
       },
       settingsKeys: {
@@ -4556,6 +4854,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Chiavi",
           "es-ES": "Claves",
           "sk-SK": "Kľúče",
+          "hi-IN": "कीज़",
         },
       },
       interfacesCli: {
@@ -4571,6 +4870,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "CLI",
           "es-ES": "CLI",
           "sk-SK": "CLI",
+          "hi-IN": "CLI",
         },
       },
       interfacesMcp: {
@@ -4586,6 +4886,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "MCP",
           "es-ES": "MCP",
           "sk-SK": "MCP",
+          "hi-IN": "MCP",
         },
       },
       interfacesFrame: {
@@ -4601,6 +4902,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Frame",
           "es-ES": "Frame",
           "sk-SK": "Vkladanie do stránok",
+          "hi-IN": "फ़्रेम",
         },
       },
       tasksCron: {
@@ -4616,6 +4918,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Attività cron",
           "es-ES": "Tareas cron",
           "sk-SK": "Plánované úlohy",
+          "hi-IN": "क्रॉन टास्क",
         },
       },
       tasksMonitoring: {
@@ -4631,6 +4934,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Monitoraggio",
           "es-ES": "Monitoreo",
           "sk-SK": "Monitorovanie",
+          "hi-IN": "मॉनिटरिंग",
         },
       },
       tasksPulse: {
@@ -4646,6 +4950,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Pulse",
           "es-ES": "Pulse",
           "sk-SK": "Pulse",
+          "hi-IN": "पल्स",
         },
       },
       tasksSync: {
@@ -4661,6 +4966,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Sincronizzazione",
           "es-ES": "Sincronización",
           "sk-SK": "Synchronizácia",
+          "hi-IN": "सिंक",
         },
       },
     },
@@ -4677,6 +4983,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Database",
       "es-ES": "Base de datos",
       "sk-SK": "Databáza",
+      "hi-IN": "डेटाबेस",
     },
     group: "system",
     icon: "database",
@@ -4696,6 +5003,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Migrazioni",
           "es-ES": "Migraciones",
           "sk-SK": "Migrácie",
+          "hi-IN": "माइग्रेशन",
         },
       },
       Tools: {
@@ -4711,6 +5019,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Strumenti",
           "es-ES": "Herramientas",
           "sk-SK": "Nástroje",
+          "hi-IN": "टूल",
         },
       },
     },
@@ -4727,6 +5036,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "it-IT": "Finanze",
       "es-ES": "Finanzas",
       "sk-SK": "Financie",
+      "hi-IN": "फ़ाइनेंस",
     },
     group: "system",
     icon: "wallet",
@@ -4754,6 +5064,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Ingresos, gastos y resultado neto contabilizados, mes a mes.",
           "sk-SK": "Zaúčtované tržby, náklady a čistý výsledok po mesiacoch.",
+          "hi-IN": "हर महीने का बुक किया रेवेन्यू, खर्च और शुद्ध नतीजा।",
         },
         "finance-status": {
           "en-US": "Provider balances, margin and cost alerts.",
@@ -4764,6 +5075,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Saldi dei fornitori, margine e avvisi sui costi.",
           "es-ES": "Saldos de proveedores, margen y alertas de costes.",
           "sk-SK": "Zostatky u poskytovateľov, marža a upozornenia na náklady.",
+          "hi-IN": "प्रोवाइडर बैलेंस, मार्जिन और खर्च अलर्ट।",
         },
         "bank-statement-lines": {
           "en-US": "Imported bank lines waiting for a journal entry.",
@@ -4774,6 +5086,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Righe bancarie importate in attesa di una registrazione.",
           "es-ES": "Líneas bancarias importadas a la espera de un asiento.",
           "sk-SK": "Importované bankové riadky čakajúce na zaúčtovanie.",
+          "hi-IN":
+            "इंपोर्ट की गई बैंक एंट्री जो जर्नल एंट्री का इंतज़ार कर रही हैं।",
         },
         "bank-connections": {
           "en-US": "Import transactions from a connected bank account.",
@@ -4784,6 +5098,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Importi i movimenti da un conto bancario collegato.",
           "es-ES": "Importe movimientos de una cuenta bancaria conectada.",
           "sk-SK": "Importujte transakcie z pripojeného bankového účtu.",
+          "hi-IN": "कनेक्टेड बैंक अकाउंट से ट्रांज़ैक्शन इंपोर्ट करें।",
         },
         "mail-bill-reviews": {
           "en-US":
@@ -4800,6 +5115,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "es-ES":
             "Facturas y recibos llegados por correo, listos para contabilizar.",
           "sk-SK": "Faktúry a doklady z e-mailu pripravené na zaúčtovanie.",
+          "hi-IN": "ईमेल से आए इनवॉइस और रसीदें, बुक करने के लिए तैयार।",
         },
         "supplier-evidence": {
           "en-US": "Provider balances and supplier documents in one place.",
@@ -4810,6 +5126,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Saldi e documenti dei fornitori in un unico posto.",
           "es-ES": "Saldos y documentos de proveedores en un solo lugar.",
           "sk-SK": "Zostatky a doklady dodávateľov na jednom mieste.",
+          "hi-IN": "प्रोवाइडर बैलेंस और सप्लायर दस्तावेज़ एक ही जगह।",
         },
       },
     },
@@ -4826,6 +5143,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "Revise el resultado mensual, los costes de los proveedores y los movimientos bancarios.",
       "sk-SK":
         "Skontrolujte mesačný výsledok, náklady na poskytovateľov a bankové pohyby.",
+      "hi-IN": "मासिक मुनाफ़ा, प्रोवाइडर खर्च और बैंक ट्रांज़ैक्शन देखें।",
       "en-GLOBAL":
         "Review monthly profit, provider costs and bank transactions.",
     },
@@ -4843,6 +5161,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Monitoraggio",
           "es-ES": "Monitoreo",
           "sk-SK": "Monitorovanie",
+          "hi-IN": "मॉनिटरिंग",
         },
       },
       "Bank reconciliation": {
@@ -4858,6 +5177,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Riconciliazione bancaria",
           "es-ES": "Conciliación bancaria",
           "sk-SK": "Párovanie bankových pohybov",
+          "hi-IN": "बैंक मिलान",
         },
       },
       "Finance: Suppliers": {
@@ -4873,6 +5193,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Fornitori",
           "es-ES": "Proveedores",
           "sk-SK": "Dodávatelia",
+          "hi-IN": "सप्लायर",
         },
       },
       "Credit liabilities": {
@@ -4888,6 +5209,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "it-IT": "Passività per crediti",
           "es-ES": "Pasivos por créditos",
           "sk-SK": "Záväzky za kredity",
+          "hi-IN": "क्रेडिट देनदारी",
         },
       },
     },

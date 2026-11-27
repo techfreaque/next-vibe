@@ -2554,8 +2554,8 @@
   },
   {
     "toolName": "lead-magnet_captures_GET",
-    "title": "Captured Leads",
-    "titleShort": "Captured Leads",
+    "title": "Captured leads",
+    "titleShort": "Captured leads",
     "description": "Everyone who submitted your lead magnet form",
     "fields": {
       "usage": {
@@ -6397,6 +6397,7 @@
         "provider": {
           "type": "text",
           "label": "Provider",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "string"
@@ -61506,6 +61507,26 @@
                 "schemaType": "primitive"
               },
               "questionSk": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionHi": {
                 "type": "text",
                 "hidden": true,
                 "schema": {
@@ -296429,8 +296450,8 @@
   },
   {
     "toolName": "execute-task",
-    "title": "Execute Task",
-    "titleShort": "Execute Task",
+    "title": "Execute task",
+    "titleShort": "Execute task",
     "description": "Trigger a single task by ID and receive the result synchronously",
     "fields": {
       "usage": {
@@ -296453,7 +296474,7 @@
         "taskId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Task ID",
+          "label": "Task key",
           "description": "The ID of the task to execute",
           "columns": 12,
           "schema": {

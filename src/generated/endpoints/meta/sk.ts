@@ -5019,12 +5019,6 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.mcpOff",
     ],
     aliases: [],
-    admin: {
-      configuredWhen: [
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY"],
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY_FILE"],
-      ],
-    },
     title: "Pripojené bankové účty",
     titleShort: "Pripojené bankové účty",
     description:
@@ -5050,12 +5044,7 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.mcpOff",
     ],
     aliases: [],
-    admin: {
-      configuredWhen: [
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY"],
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY_FILE"],
-      ],
-    },
+    admin: { role: "record" },
     title: "Načítať bankové pohyby",
     titleShort: "Načítať bankové pohyby",
     description:
@@ -5100,7 +5089,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Pripojenie banky",
     titleShort: "Pripojenie banky",
     description:
-      "Vyberte banku a účet hlavnej knihy. Banka schváli prístup na čítanie najviac na 180 dní.",
+      "Povoľte prístup na čítanie. Po návrate vyberiete firemné transakcie a skontrolujete náhľad prvého importu.",
     icon: "link",
     category: "finance",
     subCategory: "Bank reconciliation",
@@ -5111,14 +5100,14 @@ export const endpointsMeta: EndpointMeta[] = [
           companyId: "00000000-0000-4000-8000-000000000001",
           ledgerAccountId: "00000000-0000-4000-8000-000000000002",
           bankCountry: "DE",
-          bankName: "C24 Bank",
+          bankName: "C24",
           personal: true,
         },
       },
       responses: {
         default: {
           url: "https://auth.enablebanking.com/ais/start",
-          authorizedBank: "C24 Bank",
+          authorizedBank: "C24",
           authorizedLedgerAccount: "Operating bank account",
         },
       },
@@ -5395,8 +5384,8 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["finance", "bank", "list"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
-    title: "Nespárované riadky bankového výpisu",
-    titleShort: "Nespárované riadky bankového výpisu",
+    title: "Bankové transakcie",
+    titleShort: "Bankové transakcie",
     description:
       "Skontrolovať importované riadky bankového výpisu a spárovať ich so zaúčtovanými zápismi.",
     icon: "list",
@@ -6495,7 +6484,7 @@ export const endpointsMeta: EndpointMeta[] = [
           captured: true,
           nextStep: "signup",
           signupUrl:
-            "/en-GLOBAL/user/sign-up?ref=creatorcode&email=alex%40example.com&firstName=Alex",
+            "/en-GLOBAL/user/signup?ref=creatorcode&email=alex%40example.com&firstName=Alex",
         },
       },
     },
@@ -32985,15 +32974,15 @@ export const endpointsMeta: EndpointMeta[] = [
     examples: {
       responses: {
         basic: {
-          status: "HEALTHY",
+          status: "pulse.health.healthy",
           lastPulseAt: "2023-07-21T12:00:00Z",
-          successRate: 95,
+          successRate: 9500,
           totalExecutions: 1000,
         },
         success: {
-          status: "HEALTHY",
+          status: "pulse.health.healthy",
           lastPulseAt: "2023-07-21T12:00:00Z",
-          successRate: 95,
+          successRate: 9500,
           totalExecutions: 1000,
         },
       },

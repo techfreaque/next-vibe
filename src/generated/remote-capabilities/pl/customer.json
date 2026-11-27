@@ -6397,6 +6397,7 @@
         "provider": {
           "type": "text",
           "label": "Dostawca",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "string"
@@ -61506,6 +61507,26 @@
                 "schemaType": "primitive"
               },
               "questionSk": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionHi": {
                 "type": "text",
                 "hidden": true,
                 "schema": {
@@ -296453,7 +296474,7 @@
         "taskId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID zadania",
+          "label": "Klucz zadania",
           "description": "ID zadania do wykonania",
           "columns": 12,
           "schema": {

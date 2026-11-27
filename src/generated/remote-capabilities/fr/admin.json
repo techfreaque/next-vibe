@@ -157,7 +157,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -168,7 +168,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -183,7 +183,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -194,7 +194,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -51411,9 +51411,9 @@
         "accountId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "ID du compte",
+          "label": "Compte",
           "description": "Le compte à désactiver",
-          "placeholder": "UUID du compte",
+          "placeholder": "Choisir un compte",
           "columns": 12,
           "schema": {
             "def": {
@@ -57585,8 +57585,9 @@
         "companyId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "ID de l'entreprise",
+          "label": "Entreprise",
           "description": "Entreprise pour laquelle ouvrir la période",
+          "placeholder": "Choisir une entreprise",
           "columns": 12,
           "schema": {
             "def": {
@@ -72813,7 +72814,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -72824,7 +72825,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -72839,7 +72840,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -72850,7 +72851,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -105438,7 +105439,7 @@
     "toolName": "connect-bank",
     "title": "Connecter une banque",
     "titleShort": "Connecter une banque",
-    "description": "Choisissez la banque et le compte comptable. Votre banque autorise la lecture pour une durée maximale de 180 jours.",
+    "description": "Autorisez la consultation du compte. À votre retour, choisissez les opérations professionnelles à conserver et vérifiez le premier import.",
     "fields": {
       "usage": {
         "request": "data",
@@ -105488,7 +105489,7 @@
         "bankCountry": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Code pays de la banque",
+          "label": "Pays de la banque",
           "schema": {
             "def": {
               "type": "string",
@@ -107762,8 +107763,8 @@
   },
   {
     "toolName": "bank-statement-lines",
-    "title": "Lignes bancaires à rapprocher",
-    "titleShort": "Lignes bancaires à rapprocher",
+    "title": "Opérations bancaires",
+    "titleShort": "Opérations bancaires",
     "description": "Consultez les lignes importées et associez-les aux écritures comptabilisées.",
     "fields": {
       "usage": {
@@ -125611,6 +125612,7 @@
         "provider": {
           "type": "text",
           "label": "Fournisseur",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "string"
@@ -129774,6 +129776,7 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       }
                     },
@@ -129785,9 +129788,10 @@
                       "IT": "it",
                       "ES": "es",
                       "SK": "sk",
+                      "HI": "hi",
                       "EN": "en"
                     },
-                    "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                    "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
                   },
                   "usage": {
                     "response": true
@@ -134313,6 +134317,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -134328,6 +134336,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -134339,9 +134348,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               }
             },
             "type": "optional"
@@ -135646,6 +135656,7 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       }
                     },
@@ -135657,9 +135668,10 @@
                       "IT": "it",
                       "ES": "es",
                       "SK": "sk",
+                      "HI": "hi",
                       "EN": "en"
                     },
-                    "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                    "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
                   },
                   "usage": {
                     "response": true
@@ -148918,6 +148930,10 @@
                 {
                   "value": "sk",
                   "label": "languages.sk"
+                },
+                {
+                  "value": "hi",
+                  "label": "languages.hi"
                 }
               ],
               "schema": {
@@ -148930,6 +148946,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -148941,9 +148958,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               },
               "usage": {
                 "request": "data"
@@ -156117,6 +156135,10 @@
                 {
                   "value": "sk",
                   "label": "languages.sk"
+                },
+                {
+                  "value": "hi",
+                  "label": "languages.hi"
                 }
               ],
               "schema": {
@@ -156129,6 +156151,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -156140,9 +156163,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               },
               "usage": {
                 "request": "data"
@@ -178007,6 +178031,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "columns": 6,
@@ -178023,6 +178051,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -178034,9 +178063,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               }
             },
             "type": "optional"
@@ -185115,6 +185145,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -185127,6 +185161,7 @@
                 "IT": "it",
                 "ES": "es",
                 "SK": "sk",
+                "HI": "hi",
                 "EN": "en"
               }
             },
@@ -185138,9 +185173,10 @@
               "IT": "it",
               "ES": "es",
               "SK": "sk",
+              "HI": "hi",
               "EN": "en"
             },
-            "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+            "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
           },
           "usage": {
             "request": "data"
@@ -186636,18 +186672,26 @@
     "titleShort": "Modifier la tâche d'import",
     "description": "Mettre à jour la configuration de la tâche d'import",
     "fields": {
-      "type": "container",
-      "title": "Modifier les paramètres de la tâche",
-      "description": "Modifier la configuration de la tâche d'import",
-      "layoutType": "stacked",
       "usage": {
         "request": "data&urlPathParams",
         "response": true
       },
       "children": {
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "response": true
+          },
+          "type": "navigate_button",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
         "jobId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "fileName",
           "label": "ID de la tâche",
           "description": "Identifiant unique de la tâche d'import",
           "columns": 12,
@@ -186678,7 +186722,7 @@
           "children": {
             "batchSize": {
               "type": "form_field",
-              "fieldType": "number",
+              "fieldType": "int",
               "label": "Taille de lot",
               "description": "Nombre de lignes traitées par lot",
               "placeholder": "100",
@@ -186690,7 +186734,20 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [{}, {}]
+                      "checks": [
+                        {
+                          "def": {
+                            "type": "number",
+                            "check": "number_format",
+                            "abort": false,
+                            "format": "safeint"
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        {},
+                        {}
+                      ]
                     },
                     "type": "number",
                     "isFinite": true
@@ -186705,7 +186762,7 @@
             },
             "maxRetries": {
               "type": "form_field",
-              "fieldType": "number",
+              "fieldType": "int",
               "label": "Tentatives max.",
               "description": "Nombre maximal de nouvelles tentatives pour les lignes en échec",
               "placeholder": "3",
@@ -186717,7 +186774,20 @@
                     "def": {
                       "type": "number",
                       "coerce": true,
-                      "checks": [{}, {}]
+                      "checks": [
+                        {
+                          "def": {
+                            "type": "number",
+                            "check": "number_format",
+                            "abort": false,
+                            "format": "safeint"
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        {},
+                        {}
+                      ]
                     },
                     "type": "number",
                     "isFinite": true
@@ -187573,6 +187643,7 @@
           "schemaType": "object"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -187588,18 +187659,26 @@
     "titleShort": "Supprimer la tâche d'import",
     "description": "Supprimer une tâche d'import",
     "fields": {
-      "type": "container",
-      "title": "Supprimer la tâche d'import",
-      "description": "Confirmer la suppression de la tâche d'import",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
       },
       "children": {
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "response": true
+          },
+          "type": "navigate_button",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
         "jobId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "fileName",
           "label": "ID de la tâche",
           "description": "Identifiant unique de la tâche d'import à supprimer",
           "columns": 12,
@@ -187659,6 +187738,7 @@
           "schemaType": "object"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -187864,10 +187944,14 @@
     "description": "Traiter les tâches d'import CSV en attente",
     "fields": {
       "type": "container",
-      "title": "Configuration du traitement des imports",
-      "description": "Configurer les paramètres du traitement des imports",
+      "title": "Traiter les tâches d'import",
+      "description": "Traiter les tâches d'import CSV en attente",
       "layoutType": "grid",
       "columns": 12,
+      "adminForm": {
+        "sectionTitle": "import.process.post.container.title",
+        "submitText": "import.process.post.title"
+      },
       "usage": {
         "request": "data",
         "response": true
@@ -187954,6 +188038,7 @@
           "label": "ID de la tâche elle-même",
           "description": "ID interne de la tâche, pour son nettoyage après traitement",
           "columns": 6,
+          "hidden": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -188084,6 +188169,7 @@
           }
         },
         "filters": {
+          "schemaType": "object-optional",
           "type": "container",
           "title": "Filtres",
           "description": "Options de filtre des tâches d'import",
@@ -188219,8 +188305,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "jobs": {
           "type": "container",
@@ -192162,6 +192247,10 @@
                 {
                   "value": "sk",
                   "label": "languages.sk"
+                },
+                {
+                  "value": "hi",
+                  "label": "languages.hi"
                 }
               ],
               "schema": {
@@ -192180,6 +192269,7 @@
                             "IT": "it",
                             "ES": "es",
                             "SK": "sk",
+                            "HI": "hi",
                             "EN": "en"
                           }
                         },
@@ -192191,9 +192281,19 @@
                           "IT": "it",
                           "ES": "es",
                           "SK": "sk",
+                          "HI": "hi",
                           "EN": "en"
                         },
-                        "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                        "options": [
+                          "de",
+                          "pl",
+                          "fr",
+                          "it",
+                          "es",
+                          "sk",
+                          "hi",
+                          "en"
+                        ]
                       }
                     },
                     "type": "array",
@@ -192207,6 +192307,7 @@
                           "IT": "it",
                           "ES": "es",
                           "SK": "sk",
+                          "HI": "hi",
                           "EN": "en"
                         }
                       },
@@ -192218,9 +192319,19 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       },
-                      "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                      "options": [
+                        "de",
+                        "pl",
+                        "fr",
+                        "it",
+                        "es",
+                        "sk",
+                        "hi",
+                        "en"
+                      ]
                     }
                   }
                 },
@@ -194735,6 +194846,10 @@
                       {
                         "value": "sk",
                         "label": "languages.sk"
+                      },
+                      {
+                        "value": "hi",
+                        "label": "languages.hi"
                       }
                     ],
                     "schema": {
@@ -194747,6 +194862,7 @@
                           "IT": "it",
                           "ES": "es",
                           "SK": "sk",
+                          "HI": "hi",
                           "EN": "en"
                         }
                       },
@@ -194758,9 +194874,19 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       },
-                      "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                      "options": [
+                        "de",
+                        "pl",
+                        "fr",
+                        "it",
+                        "es",
+                        "sk",
+                        "hi",
+                        "en"
+                      ]
                     },
                     "usage": {
                       "response": true
@@ -200816,6 +200942,7 @@
                             "IT": "it",
                             "ES": "es",
                             "SK": "sk",
+                            "HI": "hi",
                             "EN": "en"
                           }
                         },
@@ -200827,9 +200954,19 @@
                           "IT": "it",
                           "ES": "es",
                           "SK": "sk",
+                          "HI": "hi",
                           "EN": "en"
                         },
-                        "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                        "options": [
+                          "de",
+                          "pl",
+                          "fr",
+                          "it",
+                          "es",
+                          "sk",
+                          "hi",
+                          "en"
+                        ]
                       },
                       "status": {
                         "def": {
@@ -204289,6 +204426,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "columns": 4,
@@ -204306,6 +204447,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -204318,9 +204460,20 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["all", "de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": [
+                  "all",
+                  "de",
+                  "pl",
+                  "fr",
+                  "it",
+                  "es",
+                  "sk",
+                  "hi",
+                  "en"
+                ]
               }
             },
             "type": "default"
@@ -212407,6 +212560,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -212425,6 +212582,7 @@
                         "IT": "it",
                         "ES": "es",
                         "SK": "sk",
+                        "HI": "hi",
                         "EN": "en"
                       }
                     },
@@ -212436,9 +212594,10 @@
                       "IT": "it",
                       "ES": "es",
                       "SK": "sk",
+                      "HI": "hi",
                       "EN": "en"
                     },
-                    "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                    "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
                   }
                 },
                 "type": "array",
@@ -212452,6 +212611,7 @@
                       "IT": "it",
                       "ES": "es",
                       "SK": "sk",
+                      "HI": "hi",
                       "EN": "en"
                     }
                   },
@@ -212463,9 +212623,10 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   },
-                  "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                  "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
                 }
               }
             },
@@ -215252,6 +215413,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -215263,9 +215425,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               }
             },
             "type": "array",
@@ -215279,6 +215442,7 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 }
               },
@@ -215290,9 +215454,10 @@
                 "IT": "it",
                 "ES": "es",
                 "SK": "sk",
+                "HI": "hi",
                 "EN": "en"
               },
-              "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+              "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
             }
           },
           "usage": {
@@ -218985,6 +219150,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -219000,6 +219169,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -219011,9 +219181,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               }
             },
             "type": "array",
@@ -219027,6 +219198,7 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 }
               },
@@ -219038,9 +219210,10 @@
                 "IT": "it",
                 "ES": "es",
                 "SK": "sk",
+                "HI": "hi",
                 "EN": "en"
               },
-              "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+              "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
             }
           },
           "usage": {
@@ -236690,6 +236863,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -236702,6 +236879,7 @@
                 "it": "it",
                 "es": "es",
                 "sk": "sk",
+                "hi": "hi",
                 "en": "en"
               }
             },
@@ -236713,9 +236891,10 @@
               "it": "it",
               "es": "es",
               "sk": "sk",
+              "hi": "hi",
               "en": "en"
             },
-            "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+            "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
           },
           "usage": {
             "request": "data"
@@ -238116,6 +238295,10 @@
             {
               "value": "sk",
               "label": "languages.sk"
+            },
+            {
+              "value": "hi",
+              "label": "languages.hi"
             }
           ],
           "schema": {
@@ -238128,6 +238311,7 @@
                 "it": "it",
                 "es": "es",
                 "sk": "sk",
+                "hi": "hi",
                 "en": "en"
               }
             },
@@ -238139,9 +238323,10 @@
               "it": "it",
               "es": "es",
               "sk": "sk",
+              "hi": "hi",
               "en": "en"
             },
-            "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+            "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
           },
           "usage": {
             "request": "data"
@@ -248941,7 +249126,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -248952,7 +249137,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -248967,7 +249152,7 @@
           "columns": 2,
           "schema": {
             "def": {
-              "type": "prefault",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "string",
@@ -248978,7 +249163,7 @@
                 "type": "string"
               }
             },
-            "type": "prefault"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -275024,6 +275209,7 @@
           "fieldType": "text",
           "label": "Référence de l’acheteur",
           "description": "Saisissez la référence fournie par l’acheteur. Pour une administration allemande, utilisez son Leitweg-ID.",
+          "includeInCacheKey": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -322437,6 +322623,7 @@
           }
         },
         "sortingOptions": {
+          "schemaType": "object-optional",
           "type": "container",
           "title": "Tri",
           "description": "Configurer le tri des résultats",
@@ -322542,8 +322729,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "formAlert": {
           "schemaType": "widget",
@@ -323086,10 +323272,8 @@
           "schemaType": "object"
         },
         "paginationInfo": {
-          "type": "container",
-          "layoutType": "horizontal",
-          "noCard": true,
-          "gap": "4",
+          "schemaType": "object",
+          "type": "pagination",
           "order": 4,
           "usage": {
             "request": "data",
@@ -323196,8 +323380,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         }
       },
       "type": "custom-widget",
@@ -323217,9 +323400,6 @@
     "titleShort": "Action versement",
     "description": "Approuver, refuser ou finaliser une demande de versement",
     "fields": {
-      "type": "container",
-      "noCard": true,
-      "layoutType": "stacked",
       "usage": {
         "request": "data",
         "response": true
@@ -323228,6 +323408,7 @@
         "requestId": {
           "type": "form_field",
           "fieldType": "text",
+          "hidden": true,
           "label": "ID de la demande",
           "description": "Demande de versement à traiter",
           "placeholder": "Saisir l'ID de la demande...",
@@ -323375,6 +323556,7 @@
           "schemaType": "primitive"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -359164,6 +359346,10 @@
                 {
                   "value": "sk",
                   "label": "languages.sk"
+                },
+                {
+                  "value": "hi",
+                  "label": "languages.hi"
                 }
               ],
               "columns": 6,
@@ -359177,6 +359363,7 @@
                     "IT": "it",
                     "ES": "es",
                     "SK": "sk",
+                    "HI": "hi",
                     "EN": "en"
                   }
                 },
@@ -359188,9 +359375,10 @@
                   "IT": "it",
                   "ES": "es",
                   "SK": "sk",
+                  "HI": "hi",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "hi", "en"]
               },
               "usage": {
                 "request": "data"
@@ -429695,6 +429883,26 @@
                 },
                 "schemaType": "primitive"
               },
+              "questionHi": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "verdict": {
                 "type": "badge",
                 "label": "Verdict",
@@ -430012,6 +430220,30 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Question (slovaque)",
+          "description": "Laissez vide pour effacer la traduction",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "textHi": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Question (hindi)",
           "description": "Laissez vide pour effacer la traduction",
           "columns": 6,
           "schema": {
@@ -430557,6 +430789,26 @@
                 },
                 "schemaType": "primitive"
               },
+              "textHi": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "generatedBy": {
                 "type": "text",
                 "label": "Proposée par",
@@ -430889,6 +431141,30 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Question (slovaque)",
+          "description": "Traduction affichée dans les exemples publics (facultatif)",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "textHi": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Question (hindi)",
           "description": "Traduction affichée dans les exemples publics (facultatif)",
           "columns": 6,
           "schema": {
@@ -684830,6 +685106,38 @@
             "response": true
           },
           "schemaType": "primitive"
+        },
+        "affectedFingerprints": {
+          "type": "text",
+          "label": "Empreinte",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
         }
       },
       "type": "custom-widget",
@@ -686435,11 +686743,6 @@
     "titleShort": "Contrôle de santé",
     "description": "Obtenir l'état de santé et les diagnostics du serveur",
     "fields": {
-      "type": "container",
-      "title": "Options du contrôle de santé",
-      "description": "Configurer les paramètres du contrôle de santé",
-      "layoutType": "grid",
-      "columns": 12,
       "usage": {
         "request": "data",
         "response": true
@@ -687299,6 +687602,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -693532,9 +693836,15 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  }
                 },
-                "type": "string"
+                "type": "nullable"
               }
             },
             "type": "optional"
@@ -693804,32 +694114,184 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "record",
-                  "keyType": {
+                  "type": "pipe",
+                  "in": {
                     "def": {
-                      "type": "string"
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "lazy"
+                              },
+                              "type": "lazy"
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "lazy"
+                            },
+                            "type": "lazy"
+                          }
+                        }
+                      ]
                     },
-                    "type": "string"
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "lazy"
+                            },
+                            "type": "lazy"
+                          }
+                        },
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "lazy"
+                          },
+                          "type": "lazy"
+                        }
+                      }
+                    ]
                   },
-                  "valueType": {
+                  "out": {
                     "def": {
-                      "type": "lazy"
+                      "type": "transform"
                     },
-                    "type": "lazy"
+                    "type": "transform"
                   }
                 },
-                "type": "record",
-                "keyType": {
+                "type": "pipe",
+                "in": {
                   "def": {
-                    "type": "string"
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "lazy"
+                            },
+                            "type": "lazy"
+                          }
+                        },
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "lazy"
+                          },
+                          "type": "lazy"
+                        }
+                      }
+                    ]
                   },
-                  "type": "string"
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "lazy"
+                          },
+                          "type": "lazy"
+                        }
+                      },
+                      "type": "record",
+                      "keyType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "valueType": {
+                        "def": {
+                          "type": "lazy"
+                        },
+                        "type": "lazy"
+                      }
+                    }
+                  ]
                 },
-                "valueType": {
+                "out": {
                   "def": {
-                    "type": "lazy"
+                    "type": "transform"
                   },
-                  "type": "lazy"
+                  "type": "transform"
                 }
               }
             },
@@ -695200,11 +695662,6 @@
     "titleShort": "Supprimer la tâche",
     "description": "Supprime une tâche cron",
     "fields": {
-      "type": "container",
-      "title": "Supprimer la tâche cron",
-      "description": "Retirer une tâche du système",
-      "layoutType": "grid",
-      "columns": 12,
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -695213,7 +695670,7 @@
         "id": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID de la tâche",
+          "label": "Clé de la tâche",
           "description": "Identifiant unique de la tâche à supprimer",
           "schema": {
             "def": {
@@ -695240,6 +695697,7 @@
           "schemaType": "primitive"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -703364,7 +703822,7 @@
         "id": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID de la tâche",
+          "label": "Clé de la tâche",
           "description": "Identifiant unique et stable de cette tâche (ex. 'db-health')",
           "placeholder": "Saisir l'ID de la tâche...",
           "columns": 6,
@@ -703388,7 +703846,7 @@
         "routeId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID de route",
+          "label": "Alias du point d’accès",
           "description": "Identifiant du gestionnaire : nom de tâche, alias d'endpoint ou 'cron-steps'",
           "placeholder": "Saisir l'ID de route...",
           "columns": 12,
@@ -708537,7 +708995,7 @@
         "taskId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID de la tâche",
+          "label": "Clé de la tâche",
           "description": "ID de la tâche à exécuter",
           "columns": 12,
           "schema": {

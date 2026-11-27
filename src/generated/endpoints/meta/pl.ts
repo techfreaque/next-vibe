@@ -5016,12 +5016,6 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.mcpOff",
     ],
     aliases: [],
-    admin: {
-      configuredWhen: [
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY"],
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY_FILE"],
-      ],
-    },
     title: "Połączone rachunki bankowe",
     titleShort: "Połączone rachunki bankowe",
     description:
@@ -5047,12 +5041,7 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.mcpOff",
     ],
     aliases: [],
-    admin: {
-      configuredWhen: [
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY"],
-        ["ENABLE_BANKING_APP_ID", "ENABLE_BANKING_PRIVATE_KEY_FILE"],
-      ],
-    },
+    admin: { role: "record" },
     title: "Pobierz operacje bankowe",
     titleShort: "Pobierz operacje bankowe",
     description:
@@ -5097,7 +5086,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Połącz bank",
     titleShort: "Połącz bank",
     description:
-      "Wybierz bank i konto księgowe. Bank może zezwolić na odczyt przez maksymalnie 180 dni.",
+      "Zezwól na odczyt danych. Po powrocie wybierzesz transakcje firmowe i sprawdzisz podgląd importu.",
     icon: "link",
     category: "finance",
     subCategory: "Bank reconciliation",
@@ -5108,14 +5097,14 @@ export const endpointsMeta: EndpointMeta[] = [
           companyId: "00000000-0000-4000-8000-000000000001",
           ledgerAccountId: "00000000-0000-4000-8000-000000000002",
           bankCountry: "DE",
-          bankName: "C24 Bank",
+          bankName: "C24",
           personal: true,
         },
       },
       responses: {
         default: {
           url: "https://auth.enablebanking.com/ais/start",
-          authorizedBank: "C24 Bank",
+          authorizedBank: "C24",
           authorizedLedgerAccount: "Operating bank account",
         },
       },
@@ -5392,8 +5381,8 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["finance", "bank", "list"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
-    title: "Niedopasowane pozycje bankowe",
-    titleShort: "Niedopasowane pozycje bankowe",
+    title: "Transakcje bankowe",
+    titleShort: "Transakcje bankowe",
     description: "Sprawdź pozycje wyciągu i połącz je z zapisami księgowymi.",
     icon: "list",
     category: "finance",
@@ -6488,7 +6477,7 @@ export const endpointsMeta: EndpointMeta[] = [
           captured: true,
           nextStep: "signup",
           signupUrl:
-            "/en-GLOBAL/user/sign-up?ref=creatorcode&email=alex%40example.com&firstName=Alex",
+            "/en-GLOBAL/user/signup?ref=creatorcode&email=alex%40example.com&firstName=Alex",
         },
       },
     },
@@ -32941,15 +32930,15 @@ export const endpointsMeta: EndpointMeta[] = [
     examples: {
       responses: {
         basic: {
-          status: "HEALTHY",
+          status: "pulse.health.healthy",
           lastPulseAt: "2023-07-21T12:00:00Z",
-          successRate: 95,
+          successRate: 9500,
           totalExecutions: 1000,
         },
         success: {
-          status: "HEALTHY",
+          status: "pulse.health.healthy",
           lastPulseAt: "2023-07-21T12:00:00Z",
-          successRate: 95,
+          successRate: 9500,
           totalExecutions: 1000,
         },
       },
