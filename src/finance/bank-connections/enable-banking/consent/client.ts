@@ -12,7 +12,7 @@ const providers = z.object({
         psu_types: z.array(z.enum(["personal", "business"])).optional(),
       }),
     )
-    .max(500),
+    .max(20_000),
 });
 const bank = z.object({
   name: z.string().min(1).max(200),

@@ -120,3 +120,29 @@ test("uses only expected authorization paths and returns the reported consent ca
     ).toBeUndefined();
   }
 });
+
+test("German directory entries beyond the first thousand retain their consent limit", async () => {
+  const rows = Array.from({ length: 1075 }, (_, i) => ({
+    name: `Test Bank ${i}`,
+    country: "DE",
+    maximum_consent_validity: 86400,
+    psu_types: ["personal"],
+  }));
+  const request = async (): Promise<Response> =>
+    Response.json({
+      aspsps: [
+        ...rows,
+        { ...rows[0], name: "Revolut" },
+        { ...rows[0], name: "C24" },
+      ],
+    });
+  expect(
+    await consentLimit(request, { country: "DE", name: "Revolut" }, "personal"),
+  ).toBe(86400);
+  expect(
+    await consentLimit(request, { country: "DE", name: "C24" }, "personal"),
+  ).toBe(86400);
+  expect(
+    await consentLimit(request, { country: "DE", name: "C24" }, "business"),
+  ).toBeUndefined();
+});
