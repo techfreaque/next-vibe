@@ -1379,6 +1379,45 @@ export class SubscriptionRepository {
           : null;
       }
 
+      // Plan moved from the paused card processor (provider-switch): the
+      // remaining paid time carries over into this period.
+      const switchId = session.metadata?.switchId;
+      const switchRepository = switchId
+        ? (await import("./provider-switch/repository"))
+            .ProviderSwitchRepository
+        : null;
+      const switched =
+        switchId && switchRepository
+          ? await switchRepository.applyCheckoutSwitch(
+              {
+                switchId,
+                userId,
+                providerSubscriptionId,
+                billingInterval: billingIntervalValue,
+              },
+              logger,
+            )
+          : null;
+      if (switched) {
+        currentPeriodStart = switched.periodStart;
+        currentPeriodEnd = switched.periodEnd;
+        // Whop charged now for one interval; move its next charge to the
+        // carried-over period end so no day is billed twice.
+        if (
+          providerEnum === PaymentProvider.WHOP &&
+          providerSubscriptionId &&
+          currentPeriodEnd
+        ) {
+          const { WhopProvider } =
+            await import("../payment/providers/whop/repository");
+          await new WhopProvider().moveRenewalDate(
+            providerSubscriptionId,
+            currentPeriodEnd,
+            logger,
+          );
+        }
+      }
+
       await db
         .insert(subscriptions)
         .values({
@@ -1413,6 +1452,18 @@ export class SubscriptionRepository {
             updatedAt: new Date(),
           },
         });
+
+      if (switched && switchId && switchRepository) {
+        // New plan stored first, then the old one stops (no gap in access).
+        if (switched.cancelOld) {
+          await switchRepository.stopOldPlan(switchId, logger);
+        }
+        // Deferred start: nothing was charged; the old plan's credits cover
+        // the paid time and the first paid renewal grants the next ones.
+        if (!switched.grantCreditsNow) {
+          return;
+        }
+      }
 
       // Look up user's locale from DB for credit/product translations
       let userLocale: CountryLanguage = locale;
@@ -1799,6 +1850,18 @@ export class SubscriptionRepository {
   }
 
   /**
+   * True when this Stripe subscription was moved to the new provider by the
+   * provider switch: its late webhooks find no row on purpose.
+   */
+  private static async wasMovedToNewProvider(
+    providerSubscriptionId: string,
+  ): Promise<boolean> {
+    const { ProviderSwitchRepository } =
+      await import("./provider-switch/repository");
+    return ProviderSwitchRepository.isMovedAway(providerSubscriptionId);
+  }
+
+  /**
    * Handle invoice payment failure
    * Called when invoice.payment_failed webhook is received
    * Sets grace period during which user keeps credits but subscription is in PAST_DUE
@@ -1825,6 +1888,15 @@ export class SubscriptionRepository {
         .limit(1);
 
       if (!subscription) {
+        if (
+          await SubscriptionRepository.wasMovedToNewProvider(subscriptionId)
+        ) {
+          logger.info("Webhook for a plan moved to the new provider", {
+            subscriptionId,
+            invoiceId,
+          });
+          return;
+        }
         logger.error("Subscription not found for failed invoice payment", {
           subscriptionId,
           invoiceId,
@@ -1910,6 +1982,14 @@ export class SubscriptionRepository {
         .limit(1);
 
       if (!subscription) {
+        if (
+          await SubscriptionRepository.wasMovedToNewProvider(subscriptionId)
+        ) {
+          logger.info("Webhook for a plan moved to the new provider", {
+            subscriptionId,
+          });
+          return;
+        }
         logger.error("Subscription not found for cancellation", {
           subscriptionId,
         });
@@ -2055,6 +2135,14 @@ export class SubscriptionRepository {
         .limit(1);
 
       if (!subscription) {
+        if (
+          await SubscriptionRepository.wasMovedToNewProvider(subscriptionId)
+        ) {
+          logger.info("Webhook for a plan moved to the new provider", {
+            subscriptionId,
+          });
+          return;
+        }
         logger.error("Subscription not found for update", {
           subscriptionId,
         });

@@ -33,6 +33,7 @@ import type { CampaignTypeValue } from "../../../../accounts/enum";
 import { CampaignType } from "../../../../accounts/enum";
 import { scopedTranslation } from "../i18n";
 import type {
+  SmtpAccountOverride,
   SmtpAttachment,
   SmtpSelectionCriteria,
   SmtpSendResult,
@@ -58,6 +59,8 @@ interface SendEmailParams {
   selectionCriteriaOverride?: SmtpSelectionCriteria;
   skipRateLimitCheck?: boolean;
   attachments?: SmtpAttachment[];
+  /** Admin test sends only: deliver through this exact account. */
+  accountOverride?: SmtpAccountOverride;
 }
 
 interface SendEmailResult {
@@ -150,6 +153,7 @@ export class EmailSendingRepository {
           leadId: params.leadId,
           campaignId: params.campaignId,
           attachments: params.attachments,
+          accountOverride: params.accountOverride,
         },
         logger,
         t,

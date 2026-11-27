@@ -23,7 +23,7 @@ import type {
   EmailJourneyVariantValue,
 } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { Transporter } from "nodemailer";
+import type { SendMailOptions, Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
@@ -75,6 +75,19 @@ export interface SmtpSendParams {
   leadId?: string;
   campaignId?: string;
   attachments?: SmtpAttachment[];
+  /**
+   * Explicit one-off account (admin test sends). Skips account selection,
+   * the mail sink, rate limits and the DB bookkeeping; the message itself is
+   * composed exactly like every other send (see buildMailOptions).
+   */
+  accountOverride?: SmtpAccountOverride;
+}
+
+export interface SmtpAccountOverride {
+  name: string;
+  fromEmail: string;
+  fromName: string | null;
+  transport: Transporter<SMTPTransport.SentMessageInfo>;
 }
 
 export interface SmtpSendResult {
@@ -186,6 +199,14 @@ export class SmtpRepository {
         subject: data.subject,
         userId: user.id,
       });
+
+      if (data.accountOverride) {
+        return await SmtpRepository.sendWithAccountOverride(
+          data,
+          data.accountOverride,
+          logger,
+        );
+      }
 
       const primaryAccount = await this.getSmtpAccountWithCriteria(
         data.selectionCriteria,
@@ -780,6 +801,60 @@ export class SmtpRepository {
   }
 
   /**
+   * The one place a message is composed: From, To, Reply-To, subject, HTML
+   * with the inline cid logo, plain text and List-Unsubscribe headers.
+   */
+  static buildMailOptions(
+    params: SmtpSendParams,
+    account: Pick<SmtpAccountShape, "fromEmail" | "fromName">,
+  ): SendMailOptions {
+    const resolvedSenderName = account.fromName ?? params.senderName;
+    const preparedLogo = prepareSmtpEmailLogo(params.html);
+    const mergedAttachments = [
+      ...(preparedLogo.attachments ?? []),
+      ...(params.attachments ?? []).map((att) => ({
+        filename: att.filename,
+        content: att.content,
+        contentType: att.contentType,
+      })),
+    ];
+    return {
+      from: `${resolvedSenderName} <${account.fromEmail}>`,
+      to: params.toName ? `${params.toName} <${params.to}>` : params.to,
+      replyTo: params.replyTo,
+      subject: params.subject,
+      html: preparedLogo.html,
+      attachments: mergedAttachments.length > 0 ? mergedAttachments : undefined,
+      text: resolvePlainText(params.html, params.text),
+      headers: buildListUnsubscribeHeaders(params.to, params.unsubscribeUrl),
+    };
+  }
+
+  /** Admin test send through an explicitly given account. */
+  private static async sendWithAccountOverride(
+    params: SmtpSendParams,
+    account: SmtpAccountOverride,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SmtpSendResult>> {
+    const result = await account.transport.sendMail(
+      SmtpRepository.buildMailOptions(params, account),
+    );
+    logger.info("Email sent through explicit account", {
+      messageId: result.messageId,
+      accountName: account.name,
+      to: params.to,
+    });
+    return success({
+      messageId: result.messageId,
+      accountId: "",
+      accountName: account.name,
+      accepted: result.accepted,
+      rejected: result.rejected,
+      response: result.response,
+    });
+  }
+
+  /**
    * Perform the actual email sending with an account
    */
   private static async performEmailSend(
@@ -834,32 +909,10 @@ export class SmtpRepository {
 
       const transport = transportResult.data;
 
-      const headers = buildListUnsubscribeHeaders(
-        params.to,
-        params.unsubscribeUrl,
-      );
-
       const resolvedSenderName = account.fromName ?? params.senderName;
-      const preparedLogo = prepareSmtpEmailLogo(params.html);
-      const mergedAttachments = [
-        ...(preparedLogo.attachments ?? []),
-        ...(params.attachments ?? []).map((att) => ({
-          filename: att.filename,
-          content: att.content,
-          contentType: att.contentType,
-        })),
-      ];
-      const result = await transport.sendMail({
-        from: `${resolvedSenderName} <${account.fromEmail}>`,
-        to: params.toName ? `${params.toName} <${params.to}>` : params.to,
-        replyTo: params.replyTo,
-        subject: params.subject,
-        html: preparedLogo.html,
-        attachments:
-          mergedAttachments.length > 0 ? mergedAttachments : undefined,
-        text: resolvePlainText(params.html, params.text),
-        headers,
-      });
+      const result = await transport.sendMail(
+        SmtpRepository.buildMailOptions(params, account),
+      );
 
       if (result.rejected && result.rejected.length > 0) {
         const rejectedReason =

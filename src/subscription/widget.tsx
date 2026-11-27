@@ -25,10 +25,12 @@ import { assignUrl, getCurrentOrigin } from "next-vibe/ui/lib/location";
 import {
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
 import { PaymentProvider } from "@/payment/enum";
@@ -42,6 +44,7 @@ import {
 import type definition from "./definition";
 import { SubscriptionStatus } from "./enum";
 import { SubscriptionPastDueNotice } from "./past-due-notice";
+import providerSwitchDefinitions from "./provider-switch/definition";
 
 /**
  * Format date for display
@@ -70,6 +73,7 @@ export function SubscriptionOverviewContainer(_props: {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const router = useRouter();
+  const platform = useWidgetPlatform();
   const portal = useCustomerPortal(logger, user);
   const { t: productsT } = productsScopedTranslation.scopedT(locale);
 
@@ -162,12 +166,27 @@ export function SubscriptionOverviewContainer(_props: {
     });
   };
 
+  // Card plans on the paused processor get the "move your plan" card; it
+  // renders nothing until a switch provider is live.
+  const canMoveProvider =
+    subscription.provider === PaymentProvider.STRIPE && !isCanceled;
+
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
+      {canMoveProvider && (
+        <EndpointsPage
+          logger={logger}
+          endpoint={providerSwitchDefinitions}
+          forceMethod="GET"
+          locale={locale}
+          user={user}
+          platform={platform}
+        />
+      )}
       <Card className="border-2 border-primary">
         <CardHeader>
           <Div className="flex flex-wrap items-start justify-between gap-3">
