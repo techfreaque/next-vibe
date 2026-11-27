@@ -321,8 +321,7 @@ export const translations: typeof enTranslations = {
         "Otvorený zdrojový kód. Beží na notebooku, domácom serveri aj VPS.",
       step2Title: "Spusť prepojenie zo svojej inštancie",
       step2Body:
-        "Vo svojej inštancii otvor Predplatné, potom Synchronizácia s cloudom a Pripojiť sa k cloudu. Zadaj {{appUrl}} a prihlasovacie údaje tohto účtu. Na tomto počítači môžeš použiť aj terminál.",
-      step2Command: "vibe remote-connect -i",
+        "Vo svojej inštancii otvor Predplatné, potom Synchronizácia s cloudom a Pripojiť sa k cloudu. Zadaj {{appUrl}} a prihlasovacie údaje tohto účtu.",
       step3Title: "Vyber, čo sa má synchronizovať",
       step3Body:
         "Spomienky, dokumenty, zručnosti, obľúbené konfigurácie a čety. Každý typ má vlastný prepínač, ktorý môžeš na svojej inštancii kedykoľvek zmeniť.",

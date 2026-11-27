@@ -311,8 +311,7 @@ export const translations = {
       step1Body: "Open source. Runs on a laptop, a home server or a VPS.",
       step2Title: "Link it from your instance",
       step2Body:
-        "On your instance open Subscription, then Cloud Sync, then Connect to Cloud. Enter {{appUrl}} and the login of this account. In a terminal on that machine:",
-      step2Command: "vibe remote-connect -i",
+        "On your instance open Subscription, then Cloud Sync, then Connect to Cloud. Enter {{appUrl}} and the login of this account.",
       step3Title: "Pick what syncs",
       step3Body:
         "Memories, documents, skills, favorites, chats. One switch each, changed any time on your instance.",

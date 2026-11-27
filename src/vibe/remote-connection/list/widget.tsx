@@ -31,7 +31,6 @@ import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { SiGithub } from "next-vibe/ui/components/icons/SiGithub";
-import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { WifiOff } from "next-vibe/ui/components/icons/WifiOff";
 import { Link } from "next-vibe/ui/components/link";
@@ -41,7 +40,7 @@ import {
   StatusPill,
   type StatusPillVariant,
 } from "next-vibe/ui/components/status-pill";
-import { Code, H3, P } from "next-vibe/ui/components/typography";
+import { H3, P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
@@ -560,7 +559,7 @@ function CloudView({
   isPickerMode: boolean;
   isAdmin: boolean;
 }): JSX.Element {
-  const appUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
+  const appUrl = (envClient.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "");
   const [guideOpen, setGuideOpen] = useState(false);
   const isToolsPage = useIsToolsPage();
   const foldGuide = isToolsPage && connections.length > 0;
@@ -694,14 +693,7 @@ function CloudView({
                 index={2}
                 title={t("widget.cloud.step2Title")}
                 body={t("widget.cloud.step2Body", { appUrl })}
-              >
-                <Div className="flex items-center gap-2 overflow-x-auto rounded-md border bg-muted/50 px-3 py-2">
-                  <Terminal className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                  <Code className="whitespace-nowrap bg-transparent p-0 text-xs">
-                    {t("widget.cloud.step2Command")}
-                  </Code>
-                </Div>
-              </GuideStep>
+              />
               <GuideStep
                 index={3}
                 title={t("widget.cloud.step3Title")}

@@ -315,10 +315,9 @@ export const translations: typeof enTranslations = {
       step1Title: "Instalar next-vibe",
       step1Body:
         "Fuente abierta. Se ejecuta en un portátil, un servidor de casa o un VPS.",
-      step2Title: "Víndelo desde tu instancia",
+      step2Title: "Vincúlala desde tu instancia",
       step2Body:
-        "En su caso, abra la suscripción, luego Cloud Sync, luego Conectarse a Cloud. Introduzca {{appUrl}} y el login de esta cuenta. En un terminal en esa máquina:",
-      step2Command: "vibe remote-connect -i",
+        "En tu instancia abre Suscripción, luego Sincronización en la nube y luego Conectarse a Cloud. Introduce {{appUrl}} y las credenciales de esta cuenta.",
       step3Title: "Escoge qué sincronizaciones",
       step3Body:
         "Memorias, documentos, habilidades, favoritos, chats. Un interruptor cada uno, cambió en cualquier momento de su instancia.",

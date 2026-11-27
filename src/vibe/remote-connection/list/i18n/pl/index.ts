@@ -317,8 +317,7 @@ export const translations: typeof enTranslations = {
       step1Body: "Open source. Działa na laptopie, domowym serwerze albo VPS.",
       step2Title: "Połącz ze swojej instancji",
       step2Body:
-        "Na swojej instancji otwórz Subskrypcja, potem Synchronizacja, potem Połącz z chmurą. Podaj {{appUrl}} i dane logowania tego konta. W terminalu na tej maszynie:",
-      step2Command: "vibe remote-connect -i",
+        "Na swojej instancji otwórz Subskrypcja, potem Synchronizacja, potem Połącz z chmurą. Podaj {{appUrl}} i dane logowania tego konta.",
       step3Title: "Wybierz, co się synchronizuje",
       step3Body:
         "Wspomnienia, dokumenty, skille, ulubione, czaty. Każde ma swój przełącznik, zmienisz go w dowolnej chwili na swojej instancji.",

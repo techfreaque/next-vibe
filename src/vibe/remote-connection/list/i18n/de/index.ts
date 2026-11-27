@@ -318,8 +318,7 @@ export const translations: typeof enTranslations = {
       step1Body: "Open Source. Läuft auf Laptop, Heimserver oder VPS.",
       step2Title: "Von deiner Instanz aus verknüpfen",
       step2Body:
-        "Öffne auf deiner Instanz Abonnement, dann Cloud-Sync, dann Mit Cloud verbinden. Gib {{appUrl}} und die Zugangsdaten dieses Kontos ein. Im Terminal auf dem Rechner:",
-      step2Command: "vibe remote-connect -i",
+        "Öffne auf deiner Instanz Abonnement, dann Cloud-Sync, dann Mit Cloud verbinden. Gib {{appUrl}} und die Zugangsdaten dieses Kontos ein.",
       step3Title: "Sync-Umfang festlegen",
       step3Body:
         "Erinnerungen, Dokumente, Skills, Favoriten, Chats. Je ein Schalter, jederzeit auf deiner Instanz änderbar.",

@@ -317,8 +317,7 @@ export const translations: typeof enTranslations = {
         "Open source. Tourne sur un portable, un serveur maison ou un VPS.",
       step2Title: "Relier depuis votre instance",
       step2Body:
-        "Sur votre instance, ouvrez Abonnement, puis Synchro cloud, puis Se connecter au cloud. Saisissez {{appUrl}} et les identifiants de ce compte. Dans un terminal sur cette machine :",
-      step2Command: "vibe remote-connect -i",
+        "Sur votre instance, ouvrez Abonnement, puis Synchro cloud, puis Se connecter au cloud. Saisissez {{appUrl}} et les identifiants de ce compte.",
       step3Title: "Choisir ce qui se synchronise",
       step3Body:
         "Souvenirs, documents, skills, favoris, discussions. Un interrupteur chacun, modifiable à tout moment sur votre instance.",
