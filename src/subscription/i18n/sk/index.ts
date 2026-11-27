@@ -412,6 +412,10 @@ export const translations: typeof enTranslations = {
         label: "Poskytovateľ platby",
         description: "Vyber poskytovateľa platby",
       },
+      payCurrency: {
+        label: "Kryptomena",
+        description: "Mena na platbu (len platba kryptomenou)",
+      },
       catalogProductId: {
         label: "Produkt katalógu",
         description: "Prepojenie na produkt v katalógu pre toto predplatné",
@@ -450,6 +454,7 @@ export const translations: typeof enTranslations = {
     recentCardAuthFailure: "Nedávno neúspešné overenie karty",
     checkoutProviders: "Dostupné spôsoby platby",
     nowPaymentsAcceptsCards: "Krypto platba prijíma karty",
+    cryptoCoins: "Kryptomeny a minimálne sumy",
     trialStart: "Začiatok skúšobného obdobia",
     trialEnd: "Koniec skúšobného obdobia",
     success: "Operácia bola úspešná",
@@ -903,8 +908,8 @@ export const translations: typeof enTranslations = {
       nowpayments: "Kryptomeny (NowPayments)",
       nowpaymentsDescription:
         "Zaplať bitcoinom, etherom alebo inou kryptomenou",
-      cryptoMonthlyDisabled:
-        "Starter môžeš platiť kryptomenou raz ročne. Pri Plus, Pro a Ultra môžeš kryptomenou platiť aj mesačne.",
+      cryptoAmountTooLow:
+        "Táto suma je pod minimom pre kryptomeny. Vyber si ročnú platbu alebo väčší plán.",
     },
     login: "Prihlásiť sa",
     signup: "Zaregistrovať sa zadarmo",

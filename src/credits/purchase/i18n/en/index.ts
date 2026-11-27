@@ -34,6 +34,11 @@ export const translations = {
       cryptoMinimumDisabled:
         "Minimum {{min}} packs required for crypto payments",
     },
+    payCurrency: {
+      label: "Crypto Coin",
+      description: "Coin to pay with (crypto only)",
+      placeholder: "Pick a coin",
+    },
     checkoutUrl: {
       content: "Checkout URL",
     },

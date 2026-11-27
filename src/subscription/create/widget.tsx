@@ -21,7 +21,6 @@ import {
 } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
-import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Database } from "next-vibe/ui/components/icons/Database";
@@ -62,16 +61,25 @@ import publicCapDefinitions from "@/credits/public-cap/definition";
 import { scopedTranslation as publicCapScopedTranslation } from "@/credits/public-cap/i18n";
 import purchaseDefinitions from "@/credits/purchase/definition";
 import { scopedTranslation as purchaseScopedTranslation } from "@/credits/purchase/i18n";
+import { CryptoCoinPicker } from "@/payment/checkout/crypto-coin-picker";
+import {
+  cryptoAmountUsd,
+  type CryptoCoinMinimum,
+  type CryptoCoinValue,
+  cryptoMinimumUsd,
+} from "@/payment/checkout/crypto-coins";
 import { scopedTranslation as checkoutScopedTranslation } from "@/payment/checkout/i18n";
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
 import { ProductIds, productsRepository } from "@/products/platform-products";
-import { getPricingParams } from "@/products/repository-client";
+import {
+  getPricingParams,
+  getTierProductForPlan,
+} from "@/products/repository-client";
 
 import { CheckoutCardTip } from "../checkout-card-tip";
 import subscriptionDefinitions from "../definition";
 import {
   BillingInterval,
-  SubscriptionPlan,
   type SubscriptionPlanValue,
   SubscriptionStatus,
 } from "../enum";
@@ -82,8 +90,6 @@ import { type PlanInterval, PlanPicker } from "./plan-picker";
 import { PricingFaq } from "./pricing-faq";
 
 const MIN_QTY = 1;
-// Crypto minimum is ~$25 of credits (5 packs).
-const MIN_CRYPTO_CREDITS = 2500;
 
 function formatPrice(price: number, locale: string, currency: string): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(
@@ -148,23 +154,35 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const [liveCheckout, setLiveCheckout] = useState<{
     providers: (typeof PaymentProviderValue)[];
     nowPaymentsAcceptsCards: boolean;
+    cryptoCoins: CryptoCoinMinimum[] | undefined;
   } | null>(null);
   const checkoutProviders =
     liveCheckout?.providers ?? currentSubscription?.checkoutProviders;
   const nowPaymentsAcceptsCards =
     liveCheckout?.nowPaymentsAcceptsCards ??
     currentSubscription?.nowPaymentsAcceptsCards === true;
+  // Live NOWPayments minimums: the crypto option lists only coins that take
+  // the amount. Undefined while unknown (server floor applies).
+  const cryptoCoins = liveCheckout
+    ? liveCheckout.cryptoCoins
+    : currentSubscription?.cryptoCoins;
   // Unknown (older server, read still loading) means card stays offered; the
   // server refuses a paused provider anyway.
   const isCardCheckoutPaused =
     checkoutProviders !== undefined &&
     !checkoutProviders.includes(PaymentProvider.STRIPE);
 
-  // Crypto plans are one-off invoices. Starter monthly is below what crypto
-  // payments accept, so Starter takes crypto yearly; bigger plans monthly too.
-  const isCryptoSubDisabled =
-    pendingPlan?.interval !== BillingInterval.YEARLY &&
-    pendingPlan?.plan === SubscriptionPlan.SUBSCRIPTION;
+  // Crypto plans are one-off invoices, checked against the coin minimums.
+  const pendingTierProductId = pendingPlan
+    ? getTierProductForPlan(pendingPlan.plan)
+    : null;
+  const pendingPlanUsd =
+    pendingPlan && pendingTierProductId
+      ? cryptoAmountUsd(
+          pendingTierProductId,
+          pendingPlan.interval === BillingInterval.YEARLY ? "year" : "month",
+        )
+      : 0;
 
   // Subscription submit — uses widget's own form/submit from context
   useEffect(() => {
@@ -201,6 +219,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
         setLiveCheckout({
           providers: fresh.data.checkoutProviders,
           nowPaymentsAcceptsCards: fresh.data.nowPaymentsAcceptsCards === true,
+          cryptoCoins: fresh.data.cryptoCoins,
         });
       }
       if (fresh.data.status === SubscriptionStatus.ACTIVE) {
@@ -223,6 +242,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
 
   const handleSubProviderSelect = (
     provider: typeof PaymentProviderValue,
+    payCurrency?: typeof CryptoCoinValue,
   ): void => {
     setIsSubProviderModalOpen(false);
     if (!pendingPlan) {
@@ -233,6 +253,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
       shouldDirty: true,
     });
     form.setValue("provider", provider, { shouldDirty: true });
+    form.setValue("payCurrency", payCurrency, { shouldDirty: true });
     onSubmit?.();
   };
 
@@ -315,8 +336,11 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const packQty = packForm?.watch("quantity") ?? 1;
   const totalPrice = packPrice * packQty;
   const totalCredits = packCredits * packQty;
-  const isCryptoPackDisabled = totalCredits < MIN_CRYPTO_CREDITS;
-  const minCryptoPacks = Math.ceil(MIN_CRYPTO_CREDITS / packCredits);
+  const packUsd = cryptoAmountUsd(ProductIds.CREDIT_PACK, "one_time");
+  const minCryptoPacks = Math.max(
+    MIN_QTY,
+    Math.ceil(cryptoMinimumUsd(cryptoCoins) / packUsd),
+  );
 
   function setPackQty(next: number): void {
     packForm?.setValue("quantity", Math.max(MIN_QTY, next), {
@@ -330,10 +354,12 @@ export function SubscriptionCreateContainer(): JSX.Element {
 
   const handlePackProviderSelect = (
     provider: typeof PaymentProviderValue,
+    payCurrency?: typeof CryptoCoinValue,
   ): void => {
     setIsPackProviderModalOpen(false);
     packForm?.setValue("productId", ProductIds.CREDIT_PACK);
     packForm?.setValue("provider", provider);
+    packForm?.setValue("payCurrency", payCurrency);
     void packSubmit?.();
   };
 
@@ -533,35 +559,28 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 </Div>
               </Div>
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-auto p-4 justify-start whitespace-normal"
-              onClick={() =>
-                handleSubProviderSelect(PaymentProvider.NOWPAYMENTS)
+            <CryptoCoinPicker
+              amountUsd={pendingPlanUsd}
+              coins={cryptoCoins}
+              acceptsCards={nowPaymentsAcceptsCards}
+              title={
+                nowPaymentsAcceptsCards
+                  ? tCheckout("availability.nowpaymentsCardLabel")
+                  : t("buy.provider.nowpayments")
               }
-              disabled={isCryptoSubDisabled}
-            >
-              <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
-              <Div className="min-w-0 text-left">
-                <Div className="font-semibold">
-                  {nowPaymentsAcceptsCards
-                    ? tCheckout("availability.nowpaymentsCardLabel")
-                    : t("buy.provider.nowpayments")}
-                </Div>
-                <Div className="text-sm text-muted-foreground">
-                  {nowPaymentsAcceptsCards
-                    ? tCheckout("availability.nowpaymentsCardDescription")
-                    : t("buy.provider.nowpaymentsDescription")}
-                </Div>
-              </Div>
-            </Button>
-            {isCryptoSubDisabled && (
-              <Div className="flex items-start gap-2 rounded-lg border border-warning/50 bg-warning/15 p-3 text-sm text-warning">
-                <Info className="h-4 w-4 mt-0.5 shrink-0" />
-                {t("buy.provider.cryptoMonthlyDisabled")}
-              </Div>
-            )}
+              description={
+                nowPaymentsAcceptsCards
+                  ? tCheckout("availability.nowpaymentsCardDescription")
+                  : t("buy.provider.nowpaymentsDescription")
+              }
+              belowMinimumNotice={t("buy.provider.cryptoAmountTooLow")}
+              onSelect={(payCurrency) =>
+                handleSubProviderSelect(
+                  PaymentProvider.NOWPAYMENTS,
+                  payCurrency,
+                )
+              }
+            />
           </Div>
         </DialogContent>
       </Dialog>
@@ -608,37 +627,31 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 </Div>
               </Div>
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-auto p-4 justify-start whitespace-normal"
-              onClick={() =>
-                handlePackProviderSelect(PaymentProvider.NOWPAYMENTS)
+            <CryptoCoinPicker
+              amountUsd={packUsd * packQty}
+              coins={cryptoCoins}
+              acceptsCards={nowPaymentsAcceptsCards}
+              title={
+                nowPaymentsAcceptsCards
+                  ? tCheckout("availability.nowpaymentsCardLabel")
+                  : tPurchase("post.provider.nowpayments")
               }
-              disabled={isCryptoPackDisabled}
-            >
-              <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
-              <Div className="min-w-0 text-left">
-                <Div className="font-semibold">
-                  {nowPaymentsAcceptsCards
-                    ? tCheckout("availability.nowpaymentsCardLabel")
-                    : tPurchase("post.provider.nowpayments")}
-                </Div>
-                <Div className="text-sm text-muted-foreground">
-                  {nowPaymentsAcceptsCards
-                    ? tCheckout("availability.nowpaymentsCardDescription")
-                    : tPurchase("post.provider.nowpaymentsDescription")}
-                </Div>
-              </Div>
-            </Button>
-            {isCryptoPackDisabled && (
-              <Div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
-                <Info className="h-4 w-4 mt-0.5 shrink-0" />
-                {tPurchase("post.provider.cryptoMinimumDisabled", {
-                  min: minCryptoPacks,
-                })}
-              </Div>
-            )}
+              description={
+                nowPaymentsAcceptsCards
+                  ? tCheckout("availability.nowpaymentsCardDescription")
+                  : tPurchase("post.provider.nowpaymentsDescription")
+              }
+              belowMinimumNotice={tPurchase(
+                "post.provider.cryptoMinimumDisabled",
+                { min: minCryptoPacks },
+              )}
+              onSelect={(payCurrency) =>
+                handlePackProviderSelect(
+                  PaymentProvider.NOWPAYMENTS,
+                  payCurrency,
+                )
+              }
+            />
           </Div>
         </DialogContent>
       </Dialog>

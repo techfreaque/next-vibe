@@ -34,6 +34,12 @@ export const translations: typeof enTranslations = {
         description: "Wählen Sie, wie Sie bezahlen möchten",
         placeholder: "Zahlungsanbieter auswählen",
       },
+      payCurrency: {
+        label: "Kryptowährung",
+        description:
+          "Coin für die Zahlung. Leer lassen und auf der Zahlungsseite wählen.",
+        placeholder: "Coin wählen",
+      },
       metadata: {
         label: "Metadaten",
         description: "Zusätzliche Metadaten für die Checkout-Sitzung",
@@ -120,8 +126,6 @@ export const translations: typeof enTranslations = {
         reason: {
           yearlyNotAvailable:
             "Jährliche Abrechnung gibt es nur für den Plan {{plan}}. Wähle monatlich.",
-          cryptoStarterYearly:
-            "Starter mit Krypto nur jährlich. Wähle jährlich, oder Plus, Pro oder Ultra.",
         },
       },
       network: {
@@ -205,5 +209,26 @@ export const translations: typeof enTranslations = {
     nowpaymentsCardLabel: "Karte oder Krypto (NOWPayments)",
     nowpaymentsCardDescription:
       "Visa, Mastercard, Apple Pay, Google Pay oder Bitcoin, Ethereum u.v.m.",
+    cryptoPickCoin: "Coin wählen",
+    cryptoCoinUnavailable:
+      "Dieser Coin ist gerade nicht verfügbar. Wähle einen anderen.",
+    cryptoCoinBelowMinimum:
+      "Der Betrag liegt unter dem Mindestbetrag dieses Coins. Wähle einen anderen.",
+    cryptoAmountBelowMinimum:
+      "Der Betrag liegt unter dem Krypto-Minimum. Nimm ein Paket mehr oder einen größeren Plan.",
+  },
+  cryptoCoin: {
+    btc: "Bitcoin (BTC)",
+    eth: "Ethereum (ETH)",
+    usdtTrc20: "USDT (TRON)",
+    usdtErc20: "USDT (Ethereum)",
+    usdtBsc: "USDT (BNB Chain)",
+    usdc: "USDC (Ethereum)",
+    sol: "Solana (SOL)",
+    ltc: "Litecoin (LTC)",
+    xmr: "Monero (XMR)",
+    doge: "Dogecoin (DOGE)",
+    trx: "TRON (TRX)",
+    bnbBsc: "BNB (BNB Chain)",
   },
 };

@@ -10,6 +10,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -21,6 +22,11 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import {
+  CryptoCoinDB,
+  CryptoCoinOptions,
+} from "../../payment/checkout/crypto-coins";
+import { scopedTranslation as checkoutScopedTranslation } from "../../payment/checkout/i18n";
 import {
   PaymentProvider,
   PaymentProviderDB,
@@ -87,6 +93,24 @@ const { POST } = createEndpoint({
         description: "post.provider.description" as const,
         placeholder: "post.provider.placeholder" as const,
         options: PaymentProviderOptions,
+      }),
+
+      // Crypto only: coin picked in the buy dialog (below-minimum coins are
+      // hidden there and refused by the server).
+      payCurrency: requestField(scopedTranslation, {
+        schema: z.enum(CryptoCoinDB).optional(),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.payCurrency.label" as const,
+        description: "post.payCurrency.description" as const,
+        placeholder: "post.payCurrency.placeholder" as const,
+        // Coin names live in the checkout scope.
+        options: CryptoCoinOptions.map((option) => ({
+          value: option.value,
+          label: "post.payCurrency.label" as const,
+          translateLabel: (locale: CountryLanguage): string =>
+            checkoutScopedTranslation.scopedT(locale).t(option.label),
+        })),
       }),
 
       // === RESPONSE FIELDS ===

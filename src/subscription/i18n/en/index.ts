@@ -409,6 +409,10 @@ export const translations = {
         label: "Payment Provider",
         description: "Select your payment provider",
       },
+      payCurrency: {
+        label: "Crypto Coin",
+        description: "Coin to pay with (crypto checkout only)",
+      },
       catalogProductId: {
         label: "Catalog Product",
         description: "Link to a catalog product for this subscription",
@@ -447,6 +451,7 @@ export const translations = {
     recentCardAuthFailure: "Recent Card Authentication Failure",
     checkoutProviders: "Available Payment Methods",
     nowPaymentsAcceptsCards: "Crypto Checkout Takes Cards",
+    cryptoCoins: "Crypto Coins and Minimums",
     trialStart: "Trial Start Date",
     trialEnd: "Trial End Date",
     success: "Operation successful",
@@ -896,8 +901,8 @@ export const translations = {
       stripeDescription: "Card, PayPal, Apple Pay, Google Pay via Stripe",
       nowpayments: "Crypto (NowPayments)",
       nowpaymentsDescription: "Pay with Bitcoin, Ethereum, and more",
-      cryptoMonthlyDisabled:
-        "Starter takes crypto with yearly billing. Plus, Pro and Ultra take crypto monthly too.",
+      cryptoAmountTooLow:
+        "This amount is below the crypto minimum. Pick yearly billing or a bigger plan.",
     },
     login: "Sign In",
     signup: "Sign Up Free",

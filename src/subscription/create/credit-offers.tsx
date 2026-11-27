@@ -7,7 +7,8 @@
  *   a link to every plan on the buy page.
  * - Live plan: a pack (one tap to checkout) and the next tier up, switched in
  *   place after an inline confirm (it charges the prorated difference).
- * Crypto needs yearly billing or 2500+ credits, so it lives on the buy page.
+ * Crypto needs a coin pick (only coins above their minimum), so it lives on
+ * the buy page.
  *
  * Used where a signed-in user runs dry: the chat's out-of-credits card and the
  * credits header on the subscription pages. Guests never see this (every

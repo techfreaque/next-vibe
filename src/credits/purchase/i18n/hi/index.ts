@@ -35,6 +35,11 @@ export const translations: typeof enTranslations = {
       nowpaymentsDescription: "Bitcoin, Ethereum और दूसरे से पेमेंट करें",
       cryptoMinimumDisabled: "क्रिप्टो पेमेंट के लिए कम से कम {{min}} पैक ज़रूरी हैं",
     },
+    payCurrency: {
+      label: "क्रिप्टो कॉइन",
+      description: "जिस कॉइन से पेमेंट करना है (सिर्फ़ क्रिप्टो)",
+      placeholder: "कॉइन चुनें",
+    },
     checkoutUrl: {
       content: "चेकआउट URL",
     },

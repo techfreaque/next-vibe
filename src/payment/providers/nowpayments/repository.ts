@@ -40,6 +40,7 @@ import type {
   WebhookEvent,
 } from "../types";
 import { scopedTranslation } from "./i18n";
+import { resolveCryptoPayCurrency } from "./min-amounts";
 
 /**
  * NOWPayments API Response Types
@@ -306,6 +307,22 @@ export class NOWPaymentsProvider implements PaymentProvider {
     const totalAmount = product.price * quantity;
     const totalCredits = product.credits * quantity;
 
+    // Coins below their NOWPayments minimum stall on the hosted page, so the
+    // buy dialog sends the picked coin and the amount is checked here first.
+    const payCurrency = await resolveCryptoPayCurrency(
+      {
+        productId: params.productId,
+        interval: params.interval,
+        quantity,
+        payCurrency: params.metadata.payCurrency,
+      },
+      params.locale,
+      logger,
+    );
+    if (!payCurrency.success) {
+      return payCurrency;
+    }
+
     // NOWPayments does not substitute {CHECKOUT_SESSION_ID} like Stripe does.
     // Strip the Stripe-specific placeholder - NOWPayments appends its own
     // NP_id query param to the success URL automatically.
@@ -328,6 +345,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       success_url: successUrlWithoutPlaceholder,
       cancel_url: params.cancelUrl,
       is_fee_paid_by_user: true,
+      ...(payCurrency.data ? { pay_currency: payCurrency.data } : {}),
     };
 
     logger.info("Creating NOWPayments invoice with data", {

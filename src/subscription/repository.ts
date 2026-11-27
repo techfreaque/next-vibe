@@ -42,6 +42,7 @@ import {
   getCheckoutProviders,
   nowPaymentsAcceptsCards,
 } from "../payment/providers/availability";
+import { getCryptoCoinMinimums } from "../payment/providers/nowpayments/min-amounts";
 import { StripeProvider } from "../payment/providers/stripe/repository";
 import type { WebhookData } from "../payment/providers/types";
 import { getEnvAvailability } from "../vibe/agent/env-availability";
@@ -411,6 +412,8 @@ export class SubscriptionRepository {
       ...result.data,
       checkoutProviders: await getCheckoutProviders(logger),
       nowPaymentsAcceptsCards: nowPaymentsAcceptsCards(),
+      cryptoCoins:
+        (await getCryptoCoinMinimums(logger, { wait: false })) ?? undefined,
     });
   }
 
@@ -710,6 +713,7 @@ export class SubscriptionRepository {
           planId: data.plan,
           billingInterval: data.billingInterval,
           provider: data.provider,
+          payCurrency: data.payCurrency,
         },
         user,
         locale,

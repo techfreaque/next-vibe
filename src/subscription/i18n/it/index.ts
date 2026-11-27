@@ -417,6 +417,10 @@ export const translations: typeof enTranslations = {
         label: "Servizio di pagamento",
         description: "Scegli come pagare",
       },
+      payCurrency: {
+        label: "Criptovaluta",
+        description: "Moneta con cui paghi (solo pagamento in cripto)",
+      },
       catalogProductId: {
         label: "Prodotto del catalogo",
         description: "Link a un prodotto di catalogo per questo abbonamento",
@@ -455,6 +459,7 @@ export const translations: typeof enTranslations = {
     recentCardAuthFailure: "Recente autenticazione della carta non riuscita",
     checkoutProviders: "Metodi di pagamento disponibili",
     nowPaymentsAcceptsCards: "Il checkout crypto accetta carte",
+    cryptoCoins: "Criptovalute e minimi",
     trialStart: "Data di inizio del processo",
     trialEnd: "Data di fine prova",
     success: "Operazione di successo",
@@ -910,8 +915,8 @@ export const translations: typeof enTranslations = {
       stripeDescription: "Carta, PayPal, Apple Pay e Google Pay tramite Stripe",
       nowpayments: "Criptovalute (NowPayments)",
       nowpaymentsDescription: "Paga con Bitcoin, Ethereum e altre criptovalute",
-      cryptoMonthlyDisabled:
-        "Starter accetta criptovalute con la fatturazione annuale. Plus, Pro e Ultra le accettano anche con la fatturazione mensile.",
+      cryptoAmountTooLow:
+        "Questo importo è sotto il minimo per le criptovalute. Scegli la fatturazione annuale o un piano più grande.",
     },
     login: "Accedi",
     signup: "Registrati gratis",

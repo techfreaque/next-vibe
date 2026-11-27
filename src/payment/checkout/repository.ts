@@ -183,19 +183,6 @@ export class SubscriptionCheckoutRepository {
         });
       }
 
-      // Crypto plans are one-off invoices; Starter monthly is below what
-      // crypto payments accept, so Starter takes crypto yearly only.
-      if (
-        data.provider === PaymentProvider.NOWPAYMENTS &&
-        interval === "month" &&
-        tierProductId === ProductIds.SUBSCRIPTION
-      ) {
-        return fail({
-          message: t("post.errors.validation.reason.cryptoStarterYearly"),
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-        });
-      }
-
       // Generate callback token for webhook verification
       const callbackToken = crypto.randomUUID();
 
@@ -217,6 +204,8 @@ export class SubscriptionCheckoutRepository {
             productId: tierProductId,
             interval,
             provider: data.provider || PaymentProvider.STRIPE,
+            // Crypto: checked against the coin minimums by the provider.
+            ...(data.payCurrency ? { payCurrency: data.payCurrency } : {}),
           },
         },
         customerResult.data.customerId,

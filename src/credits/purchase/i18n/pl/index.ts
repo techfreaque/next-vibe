@@ -35,6 +35,11 @@ export const translations: typeof enTranslations = {
       cryptoMinimumDisabled:
         "Minimum {{min}} pakietów wymagane dla płatności krypto",
     },
+    payCurrency: {
+      label: "Kryptowaluta",
+      description: "Waluta do zapłaty (tylko krypto)",
+      placeholder: "Wybierz walutę",
+    },
     checkoutUrl: {
       content: "URL płatności",
     },

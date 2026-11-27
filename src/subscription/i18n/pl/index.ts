@@ -412,6 +412,10 @@ export const translations: typeof enTranslations = {
         label: "Dostawca płatności",
         description: "Wybierz dostawcę płatności",
       },
+      payCurrency: {
+        label: "Kryptowaluta",
+        description: "Waluta do zapłaty (tylko płatność krypto)",
+      },
       catalogProductId: {
         label: "Produkt z katalogu",
         description: "Powiąż tę subskrypcję z produktem z katalogu",
@@ -450,6 +454,7 @@ export const translations: typeof enTranslations = {
     recentCardAuthFailure: "Niedawno nieudane potwierdzenie karty",
     checkoutProviders: "Dostępne metody płatności",
     nowPaymentsAcceptsCards: "Checkout krypto przyjmuje karty",
+    cryptoCoins: "Kryptowaluty i minimalne kwoty",
     trialStart: "Początek okresu próbnego",
     trialEnd: "Koniec okresu próbnego",
     success: "Operacja pomyślna",
@@ -902,8 +907,8 @@ export const translations: typeof enTranslations = {
       stripeDescription: "Karta, PayPal, Apple Pay, Google Pay przez Stripe",
       nowpayments: "Krypto (NowPayments)",
       nowpaymentsDescription: "Zapłać Bitcoinem, Ethereum i innymi",
-      cryptoMonthlyDisabled:
-        "Starter za krypto tylko rocznie. Plus, Pro i Ultra opłacisz krypto także co miesiąc.",
+      cryptoAmountTooLow:
+        "Ta kwota jest poniżej minimum dla krypto. Wybierz płatność roczną albo większy plan.",
     },
     login: "Zaloguj się",
     signup: "Zarejestruj się za darmo",

@@ -177,6 +177,8 @@ export class CreditPurchaseRepository {
             quantity: data.quantity.toString(),
             totalAmount: totalAmount.toString(),
             totalCredits: totalCredits.toString(),
+            // Crypto: checked against the coin minimums by the provider.
+            ...(data.payCurrency ? { payCurrency: data.payCurrency } : {}),
           },
         },
         customer.customerId,

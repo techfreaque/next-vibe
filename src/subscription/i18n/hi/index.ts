@@ -389,6 +389,10 @@ export const translations: typeof enTranslations = {
         label: "पेमेंट प्रोवाइडर",
         description: "अपना पेमेंट प्रोवाइडर चुनें",
       },
+      payCurrency: {
+        label: "क्रिप्टो कॉइन",
+        description: "जिस कॉइन से पेमेंट करना है (सिर्फ़ क्रिप्टो चेकआउट)",
+      },
       catalogProductId: {
         label: "कैटलॉग प्रोडक्ट",
         description: "इस सब्सक्रिप्शन के लिए कैटलॉग प्रोडक्ट से जोड़ें",
@@ -426,6 +430,7 @@ export const translations: typeof enTranslations = {
     recentCardAuthFailure: "हाल में कार्ड ऑथेंटिकेशन फेल हुआ",
     checkoutProviders: "उपलब्ध पेमेंट तरीके",
     nowPaymentsAcceptsCards: "क्रिप्टो चेकआउट में कार्ड चलता है",
+    cryptoCoins: "क्रिप्टो कॉइन और न्यूनतम राशि",
     trialStart: "ट्रायल शुरू होने की तारीख़",
     trialEnd: "ट्रायल ख़त्म होने की तारीख़",
     success: "ऑपरेशन सफल रहा",
@@ -864,8 +869,8 @@ export const translations: typeof enTranslations = {
       stripeDescription: "Stripe से कार्ड, PayPal, Apple Pay, Google Pay",
       nowpayments: "क्रिप्टो (NowPayments)",
       nowpaymentsDescription: "Bitcoin, Ethereum और दूसरे से पेमेंट करें",
-      cryptoMonthlyDisabled:
-        "Starter में क्रिप्टो सालाना बिलिंग के साथ चलता है। Plus, Pro और Ultra में मासिक भी चलता है।",
+      cryptoAmountTooLow:
+        "यह राशि क्रिप्टो की न्यूनतम सीमा से कम है। सालाना बिलिंग या बड़ा प्लान चुनें।",
     },
     login: "साइन इन करें",
     signup: "फ़्री साइन अप करें",

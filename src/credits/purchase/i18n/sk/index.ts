@@ -37,6 +37,11 @@ export const translations: typeof enTranslations = {
       cryptoMinimumDisabled:
         "Pri platbe kryptomenou je minimálny počet balíkov {{min}}",
     },
+    payCurrency: {
+      label: "Kryptomena",
+      description: "Mena na platbu (len kryptomeny)",
+      placeholder: "Vyber menu",
+    },
     checkoutUrl: {
       content: "URL platby",
     },

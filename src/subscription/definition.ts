@@ -15,6 +15,7 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import { responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { CryptoCoinDB } from "../payment/checkout/crypto-coins";
 import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
@@ -139,6 +140,20 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "response.nowPaymentsAcceptsCards",
         schema: z.boolean().optional(),
+      }),
+      // Crypto coins with their live NOWPayments minimum (USD). The buy dialog
+      // offers only coins that accept the amount. Omitted while unknown.
+      cryptoCoins: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.cryptoCoins",
+        schema: z
+          .array(
+            z.object({
+              coin: z.enum(CryptoCoinDB),
+              minUsd: z.number(),
+            }),
+          )
+          .optional(),
       }),
       provider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

@@ -23,7 +23,6 @@ import {
 } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
-import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
 import { Info } from "next-vibe/ui/components/icons/Info";
@@ -49,6 +48,12 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/n
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
+import { CryptoCoinPicker } from "@/payment/checkout/crypto-coin-picker";
+import {
+  cryptoAmountUsd,
+  type CryptoCoinValue,
+  cryptoMinimumUsd,
+} from "@/payment/checkout/crypto-coins";
 import { scopedTranslation as checkoutScopedTranslation } from "@/payment/checkout/i18n";
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
 import {
@@ -62,8 +67,6 @@ import { getPlanOfferState } from "@/subscription/plan-offers";
 import type definition from "./definition";
 
 const MIN_QTY = 1;
-// Crypto minimum is ~$25 of credits (5 packs).
-const MIN_CRYPTO_CREDITS = 2500;
 
 /**
  * Props for custom widget
@@ -135,12 +138,21 @@ export function CreditsPurchaseContainer({
     setIsProviderModalOpen(true);
   }
 
-  const isCryptoDisabled = totalCredits < MIN_CRYPTO_CREDITS;
-  const minCryptoPacks = Math.ceil(MIN_CRYPTO_CREDITS / packCredits);
+  // Live NOWPayments minimums: only coins that take the amount are offered.
+  const cryptoCoins = subscription?.cryptoCoins;
+  const packUsd = cryptoAmountUsd(ProductIds.CREDIT_PACK, "one_time");
+  const minCryptoPacks = Math.max(
+    MIN_QTY,
+    Math.ceil(cryptoMinimumUsd(cryptoCoins) / packUsd),
+  );
 
-  function handleProviderSelect(provider: typeof PaymentProviderValue): void {
+  function handleProviderSelect(
+    provider: typeof PaymentProviderValue,
+    payCurrency?: typeof CryptoCoinValue,
+  ): void {
     setIsProviderModalOpen(false);
     form.setValue("provider", provider);
+    form.setValue("payCurrency", payCurrency);
     onSubmit?.();
   }
 
@@ -190,35 +202,27 @@ export function CreditsPurchaseContainer({
                 </Div>
               </Div>
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-auto p-4 justify-start whitespace-normal"
-              onClick={() => handleProviderSelect(PaymentProvider.NOWPAYMENTS)}
-              disabled={isCryptoDisabled}
-            >
-              <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
-              <Div className="min-w-0 text-left">
-                <Div className="font-semibold">
-                  {nowPaymentsAcceptsCards
-                    ? tCheckout("availability.nowpaymentsCardLabel")
-                    : t("post.provider.nowpayments")}
-                </Div>
-                <Div className="text-sm text-muted-foreground">
-                  {nowPaymentsAcceptsCards
-                    ? tCheckout("availability.nowpaymentsCardDescription")
-                    : t("post.provider.nowpaymentsDescription")}
-                </Div>
-              </Div>
-            </Button>
-            {isCryptoDisabled && (
-              <Div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
-                <Info className="h-4 w-4 mt-0.5 shrink-0" />
-                {t("post.provider.cryptoMinimumDisabled", {
-                  min: minCryptoPacks,
-                })}
-              </Div>
-            )}
+            <CryptoCoinPicker
+              amountUsd={packUsd * quantity}
+              coins={cryptoCoins}
+              acceptsCards={nowPaymentsAcceptsCards}
+              title={
+                nowPaymentsAcceptsCards
+                  ? tCheckout("availability.nowpaymentsCardLabel")
+                  : t("post.provider.nowpayments")
+              }
+              description={
+                nowPaymentsAcceptsCards
+                  ? tCheckout("availability.nowpaymentsCardDescription")
+                  : t("post.provider.nowpaymentsDescription")
+              }
+              belowMinimumNotice={t("post.provider.cryptoMinimumDisabled", {
+                min: minCryptoPacks,
+              })}
+              onSelect={(payCurrency) =>
+                handleProviderSelect(PaymentProvider.NOWPAYMENTS, payCurrency)
+              }
+            />
           </Div>
         </DialogContent>
       </Dialog>
