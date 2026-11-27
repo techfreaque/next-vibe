@@ -128,6 +128,10 @@ export const translations: typeof enTranslations = {
     preview: "Podgląd (pierwsze 5 operacji)",
     matchRow: "Dopasuj",
     unmatched: "Do dopasowania",
+    matched: "Dopasowane",
+    allLines: "Wszystkie",
+    splitMatched: "Podzielone",
+    selectAccount: "Otwórz konto",
     csvHelp:
       "Wybierz eksport banku lub przypisz kolumny CSV. Wymagana jest data księgowania i kwota ze znakiem.",
     unsupported:
@@ -207,6 +211,77 @@ export const translations: typeof enTranslations = {
     journalMatch:
       "Wybierz niedopasowany zapis na tym samym koncie bankowym, o tej samej kwocie i walucie.",
     confirmation: "Potwierdź dopasowanie przed zapisaniem.",
+    splitTotalMismatch:
+      "Suma pozycji podziału musi dokładnie odpowiadać kwocie wiersza bankowego.",
+    splitTargetInvalid:
+      "Sprawdź, czy każda faktura, rachunek lub konto należy do tej firmy i zgadza się kierunek płatności.",
+  },
+  reconciliation: {
+    statusTitle: "Status uzgodnienia",
+    accountsTitle: "Status rachunków bankowych",
+    unmatchedLines: "Niedopasowane",
+    matchedLines: "Dopasowane",
+    statementNet: "Saldo wyciągu",
+    ledgerBalance: "Saldo księgowe",
+    difference: "Różnica",
+  },
+  autoMatch: {
+    title: "Automatyczne dopasowanie bankowe",
+    description:
+      "Dopasuj otwarte pozycje bankowe do faktur, rachunków i zaksięgowanych płatności według kwoty, numeru referencyjnego, IBAN, okna dat i tolerancji kursowej.",
+    success: "Automatyczne dopasowanie zakończone",
+    action: "Auto-dopasowanie",
+    dryRun: "Tylko podgląd",
+    previewAction: "Podgląd dopasowań",
+    applyAction: "Zastosuj dopasowania",
+    previewBanner: "Podgląd znalazł {{count}} jednoznacznych dopasowań.",
+    appliedBanner: "Automatycznie dopasowano {{count}} pozycji bankowych.",
+    skippedHint:
+      "Pominięto {{count}} niejednoznacznych pozycji do ręcznej weryfikacji.",
+    matchedCount: "Dopasowane",
+    invoiceMatches: "Faktury",
+    billMatches: "Rachunki",
+    journalMatches: "Zapisy księgowe",
+    skippedAmbiguous: "Niejednoznaczne",
+    items: "Dopasowane pozycje",
+    targetType: "Typ",
+    targetLabel: "Cel",
+    basisLabel: "Podstawa",
+    emptyTitle: "Nie znaleziono automatycznych dopasowań",
+    emptyHint:
+      "Sprawdź otwarte pozycje ręcznie lub dostosuj okno dat i ustawienia różnic kursowych.",
+    targets: {
+      journal_line: "Zapis księgowy",
+      invoice: "Faktura",
+      bill: "Rachunek",
+    },
+    basis: {
+      reference: "Numer dokumentu",
+      iban: "IBAN",
+      amount_date: "Kwota i data",
+      fx_tolerance: "Tolerancja FX lub opłat",
+    },
+  },
+  split: {
+    title: "Podziel pozycję bankową",
+    description:
+      "Rozdziel jedną pozycję wyciągu na kilka faktur, rachunków, kont lub zapisów księgowych.",
+    success: "Pozycja bankowa podzielona i uzgodniona",
+    openAction: "Podziel",
+    allocations: "Pozycje podziału",
+    count: "Pozycje",
+    remaining: "Pozostało do rozdzielenia",
+    selectTarget: "Wybierz cel",
+    addRow: "Dodaj wiersz",
+    removeRow: "Usuń",
+    confirmAction: "Potwierdź podział",
+    documentCandidates: "Otwarte faktury i rachunki",
+    types: {
+      journal_line: "Zapis księgowy",
+      invoice: "Otwarta faktura",
+      bill: "Otwarty rachunek",
+      account: "Konto księgowe",
+    },
   },
   import: {
     title: "Import wyciągu bankowego",

@@ -152,6 +152,21 @@ const { GET } = createEndpoint({
               label: "ledger.response.currency" as const,
               schema: z.string(),
             }),
+            functionalAmount: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "ledger.response.amount" as const,
+              schema: z.number().nullable(),
+            }),
+            functionalCurrency: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "ledger.response.currency" as const,
+              schema: z.string().nullable(),
+            }),
+            exchangeRate: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "ledger.response.currency" as const,
+              schema: z.number().nullable(),
+            }),
             runningBalance: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "ledger.response.runningBalance" as const,

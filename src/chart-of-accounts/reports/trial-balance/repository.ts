@@ -26,7 +26,7 @@ import { scopedTranslation } from "../../i18n";
 import { nextAccountingDay } from "../../shared/journal-validation";
 import {
   findLedgerReportCompany,
-  resolveLedgerReportCurrency,
+  resolveLedgerReportScope,
 } from "../../shared/report-currency";
 import type { TrialBalanceRequestOutput } from "./definition";
 
@@ -103,19 +103,27 @@ export class TrialBalanceRepository {
         entryConditions.push(eq(journalEntries.periodId, data.periodId));
       }
 
-      // Aggregate debit and credit totals per account
-      const reportCurrency = await resolveLedgerReportCurrency(
+      // Aggregate debit and credit totals per account (functional currency when multi-currency)
+      const scope = await resolveLedgerReportScope(
         company.currency,
         entryConditions,
         data.currency,
       );
-      if (!reportCurrency) {
+      if (!scope) {
         return fail({
           message: t("reports.mixedCurrency"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
-      entryConditions.push(eq(journalEntryLines.currency, reportCurrency));
+      const reportCurrency = scope.reportCurrency;
+      if (scope.filterCurrency) {
+        entryConditions.push(
+          eq(journalEntryLines.currency, scope.filterCurrency),
+        );
+      }
+      const lineAmountExpr = scope.useFunctionalAmount
+        ? sql`coalesce(${journalEntryLines.functionalAmount}, ${journalEntryLines.amount})`
+        : journalEntryLines.amount;
 
       const rows = await db
         .select({
@@ -123,8 +131,13 @@ export class TrialBalanceRepository {
           code: accountNodes.code,
           name: accountNodes.name,
           type: accountNodes.type,
-          debitUnits: sql<string>`(sum(case when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount} else 0 end) * 10000)::numeric(30, 0)`,
-          creditUnits: sql<string>`(sum(case when ${journalEntryLines.type} = ${LineType.CREDIT} then ${journalEntryLines.amount} else 0 end) * 10000)::numeric(30, 0)`,
+          debitUnits: sql<string>`(sum(case when ${journalEntryLines.type} = ${LineType.DEBIT} then ${lineAmountExpr} else 0 end) * 10000)::numeric(30, 0)`,
+          creditUnits: sql<string>`(sum(case when ${journalEntryLines.type} = ${LineType.CREDIT} then ${lineAmountExpr} else 0 end) * 10000)::numeric(30, 0)`,
+          foreignSummary: scope.useFunctionalAmount
+            ? sql<
+                string | null
+              >`string_agg(distinct case when ${journalEntryLines.currency} <> ${reportCurrency} then ${journalEntryLines.currency} else null end, ', ')`
+            : sql<string | null>`null`,
         })
         .from(journalEntryLines)
         .innerJoin(
@@ -158,7 +171,7 @@ export class TrialBalanceRepository {
         return {
           accountId: r.accountId,
           code: r.code,
-          name: r.name,
+          name: r.foreignSummary ? `${r.name} (${r.foreignSummary})` : r.name,
           type: r.type,
           debitTotal: Number(debitUnits) / 10_000,
           creditTotal: Number(creditUnits) / 10_000,

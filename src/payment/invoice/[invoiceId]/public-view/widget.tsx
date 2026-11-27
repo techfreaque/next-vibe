@@ -1,6 +1,9 @@
 "use client";
 
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
+import { Image } from "next-vibe/ui/components/image";
+import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
@@ -113,6 +116,70 @@ export function InvoicePublicViewWidget({
                 </Span>
               </Div>
             ))}
+          </Div>
+        )}
+
+        {(data.paymentUrl || data.bankIban || data.qrSvg) && (
+          <Div className="flex flex-col gap-4 rounded-xl border bg-card p-5">
+            {data.paymentUrl && (
+              <Div className="flex flex-wrap items-center justify-between gap-3">
+                <Span className="text-sm font-medium">
+                  {t("get.response.paymentUrl")}
+                </Span>
+                <ExternalLink
+                  href={data.paymentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+                >
+                  {t("widget.payOnline")}
+                </ExternalLink>
+              </Div>
+            )}
+            {(data.bankIban || data.qrSvg) && (
+              <Div className="flex flex-wrap items-start justify-between gap-4 border-t pt-4 first:border-t-0 first:pt-0">
+                <Div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <Span className="text-sm font-semibold">
+                    {t("widget.bankTransfer")}
+                  </Span>
+                  <DetailGrid columns={2}>
+                    {data.bankIban && (
+                      <DetailField
+                        label={t("get.response.bankIban")}
+                        value={data.bankIban}
+                        mono
+                        copyable
+                      />
+                    )}
+                    {data.bankBic && (
+                      <DetailField
+                        label={t("get.response.bankBic")}
+                        value={data.bankBic}
+                        mono
+                      />
+                    )}
+                  </DetailGrid>
+                </Div>
+                {data.qrSvg && (
+                  <Div className="flex flex-col items-center gap-1.5">
+                    <Image
+                      src={`data:image/svg+xml;utf8,${encodeURIComponent(data.qrSvg)}`}
+                      alt={
+                        data.qrKind === "PAY_BY_SQUARE"
+                          ? t("widget.payBySquareQr")
+                          : t("widget.epcQr")
+                      }
+                      width={144}
+                      height={144}
+                      className="rounded border bg-white p-1"
+                    />
+                    <Span className="text-xs text-muted-foreground">
+                      {t("widget.scanToPay")}
+                    </Span>
+                  </Div>
+                )}
+              </Div>
+            )}
           </Div>
         )}
 

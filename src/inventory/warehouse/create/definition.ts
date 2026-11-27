@@ -19,6 +19,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { NegativeStockPolicyDB, NegativeStockPolicyOptions } from "../../enum";
 import { scopedTranslation } from "../../i18n";
 
 const InventoryWarehouseCreateWidget = lazyWidget(() =>
@@ -96,6 +97,15 @@ const { POST } = createEndpoint({
         description: "warehouseCreate.post.isDefault.description" as const,
         schema: z.boolean().default(false),
       }),
+      negativeStockPolicy: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "warehouseCreate.post.negativeStockPolicy.label" as const,
+        description:
+          "warehouseCreate.post.negativeStockPolicy.description" as const,
+        options: NegativeStockPolicyOptions,
+        schema: z.enum(NegativeStockPolicyDB).default("BLOCK"),
+      }),
 
       result: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -132,6 +142,11 @@ const { POST } = createEndpoint({
             type: WidgetType.TEXT,
             label: "warehouseCreate.post.response.isDefault" as const,
             schema: z.boolean(),
+          }),
+          negativeStockPolicy: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "warehouseCreate.post.response.negativeStockPolicy" as const,
+            schema: z.enum(NegativeStockPolicyDB),
           }),
         },
       }),
@@ -194,6 +209,7 @@ const { POST } = createEndpoint({
         address: "123 Storage Lane",
         isActive: true,
         isDefault: true,
+        negativeStockPolicy: "BLOCK",
       },
     },
     responses: {
@@ -205,6 +221,7 @@ const { POST } = createEndpoint({
           code: "WH-01",
           isActive: true,
           isDefault: true,
+          negativeStockPolicy: "BLOCK",
         },
       },
     },

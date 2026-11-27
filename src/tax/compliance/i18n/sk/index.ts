@@ -90,7 +90,7 @@ export const translations: typeof enTranslations = {
       title: "Čo ERP pripraví",
       vatReturn: "Daňové priznanie k DPH a kontrolný výkaz",
       statements: "Účtovná závierka",
-      fiscal: "Pokladničné doklady (eKasa)",
+      fiscal: "Pokladničné doklady",
       eInvoicing: "Povinná elektronická fakturácia od",
       yes: "Dostupné",
       no: "Pre túto krajinu nedostupné",

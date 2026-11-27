@@ -73,7 +73,7 @@ export const translations = {
     row: "Row",
     marker: "Item",
     label: "Label",
-    officialLabel: "Official label (SK)",
+    officialLabel: "Official label",
     current: "Current period",
     previous: "Previous period",
     currency: "Currency",

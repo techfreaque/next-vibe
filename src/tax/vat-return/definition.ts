@@ -1,6 +1,11 @@
 /**
- * Statutory VAT return preparation per country profile.
- * Slovakia: DPHv25 return lines + KVDPHv25 control statement XML.
+ * Statutory VAT return & tax filing export per country profile.
+ *
+ * One country-agnostic tool driven by the company's selected country and tax regime:
+ * - DE: UStVA Kennzahlen + ELSTER XML / CSV (or § 19 Kleinunternehmer EÜR summary)
+ * - SK: DPHv25 return lines + KVDPHv25 control statement XML
+ * - AT: UVA U30 Kennzahlen + FinanzOnline XML / CSV (or small-business E/A summary)
+ * - Other countries: generic VAT summary by rate + CSV export
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -23,13 +28,21 @@ import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
 import { defaultVatPeriod, VAT_PERIOD_PATTERN } from "./period";
-import { SK_DPH_LINES } from "./sk-dph";
 
 const VatReturnWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.VatReturnWidget })),
 );
 
 export const VAT_RETURN_ALIAS = "tax-vat-return" as const;
+
+export const FILING_FORMATS = [
+  "SK_DPH",
+  "DE_USTVA",
+  "DE_EUR_SMALL_BUSINESS",
+  "AT_UVA",
+  "AT_EA_SMALL_BUSINESS",
+  "GENERIC_VAT",
+] as const;
 
 export const KV_SECTIONS = [
   "A1",
@@ -44,6 +57,7 @@ export const KV_SECTIONS = [
 
 export const VAT_RETURN_WARNINGS = [
   "warnings.noVatId",
+  "warnings.noTaxId",
   "warnings.customerVatIds",
   "warnings.unmappedRates",
   "warnings.b32Required",
@@ -104,6 +118,26 @@ const { GET } = createEndpoint({
         label: "company.label",
         schema: z.string(),
       }),
+      country: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "company.label",
+        schema: z.string(),
+      }),
+      currency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "lines.amount",
+        schema: z.string(),
+      }),
+      filingFormat: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "lines.title",
+        schema: z.enum(FILING_FORMATS),
+      }),
+      smallBusinessExempt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "smallBusiness.title",
+        schema: z.boolean(),
+      }),
       returnPeriod: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "period.label",
@@ -128,12 +162,27 @@ const { GET } = createEndpoint({
             line: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "lines.line",
-              schema: z.enum(SK_DPH_LINES),
+              schema: z.string(),
+            }),
+            label: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "lines.meaning",
+              schema: z.string().optional(),
+            }),
+            base: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "lines.base",
+              schema: z.number().optional(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "lines.amount",
               schema: z.number(),
+            }),
+            isTotal: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "lines.amount",
+              schema: z.boolean().optional(),
             }),
           },
         }),
@@ -183,7 +232,17 @@ const { GET } = createEndpoint({
       }),
       kvFileName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "actions.downloadKv",
+        label: "actions.downloadXml",
+        schema: z.string(),
+      }),
+      exportCsv: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "actions.downloadCsv",
+        schema: z.string(),
+      }),
+      exportCsvFileName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "actions.downloadCsv",
         schema: z.string(),
       }),
     },
@@ -237,19 +296,34 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         returnCompanyId: "00000000-0000-4000-8000-000000000001",
-        returnCompanyName: "Demo Slovensko s.r.o.",
+        returnCompanyName: "Example GmbH",
+        country: "DE",
+        currency: "EUR",
+        filingFormat: "DE_USTVA",
+        smallBusinessExempt: false,
         returnPeriod: "2026-10",
         periodFrom: "2026-10-01",
         periodTo: "2026-10-31",
         lines: [
-          { line: "r03", amount: 800 },
-          { line: "r04", amount: 184 },
-          { line: "r32", amount: 184 },
+          {
+            line: "Kz 81",
+            label: "Steuerpflichtige Umsätze zum Steuersatz von 19 %",
+            base: 1000,
+            amount: 190,
+          },
+          {
+            line: "Kz 83",
+            label: "Verbleibende Umsatzsteuer-Vorauszahlung / Überschuss",
+            amount: 190,
+            isTotal: true,
+          },
         ],
-        sections: [{ section: "A1", count: 1 }],
+        sections: [],
         warnings: [],
-        kvXml: "<KVDPH_2025/>",
-        kvFileName: "KVDPH_SK2020273893_2026-10.xml",
+        kvXml: "<Elster/>",
+        kvFileName: "ELSTER_UStVA_DE_2026-10.xml",
+        exportCsv: "kennzahl;description;base_eur;tax_eur",
+        exportCsvFileName: "UStVA_DE_2026-10.csv",
       },
     },
   },

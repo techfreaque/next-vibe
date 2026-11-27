@@ -6,6 +6,7 @@ import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { Building } from "next-vibe/ui/components/icons/Building";
 import { Pre } from "next-vibe/ui/components/pre";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import {
   Select,
   SelectContent,
@@ -46,10 +47,10 @@ import { DocumentTextExportButton } from "@/finance/document-text-export";
 import type definition from "./definition";
 import { recentVatPeriods } from "./period";
 
-function useMoney(locale: string): (value: number) => string {
+function useMoney(locale: string, currency: string): (value: number) => string {
   const format = new Intl.NumberFormat(locale, {
     style: "currency",
-    currency: "EUR",
+    currency: currency || "EUR",
   });
   return (value: number) => format.format(value);
 }
@@ -70,7 +71,13 @@ export function VatReturnWidget({
   const period = form.watch("period");
   const [periods] = useState(() => recentVatPeriods(new Date()));
   const [showXml, setShowXml] = useState(false);
-  const money = useMoney(locale);
+
+  const prepared =
+    result?.returnCompanyId &&
+    (!companyId || result.returnCompanyId === companyId)
+      ? result
+      : undefined;
+  const money = useMoney(locale, prepared?.currency ?? "EUR");
   const monthName = new Intl.DateTimeFormat(locale, { month: "long" });
 
   const periodLabel = (value: string): string => {
@@ -89,21 +96,20 @@ export function VatReturnWidget({
     });
   };
 
-  const prepared =
-    result?.returnCompanyId &&
-    (!companyId || result.returnCompanyId === companyId)
-      ? result
-      : undefined;
-  const csv = prepared
-    ? [
-        "line;meaning;amount",
-        ...prepared.lines.map(
-          (line) =>
-            `${line.line};"${t(`lines.${line.line}`)}";${line.amount.toFixed(2)}`,
-        ),
-      ].join("\n")
-    : "";
-  const allZero = prepared?.lines.every((line) => line.amount === 0) ?? true;
+  const formatKey = prepared?.filingFormat ?? "GENERIC_VAT";
+  const hasBaseColumn =
+    prepared?.lines.some((line) => line.base !== undefined) ?? false;
+  const visibleLines = (prepared?.lines ?? []).filter(
+    (line) =>
+      line.amount !== 0 ||
+      (line.base !== undefined && line.base !== 0) ||
+      line.isTotal === true,
+  );
+  const allZero =
+    (prepared?.lines ?? []).every(
+      (line) => line.amount === 0 && (line.base ?? 0) === 0,
+    ) ?? true;
+  const hasXmlExport = Boolean(prepared?.kvXml && prepared?.kvFileName);
 
   return (
     <WidgetShell layout="page">
@@ -167,8 +173,18 @@ export function VatReturnWidget({
                 to: formatDocDate(prepared.periodTo, locale),
               })}
             </Span>
-            <Span className="text-xs text-muted-foreground">{t("due")}</Span>
+            <Span className="text-xs text-muted-foreground">
+              {t(`dueByFormat.${formatKey}`)}
+            </Span>
           </Div>
+
+          {prepared.smallBusinessExempt && (
+            <ResultBanner
+              variant="info"
+              title={t("smallBusiness.title")}
+              message={t(`smallBusiness.body.${formatKey}`)}
+            />
+          )}
 
           {prepared.warnings.map((warning) => (
             <Div
@@ -187,10 +203,12 @@ export function VatReturnWidget({
 
           <Div className="rounded-lg border bg-card">
             <Div className="flex flex-wrap items-center justify-between gap-2 border-b p-3">
-              <Span className="text-sm font-semibold">{t("lines.title")}</Span>
+              <Span className="text-sm font-semibold">
+                {t(`formats.${formatKey}`)}
+              </Span>
               <DocumentTextExportButton
-                filename={`DPH_${prepared.returnPeriod}.csv`}
-                content={csv}
+                filename={prepared.exportCsvFileName}
+                content={prepared.exportCsv}
                 mimeType="text/csv"
                 downloadLabel={t("actions.downloadCsv")}
                 copyLabel={t("actions.copy")}
@@ -204,101 +222,114 @@ export function VatReturnWidget({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-16">{t("lines.line")}</TableHead>
+                    <TableHead className="w-24">{t("lines.line")}</TableHead>
                     <TableHead>{t("lines.meaning")}</TableHead>
+                    {hasBaseColumn && (
+                      <TableHead className="text-right">
+                        {t("lines.base")}
+                      </TableHead>
+                    )}
                     <TableHead className="text-right">
                       {t("lines.amount")}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {prepared.lines
-                    .filter(
-                      (line) =>
-                        line.amount !== 0 ||
-                        line.line === "r32" ||
-                        line.line === "r33",
-                    )
-                    .map((line) => {
-                      const total =
-                        line.line === "r17" ||
-                        line.line === "r32" ||
-                        line.line === "r33";
-                      return (
-                        <TableRow key={line.line}>
-                          <TableCell className="font-mono text-xs">
-                            {line.line.slice(1)}
+                  {visibleLines.map((line) => {
+                    const total = Boolean(line.isTotal);
+                    return (
+                      <TableRow key={`${line.line}-${line.label ?? ""}`}>
+                        <TableCell className="font-mono text-xs whitespace-nowrap">
+                          {formatKey === "SK_DPH" && line.line.startsWith("r")
+                            ? line.line.slice(1)
+                            : line.line}
+                        </TableCell>
+                        <TableCell
+                          className={total ? "font-semibold" : undefined}
+                        >
+                          {line.label ?? line.line}
+                        </TableCell>
+                        {hasBaseColumn && (
+                          <TableCell className="text-right tabular-nums">
+                            {line.base !== undefined ? money(line.base) : ""}
                           </TableCell>
-                          <TableCell
-                            className={total ? "font-semibold" : undefined}
-                          >
-                            {t(`lines.${line.line}`)}
-                          </TableCell>
-                          <TableCell
-                            className={
-                              total
-                                ? "text-right font-semibold tabular-nums"
-                                : "text-right tabular-nums"
-                            }
-                          >
-                            {money(line.amount)}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                        )}
+                        <TableCell
+                          className={
+                            total
+                              ? "text-right font-semibold tabular-nums"
+                              : "text-right tabular-nums"
+                          }
+                        >
+                          {money(line.amount)}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             )}
           </Div>
 
-          <Div className="rounded-lg border bg-card">
-            <Div className="flex flex-wrap items-center justify-between gap-2 border-b p-3">
-              <Span className="text-sm font-semibold">
-                {t("sections.title")}
-              </Span>
-              <Div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setShowXml((open) => !open)}
-                >
-                  {showXml ? t("actions.hideXml") : t("actions.showXml")}
-                </Button>
-                <DocumentTextExportButton
-                  filename={prepared.kvFileName}
-                  content={prepared.kvXml}
-                  mimeType="application/xml"
-                  downloadLabel={t("actions.downloadKv")}
-                  copyLabel={t("actions.copy")}
-                  copiedLabel={t("actions.copied")}
-                  copyErrorLabel={t("actions.copyError")}
-                />
-              </Div>
-            </Div>
-            <Div className="grid gap-x-6 gap-y-1 p-3 @md:grid-cols-2">
-              {prepared.sections.map((section) => (
-                <Div
-                  key={section.section}
-                  className="flex items-center justify-between gap-3 py-1 text-sm"
-                >
-                  <Span
-                    className={
-                      section.count === 0 ? "text-muted-foreground" : undefined
-                    }
+          {hasXmlExport && (
+            <Div className="rounded-lg border bg-card">
+              <Div className="flex flex-wrap items-center justify-between gap-2 border-b p-3">
+                <Span className="text-sm font-semibold">
+                  {t(`xmlSection.${formatKey}`)}
+                </Span>
+                <Div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setShowXml((open) => !open)}
                   >
-                    {t(`sections.${section.section}`)}
-                  </Span>
-                  <Span className="tabular-nums">{section.count}</Span>
+                    {showXml ? t("actions.hideXml") : t("actions.showXml")}
+                  </Button>
+                  <DocumentTextExportButton
+                    filename={prepared.kvFileName}
+                    content={prepared.kvXml}
+                    mimeType="application/xml"
+                    downloadLabel={t("actions.downloadXml")}
+                    copyLabel={t("actions.copy")}
+                    copiedLabel={t("actions.copied")}
+                    copyErrorLabel={t("actions.copyError")}
+                  />
                 </Div>
-              ))}
+              </Div>
+              {prepared.sections.length > 0 ? (
+                <Div className="grid gap-x-6 gap-y-1 p-3 @md:grid-cols-2">
+                  {prepared.sections.map((section) => (
+                    <Div
+                      key={section.section}
+                      className="flex items-center justify-between gap-3 py-1 text-sm"
+                    >
+                      <Span
+                        className={
+                          section.count === 0
+                            ? "text-muted-foreground"
+                            : undefined
+                        }
+                      >
+                        {t(`sections.${section.section}`)}
+                      </Span>
+                      <Span className="tabular-nums">{section.count}</Span>
+                    </Div>
+                  ))}
+                </Div>
+              ) : (
+                <P className="p-3 text-sm text-muted-foreground">
+                  {t(`xmlNote.${formatKey}`)}
+                </P>
+              )}
+              {showXml && (
+                <Pre className="max-h-96 overflow-auto border-t p-3 text-xs">
+                  {prepared.kvXml}
+                </Pre>
+              )}
             </Div>
-            {showXml && (
-              <Pre className="max-h-96 overflow-auto border-t p-3 text-xs">
-                {prepared.kvXml}
-              </Pre>
-            )}
-          </Div>
+          )}
+
           <P className="text-xs text-muted-foreground">{t("disclaimer")}</P>
         </Div>
       ) : response?.success === false ? null : (

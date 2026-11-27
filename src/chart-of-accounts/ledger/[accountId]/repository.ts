@@ -47,6 +47,9 @@ export class CoaLedgerRepository {
         type: string;
         amount: number;
         currency: string;
+        functionalAmount: number | null;
+        functionalCurrency: string | null;
+        exchangeRate: number | null;
         runningBalance: number;
       }>;
       totalCount: number;
@@ -90,6 +93,9 @@ export class CoaLedgerRepository {
           type: journalEntryLines.type,
           amount: journalEntryLines.amount,
           currency: journalEntryLines.currency,
+          functionalAmount: journalEntryLines.functionalAmount,
+          functionalCurrency: journalEntryLines.functionalCurrency,
+          exchangeRate: journalEntryLines.exchangeRate,
           sortOrder: journalEntryLines.sortOrder,
           runningBalance: sql`sum(case
             when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount}
@@ -143,6 +149,9 @@ export class CoaLedgerRepository {
           type: movements.type,
           amount: movements.amount,
           currency: movements.currency,
+          functionalAmount: movements.functionalAmount,
+          functionalCurrency: movements.functionalCurrency,
+          exchangeRate: movements.exchangeRate,
           runningBalance: movements.runningBalance,
         })
         .from(movements)

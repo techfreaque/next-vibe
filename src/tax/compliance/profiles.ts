@@ -72,11 +72,12 @@ export interface CountryProfile {
   eInvoicing: {
     /** Day domestic B2B structured e-invoices become mandatory, if enacted. */
     mandatoryFrom: string | null;
+    formats: readonly ("peppol" | "xrechnung" | "sk-efaktura")[];
   };
-  /** Statutory VAT return layout, if the ERP can prepare it. */
-  vatReturn: "SK_DPH" | null;
-  /** Statutory financial statement layout, if available. */
-  statements: "SK_MUJ" | null;
+  /** Statutory VAT return layout prepared by the ERP for this country. */
+  vatReturn: "SK_DPH" | "DE_USTVA" | "AT_UVA" | "GENERIC";
+  /** Statutory financial statement layout prepared by the ERP. */
+  statements: "SK_MUJ" | "DE_HGB" | "AT_UGB" | "IFRS";
 }
 
 const ALL_TREATMENTS = [
@@ -194,7 +195,7 @@ const SK_PROFILE: CountryProfile = {
   identifiers: "SK",
   vatRegistration: { threshold: 50_000, immediateThreshold: 62_500 },
   fiscalReceipts: "EKASA",
-  eInvoicing: { mandatoryFrom: "2027-01-01" },
+  eInvoicing: { mandatoryFrom: "2027-01-01", formats: ["sk-efaktura"] },
   vatReturn: "SK_DPH",
   statements: "SK_MUJ",
 };
@@ -258,9 +259,12 @@ const DE_PROFILE: CountryProfile = {
   identifiers: "generic",
   vatRegistration: { threshold: null, immediateThreshold: null },
   fiscalReceipts: null,
-  eInvoicing: { mandatoryFrom: null },
-  vatReturn: null,
-  statements: null,
+  eInvoicing: {
+    mandatoryFrom: null,
+    formats: ["peppol", "xrechnung"],
+  },
+  vatReturn: "DE_USTVA",
+  statements: "DE_HGB",
 };
 
 const AT_PROFILE: CountryProfile = {
@@ -331,9 +335,9 @@ const AT_PROFILE: CountryProfile = {
   identifiers: "generic",
   vatRegistration: { threshold: null, immediateThreshold: null },
   fiscalReceipts: null,
-  eInvoicing: { mandatoryFrom: null },
-  vatReturn: null,
-  statements: null,
+  eInvoicing: { mandatoryFrom: null, formats: ["peppol"] },
+  vatReturn: "AT_UVA",
+  statements: "AT_UGB",
 };
 
 const GENERIC_PROFILE: CountryProfile = {
@@ -388,9 +392,9 @@ const GENERIC_PROFILE: CountryProfile = {
   identifiers: "generic",
   vatRegistration: { threshold: null, immediateThreshold: null },
   fiscalReceipts: null,
-  eInvoicing: { mandatoryFrom: null },
-  vatReturn: null,
-  statements: null,
+  eInvoicing: { mandatoryFrom: null, formats: ["peppol"] },
+  vatReturn: "GENERIC",
+  statements: "IFRS",
 };
 
 const PROFILES: Record<ProfileCountry, CountryProfile> = {

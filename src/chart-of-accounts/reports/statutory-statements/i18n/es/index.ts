@@ -74,7 +74,7 @@ export const translations: typeof enTranslations = {
     row: "Fila",
     marker: "Partida",
     label: "Denominación",
-    officialLabel: "Denominación oficial (SK)",
+    officialLabel: "Denominación oficial",
     current: "Periodo actual",
     previous: "Periodo anterior",
     currency: "Moneda",

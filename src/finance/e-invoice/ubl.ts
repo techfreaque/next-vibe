@@ -12,6 +12,11 @@ export const PEPPOL_CUSTOMIZATION_ID =
   "urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0";
 export const PEPPOL_PROFILE_ID = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
 
+export const XRECHNUNG_CUSTOMIZATION_ID =
+  "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0";
+
+export type UblProfile = "peppol" | "sk-efaktura" | "xrechnung";
+
 export type UblDocumentType = "INVOICE" | "CREDIT_NOTE";
 
 /** UNCL5305 VAT category codes used by EN 16931. */
@@ -28,6 +33,7 @@ export interface UblParty {
   taxId: string | null;
   vatNumber: string | null;
   email: string | null;
+  phone?: string | null;
 }
 
 /** A line as stored: lineTotal is gross, taxAmount is the line VAT. */
@@ -50,7 +56,7 @@ export interface UblInvoiceInput {
   supplyDate: string | null;
   currency: string | null;
   treatment: typeof VatTreatmentValue;
-  /** False when the issuer is not a VAT payer (category O). */
+  /** False when the issuer does not charge domestic VAT. */
   vatPayer: boolean;
   /** Legal notes printed on the document. */
   notes: readonly string[];
@@ -59,6 +65,9 @@ export interface UblInvoiceInput {
   buyerReference: string | null;
   originalInvoice: { number: string; issueDate: string | null } | null;
   iban: string | null;
+  bic?: string | null;
+  paymentUrl?: string | null;
+  smallBusinessExemption?: boolean;
   seller: UblParty;
   buyer: UblParty | null;
   /** Amounts as stored (credit notes carry negative amounts). */
@@ -71,13 +80,22 @@ export const UBL_FIELD_IDS = [
   "BT-2",
   "BT-5",
   "BT-9",
+  "BT-10",
   "BT-27",
   "BT-31",
   "BT-34",
+  "BT-35",
+  "BT-37",
+  "BT-38",
   "BT-40",
+  "BT-42",
+  "BT-43",
   "BT-44",
   "BT-48",
   "BT-49",
+  "BT-50",
+  "BT-52",
+  "BT-53",
   "BT-55",
   "BT-153",
   "BG-25",
@@ -228,15 +246,14 @@ export function ublEndpoint(
   if (!party) {
     return null;
   }
+  const country = party.country?.trim().toUpperCase() ?? null;
+  const taxId = compact(party.taxId);
   const vat = compact(party.vatNumber);
   const vatPrefix = vat?.slice(0, 2);
   if (vat && vatPrefix && VAT_EAS[vatPrefix]) {
     return { scheme: VAT_EAS[vatPrefix], id: vat };
   }
-  const country = party.country?.trim().toUpperCase() ?? null;
-  const taxId = compact(party.taxId);
-  if (country === "SK" && taxId) {
-    // DIČ, Slovakia (EAS 0245).
+  if (country === "SK" && taxId && /^\d{10}$/.test(taxId)) {
     return { scheme: "0245", id: taxId };
   }
   const registration = compact(party.registrationNumber);
@@ -276,7 +293,9 @@ function prepareLines(input: UblInvoiceInput): PreparedLine[] {
       taxCents,
       price,
       rate: line.taxRate,
-      category: ublTaxCategory(input.treatment, input.vatPayer, line.taxRate),
+      category: input.smallBusinessExemption
+        ? "E"
+        : ublTaxCategory(input.treatment, input.vatPayer, line.taxRate),
     };
   });
 }
@@ -331,7 +350,30 @@ function categoriesOf(input: UblInvoiceInput): Set<UblTaxCategory> {
 }
 
 /** Mandatory EN 16931 / Peppol fields that are missing for this document. */
-export function validateUblInput(input: UblInvoiceInput): UblFieldId[] {
+function documentEndpoint(
+  party: UblParty | null,
+  profile: UblProfile,
+): ReturnType<typeof ublEndpoint> {
+  const taxId = compact(party?.taxId);
+  if (
+    profile === "sk-efaktura" &&
+    party?.country?.trim().toUpperCase() === "SK" &&
+    taxId &&
+    /^\d{10}$/.test(taxId)
+  ) {
+    return { scheme: "0245", id: taxId };
+  }
+  const email = clean(party?.email);
+  if (profile === "xrechnung" && email) {
+    return { scheme: "EM", id: email };
+  }
+  return ublEndpoint(party);
+}
+
+export function validateUblInput(
+  input: UblInvoiceInput,
+  profile: UblProfile = "peppol",
+): UblFieldId[] {
   const missing: UblFieldId[] = [];
   const categories = categoriesOf(input);
   const needsSellerVat = [...categories].some((c) => c !== "O");
@@ -351,13 +393,38 @@ export function validateUblInput(input: UblInvoiceInput): UblFieldId[] {
       ublTotals(input).payableCents > 0,
   );
   add("BT-27", !clean(input.seller.name));
-  add("BT-31", needsSellerVat && !compact(input.seller.vatNumber));
-  add("BT-34", !ublEndpoint(input.seller));
+  const sellerTaxRegistration =
+    categories.has("E") || categories.has("S") || categories.has("AE");
+  add(
+    "BT-31",
+    needsSellerVat &&
+      !compact(input.seller.vatNumber) &&
+      !(sellerTaxRegistration && clean(input.seller.taxId)),
+  );
+  add("BT-34", !documentEndpoint(input.seller, profile));
   add("BT-40", !clean(input.seller.country));
   add("BT-44", !clean(input.buyer?.name));
   add("BT-48", needsBuyerVat && !compact(input.buyer?.vatNumber));
-  add("BT-49", !ublEndpoint(input.buyer));
+  add("BT-49", !documentEndpoint(input.buyer, profile));
   add("BT-55", !clean(input.buyer?.country));
+  const domesticSk =
+    profile === "sk-efaktura" && input.buyer?.country?.toUpperCase() === "SK";
+  const domesticDe =
+    input.seller.country?.toUpperCase() === "DE" &&
+    input.buyer?.country?.toUpperCase() === "DE";
+  if (profile === "xrechnung" || domesticDe || domesticSk) {
+    add("BT-35", !clean(input.seller.addressLine1));
+    add("BT-37", !clean(input.seller.city));
+    add("BT-38", !clean(input.seller.postalCode));
+    add("BT-50", !clean(input.buyer?.addressLine1));
+    add("BT-52", !clean(input.buyer?.city));
+    add("BT-53", !clean(input.buyer?.postalCode));
+  }
+  if (profile === "xrechnung" || domesticDe) {
+    add("BT-42", !clean(input.seller.phone));
+    add("BT-43", !clean(input.seller.email));
+  }
+  add("BT-10", profile === "xrechnung" && !clean(input.buyerReference));
   add("BG-25", input.lines.length === 0);
   add(
     "BT-153",
@@ -389,8 +456,13 @@ function amount(tag: string, centsValue: number, currency: string): string {
   return `<${tag} currencyID="${escapeXml(currency)}">${money(centsValue)}</${tag}>`;
 }
 
-function partyNode(value: UblParty | null, includeVat: boolean): Node {
-  const endpoint = ublEndpoint(value);
+function partyNode(
+  value: UblParty | null,
+  profile: UblProfile,
+  includeVat: boolean,
+  seller = false,
+): Node {
+  const endpoint = documentEndpoint(value, profile);
   const vat = compact(value?.vatNumber);
   const name = clean(value?.name);
   return wrap("cac:Party", [
@@ -413,13 +485,27 @@ function partyNode(value: UblParty | null, includeVat: boolean): Node {
           "<cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>",
         ])
       : null,
+    seller && includeVat
+      ? wrap("cac:PartyTaxScheme", [
+          clean(value?.taxId) ? el("cbc:CompanyID", value?.taxId) : null,
+          clean(value?.taxId)
+            ? "<cac:TaxScheme><cbc:ID>FC</cbc:ID></cac:TaxScheme>"
+            : null,
+        ])
+      : null,
     name
       ? wrap("cac:PartyLegalEntity", [
           el("cbc:RegistrationName", name),
           el("cbc:CompanyID", compact(value?.registrationNumber)),
         ])
       : null,
-    wrap("cac:Contact", [el("cbc:ElectronicMail", value?.email)]),
+    seller
+      ? wrap("cac:Contact", [
+          el("cbc:Name", value?.name),
+          el("cbc:Telephone", value?.phone),
+          el("cbc:ElectronicMail", value?.email),
+        ])
+      : null,
   ]);
 }
 
@@ -445,7 +531,10 @@ function taxCategory(
 }
 
 /** Builds the Peppol BIS 3.0 Invoice or CreditNote XML. */
-export function buildUblInvoice(input: UblInvoiceInput): string {
+export function buildUblInvoice(
+  input: UblInvoiceInput,
+  profile: UblProfile = "peppol",
+): string {
   const isCredit = input.documentType === "CREDIT_NOTE";
   const root = isCredit ? "CreditNote" : "Invoice";
   const currency = clean(input.currency)?.toUpperCase() ?? "EUR";
@@ -465,7 +554,12 @@ export function buildUblInvoice(input: UblInvoiceInput): string {
     : "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
 
   const header: Node[] = [
-    el("cbc:CustomizationID", PEPPOL_CUSTOMIZATION_ID),
+    el(
+      "cbc:CustomizationID",
+      profile === "xrechnung"
+        ? XRECHNUNG_CUSTOMIZATION_ID
+        : PEPPOL_CUSTOMIZATION_ID,
+    ),
     el("cbc:ProfileID", PEPPOL_PROFILE_ID),
     el("cbc:ID", input.number),
     el("cbc:IssueDate", input.issueDate),
@@ -487,7 +581,10 @@ export function buildUblInvoice(input: UblInvoiceInput): string {
   }
   header.push(
     el("cbc:DocumentCurrencyCode", currency),
-    el("cbc:BuyerReference", input.buyerReference ?? input.number),
+    el(
+      "cbc:BuyerReference",
+      input.buyerReference ?? (profile === "xrechnung" ? null : input.number),
+    ),
     input.originalInvoice
       ? wrap("cac:BillingReference", [
           wrap("cac:InvoiceDocumentReference", [
@@ -496,8 +593,12 @@ export function buildUblInvoice(input: UblInvoiceInput): string {
           ]),
         ])
       : null,
-    wrap("cac:AccountingSupplierParty", [partyNode(input.seller, includeVat)]),
-    wrap("cac:AccountingCustomerParty", [partyNode(input.buyer, includeVat)]),
+    wrap("cac:AccountingSupplierParty", [
+      partyNode(input.seller, profile, includeVat, true),
+    ]),
+    wrap("cac:AccountingCustomerParty", [
+      partyNode(input.buyer, profile, includeVat),
+    ]),
     supplyDate
       ? wrap("cac:Delivery", [
           el("cbc:ActualDeliveryDate", supplyDate),
@@ -515,13 +616,37 @@ export function buildUblInvoice(input: UblInvoiceInput): string {
             : null,
         ])
       : null,
-    iban
+    iban ||
+      input.paymentUrl ||
+      (!isCredit &&
+        (profile === "xrechnung" ||
+          (input.seller.country === "DE" && input.buyer?.country === "DE")))
       ? wrap("cac:PaymentMeans", [
-          el("cbc:PaymentMeansCode", currency === "EUR" ? "58" : "30"),
-          isCredit ? el("cbc:PaymentDueDate", input.dueDate) : null,
+          el(
+            "cbc:PaymentMeansCode",
+            iban
+              ? currency === "EUR"
+                ? "58"
+                : "30"
+              : input.paymentUrl
+                ? "48"
+                : "1",
+          ),
           el("cbc:PaymentID", input.number),
-          wrap("cac:PayeeFinancialAccount", [el("cbc:ID", iban)]),
+          iban
+            ? wrap("cac:PayeeFinancialAccount", [
+                el("cbc:ID", iban),
+                clean(input.bic)
+                  ? wrap("cac:FinancialInstitutionBranch", [
+                      el("cbc:ID", input.bic),
+                    ])
+                  : null,
+              ])
+            : null,
         ])
+      : null,
+    !isCredit && input.paymentUrl
+      ? wrap("cac:PaymentTerms", [el("cbc:Note", input.paymentUrl)])
       : null,
     wrap("cac:TaxTotal", [
       amount("cbc:TaxAmount", totals.taxCents, currency),

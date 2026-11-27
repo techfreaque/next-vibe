@@ -55,6 +55,12 @@ export interface SmtpSelectionCriteria {
   language: Languages;
 }
 
+export interface SmtpAttachment {
+  filename: string;
+  content: Buffer;
+  contentType: string;
+}
+
 export interface SmtpSendParams {
   to: string;
   toName?: string;
@@ -68,6 +74,7 @@ export interface SmtpSendParams {
   skipRateLimitCheck?: boolean;
   leadId?: string;
   campaignId?: string;
+  attachments?: SmtpAttachment[];
 }
 
 export interface SmtpSendResult {
@@ -833,12 +840,23 @@ export class SmtpRepository {
       );
 
       const resolvedSenderName = account.fromName ?? params.senderName;
+      const preparedLogo = await prepareSmtpEmailLogo(params.html);
+      const mergedAttachments = [
+        ...(preparedLogo.attachments ?? []),
+        ...(params.attachments ?? []).map((att) => ({
+          filename: att.filename,
+          content: att.content,
+          contentType: att.contentType,
+        })),
+      ];
       const result = await transport.sendMail({
         from: `${resolvedSenderName} <${account.fromEmail}>`,
         to: params.toName ? `${params.toName} <${params.to}>` : params.to,
         replyTo: params.replyTo,
         subject: params.subject,
-        ...(await prepareSmtpEmailLogo(params.html)),
+        html: preparedLogo.html,
+        attachments:
+          mergedAttachments.length > 0 ? mergedAttachments : undefined,
         text: resolvePlainText(params.html, params.text),
         headers,
       });

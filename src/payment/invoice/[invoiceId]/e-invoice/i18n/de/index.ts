@@ -1,13 +1,18 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "E-Rechnung (Peppol)",
+  title: "E-Rechnung",
   titleShort: "E-Rechnung",
   description:
     "Exportieren Sie eine ausgestellte Rechnung oder Gutschrift als Peppol-BIS-Billing-3.0-Datei (UBL, EN 16931).",
   invoiceId: {
     label: "Rechnung",
     description: "Die ausgestellte Rechnung oder Gutschrift für den Export",
+  },
+  buyerReference: {
+    label: "Käuferreferenz",
+    description:
+      "Tragen Sie die Referenz des Empfängers ein. Bei deutschen Behörden ist das die Leitweg-ID.",
   },
   response: {
     invoiceNumber: "Belegnummer",
@@ -18,6 +23,12 @@ export const translations: typeof enTranslations = {
     xml: "XML",
   },
   widget: {
+    peppol: "Peppol-XML herunterladen",
+    slovak: "eFaktúra-XML herunterladen",
+    xrechnung: "XRechnung als XML",
+    send: "Über Peppol senden",
+    providerNeeded:
+      "Verbinden Sie einen zertifizierten Peppol-Zugangspunkt und registrieren Sie die Peppol-ID des Rechnungsausstellers.",
     back: "Zurück",
     submit: "E-Rechnung erstellen",
     invoice: "Rechnung {{number}}",
@@ -32,6 +43,15 @@ export const translations: typeof enTranslations = {
     disclaimer: "Wir liefern Werkzeuge, keine Steuerberatung.",
   },
   fields: {
+    bt10: "Käuferreferenz",
+    bt35: "Straße des Rechnungsausstellers",
+    bt37: "Ort des Rechnungsausstellers",
+    bt38: "Postleitzahl des Rechnungsausstellers",
+    bt42: "Telefon des Rechnungsausstellers",
+    bt43: "E-Mail des Rechnungsausstellers",
+    bt50: "Straße des Empfängers",
+    bt52: "Ort des Empfängers",
+    bt53: "Postleitzahl des Empfängers",
     bt1: "Belegnummer",
     bt2: "Ausstellungsdatum",
     bt5: "Währung",

@@ -33,7 +33,11 @@ import { documentLineContext } from "@/finance/document-action-confirm";
 import { DocumentLineItems } from "@/finance/document-line-items";
 import { documentStatusVariant } from "@/finance/document-status";
 import { InvoiceStatus } from "@/payment/enum";
+import invoiceCheckoutDefinitions from "@/payment/invoice/[invoiceId]/checkout/definition";
+import invoiceDeliverDefinitions from "@/payment/invoice/[invoiceId]/deliver/definition";
 import invoiceDuplicateDefinitions from "@/payment/invoice/[invoiceId]/duplicate/definition";
+import invoiceEInvoiceDefinitions from "@/payment/invoice/[invoiceId]/e-invoice/definition";
+import invoicePdfDefinitions from "@/payment/invoice/[invoiceId]/pdf/definition";
 import invoiceRecordPaymentDefinitions from "@/payment/invoice/[invoiceId]/record-payment/definition";
 import invoiceReversePaymentDefinitions from "@/payment/invoice/[invoiceId]/reverse-payment/definition";
 import invoiceSendDefinitions from "@/payment/invoice/[invoiceId]/send/definition";
@@ -236,12 +240,45 @@ export function InvoiceGetWidget({
     }
   }
 
+  const eInvoiceT =
+    invoiceEInvoiceDefinitions.GET.scopedTranslation.scopedT(locale).t;
   const { t: shareT } =
     invoiceSendDefinitions.GET.scopedTranslation.scopedT(locale);
   const { t: duplicateT } =
     invoiceDuplicateDefinitions.POST.scopedTranslation.scopedT(locale);
   const { t: removeLineT } =
     invoiceLineRemoveDefinitions.POST.scopedTranslation.scopedT(locale);
+  const { t: deliveryT } =
+    invoicePdfDefinitions.GET.scopedTranslation.scopedT(locale);
+  const { t: checkoutT } =
+    invoiceCheckoutDefinitions.POST.scopedTranslation.scopedT(locale);
+  const openPdf = (): void => {
+    navigate(invoicePdfDefinitions.GET, {
+      urlPathParams: { invoiceId: data.id },
+      renderInModal: true,
+    });
+  };
+  const openCheckoutLink = (): void => {
+    navigate(invoiceCheckoutDefinitions.POST, {
+      urlPathParams: { invoiceId: data.id },
+      renderInModal: true,
+    });
+  };
+  const openEmailDeliver = (): void => {
+    navigate(invoiceDeliverDefinitions.POST, {
+      urlPathParams: { invoiceId: data.id },
+      renderInModal: true,
+      data: {
+        recipientName: data.customerName ?? undefined,
+        isResend: false,
+      },
+    });
+  };
+  const openDeliveryLog = (): void => {
+    navigate(invoiceDeliverDefinitions.GET, {
+      urlPathParams: { invoiceId: data.id },
+    });
+  };
   const canDuplicate = data.canManage && totalAmount > 0 && !isDraft;
   const handleDuplicate = (): void => {
     void import("./definition").then((getDef) =>
@@ -291,6 +328,26 @@ export function InvoiceGetWidget({
       {canDuplicate && (
         <Button type="button" variant="outline" onClick={handleDuplicate}>
           {duplicateT("widget.duplicate")}
+        </Button>
+      )}
+      {!isVoid && (
+        <Button type="button" variant="outline" onClick={openPdf}>
+          {deliveryT("pdf.downloadAction")}
+        </Button>
+      )}
+      {canShare && (
+        <Button type="button" variant="outline" onClick={openEmailDeliver}>
+          {deliveryT("deliver.sendAction")}
+        </Button>
+      )}
+      {canShare && (
+        <Button type="button" variant="outline" onClick={openDeliveryLog}>
+          {deliveryT("deliver.logTitle")}
+        </Button>
+      )}
+      {data.canManage && hasBalance && (
+        <Button type="button" variant="outline" onClick={openCheckoutLink}>
+          {checkoutT("checkout.action")}
         </Button>
       )}
       {data.canManage && isOverdue && (
@@ -407,6 +464,20 @@ export function InvoiceGetWidget({
                 }
               >
                 {shareT("delivery.share")}
+              </Button>
+            )}
+            {isInteractive && !isDraft && !isVoid && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  navigate(invoiceEInvoiceDefinitions.GET, {
+                    urlPathParams: { invoiceId: data.id },
+                    renderInModal: true,
+                  })
+                }
+              >
+                {eInvoiceT("titleShort")}
               </Button>
             )}
             {secondaryActions}

@@ -54,6 +54,7 @@ export async function applyStockMovement(
     quantityReserved: number;
     quantityAvailable: number;
     unitCost: number | null;
+    negativeStockWarning: boolean;
   }>
 > {
   if (!tx) {
@@ -81,7 +82,10 @@ export async function applyStockMovement(
 
   // Lock the warehouse even for its first stock row, when there is no level to lock yet.
   const [warehouse] = await tx
-    .select({ companyId: warehouses.companyId })
+    .select({
+      companyId: warehouses.companyId,
+      negativeStockPolicy: warehouses.negativeStockPolicy,
+    })
     .from(warehouses)
     .where(
       and(
@@ -127,21 +131,34 @@ export async function applyStockMovement(
       ),
     )
     .for("update");
-  if (
+  const wouldGoNegative =
     quantity < 0 &&
     Math.round((level?.onHand ?? 0) * 10_000) -
       Math.round((level?.reserved ?? 0) * 10_000) +
       quantityUnits <
-      0
-  ) {
-    return invalid;
+      0;
+  let negativeStockWarning = false;
+  if (wouldGoNegative) {
+    if (warehouse.negativeStockPolicy === "BLOCK") {
+      return invalid;
+    }
+    if (warehouse.negativeStockPolicy === "WARN") {
+      negativeStockWarning = true;
+      opts.logger.warn("Stock level went negative under WARN policy", {
+        warehouseId,
+        productId,
+        quantity,
+      });
+    }
   }
 
   const cost =
     quantity > 0 && unitCost !== undefined
-      ? sql`case when ${stockLevels.unitCost} is null or ${stockLevels.quantityOnHand} = 0 then ${unitCost}::numeric
+      ? sql`case when ${stockLevels.unitCost} is null or ${stockLevels.quantityOnHand} <= 0 then ${unitCost}::numeric
       else (${stockLevels.quantityOnHand} * ${stockLevels.unitCost} + ${quantity}::numeric * ${unitCost}::numeric) / (${stockLevels.quantityOnHand} + ${quantity}::numeric) end`
       : stockLevels.unitCost;
+  const movementUnitCost =
+    quantity < 0 ? (level?.unitCost ?? null) : (unitCost ?? null);
   const [saved] = await tx
     .insert(stockLevels)
     .values({ warehouseId, productId, quantityOnHand: quantity, unitCost })
@@ -165,7 +182,7 @@ export async function applyStockMovement(
     productId,
     type: opts.type,
     quantity,
-    unitCost: quantity < 0 ? level?.unitCost : unitCost,
+    unitCost: movementUnitCost,
     reference: opts.reference,
     sourceId: opts.sourceId,
     sourceType: opts.sourceType,
@@ -175,6 +192,8 @@ export async function applyStockMovement(
   return success({
     movementId,
     ...saved,
+    unitCost: movementUnitCost ?? saved.unitCost,
+    negativeStockWarning,
     quantityAvailable:
       (Math.round(saved.quantityOnHand * 10_000) -
         Math.round(saved.quantityReserved * 10_000)) /

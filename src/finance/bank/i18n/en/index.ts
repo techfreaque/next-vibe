@@ -129,6 +129,10 @@ export const translations = {
     preview: "Preview (first 5 transactions)",
     matchRow: "Match",
     unmatched: "Unmatched",
+    matched: "Matched",
+    allLines: "All",
+    splitMatched: "Split",
+    selectAccount: "Open account",
     csvHelp:
       "Choose a bank export or map the CSV columns. Booking date and signed amount are required.",
     unsupported:
@@ -209,6 +213,76 @@ export const translations = {
     journalMatch:
       "Choose an unmatched posted journal line for the same bank account, amount and currency.",
     confirmation: "Confirm the match before submitting.",
+    splitTotalMismatch:
+      "Split allocations must add up to the exact bank line amount.",
+    splitTargetInvalid:
+      "Check that each selected invoice, bill or account belongs to this company and matches the line direction.",
+  },
+  reconciliation: {
+    statusTitle: "Reconciliation status",
+    accountsTitle: "Bank accounts status",
+    unmatchedLines: "Unmatched",
+    matchedLines: "Matched",
+    statementNet: "Statement net",
+    ledgerBalance: "Ledger balance",
+    difference: "Difference",
+  },
+  autoMatch: {
+    title: "Auto-match bank lines",
+    description:
+      "Match open bank lines against invoices, bills and posted payments using amount, reference, IBAN, date window and FX tolerance.",
+    success: "Auto-match completed",
+    action: "Auto-match",
+    dryRun: "Preview only",
+    previewAction: "Preview matches",
+    applyAction: "Apply matches",
+    previewBanner: "Preview found {{count}} unambiguous matches.",
+    appliedBanner: "Matched {{count}} bank lines automatically.",
+    skippedHint: "{{count}} ambiguous lines skipped for manual review.",
+    matchedCount: "Matched",
+    invoiceMatches: "Invoices",
+    billMatches: "Bills",
+    journalMatches: "Journal lines",
+    skippedAmbiguous: "Ambiguous skipped",
+    items: "Matched items",
+    targetType: "Type",
+    targetLabel: "Matched target",
+    basisLabel: "Match basis",
+    emptyTitle: "No automatic matches found",
+    emptyHint:
+      "Review unmatched lines manually or adjust your matching date window and FX settings.",
+    targets: {
+      journal_line: "Journal line",
+      invoice: "Invoice",
+      bill: "Bill",
+    },
+    basis: {
+      reference: "Document reference",
+      iban: "IBAN",
+      amount_date: "Amount and date",
+      fx_tolerance: "FX or fee tolerance",
+    },
+  },
+  split: {
+    title: "Split bank line",
+    description:
+      "Allocate one bank statement line across multiple invoices, bills, accounts or journal lines.",
+    success: "Bank line split and reconciled",
+    openAction: "Split / allocate",
+    allocations: "Split allocations",
+    count: "Allocations",
+    remaining: "Remaining to allocate",
+    selectTarget: "Select target",
+    addRow: "Add split row",
+    removeRow: "Remove",
+    confirmAction: "Confirm split",
+    documentCandidates: "Open invoices and bills",
+    types: {
+      journal_line: "Journal line",
+      invoice: "Open invoice",
+      bill: "Open bill",
+      account: "Ledger account",
+    },
   },
   import: {
     title: "Import bank statement",

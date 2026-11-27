@@ -18,7 +18,7 @@ const logger = createEndpointLogger(false, defaultLocale);
 beforeAll(async () => {
   await pg.exec(`CREATE TABLE company_members(id uuid,company_id uuid,user_id uuid,role text,is_active boolean,invited_by_user_id uuid,joined_at timestamp,created_at timestamp,updated_at timestamp);
  CREATE TABLE companies(id uuid PRIMARY KEY,is_active boolean,currency text);
- CREATE TABLE warehouses(id uuid PRIMARY KEY,company_id uuid,is_active boolean,name text);
+ CREATE TABLE warehouses(id uuid PRIMARY KEY,company_id uuid,is_active boolean,name text,negative_stock_policy text NOT NULL DEFAULT 'BLOCK');
  CREATE TABLE catalog_products(id uuid PRIMARY KEY,company_id uuid,owner_user_id uuid,name text);
  CREATE TABLE stock_levels(id uuid PRIMARY KEY default gen_random_uuid(),warehouse_id uuid,product_id uuid,quantity_on_hand numeric,quantity_reserved numeric,quantity_on_order numeric default 0,reorder_point numeric,unit_cost numeric,updated_at timestamp default now());
  CREATE TABLE warehouse_transfers(id uuid PRIMARY KEY,company_id uuid,status text);

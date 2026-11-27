@@ -178,7 +178,26 @@ export function CoaLedgerWidget(): JSX.Element {
                       )}
                     </TableCell>
                     <TableCell className="text-right tabular-nums whitespace-nowrap">
-                      {formatMoney(line.amount, line.currency, formatLocale)}
+                      <Div className="flex flex-col items-end">
+                        <Span>
+                          {formatMoney(
+                            line.amount,
+                            line.currency,
+                            formatLocale,
+                          )}
+                        </Span>
+                        {line.functionalAmount !== null &&
+                          line.functionalCurrency &&
+                          line.functionalCurrency !== line.currency && (
+                            <Span className="text-xs text-muted-foreground">
+                              {formatMoney(
+                                line.functionalAmount,
+                                line.functionalCurrency,
+                                formatLocale,
+                              )}
+                            </Span>
+                          )}
+                      </Div>
                     </TableCell>
                     <TableCell className="text-right tabular-nums whitespace-nowrap font-medium">
                       {formatMoney(

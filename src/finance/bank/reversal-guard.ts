@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { journalEntryLines } from "@/chart-of-accounts/db";
 import type { LedgerTransaction } from "@/chart-of-accounts/shared/ledger-write";
 
-import { bankStatementLines } from "./db";
+import { bankStatementLines, bankStatementLineSplits } from "./db";
 
 /** Call while the company lock serializes matches, release and source reversal. */
 export async function hasMatchedBankJournalEntry(
@@ -27,5 +27,22 @@ export async function hasMatchedBankJournalEntry(
       ),
     )
     .limit(1);
-  return !!statement;
+  if (statement) {
+    return true;
+  }
+  const [split] = await tx
+    .select({ id: bankStatementLineSplits.id })
+    .from(bankStatementLineSplits)
+    .innerJoin(
+      journalEntryLines,
+      eq(journalEntryLines.id, bankStatementLineSplits.journalLineId),
+    )
+    .where(
+      and(
+        eq(bankStatementLineSplits.companyId, companyId),
+        eq(journalEntryLines.journalEntryId, journalEntryId),
+      ),
+    )
+    .limit(1);
+  return !!split;
 }

@@ -45,6 +45,11 @@ export const translations: typeof enTranslations = {
       received: "Recibidos",
       cancelled: "Cancelada",
     },
+    negativeStockPolicy: {
+      block: "Bloquear stock negativo",
+      warn: "Permitir con aviso",
+      allow: "Permitir stock negativo",
+    },
   },
 
   // Warehouse create
@@ -88,6 +93,11 @@ export const translations: typeof enTranslations = {
         label: "Almacén predeterminado",
         description:
           "Establecer como el almacén predeterminado de esta empresa",
+      },
+      negativeStockPolicy: {
+        label: "Política de stock negativo",
+        description:
+          "Comportamiento de las ventas en caja y salidas cuando el stock es insuficiente",
       },
       errors: {
         validation: {
@@ -138,6 +148,7 @@ export const translations: typeof enTranslations = {
         companyId: "Empresa",
         isActive: "Activa",
         isDefault: "Predeterminado",
+        negativeStockPolicy: "Política de stock negativo",
       },
     },
   },
@@ -292,6 +303,7 @@ export const translations: typeof enTranslations = {
         address: "Dirección",
         isActive: "Activa",
         isDefault: "Predeterminado",
+        negativeStockPolicy: "Política de stock negativo",
         createdAt: "Creado en",
         updatedAt: "Actualizado en",
       },
@@ -335,6 +347,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Almacén predeterminado",
         description: "Establecer como almacén predeterminado",
+      },
+      negativeStockPolicy: {
+        label: "Política de stock negativo",
+        description:
+          "Comportamiento de las ventas en caja y salidas cuando el stock es insuficiente",
       },
       errors: {
         validation: {
@@ -384,6 +401,7 @@ export const translations: typeof enTranslations = {
         code: "Código",
         isActive: "Activa",
         isDefault: "Predeterminado",
+        negativeStockPolicy: "Política de stock negativo",
       },
     },
   },

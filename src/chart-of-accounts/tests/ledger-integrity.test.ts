@@ -68,7 +68,10 @@ beforeAll(async () => {
     company_id uuid,
     matched_journal_line_id uuid
   );
-  CREATE TABLE companies (id uuid PRIMARY KEY, currency text, name text, is_active boolean NOT NULL DEFAULT true);
+    CREATE TABLE companies (
+      id uuid PRIMARY KEY, currency text, name text,
+      country text NOT NULL DEFAULT 'GLOBAL', is_active boolean NOT NULL DEFAULT true
+    );
     CREATE TABLE company_members (company_id uuid, user_id uuid, is_active boolean);
     CREATE TABLE payment_invoices (id uuid PRIMARY KEY, company_id uuid, amount numeric(10,2), currency text, status text, metadata jsonb);
     CREATE TABLE payment_bills (id uuid PRIMARY KEY, company_id uuid, total numeric(10,2), currency text, status text, paid_at timestamp);
@@ -101,8 +104,14 @@ beforeAll(async () => {
       journal_entry_id uuid NOT NULL REFERENCES journal_entries(id),
       account_id uuid NOT NULL REFERENCES account_nodes(id), type text NOT NULL,
       amount numeric(14, 4) NOT NULL,
+      functional_amount numeric(14, 4), functional_currency text,
+      exchange_rate numeric(16, 8),
       description text CHECK (description <> 'reject-this-line'),
       currency text NOT NULL, sort_order integer NOT NULL DEFAULT 0, created_at timestamp DEFAULT now()
+    );
+    CREATE TABLE bank_statement_line_splits (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), company_id uuid NOT NULL,
+      journal_line_id uuid REFERENCES journal_entry_lines(id)
     );
     INSERT INTO companies (id, currency, name) VALUES
       ('${companyId}', 'EUR', 'Alpha Company'), ('${otherCompanyId}', 'EUR', 'Beta Company');
@@ -538,6 +547,31 @@ test("financial reports keep historic currencies separate and carry unclosed ear
   expect(nominal).toMatchObject({
     success: true,
     data: { reportCurrency: "USD", netProfit: 4.125 },
+  });
+
+  await pg.query(
+    "update journal_entry_lines set functional_amount = 3.3, functional_currency = 'EUR', exchange_rate = 0.8 where journal_entry_id = $1",
+    [id(61)],
+  );
+  const functional = await ProfitLossRepository.getProfitLoss(
+    { companyId, from: new Date("2026-02-04"), to: new Date("2026-02-04") },
+    logger,
+    user,
+    defaultLocale,
+  );
+  expect(functional).toMatchObject({
+    success: true,
+    data: { reportCurrency: "EUR", netProfit: 3.3 },
+  });
+  const valuedLedger = await TrialBalanceRepository.getTrialBalance(
+    scope,
+    logger,
+    user,
+    defaultLocale,
+  );
+  expect(valuedLedger).toMatchObject({
+    success: true,
+    data: { reportCurrency: "EUR" },
   });
 
   // A closing entry moves the earnings to an equity account exactly once.

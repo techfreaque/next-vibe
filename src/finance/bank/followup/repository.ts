@@ -39,7 +39,7 @@ import { billDueDateFromTerms } from "@/payment/bill/create/dates";
 import { paymentBillLines, paymentBills } from "@/payment/db";
 import { purchasingVendors } from "@/purchasing/db";
 
-import { bankStatementLines } from "../db";
+import { bankStatementLines, bankStatementLineSplits } from "../db";
 import { type BankT, scopedTranslation } from "../i18n";
 import { bankUnits } from "../reconciliation-plan";
 import { hasSupplierBillCandidate } from "./bill-provenance";
@@ -109,7 +109,7 @@ export class BankFollowupRepository {
     userId: string,
     t: BankT,
   ): Promise<ResponseType<BankFollowupOutput>> {
-    if (!statement.matchedJournalLineId) {
+    if (!statement.matchedJournalLineId && !statement.matchedAt) {
       return success({
         released: true,
         billId: null,
@@ -117,7 +117,8 @@ export class BankFollowupRepository {
       });
     }
     if (
-      data.expectedJournalLineId !== statement.matchedJournalLineId ||
+      (statement.matchedJournalLineId &&
+        data.expectedJournalLineId !== statement.matchedJournalLineId) ||
       !statement.matchedAt ||
       data.expectedMatchedAt !== statement.matchedAt.toISOString() ||
       !data.reason
@@ -183,6 +184,9 @@ export class BankFollowupRepository {
       reversalId = reversal.id;
     }
 
+    await tx
+      .delete(bankStatementLineSplits)
+      .where(eq(bankStatementLineSplits.bankStatementLineId, statement.id));
     await tx
       .update(bankStatementLines)
       .set({

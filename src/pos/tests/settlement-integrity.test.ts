@@ -64,7 +64,7 @@ beforeAll(async () => {
       account_id uuid NOT NULL REFERENCES account_nodes(id), type text NOT NULL,
       amount numeric(14, 4) NOT NULL,
       description text CHECK (description <> 'reject-this-line'),
-      currency text NOT NULL, sort_order integer NOT NULL DEFAULT 0, created_at timestamp DEFAULT now()
+      currency text NOT NULL, functional_amount numeric(14, 4), functional_currency text, exchange_rate numeric(18, 8), sort_order integer NOT NULL DEFAULT 0, created_at timestamp DEFAULT now()
     );
 
  CREATE TABLE pos_terminals(id uuid PRIMARY KEY, company_id uuid,cash_account_node_id uuid,warehouse_id uuid,currency text,name text DEFAULT 'Counter');
@@ -73,7 +73,7 @@ beforeAll(async () => {
  CREATE TABLE pos_order_items(id uuid PRIMARY KEY default gen_random_uuid(),order_id uuid,product_id uuid,description text,quantity numeric,unit_price numeric,tax_rate numeric,tax_amount numeric,line_total numeric,sort_order int,created_at timestamp,updated_at timestamp);
  CREATE TABLE pos_payments(id uuid PRIMARY KEY default gen_random_uuid(),order_id uuid,method text,amount numeric,change numeric,account_node_id uuid,reference text,created_at timestamp default now());
  CREATE TABLE pos_refunds(id uuid PRIMARY KEY default gen_random_uuid(),order_id uuid,session_id uuid,method text,currency text,total numeric,created_at timestamp default now());
- CREATE TABLE warehouses(id uuid PRIMARY KEY, company_id uuid NOT NULL, is_active boolean NOT NULL);
+ CREATE TABLE warehouses(id uuid PRIMARY KEY, company_id uuid NOT NULL, is_active boolean NOT NULL, negative_stock_policy text NOT NULL DEFAULT 'BLOCK');
  CREATE TABLE catalog_products(id uuid PRIMARY KEY, company_id uuid, owner_user_id uuid, type text NOT NULL);
  CREATE TABLE stock_levels(
    id uuid PRIMARY KEY default gen_random_uuid(), warehouse_id uuid NOT NULL,

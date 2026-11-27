@@ -1,26 +1,75 @@
 export const translations = {
   tags: { tax: "Tax", vatReturn: "VAT return" },
-  title: "Slovak VAT return and control statement",
-  titleShort: "VAT return (SK)",
+  title: "VAT return",
+  titleShort: "VAT return",
   description:
-    "Prepare the DPH return lines and the kontrolný výkaz XML for a month or quarter.",
-  company: { label: "Company", description: "The VAT registered company" },
+    "Your VAT return for the period, in your country's official format.",
+  company: {
+    label: "Company",
+    description: "The company to prepare the filing for",
+  },
   period: {
     label: "Period",
     description: "Month or quarter of the return",
     month: "{{month}} {{year}}",
     quarter: "Q{{quarter}} {{year}}",
   },
-  unsupportedCountry:
-    "The VAT return is prepared for Slovak companies only. Set the company country to Slovakia to use it.",
   disclaimer:
-    "We provide tooling, not tax advice. Check filings with your tax adviser before you submit them in eDane.",
+    "We provide tooling, not tax advice. Review filings with your tax adviser before submitting.",
   summary: "{{company}}, {{from}} to {{to}}",
-  due: "Due on the 25th of the following month, electronically.",
+  formats: {
+    SK_DPH: "DPH return lines (DPHv25)",
+    DE_USTVA: "Umsatzsteuer-Voranmeldung (UStVA)",
+    DE_EUR_SMALL_BUSINESS: "EÜR summary (§ 19 UStG small business)",
+    AT_UVA: "Umsatzsteuervoranmeldung (U30)",
+    AT_EA_SMALL_BUSINESS: "Revenue and expense summary (§ 6 Abs. 1 Z 27 UStG)",
+    GENERIC_VAT: "VAT return summary by rate",
+  },
+  dueByFormat: {
+    SK_DPH: "Due on the 25th of the following month, electronically.",
+    DE_USTVA: "Due on the 10th of the following month via ELSTER.",
+    DE_EUR_SMALL_BUSINESS: "Annual EÜR filing with income tax return.",
+    AT_UVA: "Due on the 15th of the second following month via FinanzOnline.",
+    AT_EA_SMALL_BUSINESS: "Annual income summary for small businesses.",
+    GENERIC_VAT: "Check your local tax authority filing deadline.",
+  },
+  smallBusiness: {
+    title: "No VAT return required under small-business exemption",
+    body: {
+      SK_DPH: "This company is not VAT registered.",
+      DE_USTVA: "No regular UStVA filing is required.",
+      DE_EUR_SMALL_BUSINESS:
+        "This company uses the § 19 UStG Kleinunternehmer exemption. No regular UStVA is needed. Below is your EÜR revenue and expense summary for the period.",
+      AT_UVA: "No regular UVA filing is required.",
+      AT_EA_SMALL_BUSINESS:
+        "This company uses the § 6 Abs. 1 Z 27 UStG small-business exemption. Below is your revenue and expense summary for the period.",
+      GENERIC_VAT: "No VAT return is required for this tax regime.",
+    },
+  },
+  xmlSection: {
+    SK_DPH: "Control statement (KV DPH)",
+    DE_USTVA: "ELSTER UStVA XML",
+    DE_EUR_SMALL_BUSINESS: "XML export",
+    AT_UVA: "FinanzOnline UVA XML (U30)",
+    AT_EA_SMALL_BUSINESS: "XML export",
+    GENERIC_VAT: "XML export",
+  },
+  xmlNote: {
+    SK_DPH: "Upload the KVDPHv25 XML in the eDane portal.",
+    DE_USTVA:
+      "ELSTER Anmeldungssteuern UStVA XML prepared for tax-advisor import or ERiC transmission. Direct automated ELSTER submission requires an ERiC certificate; you can also copy the Kennzahlen above into Mein ELSTER or download the CSV.",
+    DE_EUR_SMALL_BUSINESS: "Use the structured CSV export above for your EÜR.",
+    AT_UVA:
+      "FinanzOnline U30 XML prepared for portal upload or tax-advisor review. You can also download the structured CSV above.",
+    AT_EA_SMALL_BUSINESS: "Use the structured CSV export above.",
+    GENERIC_VAT:
+      "Use the structured CSV export above for your local tax filing.",
+  },
   lines: {
-    title: "DPH return lines (DPHv25)",
+    title: "Return lines",
     line: "Line",
     meaning: "Meaning",
+    base: "Taxable base",
     amount: "Amount",
     r01: "Base at 19 %",
     r02: "VAT at 19 %",
@@ -50,7 +99,7 @@ export const translations = {
     r33: "Excess deduction (refund)",
   },
   sections: {
-    title: "Control statement (KV DPH)",
+    title: "Control statement",
     section: "Section",
     count: "Rows",
     A1: "A.1 Issued invoices to VAT payers",
@@ -59,22 +108,24 @@ export const translations = {
     B2: "B.2 Received domestic invoices with deduction",
     B31: "B.3.1 Simplified invoices received (total)",
     C1: "C.1 Issued credit notes",
-    D1: "D.1 eKasa turnover",
-    D2: "D.2 Other supplies (customers without IČ DPH)",
+    D1: "D.1 Fiscal register turnover",
+    D2: "D.2 Other supplies (customers without VAT ID)",
   },
   warnings: {
     noVatId:
-      "The company has no valid IČ DPH. The KV XML needs it before you can submit.",
+      "The company has no valid VAT ID configured. Add it in company settings before submitting.",
+    noTaxId:
+      "The company has no tax number (Steuernummer) configured. Add it in company settings before submitting to ELSTER.",
     customerVatIds:
-      "{{count}} invoices have customers without IČ DPH and are reported in D.2.",
+      "{{count}} invoices have customers without a VAT ID and are reported in D.2.",
     unmappedRates:
-      "{{count}} rows use rates outside 23 / 19 / 5 % and are not in the return. Check them.",
+      "{{count}} rows use non-standard tax rates and are not included in the mapped lines. Review them.",
     b32Required:
-      "Deducted VAT from simplified invoices reached 3,000 EUR. List them per supplier in B.3.2 before you submit.",
+      "Deducted VAT from simplified invoices reached 3,000 EUR. List them per supplier in B.3.2 before submitting.",
   },
   actions: {
-    downloadKv: "Download KV DPH XML",
-    downloadCsv: "Download return lines (CSV)",
+    downloadXml: "Download XML",
+    downloadCsv: "Download CSV",
     showXml: "Show XML",
     hideXml: "Hide XML",
     copy: "Copy",
@@ -82,7 +133,7 @@ export const translations = {
     copyError: "Could not copy. Select the text and copy it manually.",
   },
   pickCompany: "Choose a company to prepare its VAT return.",
-  empty: "No VAT relevant documents in this period.",
+  empty: "No relevant documents in this period.",
   errors: {
     validation: {
       title: "Invalid request",
@@ -123,6 +174,6 @@ export const translations = {
   },
   success: {
     title: "VAT return prepared",
-    description: "Lines and control statement reflect the saved documents.",
+    description: "Return lines and export files reflect the saved documents.",
   },
 };

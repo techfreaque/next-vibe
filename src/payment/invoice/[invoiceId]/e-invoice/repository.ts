@@ -42,9 +42,14 @@ import { getCountryProfile } from "@/tax/compliance/profiles";
 import { CompanyTaxRegime } from "@/tax/regime/enum";
 import { getCompanyTaxRegime } from "@/tax/regime/policy";
 
-import { paymentInvoiceLines, paymentInvoices } from "../../../db";
+import {
+  companyPaymentSettings,
+  paymentInvoiceLines,
+  paymentInvoices,
+} from "../../../db";
 import { InvoiceStatus } from "../../../enum";
 import type {
+  InvoiceEInvoiceRequestOutput,
   InvoiceEInvoiceResponseOutput,
   InvoiceEInvoiceUrlPathParams,
 } from "./definition";
@@ -64,6 +69,15 @@ const FIELD_LABELS: Record<UblFieldId, InvoiceEInvoiceTranslationKey> = {
   "BT-49": "fields.bt49",
   "BT-55": "fields.bt55",
   "BT-153": "fields.bt153",
+  "BT-10": "fields.bt10",
+  "BT-35": "fields.bt35",
+  "BT-37": "fields.bt37",
+  "BT-38": "fields.bt38",
+  "BT-42": "fields.bt42",
+  "BT-43": "fields.bt43",
+  "BT-50": "fields.bt50",
+  "BT-52": "fields.bt52",
+  "BT-53": "fields.bt53",
   "BG-25": "fields.bg25",
 };
 
@@ -72,6 +86,7 @@ const metadataSchema = z.object({
   customerName: z.string().optional(),
   originalInvoiceId: z.string().optional(),
   taxExemptionNotice: z.string().optional(),
+  buyerReference: z.string().optional(),
 });
 
 /** Parses raw jsonb metadata (any shape) into the issue-time snapshot. */
@@ -109,6 +124,7 @@ export class InvoiceEInvoiceRepository {
   static async getEInvoice(
     userId: string,
     urlPathParams: InvoiceEInvoiceUrlPathParams,
+    data: InvoiceEInvoiceRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
   ): Promise<ResponseType<InvoiceEInvoiceResponseOutput>> {
@@ -179,11 +195,18 @@ export class InvoiceEInvoiceRepository {
             ).code
           : CompanyTaxRegime.STANDARD);
       const vatPayer = regime === CompanyTaxRegime.STANDARD;
+      const profile = getCountryProfile(snapshot?.country ?? seller.country);
+      const jurisdiction = profile.eInvoicing.formats.includes("sk-efaktura")
+        ? "sk-efaktura"
+        : "peppol";
       const treatment =
         snapshot?.treatment ?? draft.vatTreatment ?? VatTreatment.DOMESTIC;
-      const notes =
-        snapshot?.notes ??
-        (meta.taxExemptionNotice ? [meta.taxExemptionNotice] : []);
+      const notes = [
+        ...new Set([
+          ...(meta.taxExemptionNotice ? [meta.taxExemptionNotice] : []),
+          ...(snapshot?.notes ?? []),
+        ]),
+      ];
 
       const original =
         isCreditNote && meta.originalInvoiceId
@@ -192,6 +215,14 @@ export class InvoiceEInvoiceRepository {
               invoice.companyId,
             )
           : null;
+
+      const [paySettings] = invoice.companyId
+        ? await db
+            .select()
+            .from(companyPaymentSettings)
+            .where(eq(companyPaymentSettings.companyId, invoice.companyId))
+            .limit(1)
+        : [];
 
       const input: UblInvoiceInput = {
         documentType: isCreditNote ? "CREDIT_NOTE" : "INVOICE",
@@ -210,9 +241,12 @@ export class InvoiceEInvoiceRepository {
           vatPayer,
           notes,
         ),
-        buyerReference: null,
+        buyerReference: data.buyerReference ?? meta.buyerReference ?? null,
+        smallBusinessExemption: regime === CompanyTaxRegime.DE_SMALL_BUSINESS,
         originalInvoice: original,
-        iban: null,
+        iban: paySettings?.bankIban ?? null,
+        bic: paySettings?.bankBic ?? null,
+        paymentUrl: invoice.invoiceUrl ?? null,
         seller,
         buyer,
         lines: lines.map((line) => ({
@@ -225,19 +259,31 @@ export class InvoiceEInvoiceRepository {
         })),
       };
 
-      const missing = validateUblInput(input);
       const number = invoice.invoiceNumber ?? invoice.id;
       const safeNumber = number.replace(/[^A-Za-z0-9._-]+/g, "-");
+      const missingFields = (
+        format: typeof jurisdiction | "xrechnung",
+      ): InvoiceEInvoiceResponseOutput["missingFields"] =>
+        validateUblInput(input, format).map((field) => ({
+          field,
+          label: t(FIELD_LABELS[field]),
+        }));
+      const missing = missingFields(jurisdiction);
       return success({
+        jurisdiction,
+        xrechnung: profile.eInvoicing.formats.includes("xrechnung")
+          ? {
+              fileName: `xrechnung-${safeNumber}.xml`,
+              xml: buildUblInvoice(input, "xrechnung"),
+              missingFields: missingFields("xrechnung"),
+            }
+          : undefined,
         invoiceNumber: number,
         isCreditNote,
         fileName: `${isCreditNote ? "credit-note" : "invoice"}-${safeNumber}.xml`,
         ready: missing.length === 0,
-        missingFields: missing.map((field) => ({
-          field,
-          label: t(FIELD_LABELS[field]),
-        })),
-        xml: buildUblInvoice(input),
+        missingFields: missing,
+        xml: buildUblInvoice(input, jurisdiction),
       });
     } catch (error) {
       logger.error("Failed to build e-invoice", {
@@ -304,6 +350,7 @@ export class InvoiceEInvoiceRepository {
       taxId: company.taxId,
       vatNumber: company.vatNumber,
       email: company.email,
+      phone: company.phone,
     };
   }
 

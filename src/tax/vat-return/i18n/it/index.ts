@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tags: { tax: "Fisco", vatReturn: "Dichiarazione IVA" },
-  title: "Dichiarazione IVA slovacca e prospetto di controllo",
-  titleShort: "Dichiarazione IVA (SK)",
+  title: "Dichiarazione IVA",
+  titleShort: "Dichiarazione IVA",
   description:
-    "Prepari i righi della dichiarazione DPH e l'XML del prospetto di controllo (kontrolný výkaz) per un mese o un trimestre.",
+    "La sua dichiarazione IVA per il periodo, nel formato ufficiale del suo Paese.",
   company: {
     label: "Azienda",
-    description: "L'azienda soggetta a IVA",
+    description: "L'azienda per cui preparare la dichiarazione",
   },
   period: {
     label: "Periodo",
@@ -16,16 +16,62 @@ export const translations: typeof enTranslations = {
     month: "{{month}} {{year}}",
     quarter: "T{{quarter}} {{year}}",
   },
-  unsupportedCountry:
-    "La dichiarazione IVA è disponibile solo per aziende slovacche. Imposti la Slovacchia come paese dell'azienda per usarla.",
   disclaimer:
-    "Forniamo strumenti, non consulenza fiscale. Faccia verificare le dichiarazioni dal Suo consulente fiscale prima di presentarle in eDane.",
+    "Forniamo strumenti, non consulenza fiscale. Faccia verificare le dichiarazioni dal suo consulente prima dell'invio.",
   summary: "{{company}}, dal {{from}} al {{to}}",
-  due: "Scadenza: il 25 del mese successivo, in via telematica.",
+  formats: {
+    SK_DPH: "Righi della dichiarazione DPH (DPHv25)",
+    DE_USTVA: "Umsatzsteuer-Voranmeldung (UStVA)",
+    DE_EUR_SMALL_BUSINESS: "Riepilogo EÜR (regime forfettario § 19 UStG)",
+    AT_UVA: "Umsatzsteuervoranmeldung (U30)",
+    AT_EA_SMALL_BUSINESS: "Riepilogo entrate e uscite (§ 6 c. 1 Z 27 UStG)",
+    GENERIC_VAT: "Riepilogo IVA per aliquota",
+  },
+  dueByFormat: {
+    SK_DPH: "Scadenza: il 25 del mese successivo, in via telematica.",
+    DE_USTVA: "Scadenza: il 10 del mese successivo tramite ELSTER.",
+    DE_EUR_SMALL_BUSINESS:
+      "Riepilogo annuale EÜR con la dichiarazione dei redditi.",
+    AT_UVA: "Scadenza: il 15 del secondo mese successivo tramite FinanzOnline.",
+    AT_EA_SMALL_BUSINESS: "Riepilogo annuale per piccole imprese.",
+    GENERIC_VAT: "Verifichi la scadenza presso l'autorità fiscale locale.",
+  },
+  smallBusiness: {
+    title: "Nessuna dichiarazione IVA richiesta (regime piccole imprese)",
+    body: {
+      SK_DPH: "Questa azienda non è registrata ai fini IVA.",
+      DE_USTVA: "Nessuna UStVA periodica richiesta.",
+      DE_EUR_SMALL_BUSINESS:
+        "Questa azienda applica l'esenzione § 19 UStG. Non serve la UStVA periodica. Qui sotto trova il riepilogo EÜR per il periodo.",
+      AT_UVA: "Nessuna UVA periodica richiesta.",
+      AT_EA_SMALL_BUSINESS:
+        "Questa azienda applica l'esenzione § 6 c. 1 Z 27 UStG. Qui sotto trova il riepilogo entrate e uscite.",
+      GENERIC_VAT: "Nessuna dichiarazione IVA richiesta per questo regime.",
+    },
+  },
+  xmlSection: {
+    SK_DPH: "Prospetto di controllo (KV DPH)",
+    DE_USTVA: "XML ELSTER UStVA",
+    DE_EUR_SMALL_BUSINESS: "Esportazione XML",
+    AT_UVA: "XML FinanzOnline UVA (U30)",
+    AT_EA_SMALL_BUSINESS: "Esportazione XML",
+    GENERIC_VAT: "Esportazione XML",
+  },
+  xmlNote: {
+    SK_DPH: "Carichi l'XML KVDPHv25 nel portale eDane.",
+    DE_USTVA:
+      "XML ELSTER UStVA pronto per l'importazione contabile o l'invio ERiC. L'invio automatico richiede un certificato ERiC; in alternativa copi i valori in Mein ELSTER o scarichi il CSV.",
+    DE_EUR_SMALL_BUSINESS: "Utilizzi l'esportazione CSV strutturata sopra.",
+    AT_UVA:
+      "XML FinanzOnline U30 pronto per il caricamento sul portale o la revisione del consulente.",
+    AT_EA_SMALL_BUSINESS: "Utilizzi l'esportazione CSV strutturata sopra.",
+    GENERIC_VAT: "Utilizzi l'esportazione CSV strutturata sopra.",
+  },
   lines: {
-    title: "Righi della dichiarazione DPH (DPHv25)",
+    title: "Righi della dichiarazione",
     line: "Rigo",
     meaning: "Significato",
+    base: "Imponibile",
     amount: "Importo",
     r01: "Imponibile al 19 %",
     r02: "IVA al 19 %",
@@ -55,7 +101,7 @@ export const translations: typeof enTranslations = {
     r33: "Eccedenza detraibile (rimborso)",
   },
   sections: {
-    title: "Prospetto di controllo (KV DPH)",
+    title: "Prospetto di controllo",
     section: "Sezione",
     count: "Righe",
     A1: "A.1 Fatture emesse a soggetti IVA",
@@ -64,22 +110,24 @@ export const translations: typeof enTranslations = {
     B2: "B.2 Fatture nazionali ricevute con detrazione",
     B31: "B.3.1 Fatture semplificate ricevute (totale)",
     C1: "C.1 Note di credito emesse",
-    D1: "D.1 Corrispettivi eKasa",
-    D2: "D.2 Altre cessioni (clienti senza IČ DPH)",
+    D1: "D.1 Corrispettivi di cassa",
+    D2: "D.2 Altre cessioni (clienti senza partita IVA)",
   },
   warnings: {
     noVatId:
-      "L'azienda non ha una partita IVA (IČ DPH) valida. L'XML KV la richiede prima dell'invio.",
+      "L'azienda non ha una partita IVA valida configurata. La inserisca prima dell'invio.",
+    noTaxId:
+      "L'azienda non ha un codice fiscale configurato. Lo inserisca prima dell'esportazione.",
     customerVatIds:
-      "{{count}} fatture a clienti senza IČ DPH sono riportate in D.2.",
+      "{{count}} fatture a clienti senza partita IVA sono riportate in D.2.",
     unmappedRates:
-      "{{count}} righe usano aliquote diverse da 23 / 19 / 5 % e non sono nella dichiarazione. Le verifichi.",
+      "{{count}} righe usano aliquote non standard e non sono incluse nei righi mappati. Le verifichi.",
     b32Required:
       "L'IVA detratta dalle fatture semplificate ha raggiunto 3.000 EUR. Le indichi per fornitore in B.3.2 prima dell'invio.",
   },
   actions: {
-    downloadKv: "Scarica XML KV DPH",
-    downloadCsv: "Scarica righi della dichiarazione (CSV)",
+    downloadXml: "Scarica XML",
+    downloadCsv: "Scarica CSV",
     showXml: "Mostra XML",
     hideXml: "Nascondi XML",
     copy: "Copia",
@@ -87,7 +135,7 @@ export const translations: typeof enTranslations = {
     copyError: "Copia non riuscita. Selezioni il testo e lo copi manualmente.",
   },
   pickCompany: "Scelga un'azienda per preparare la sua dichiarazione IVA.",
-  empty: "Nessun documento rilevante ai fini IVA in questo periodo.",
+  empty: "Nessun documento rilevante in questo periodo.",
   errors: {
     validation: {
       title: "Richiesta non valida",
@@ -129,7 +177,6 @@ export const translations: typeof enTranslations = {
   },
   success: {
     title: "Dichiarazione IVA preparata",
-    description:
-      "Righi e prospetto di controllo riflettono i documenti salvati.",
+    description: "Righi e file di esportazione riflettono i documenti salvati.",
   },
 };

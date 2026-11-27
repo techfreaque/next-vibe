@@ -15,7 +15,12 @@ import { z } from "zod";
 
 import { bankErrorTypes } from "../endpoint-errors";
 import { scopedTranslation } from "../i18n";
-import { bankCandidateSchema, bankLineSchema } from "../schemas";
+import {
+  bankCandidateSchema,
+  bankDocumentCandidateSchema,
+  bankLineSchema,
+  bankSplitRecordSchema,
+} from "../schemas";
 
 const BankCandidatesWidgetLazy = lazyWidget(() =>
   import("./widget").then((module) => ({
@@ -66,6 +71,16 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "fields.journalLine",
         schema: z.array(bankCandidateSchema),
+      }),
+      documentCandidates: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "split.documentCandidates",
+        schema: z.array(bankDocumentCandidateSchema).optional(),
+      }),
+      splits: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "split.allocations",
+        schema: z.array(bankSplitRecordSchema).optional(),
       }),
       selectedCompanyId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

@@ -2,27 +2,78 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tags: { tax: "Podatki", vatReturn: "Deklaracja VAT" },
-  title: "Słowacka deklaracja VAT i raport kontrolny",
-  titleShort: "Deklaracja VAT (SK)",
+  title: "Deklaracja VAT",
+  titleShort: "Deklaracja VAT",
   description:
-    "Przygotuj pozycje deklaracji DPH i plik XML raportu kontrolnego (kontrolný výkaz) za miesiąc lub kwartał.",
-  company: { label: "Firma", description: "Firma zarejestrowana do VAT" },
+    "Twoja deklaracja VAT za okres w urzędowym formacie Twojego kraju.",
+  company: {
+    label: "Firma",
+    description: "Firma, dla której przygotowujesz deklarację",
+  },
   period: {
     label: "Okres",
     description: "Miesiąc lub kwartał deklaracji",
     month: "{{month}} {{year}}",
     quarter: "Q{{quarter}} {{year}}",
   },
-  unsupportedCountry:
-    "Deklaracja VAT jest dostępna tylko dla firm słowackich. Ustaw kraj firmy na Słowację, aby z niej korzystać.",
   disclaimer:
-    "Dostarczamy narzędzia, nie doradztwo podatkowe. Zanim złożysz deklaracje w eDane, skonsultuj je z doradcą podatkowym.",
+    "Dostarczamy narzędzia, nie doradztwo podatkowe. Przed złożeniem sprawdź rozliczenie z doradcą podatkowym.",
   summary: "{{company}}, od {{from}} do {{to}}",
-  due: "Termin: 25. dzień następnego miesiąca, elektronicznie.",
+  formats: {
+    SK_DPH: "Pozycje deklaracji DPH (DPHv25)",
+    DE_USTVA: "Umsatzsteuer-Voranmeldung (UStVA)",
+    DE_EUR_SMALL_BUSINESS: "Podsumowanie EÜR (§ 19 UStG mały przedsiębiorca)",
+    AT_UVA: "Umsatzsteuervoranmeldung (U30)",
+    AT_EA_SMALL_BUSINESS:
+      "Zestawienie przychodów i kosztów (§ 6 ust. 1 Z 27 UStG)",
+    GENERIC_VAT: "Podsumowanie VAT według stawek",
+  },
+  dueByFormat: {
+    SK_DPH: "Termin: 25. dzień następnego miesiąca, elektronicznie.",
+    DE_USTVA: "Termin: 10. dzień następnego miesiąca przez ELSTER.",
+    DE_EUR_SMALL_BUSINESS: "Roczne zestawienie EÜR z zeznaniem dochodowym.",
+    AT_UVA:
+      "Termin: 15. dzień drugiego następnego miesiąca przez FinanzOnline.",
+    AT_EA_SMALL_BUSINESS: "Roczne zestawienie przychodów i kosztów.",
+    GENERIC_VAT: "Sprawdź lokalny termin składania deklaracji VAT.",
+  },
+  smallBusiness: {
+    title: "Deklaracja VAT nie jest wymagana (zwolnienie podmiotowe)",
+    body: {
+      SK_DPH: "Firma nie jest czynnym podatnikiem VAT.",
+      DE_USTVA: "Regularna deklaracja UStVA nie jest wymagana.",
+      DE_EUR_SMALL_BUSINESS:
+        "Firma korzysta ze zwolnienia § 19 UStG. Regularna deklaracja UStVA nie jest potrzebna. Poniżej znajduje się podsumowanie przychodów i kosztów (EÜR).",
+      AT_UVA: "Regularna deklaracja UVA nie jest wymagana.",
+      AT_EA_SMALL_BUSINESS:
+        "Firma korzysta ze zwolnienia dla małych firm (§ 6 ust. 1 Z 27 UStG). Poniżej znajduje się zestawienie przychodów i kosztów.",
+      GENERIC_VAT:
+        "Dla tego statusu podatkowego deklaracja VAT nie jest wymagana.",
+    },
+  },
+  xmlSection: {
+    SK_DPH: "Raport kontrolny (KV DPH)",
+    DE_USTVA: "ELSTER UStVA XML",
+    DE_EUR_SMALL_BUSINESS: "Eksport XML",
+    AT_UVA: "FinanzOnline UVA XML (U30)",
+    AT_EA_SMALL_BUSINESS: "Eksport XML",
+    GENERIC_VAT: "Eksport XML",
+  },
+  xmlNote: {
+    SK_DPH: "Wgraj plik KVDPHv25 XML w portalu eDane.",
+    DE_USTVA:
+      "Plik XML ELSTER UStVA gotowy do importu u doradcy lub wysyłki ERiC. Bezpośrednia wysyłka wymaga certyfikatu ERiC; kwoty możesz też przepisać w Mein ELSTER lub pobrać CSV.",
+    DE_EUR_SMALL_BUSINESS: "Użyj ustrukturyzowanego pliku CSV powyżej.",
+    AT_UVA:
+      "Plik XML FinanzOnline U30 gotowy do wgrania w portalu lub przekazania doradcy.",
+    AT_EA_SMALL_BUSINESS: "Użyj ustrukturyzowanego pliku CSV powyżej.",
+    GENERIC_VAT: "Użyj ustrukturyzowanego pliku CSV powyżej.",
+  },
   lines: {
-    title: "Pozycje deklaracji DPH (DPHv25)",
+    title: "Pozycje deklaracji",
     line: "Pozycja",
     meaning: "Opis",
+    base: "Podstawa",
     amount: "Kwota",
     r01: "Podstawa opodatkowania 19 %",
     r02: "VAT należny 19 %",
@@ -52,7 +103,7 @@ export const translations: typeof enTranslations = {
     r33: "Nadwyżka VAT naliczonego (zwrot)",
   },
   sections: {
-    title: "Raport kontrolny (KV DPH)",
+    title: "Raport kontrolny",
     section: "Sekcja",
     count: "Wiersze",
     A1: "A.1 Faktury wystawione dla podatników VAT",
@@ -61,22 +112,24 @@ export const translations: typeof enTranslations = {
     B2: "B.2 Krajowe faktury otrzymane z odliczeniem",
     B31: "B.3.1 Otrzymane faktury uproszczone (suma)",
     C1: "C.1 Wystawione faktury korygujące",
-    D1: "D.1 Obrót z eKasa",
-    D2: "D.2 Pozostałe dostawy (klienci bez IČ DPH)",
+    D1: "D.1 Obrót z kasy fiskalnej",
+    D2: "D.2 Pozostałe dostawy (klienci bez numeru VAT)",
   },
   warnings: {
     noVatId:
-      "Firma nie ma ważnego numeru VAT UE (IČ DPH). Plik KV XML wymaga go przed złożeniem.",
+      "Firma nie ma ważnego numeru VAT. Uzupełnij go w ustawieniach firmy przed złożeniem.",
+    noTaxId:
+      "Firma nie ma wpisanego numeru podatkowego. Uzupełnij go w ustawieniach firmy przed eksportem.",
     customerVatIds:
-      "{{count}} faktur dla klientów bez IČ DPH trafia do sekcji D.2.",
+      "{{count}} faktur dla klientów bez numeru VAT trafia do sekcji D.2.",
     unmappedRates:
-      "{{count}} wierszy ma stawki inne niż 23 / 19 / 5 % i nie trafia do deklaracji. Sprawdź je.",
+      "{{count}} wierszy ma niestandardowe stawki i nie trafia do przypisanych pozycji. Sprawdź je.",
     b32Required:
       "VAT odliczony z faktur uproszczonych osiągnął 3000 EUR. Przed złożeniem wykaż je w B.3.2 osobno dla każdego dostawcy.",
   },
   actions: {
-    downloadKv: "Pobierz KV DPH XML",
-    downloadCsv: "Pobierz pozycje deklaracji (CSV)",
+    downloadXml: "Pobierz XML",
+    downloadCsv: "Pobierz CSV",
     showXml: "Pokaż XML",
     hideXml: "Ukryj XML",
     copy: "Kopiuj",
@@ -84,7 +137,7 @@ export const translations: typeof enTranslations = {
     copyError: "Nie udało się skopiować. Zaznacz tekst i skopiuj go ręcznie.",
   },
   pickCompany: "Wybierz firmę, aby przygotować jej deklarację VAT.",
-  empty: "Brak dokumentów istotnych dla VAT w tym okresie.",
+  empty: "Brak dokumentów w tym okresie.",
   errors: {
     validation: {
       title: "Nieprawidłowe żądanie",
@@ -127,6 +180,6 @@ export const translations: typeof enTranslations = {
   },
   success: {
     title: "Deklaracja VAT przygotowana",
-    description: "Pozycje i raport kontrolny odpowiadają zapisanym dokumentom.",
+    description: "Pozycje i pliki eksportu odpowiadają zapisanym dokumentom.",
   },
 };

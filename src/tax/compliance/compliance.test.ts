@@ -81,7 +81,10 @@ describe("Slovak VAT rates", () => {
   it("keeps unknown countries on the generic profile", () => {
     expect(profileCountry("sk")).toBe("SK");
     expect(profileCountry("FR")).toBe("XX");
-    expect(getCountryProfile(null).vatReturn).toBeNull();
+    expect(getCountryProfile(null).vatReturn).toBe("GENERIC");
+    expect(getCountryProfile("DE").vatReturn).toBe("DE_USTVA");
+    expect(getCountryProfile("AT").vatReturn).toBe("AT_UVA");
+    expect(getCountryProfile("SK").vatReturn).toBe("SK_DPH");
   });
 });
 

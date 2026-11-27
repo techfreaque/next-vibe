@@ -58,3 +58,16 @@ export const TransferStatusDB = [
   "RECEIVED",
   "CANCELLED",
 ] as const;
+
+export const {
+  enum: NegativeStockPolicy,
+  options: NegativeStockPolicyOptions,
+  Value: NegativeStockPolicyValue,
+} = createEnumOptions(scopedTranslation, {
+  BLOCK: "enums.negativeStockPolicy.block",
+  WARN: "enums.negativeStockPolicy.warn",
+  ALLOW: "enums.negativeStockPolicy.allow",
+});
+
+export const NegativeStockPolicyDB = ["BLOCK", "WARN", "ALLOW"] as const;
+export type NegativeStockPolicyDbValue = (typeof NegativeStockPolicyDB)[number];

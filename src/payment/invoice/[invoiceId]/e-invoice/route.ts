@@ -14,10 +14,11 @@ export const { GET, tools } = endpointsHandler({
   endpoint: invoiceEInvoiceDefinitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger, locale }) =>
+    handler: ({ urlPathParams, data, user, logger, locale }) =>
       InvoiceEInvoiceRepository.getEInvoice(
         user.id,
         urlPathParams,
+        data,
         logger,
         locale,
       ),

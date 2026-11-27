@@ -75,7 +75,7 @@ export const translations: typeof enTranslations = {
     row: "Ligne",
     marker: "Poste",
     label: "Libellé",
-    officialLabel: "Libellé officiel (SK)",
+    officialLabel: "Libellé officiel",
     current: "Période en cours",
     previous: "Période précédente",
     currency: "Devise",

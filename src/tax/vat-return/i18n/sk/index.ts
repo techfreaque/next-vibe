@@ -2,27 +2,76 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tags: { tax: "Dane", vatReturn: "Daňové priznanie k DPH" },
-  title: "Daňové priznanie k DPH a kontrolný výkaz",
-  titleShort: "Priznanie k DPH (SK)",
+  title: "Daňové priznanie k DPH",
+  titleShort: "Priznanie k DPH",
   description:
-    "Pripravte riadky daňového priznania k DPH a XML kontrolného výkazu za mesiac alebo štvrťrok.",
-  company: { label: "Firma", description: "Firma registrovaná pre DPH" },
+    "Vaše daňové priznanie k DPH za obdobie v úradnom formáte vašej krajiny.",
+  company: {
+    label: "Firma",
+    description: "Firma, pre ktorú pripravujete priznanie",
+  },
   period: {
     label: "Zdaňovacie obdobie",
     description: "Mesiac alebo štvrťrok priznania",
     month: "{{month}} {{year}}",
     quarter: "{{quarter}}. štvrťrok {{year}}",
   },
-  unsupportedCountry:
-    "Daňové priznanie k DPH sa pripravuje len pre slovenské firmy. Nastavte krajinu firmy na Slovensko.",
   disclaimer:
-    "Poskytujeme nástroje, nie daňové poradenstvo. Pred podaním cez eDane si podania overte u svojho daňového poradcu.",
+    "Poskytujeme nástroje, nie daňové poradenstvo. Pred podaním si výkazy overte u svojho daňového poradcu.",
   summary: "{{company}}, od {{from}} do {{to}}",
-  due: "Lehota: do 25. dňa nasledujúceho mesiaca, elektronicky.",
+  formats: {
+    SK_DPH: "Riadky daňového priznania k DPH (DPHv25)",
+    DE_USTVA: "Umsatzsteuer-Voranmeldung (UStVA)",
+    DE_EUR_SMALL_BUSINESS: "Prehľad EÜR (§ 19 UStG malý podnikateľ)",
+    AT_UVA: "Umsatzsteuervoranmeldung (U30)",
+    AT_EA_SMALL_BUSINESS: "Prehľad príjmov a výdavkov (§ 6 ods. 1 Z 27 UStG)",
+    GENERIC_VAT: "Prehľad DPH podľa sadzieb",
+  },
+  dueByFormat: {
+    SK_DPH: "Lehota: do 25. dňa nasledujúceho mesiaca, elektronicky.",
+    DE_USTVA: "Lehota: do 10. dňa nasledujúceho mesiaca cez ELSTER.",
+    DE_EUR_SMALL_BUSINESS: "Ročný prehľad EÜR k dani z príjmov.",
+    AT_UVA:
+      "Lehota: do 15. dňa druhého nasledujúceho mesiaca cez FinanzOnline.",
+    AT_EA_SMALL_BUSINESS: "Ročný prehľad príjmov a výdavkov.",
+    GENERIC_VAT: "Skontrolujte zákonnú lehotu daňového úradu vašej krajiny.",
+  },
+  smallBusiness: {
+    title: "Priznanie k DPH nie je potrebné (oslobodenie malého podnikateľa)",
+    body: {
+      SK_DPH: "Firma nie je platiteľom DPH.",
+      DE_USTVA: "Pravidelné podanie UStVA sa nevyžaduje.",
+      DE_EUR_SMALL_BUSINESS:
+        "Firma uplatňuje oslobodenie podľa § 19 UStG. Pravidelné priznanie k DPH sa nepodáva. Nižšie nájdete prehľad príjmov a výdavkov (EÜR) za obdobie.",
+      AT_UVA: "Pravidelné podanie UVA sa nevyžaduje.",
+      AT_EA_SMALL_BUSINESS:
+        "Firma uplatňuje oslobodenie malého podnikateľa podľa § 6 ods. 1 Z 27 UStG. Nižšie nájdete prehľad príjmov a výdavkov.",
+      GENERIC_VAT: "Pre tento daňový režim nie je priznanie k DPH potrebné.",
+    },
+  },
+  xmlSection: {
+    SK_DPH: "Kontrolný výkaz (KV DPH)",
+    DE_USTVA: "ELSTER UStVA XML",
+    DE_EUR_SMALL_BUSINESS: "XML export",
+    AT_UVA: "FinanzOnline UVA XML (U30)",
+    AT_EA_SMALL_BUSINESS: "XML export",
+    GENERIC_VAT: "XML export",
+  },
+  xmlNote: {
+    SK_DPH: "Nahrajte KVDPHv25 XML cez portál eDane.",
+    DE_USTVA:
+      "XML ELSTER UStVA je pripravené na import u daňového poradcu alebo prenos cez ERiC. Priame odoslanie vyžaduje certifikát ERiC; údaje môžete zadať aj v Mein ELSTER alebo stiahnuť CSV.",
+    DE_EUR_SMALL_BUSINESS: "Použite štruktúrovaný CSV export vyššie.",
+    AT_UVA:
+      "XML FinanzOnline U30 je pripravené na nahratie na portál alebo kontrolu poradcom.",
+    AT_EA_SMALL_BUSINESS: "Použite štruktúrovaný CSV export vyššie.",
+    GENERIC_VAT: "Použite štruktúrovaný CSV export vyššie.",
+  },
   lines: {
-    title: "Riadky daňového priznania k DPH (DPHv25)",
+    title: "Riadky priznania",
     line: "Riadok",
     meaning: "Význam",
+    base: "Základ dane",
     amount: "Suma",
     r01: "Základ dane, sadzba 19 %",
     r02: "Daň, sadzba 19 %",
@@ -52,7 +101,7 @@ export const translations: typeof enTranslations = {
     r33: "Nadmerný odpočet",
   },
   sections: {
-    title: "Kontrolný výkaz (KV DPH)",
+    title: "Kontrolný výkaz",
     section: "Časť",
     count: "Riadky",
     A1: "A.1 Vyhotovené faktúry pre platiteľov DPH",
@@ -61,22 +110,24 @@ export const translations: typeof enTranslations = {
     B2: "B.2 Prijaté tuzemské faktúry s odpočítaním dane",
     B31: "B.3.1 Prijaté zjednodušené faktúry (súhrnne)",
     C1: "C.1 Vyhotovené opravné faktúry",
-    D1: "D.1 Tržby z eKasy",
+    D1: "D.1 Tržby z pokladnice",
     D2: "D.2 Ostatné plnenia (odberatelia bez IČ DPH)",
   },
   warnings: {
     noVatId:
-      "Firma nemá platné IČ DPH. XML kontrolného výkazu ho pred podaním vyžaduje.",
+      "Firma nemá platné IČ DPH. Doplňte ho v nastaveniach firmy pred podaním.",
+    noTaxId:
+      "Firma nemá vyplnené daňové číslo. Doplňte ho v nastaveniach firmy pred exportom.",
     customerVatIds:
       "{{count}} faktúr pre odberateľov bez IČ DPH sa uvádza v časti D.2.",
     unmappedRates:
-      "{{count}} riadkov má inú sadzbu ako 23 / 19 / 5 % a nie sú v priznaní. Skontrolujte ich.",
+      "{{count}} riadkov má neštandardnú sadzbu a nie sú v priradených riadkoch. Skontrolujte ich.",
     b32Required:
       "Odpočítaná daň zo zjednodušených faktúr dosiahla 3 000 EUR. Pred podaním ich uveďte v časti B.3.2 podľa dodávateľov.",
   },
   actions: {
-    downloadKv: "Stiahnuť XML KV DPH",
-    downloadCsv: "Stiahnuť riadky priznania (CSV)",
+    downloadXml: "Stiahnuť XML",
+    downloadCsv: "Stiahnuť CSV",
     showXml: "Zobraziť XML",
     hideXml: "Skryť XML",
     copy: "Kopírovať",
@@ -84,7 +135,7 @@ export const translations: typeof enTranslations = {
     copyError: "Kopírovanie zlyhalo. Označte text a skopírujte ho ručne.",
   },
   pickCompany: "Vyberte firmu, pre ktorú chcete pripraviť priznanie k DPH.",
-  empty: "V tomto období nie sú žiadne doklady relevantné pre DPH.",
+  empty: "V tomto období nie sú žiadne relevantné doklady.",
   errors: {
     validation: {
       title: "Neplatná požiadavka",
@@ -125,6 +176,6 @@ export const translations: typeof enTranslations = {
   },
   success: {
     title: "Priznanie k DPH pripravené",
-    description: "Riadky a kontrolný výkaz zodpovedajú uloženým dokladom.",
+    description: "Riadky a exportné súbory zodpovedajú uloženým dokladom.",
   },
 };

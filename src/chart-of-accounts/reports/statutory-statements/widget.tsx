@@ -278,7 +278,15 @@ export function StatutoryStatementsWidget({
         <Div className="flex flex-col gap-4">
           <Div className="flex flex-col gap-1 text-sm text-muted-foreground">
             <Span className="font-medium text-foreground">
-              {`${report.reportCompanyName} · ${t("widget.layoutSkMuj")} · ${report.reportCurrency}`}
+              {`${report.reportCompanyName} · ${
+                report.layout === "DE_HGB"
+                  ? "HGB (§ 266 / § 275)"
+                  : report.layout === "AT_UGB"
+                    ? "UGB (§ 224 / § 231)"
+                    : report.layout === "IFRS"
+                      ? "IFRS (IAS 1)"
+                      : t("widget.layoutSkMuj")
+              } · ${report.reportCurrency}`}
             </Span>
             <Span>
               {t("widget.periods", {

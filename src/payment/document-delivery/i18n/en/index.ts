@@ -1,0 +1,110 @@
+export const translations = {
+  tags: {
+    payment: "payment",
+    pdf: "pdf",
+    email: "email",
+  },
+  pdf: {
+    invoiceTitle: "Invoice PDF",
+    invoiceDescription:
+      "Download the branded PDF/A-3 invoice with legal fields, payment QR code and embedded ZUGFeRD XML.",
+    estimateTitle: "Estimate PDF",
+    estimateDescription: "Download the branded PDF estimate.",
+    success: "PDF generated",
+    downloadAction: "Download PDF",
+    zugferdBadge: "ZUGFeRD / Factur-X EN 16931 embedded",
+    qrBadgeEpc: "EPC / GiroCode SEPA QR included",
+    qrBadgePayBySquare: "PAY by square QR included",
+    filename: "Filename",
+    documentNumber: "Document number",
+    paymentUrl: "Online payment link",
+    qrSection: "Payment QR code",
+    back: "Back",
+  },
+  deliver: {
+    logTitle: "Email delivery log",
+    logDescription:
+      "Review sent invoice emails and resend the PDF attachment through the platform mailer.",
+    logSuccess: "Delivery log loaded",
+    sendTitle: "Send document by email",
+    sendDescription:
+      "Email the PDF document to the customer from the platform hi@ account.",
+    sendSuccess: "Email sent with PDF attachment",
+    recipientEmail: "Recipient email",
+    recipientName: "Recipient name",
+    customMessage: "Personal message (optional)",
+    isResend: "Resend",
+    sendAction: "Send email with PDF",
+    resendAction: "Resend PDF",
+    emptyLog: "No emails sent yet",
+    emptyLogHint: "Send the PDF above to record the delivery here.",
+    sentAt: "Sent at",
+    sender: "From",
+    status: "Status",
+    attachment: "Attachment",
+    statusSent: "Sent",
+    statusFailed: "Failed",
+    resendBadge: "Resent",
+    subjectInvoice: "Invoice {{number}} from {{company}}",
+    subjectCreditNote: "Credit note {{number}} from {{company}}",
+    subjectEstimate: "Estimate {{number}} from {{company}}",
+    bodyIntro: "Please find {{document}} attached as a PDF.",
+    bodyPayOnline: "Pay online:",
+    bodyViewLink: "View document:",
+    theaBlocked: "ERP emails must use the platform hi@ mailer, never thea@.",
+    mailerUnavailable:
+      "Platform mailer is not configured. Check the default SMTP account.",
+  },
+  fields: {
+    invoiceId: "Invoice",
+    estimateId: "Estimate",
+    documentType: "Document type",
+    pdfBase64: "PDF data",
+    contentType: "Content type",
+    hasZugferd: "ZUGFeRD embedded",
+    qrKind: "QR format",
+    qrSvg: "QR preview",
+    deliveries: "Deliveries",
+    deliveryId: "Delivery",
+    messageId: "Message ID",
+  },
+  errors: {
+    validation: {
+      title: "Check your input",
+      description: "Provide a valid document and recipient email address.",
+    },
+    network: {
+      title: "Network error",
+      description: "Check your connection and try again.",
+    },
+    unauthorized: {
+      title: "Sign in required",
+      description: "Sign in to access document PDFs and email delivery.",
+    },
+    forbidden: {
+      title: "Access denied",
+      description: "Your company role does not allow this action.",
+    },
+    notFound: {
+      title: "Document not found",
+      description:
+        "The requested invoice, credit note or estimate does not exist.",
+    },
+    server: {
+      title: "Document delivery failed",
+      description: "Could not generate the PDF or send the email. Try again.",
+    },
+    unknown: {
+      title: "Unexpected error",
+      description: "Try again.",
+    },
+    unsavedChanges: {
+      title: "Unsaved changes",
+      description: "Your changes are still in this form.",
+    },
+    conflict: {
+      title: "Document not ready",
+      description: "Issue the document before sending it by email.",
+    },
+  },
+};

@@ -45,6 +45,11 @@ export const translations: typeof enTranslations = {
       received: "Empfangen",
       cancelled: "Storniert",
     },
+    negativeStockPolicy: {
+      block: "Negativbestand sperren",
+      warn: "Mit Warnung erlauben",
+      allow: "Negativbestand erlauben",
+    },
   },
 
   warehouseCreate: {
@@ -86,6 +91,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Standardlager",
         description: "Als Standardlagerhaus für dieses Unternehmen festlegen",
+      },
+      negativeStockPolicy: {
+        label: "Negativbestand-Regel",
+        description:
+          "Verhalten bei Kassenverkäufen und Warenausgängen, wenn der Bestand nicht ausreicht",
       },
       errors: {
         validation: {
@@ -137,6 +147,7 @@ export const translations: typeof enTranslations = {
         companyId: "Unternehmens-ID",
         isActive: "Aktiv",
         isDefault: "Standard",
+        negativeStockPolicy: "Negativbestand-Regel",
       },
     },
   },
@@ -289,6 +300,7 @@ export const translations: typeof enTranslations = {
         address: "Adresse",
         isActive: "Aktiv",
         isDefault: "Standard",
+        negativeStockPolicy: "Negativbestand-Regel",
         createdAt: "Erstellt am",
         updatedAt: "Aktualisiert am",
       },
@@ -331,6 +343,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Standardlager",
         description: "Als Standardlagerhaus festlegen",
+      },
+      negativeStockPolicy: {
+        label: "Negativbestand-Regel",
+        description:
+          "Verhalten bei Kassenverkäufen und Warenausgängen, wenn der Bestand nicht ausreicht",
       },
       errors: {
         validation: {
@@ -380,6 +397,7 @@ export const translations: typeof enTranslations = {
         code: "Kürzel",
         isActive: "Aktiv",
         isDefault: "Standard",
+        negativeStockPolicy: "Negativbestand-Regel",
       },
     },
   },

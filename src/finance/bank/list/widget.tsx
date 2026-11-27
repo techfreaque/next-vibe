@@ -4,8 +4,11 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ListItem } from "next-vibe/ui/components/list-item";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { RecordTable } from "next-vibe/ui/components/record-table";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   formatDocDate,
@@ -40,6 +43,7 @@ export function BankListWidget(): JSX.Element {
   const companyId = form.watch("companyId");
   const accountId =
     form.watch("accountId") ?? data?.selectedAccountId ?? undefined;
+  const activeStatus = form.watch("status") ?? "open";
   const responseOnly = useWidgetResponseOnly();
   const interactive = useWidgetIsInteractive() && !responseOnly;
 
@@ -47,11 +51,23 @@ export function BankListWidget(): JSX.Element {
     form.setValue("page", page, { shouldDirty: true });
     onSubmit?.();
   };
+  const submitStatus = (status: "open" | "matched" | "all"): void => {
+    form.setValue("status", status, { shouldDirty: true });
+    form.setValue("page", 1, { shouldDirty: true });
+    onSubmit?.();
+  };
   const openImport = (): void => {
     void (async (): Promise<void> => {
       const { default: create } = await import("../import/definition");
       push(create.POST, { data: { companyId, accountId } });
     })();
+  };
+  const openAutoMatch = (): void => {
+    void import("../auto-match/definition").then(({ default: routes }) =>
+      push(routes.POST, {
+        data: { companyId, accountId, dryRun: true },
+      }),
+    );
   };
   const openSettings = (): void => {
     void import("../settings/definition").then(({ default: routes }) =>
@@ -99,9 +115,23 @@ export function BankListWidget(): JSX.Element {
     const onOpen = interactive
       ? (): void => openCandidates(line.id)
       : undefined;
+    const isMatched = Boolean(line.matchedAt || line.matchKind);
+    const statusPill = (
+      <StatusPill
+        status={isMatched ? (line.matchKind ?? "matched") : "unmatched"}
+        variant={isMatched ? "success" : "warning"}
+        label={
+          isMatched
+            ? line.matchKind === "split"
+              ? t("ui.splitMatched")
+              : t("ui.matched")
+            : t("ui.unmatched")
+        }
+      />
+    );
     const matchButton = onOpen ? (
       <Button type="button" size="sm" variant="outline" onClick={onOpen}>
-        {t("ui.matchRow")}
+        {isMatched ? t("ui.review") : t("ui.matchRow")}
       </Button>
     ) : undefined;
     return {
@@ -110,11 +140,62 @@ export function BankListWidget(): JSX.Element {
         transactionId: line.transactionId,
         date,
         amount: amountCell,
-        status: t("ui.unmatched"),
+        status: statusPill,
         action: matchButton,
       },
       amount,
       onOpen,
+    };
+  });
+
+  const recon = data?.reconciliationStatus;
+  const accountRows = (data?.accountStatuses ?? []).map((acct) => {
+    const statementNetCell = (
+      <Span className="tabular-nums">
+        {formatMoney(acct.statementNetAmount, acct.currency, locale)}
+      </Span>
+    );
+    const ledgerBalanceCell = (
+      <Span className="tabular-nums">
+        {formatMoney(acct.ledgerBalance, acct.currency, locale)}
+      </Span>
+    );
+    const differenceCell = (
+      <Span
+        className={
+          Number(acct.difference) === 0
+            ? "tabular-nums text-success"
+            : "tabular-nums text-warning"
+        }
+      >
+        {formatMoney(acct.difference, acct.currency, locale)}
+      </Span>
+    );
+    const selectButton = interactive ? (
+      <Button
+        type="button"
+        size="sm"
+        variant={acct.accountId === accountId ? "default" : "outline"}
+        onClick={() => {
+          form.setValue("accountId", acct.accountId, { shouldDirty: true });
+          submitPage(1);
+        }}
+      >
+        {t("ui.selectAccount")}
+      </Button>
+    ) : undefined;
+    return {
+      id: acct.accountId,
+      cells: {
+        account: `${acct.accountCode} ${acct.accountName}`,
+        matched: `${acct.matchedLines} / ${acct.totalLines}`,
+        unmatched: acct.unmatchedLines,
+        statementNet: statementNetCell,
+        ledgerBalance: ledgerBalanceCell,
+        difference: differenceCell,
+        action: selectButton,
+      },
+      acct,
     };
   });
 
@@ -129,6 +210,16 @@ export function BankListWidget(): JSX.Element {
               <Button type="button" size="sm" onClick={openImport}>
                 {t("ui.importAction")}
               </Button>
+              {data?.canManage && accountId && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={openAutoMatch}
+                >
+                  {t("autoMatch.action")}
+                </Button>
+              )}
               {data?.canManage && (
                 <Button
                   type="button"
@@ -177,6 +268,98 @@ export function BankListWidget(): JSX.Element {
         </Div>
       )}
       <FormAlertWidget field={{}} />
+      {recon && (
+        <Div className="grid gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
+          <MetricCard
+            label={t("reconciliation.unmatchedLines")}
+            value={recon.unmatchedLines}
+          />
+          <MetricCard
+            label={t("reconciliation.matchedLines")}
+            value={`${recon.matchedLines} / ${recon.totalLines}`}
+          />
+          <MetricCard
+            label={t("reconciliation.statementNet")}
+            value={formatMoney(
+              recon.statementNetAmount,
+              recon.currency,
+              locale,
+            )}
+          />
+          <MetricCard
+            label={t("reconciliation.ledgerBalance")}
+            value={formatMoney(recon.ledgerBalance, recon.currency, locale)}
+          />
+        </Div>
+      )}
+      {accountRows.length > 1 && (
+        <SectionGroup title={t("reconciliation.accountsTitle")}>
+          <RecordTable
+            label={t("reconciliation.accountsTitle")}
+            columns={[
+              { id: "account", label: t("fields.account") },
+              { id: "matched", label: t("reconciliation.matchedLines") },
+              {
+                id: "unmatched",
+                label: t("reconciliation.unmatchedLines"),
+                numeric: true,
+              },
+              {
+                id: "statementNet",
+                label: t("reconciliation.statementNet"),
+                numeric: true,
+              },
+              {
+                id: "ledgerBalance",
+                label: t("reconciliation.ledgerBalance"),
+                numeric: true,
+              },
+              {
+                id: "difference",
+                label: t("reconciliation.difference"),
+                numeric: true,
+              },
+              { id: "action", label: "" },
+            ]}
+            rows={accountRows.map(({ id, cells }) => ({ id, cells }))}
+            compact={
+              <Div className="flex flex-col gap-2">
+                {accountRows.map(({ id, acct }) => (
+                  <ListItem
+                    key={id}
+                    title={`${acct.accountCode} ${acct.accountName}`}
+                    subtitle={`${acct.matchedLines}/${acct.totalLines} · ${t("reconciliation.difference")} ${formatMoney(acct.difference, acct.currency, locale)}`}
+                    meta={formatMoney(
+                      acct.ledgerBalance,
+                      acct.currency,
+                      locale,
+                    )}
+                  />
+                ))}
+              </Div>
+            }
+          />
+        </SectionGroup>
+      )}
+      {data?.selectedAccountId && interactive && (
+        <Div className="flex flex-wrap gap-2">
+          {(["open", "matched", "all"] as const).map((statusVal) => (
+            <Button
+              key={statusVal}
+              type="button"
+              size="sm"
+              variant={activeStatus === statusVal ? "default" : "outline"}
+              onClick={() => submitStatus(statusVal)}
+            >
+              {statusVal === "open"
+                ? t("ui.unmatched")
+                : statusVal === "matched"
+                  ? t("ui.matched")
+                  : t("ui.allLines")}
+            </Button>
+          ))}
+        </Div>
+      )}
       {data?.selectedAccountId ? (
         rows.length > 0 ? (
           <RecordTable

@@ -45,6 +45,11 @@ export const translations: typeof enTranslations = {
       received: "Prijaté",
       cancelled: "Zrušené",
     },
+    negativeStockPolicy: {
+      block: "Blokovať záporný stav",
+      warn: "Povoliť s upozornením",
+      allow: "Povoliť záporný stav",
+    },
   },
   warehouseCreate: {
     post: {
@@ -85,6 +90,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Predvolený sklad",
         description: "Nastaviť ako predvolený sklad firmy",
+      },
+      negativeStockPolicy: {
+        label: "Pravidlo záporného stavu",
+        description:
+          "Správanie pri predaji na pokladnici a výdaji zo skladu pri nedostatku zásob",
       },
       errors: {
         validation: {
@@ -135,6 +145,7 @@ export const translations: typeof enTranslations = {
         companyId: "ID firmy",
         isActive: "Aktívny",
         isDefault: "Predvolený",
+        negativeStockPolicy: "Pravidlo záporného stavu",
       },
     },
   },
@@ -289,6 +300,7 @@ export const translations: typeof enTranslations = {
         address: "Adresa",
         isActive: "Aktívny",
         isDefault: "Predvolený",
+        negativeStockPolicy: "Pravidlo záporného stavu",
         createdAt: "Čas vytvorenia",
         updatedAt: "Čas aktualizácie",
       },
@@ -330,6 +342,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Predvolený sklad",
         description: "Nastaviť ako predvolený sklad",
+      },
+      negativeStockPolicy: {
+        label: "Pravidlo záporného stavu",
+        description:
+          "Správanie pri predaji na pokladnici a výdaji zo skladu pri nedostatku zásob",
       },
       errors: {
         validation: {
@@ -379,6 +396,7 @@ export const translations: typeof enTranslations = {
         code: "Kód",
         isActive: "Aktívny",
         isDefault: "Predvolený",
+        negativeStockPolicy: "Pravidlo záporného stavu",
       },
     },
   },

@@ -28,7 +28,12 @@ import {
   JournalSourceType,
   LineType,
 } from "@/chart-of-accounts/enum";
-import { postJournalEntry } from "@/chart-of-accounts/shared/auto-post";
+import { lookupExchangeRate } from "@/chart-of-accounts/exchange-rates/ecb";
+import {
+  type AutoPostLine,
+  postJournalEntry,
+} from "@/chart-of-accounts/shared/auto-post";
+import { buildRealizedFxSettlement } from "@/chart-of-accounts/shared/fx-settlement";
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
@@ -78,7 +83,7 @@ export class BillPayRepository {
       }
 
       return await db.transaction(async (tx) => {
-        await lockLedgerCompany(tx, observedBill.companyId);
+        const companyRow = await lockLedgerCompany(tx, observedBill.companyId);
         const [bill] = await tx
           .select()
           .from(paymentBills)
@@ -110,6 +115,8 @@ export class BillPayRepository {
               .select({
                 accountId: journalEntryLines.accountId,
                 amount: journalEntryLines.amount,
+                exchangeRate: journalEntryLines.exchangeRate,
+                functionalAmount: journalEntryLines.functionalAmount,
               })
               .from(journalEntryLines)
               .innerJoin(
@@ -169,6 +176,57 @@ export class BillPayRepository {
         }
 
         const paidAt = data.paidAt ? new Date(data.paidAt) : new Date();
+        const functionalCurrency = (
+          companyRow?.currency ?? "EUR"
+        ).toUpperCase();
+        const billCurrency = bill.currency.toUpperCase();
+
+        let payLines: AutoPostLine[] = [
+          {
+            subtype: AccountSubtype.ACCOUNTS_PAYABLE,
+            accountNodeId: payableLine.accountId,
+            type: LineType.DEBIT,
+            amount: bill.total,
+            currency: bill.currency,
+          },
+          {
+            subtype: AccountSubtype.BANK,
+            fallbackSubtype: AccountSubtype.CASH,
+            accountNodeId: data.accountNodeId,
+            type: LineType.CREDIT,
+            amount: bill.total,
+            currency: bill.currency,
+          },
+        ];
+
+        if (billCurrency !== functionalCurrency) {
+          const historicalRate =
+            payableLine.exchangeRate ??
+            (payableLine.functionalAmount && payableLine.amount > 0
+              ? payableLine.functionalAmount / payableLine.amount
+              : undefined);
+          const settlementResolved = await lookupExchangeRate(
+            tx,
+            billCurrency,
+            functionalCurrency,
+            paidAt,
+          );
+          if (historicalRate && settlementResolved) {
+            payLines = buildRealizedFxSettlement({
+              side: "AP",
+              amount: bill.total,
+              transactionCurrency: billCurrency,
+              functionalCurrency,
+              historicalRate,
+              settlementRate: settlementResolved.rate,
+              bankOrCashSubtype: AccountSubtype.BANK,
+              bankOrCashFallbackSubtype: AccountSubtype.CASH,
+              bankOrCashAccountId: data.accountNodeId,
+              controlAccountId: payableLine.accountId,
+            }).lines;
+          }
+        }
+
         const journalEntryId = await postJournalEntry(
           {
             companyId: bill.companyId,
@@ -177,23 +235,7 @@ export class BillPayRepository {
             sourceType: JournalSourceType.AP_PAYMENT,
             sourceId: bill.id,
             postedByUserId: userId,
-            lines: [
-              {
-                subtype: AccountSubtype.ACCOUNTS_PAYABLE,
-                accountNodeId: payableLine.accountId,
-                type: LineType.DEBIT,
-                amount: bill.total,
-                currency: bill.currency,
-              },
-              {
-                subtype: AccountSubtype.BANK,
-                fallbackSubtype: AccountSubtype.CASH,
-                accountNodeId: data.accountNodeId,
-                type: LineType.CREDIT,
-                amount: bill.total,
-                currency: bill.currency,
-              },
-            ],
+            lines: payLines,
             logger,
           },
           tx,

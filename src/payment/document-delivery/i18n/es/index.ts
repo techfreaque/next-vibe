@@ -1,0 +1,110 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: {
+    payment: "pagos",
+    pdf: "pdf",
+    email: "email",
+  },
+  pdf: {
+    invoiceTitle: "PDF de factura",
+    invoiceDescription:
+      "Descarga la factura PDF/A-3 con datos legales, código QR de pago y XML ZUGFeRD incrustado.",
+    estimateTitle: "PDF de presupuesto",
+    estimateDescription: "Descarga el presupuesto en PDF.",
+    success: "PDF generado",
+    downloadAction: "Descargar PDF",
+    zugferdBadge: "ZUGFeRD / Factur-X EN 16931 incrustado",
+    qrBadgeEpc: "Código QR SEPA EPC / GiroCode incluido",
+    qrBadgePayBySquare: "Código QR PAY by square incluido",
+    filename: "Archivo",
+    documentNumber: "Número de documento",
+    paymentUrl: "Enlace de pago online",
+    qrSection: "Código QR de pago",
+    back: "Volver",
+  },
+  deliver: {
+    logTitle: "Registro de envíos por correo",
+    logDescription:
+      "Consulta los correos enviados y reenvía el PDF adjunto desde el correo del sistema.",
+    logSuccess: "Registro cargado",
+    sendTitle: "Enviar documento por correo",
+    sendDescription: "Envía el PDF al cliente desde la cuenta del sistema hi@.",
+    sendSuccess: "Correo enviado con PDF adjunto",
+    recipientEmail: "Correo del destinatario",
+    recipientName: "Nombre del destinatario",
+    customMessage: "Mensaje personal (opcional)",
+    isResend: "Reenviar",
+    sendAction: "Enviar correo con PDF",
+    resendAction: "Reenviar PDF",
+    emptyLog: "Aún no se han enviado correos",
+    emptyLogHint: "Envía el PDF arriba para registrar la entrega aquí.",
+    sentAt: "Enviado el",
+    sender: "Remitente",
+    status: "Estado",
+    attachment: "Adjunto",
+    statusSent: "Enviado",
+    statusFailed: "Fallido",
+    resendBadge: "Reenviado",
+    subjectInvoice: "Factura {{number}} de {{company}}",
+    subjectCreditNote: "Nota de crédito {{number}} de {{company}}",
+    subjectEstimate: "Presupuesto {{number}} de {{company}}",
+    bodyIntro: "Adjuntamos {{document}} en formato PDF.",
+    bodyPayOnline: "Pagar online:",
+    bodyViewLink: "Ver documento:",
+    theaBlocked: "Los correos del ERP deben usar la cuenta hi@, nunca thea@.",
+    mailerUnavailable:
+      "El correo de la plataforma no está configurado. Revisa la cuenta SMTP predeterminada.",
+  },
+  fields: {
+    invoiceId: "Factura",
+    estimateId: "Presupuesto",
+    documentType: "Tipo de documento",
+    pdfBase64: "Datos PDF",
+    contentType: "Tipo de contenido",
+    hasZugferd: "ZUGFeRD incrustado",
+    qrKind: "Formato QR",
+    qrSvg: "Vista previa QR",
+    deliveries: "Envíos",
+    deliveryId: "Envío",
+    messageId: "ID de mensaje",
+  },
+  errors: {
+    validation: {
+      title: "Revisa los datos",
+      description: "Indica un documento y un correo electrónico válidos.",
+    },
+    network: {
+      title: "Error de red",
+      description: "Comprueba tu conexión e inténtalo de nuevo.",
+    },
+    unauthorized: {
+      title: "Inicio de sesión requerido",
+      description: "Inicia sesión para descargar PDF y enviar correos.",
+    },
+    forbidden: {
+      title: "Acceso denegado",
+      description: "Tu rol en la empresa no permite esta acción.",
+    },
+    notFound: {
+      title: "Documento no encontrado",
+      description: "La factura, nota de crédito o presupuesto no existe.",
+    },
+    server: {
+      title: "Error al enviar",
+      description: "No se pudo generar el PDF ni enviar el correo.",
+    },
+    unknown: {
+      title: "Error inesperado",
+      description: "Inténtalo de nuevo.",
+    },
+    unsavedChanges: {
+      title: "Cambios sin guardar",
+      description: "Tus cambios siguen en el formulario.",
+    },
+    conflict: {
+      title: "Documento no listo",
+      description: "Emite el documento antes de enviarlo por correo.",
+    },
+  },
+};

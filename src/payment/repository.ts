@@ -499,6 +499,18 @@ export class PaymentRepository {
             });
             break;
           }
+          const { isErpInvoiceWebhook, settleErpInvoiceFromStripeWebhook } =
+            await import("./invoice/stripe-checkout");
+          if (isErpInvoiceWebhook(eventData)) {
+            const settled = await settleErpInvoiceFromStripeWebhook(
+              eventData,
+              logger,
+            );
+            if (!settled.success) {
+              return settled;
+            }
+            break;
+          }
           const checkout = await this.handleCheckoutSessionCompleted(
             eventData,
             logger,

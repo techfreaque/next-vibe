@@ -26,7 +26,7 @@ import { scopedTranslation } from "../../i18n";
 import { nextAccountingDay } from "../../shared/journal-validation";
 import {
   findLedgerReportCompany,
-  resolveLedgerReportCurrency,
+  resolveLedgerReportScope,
 } from "../../shared/report-currency";
 import type { BalanceSheetRequestOutput } from "./definition";
 
@@ -93,18 +93,26 @@ export class BalanceSheetRepository {
         lt(journalEntries.date, nextAccountingDay(asOfDate)),
       ];
 
-      const reportCurrency = await resolveLedgerReportCurrency(
+      const scope = await resolveLedgerReportScope(
         company.currency,
         entryConditions,
         data.currency,
       );
-      if (!reportCurrency) {
+      if (!scope) {
         return fail({
           message: t("reports.mixedCurrency"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
-      entryConditions.push(eq(journalEntryLines.currency, reportCurrency));
+      const reportCurrency = scope.reportCurrency;
+      if (scope.filterCurrency) {
+        entryConditions.push(
+          eq(journalEntryLines.currency, scope.filterCurrency),
+        );
+      }
+      const lineAmountExpr = scope.useFunctionalAmount
+        ? sql`coalesce(${journalEntryLines.functionalAmount}, ${journalEntryLines.amount})`
+        : journalEntryLines.amount;
 
       const rows = await db
         .select({
@@ -114,9 +122,14 @@ export class BalanceSheetRepository {
           type: accountNodes.type,
           subtype: accountNodes.subtype,
           balanceUnits: sql<string>`(sum(case
-            when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount}
-            else -${journalEntryLines.amount}
+            when ${journalEntryLines.type} = ${LineType.DEBIT} then ${lineAmountExpr}
+            else -${lineAmountExpr}
           end) * 10000)::numeric(30, 0)`,
+          foreignSummary: scope.useFunctionalAmount
+            ? sql<
+                string | null
+              >`string_agg(distinct case when ${journalEntryLines.currency} <> ${reportCurrency} then ${journalEntryLines.currency} else null end, ', ')`
+            : sql<string | null>`null`,
         })
         .from(journalEntryLines)
         .innerJoin(
@@ -150,7 +163,9 @@ export class BalanceSheetRepository {
         const line = {
           accountId: row.accountId,
           code: row.code,
-          name: row.name,
+          name: row.foreignSummary
+            ? `${row.name} (${row.foreignSummary})`
+            : row.name,
           subtype: row.subtype,
           balance:
             Number(row.type === AccountType.ASSET ? units : -units) / 10_000,

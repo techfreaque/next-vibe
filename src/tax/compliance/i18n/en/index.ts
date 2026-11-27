@@ -90,7 +90,7 @@ export const translations = {
       title: "What the ERP prepares",
       vatReturn: "VAT return and control statement",
       statements: "Statutory financial statements",
-      fiscal: "Fiscal receipts (eKasa)",
+      fiscal: "Fiscal receipts",
       eInvoicing: "Mandatory e-invoicing from",
       yes: "Available",
       no: "Not available for this country",

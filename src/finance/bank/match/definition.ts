@@ -107,7 +107,7 @@ const { POST } = createEndpoint({
       matchKind: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "adjustment.kind",
-        schema: z.enum(["exact", "fee", "fx"]).optional(),
+        schema: z.enum(["exact", "fee", "fx", "split"]).optional(),
       }),
       matchedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

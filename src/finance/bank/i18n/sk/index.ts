@@ -131,6 +131,10 @@ export const translations: typeof enTranslations = {
     preview: "Náhľad prvých piatich transakcií",
     matchRow: "Spárovať",
     unmatched: "Nespárované",
+    matched: "Spárované",
+    allLines: "Všetky",
+    splitMatched: "Rozdelené",
+    selectAccount: "Otvoriť účet",
     csvHelp:
       "Vyberte export z banky alebo priraďte stĺpce CSV. Potrebujete dátum zaúčtovania a sumu so znamienkom.",
     unsupported:
@@ -211,6 +215,77 @@ export const translations: typeof enTranslations = {
     journalMatch:
       "Vyberte nespárovaný riadok zaúčtovaného zápisu s rovnakým bankovým účtom, sumou a menou.",
     confirmation: "Pred odoslaním potvrďte spárovanie.",
+    splitTotalMismatch:
+      "Súčet rozdelených položiek sa musí presne rovnať sume bankového riadku.",
+    splitTargetInvalid:
+      "Skontrolujte, či vybraná faktúra, doklad alebo účet patrí tejto firme a zodpovedá smeru platby.",
+  },
+  reconciliation: {
+    statusTitle: "Stav párovania",
+    accountsTitle: "Stav bankových účtov",
+    unmatchedLines: "Nespárované",
+    matchedLines: "Spárované",
+    statementNet: "Zostatok výpisu",
+    ledgerBalance: "Účtovný zostatok",
+    difference: "Rozdiel",
+  },
+  autoMatch: {
+    title: "Automatické párovanie banky",
+    description:
+      "Spárujte nespárované bankové riadky s faktúrami, dodávateľskými dokladmi a zaúčtovanými platbami podľa sumy, referencie, IBAN, časového okna a kurzovej tolerancie.",
+    success: "Automatické párovanie dokončené",
+    action: "Auto-párovanie",
+    dryRun: "Len náhľad",
+    previewAction: "Náhľad zhôd",
+    applyAction: "Použiť zhody",
+    previewBanner: "Náhľad našiel {{count}} jednoznačných zhôd.",
+    appliedBanner: "Automaticky spárovaných {{count}} bankových riadkov.",
+    skippedHint:
+      "{{count}} nejednoznačných riadkov preskočených na ručnú kontrolu.",
+    matchedCount: "Spárované",
+    invoiceMatches: "Faktúry",
+    billMatches: "Dodávateľské faktúry",
+    journalMatches: "Účtovné zápisy",
+    skippedAmbiguous: "Preskočené nejednoznačné",
+    items: "Spárované položky",
+    targetType: "Typ",
+    targetLabel: "Cieľ",
+    basisLabel: "Kritérium",
+    emptyTitle: "Nenašli sa žiadne automatické zhody",
+    emptyHint:
+      "Skontrolujte nespárované riadky ručne alebo upravte časové okno a kurzové nastavenia.",
+    targets: {
+      journal_line: "Účtovný riadok",
+      invoice: "Faktúra",
+      bill: "Dodávateľská faktúra",
+    },
+    basis: {
+      reference: "Referencia dokladu",
+      iban: "IBAN",
+      amount_date: "Suma a dátum",
+      fx_tolerance: "Kurzová alebo poplatková tolerancia",
+    },
+  },
+  split: {
+    title: "Rozdeliť bankový riadok",
+    description:
+      "Rozdeľte jeden riadok bankového výpisu na viacero faktúr, dokladov, účtov alebo účtovných riadkov.",
+    success: "Bankový riadok rozdelený a spárovaný",
+    openAction: "Rozdeliť",
+    allocations: "Položky rozdelenia",
+    count: "Položky",
+    remaining: "Zostáva rozdeliť",
+    selectTarget: "Vybrať cieľ",
+    addRow: "Pridať riadok",
+    removeRow: "Odstrániť",
+    confirmAction: "Potvrdiť rozdelenie",
+    documentCandidates: "Otvorené faktúry a doklady",
+    types: {
+      journal_line: "Účtovný riadok",
+      invoice: "Otvorená faktúra",
+      bill: "Otvorený doklad",
+      account: "Účtovný účet",
+    },
   },
   import: {
     title: "Import bankového výpisu",

@@ -9,6 +9,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
@@ -96,6 +97,10 @@ export function InventoryWarehouseCreateWidget({
       <TextFieldWidget
         fieldName="address"
         field={withValue(field.children.address, undefined, null)}
+      />
+      <SelectFieldWidget
+        fieldName="negativeStockPolicy"
+        field={field.children.negativeStockPolicy}
       />
       <Div className="grid gap-3 border-t pt-4 @lg:grid-cols-2">
         <BooleanFieldWidget

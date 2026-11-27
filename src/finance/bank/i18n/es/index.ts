@@ -132,6 +132,10 @@ export const translations: typeof enTranslations = {
     preview: "Vista previa (primeros 5 movimientos)",
     matchRow: "Conciliar",
     unmatched: "Pendiente",
+    matched: "Conciliado",
+    allLines: "Todos",
+    splitMatched: "Dividido",
+    selectAccount: "Abrir cuenta",
     csvHelp:
       "Elige un extracto bancario o asigna las columnas CSV. La fecha contable y el importe con signo son obligatorios.",
     unsupported:
@@ -213,6 +217,78 @@ export const translations: typeof enTranslations = {
     journalMatch:
       "Elige una línea contabilizada sin conciliar que coincida en cuenta bancaria, importe y moneda.",
     confirmation: "Confirma la conciliación antes de guardar.",
+    splitTotalMismatch:
+      "Las partidas divididas deben sumar exactamente el importe del movimiento bancario.",
+    splitTargetInvalid:
+      "Comprueba que cada factura, gasto o cuenta pertenece a esta empresa y coincide con el sentido del pago.",
+  },
+  reconciliation: {
+    statusTitle: "Estado de conciliación",
+    accountsTitle: "Estado de cuentas bancarias",
+    unmatchedLines: "Pendientes",
+    matchedLines: "Conciliados",
+    statementNet: "Saldo del extracto",
+    ledgerBalance: "Saldo contable",
+    difference: "Diferencia",
+  },
+  autoMatch: {
+    title: "Conciliación automática",
+    description:
+      "Concilia movimientos bancarios abiertos con facturas, gastos y pagos contabilizados por importe, referencia, IBAN, ventana de fechas y tolerancia de divisa.",
+    success: "Conciliación automática completada",
+    action: "Auto-conciliar",
+    dryRun: "Solo vista previa",
+    previewAction: "Previsualizar",
+    applyAction: "Aplicar conciliaciones",
+    previewBanner: "Vista previa: {{count}} coincidencias inequívocas.",
+    appliedBanner:
+      "{{count}} movimientos bancarios conciliados automáticamente.",
+    skippedHint:
+      "{{count}} movimientos ambiguos omitidos para revisión manual.",
+    matchedCount: "Conciliados",
+    invoiceMatches: "Facturas",
+    billMatches: "Facturas de proveedor",
+    journalMatches: "Asientos",
+    skippedAmbiguous: "Ambiguos omitidos",
+    items: "Elementos conciliados",
+    targetType: "Tipo",
+    targetLabel: "Destino",
+    basisLabel: "Criterio",
+    emptyTitle: "No se encontraron coincidencias automáticas",
+    emptyHint:
+      "Revisa los movimientos pendientes manualmente o ajusta la ventana de fechas y tolerancia FX.",
+    targets: {
+      journal_line: "Línea contable",
+      invoice: "Factura",
+      bill: "Factura de proveedor",
+    },
+    basis: {
+      reference: "Referencia de documento",
+      iban: "IBAN",
+      amount_date: "Importe y fecha",
+      fx_tolerance: "Tolerancia FX o comisión",
+    },
+  },
+  split: {
+    title: "Dividir movimiento bancario",
+    description:
+      "Reparte un movimiento bancario entre varias facturas, gastos, cuentas o asientos contables.",
+    success: "Movimiento dividido y conciliado",
+    openAction: "Dividir",
+    allocations: "Asignaciones",
+    count: "Partidas",
+    remaining: "Pendiente de asignar",
+    selectTarget: "Seleccionar destino",
+    addRow: "Añadir línea",
+    removeRow: "Eliminar",
+    confirmAction: "Confirmar división",
+    documentCandidates: "Facturas y gastos abiertos",
+    types: {
+      journal_line: "Línea contable",
+      invoice: "Factura abierta",
+      bill: "Gasto abierto",
+      account: "Cuenta contable",
+    },
   },
   import: {
     title: "Importar extracto bancario",

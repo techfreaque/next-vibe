@@ -17,6 +17,7 @@ import {
   type JournalSourceTypeDB,
   type LineTypeDB,
 } from "../enum";
+import { convertToFunctional, lookupExchangeRate } from "../exchange-rates/ecb";
 import { validateJournalLines } from "./journal-validation";
 import {
   findOpenPeriod,
@@ -31,6 +32,12 @@ export interface AutoPostLine {
   type: (typeof LineTypeDB)[number];
   amount: number;
   currency: string;
+  /** Optional precomputed functional-currency amount for multi-currency entries. */
+  functionalAmount?: number;
+  /** Optional functional currency code (defaults to company.currency). */
+  functionalCurrency?: string;
+  /** Optional exchange rate: 1 transactionCurrency = exchangeRate functionalCurrency. */
+  exchangeRate?: number;
   description?: string;
   /** Select this active account instead of resolving by subtype. */
   accountNodeId?: string;
@@ -66,7 +73,74 @@ export async function postJournalEntry(
     return null;
   }
 
-  const issue = validateJournalLines(lines, company.currency ?? "EUR");
+  const functionalCurrency = (company.currency ?? "EUR").toUpperCase();
+  const hasForeignLine = lines.some(
+    (l) => l.currency.toUpperCase() !== functionalCurrency,
+  );
+
+  const translatedLines: Array<
+    AutoPostLine & {
+      resolvedFunctionalAmount: number;
+      resolvedFunctionalCurrency: string;
+      resolvedExchangeRate: number;
+    }
+  > = [];
+
+  for (const line of lines) {
+    const lineCurrency = line.currency.toUpperCase();
+    if (line.functionalAmount !== undefined) {
+      translatedLines.push({
+        ...line,
+        currency: lineCurrency,
+        resolvedFunctionalAmount: line.functionalAmount,
+        resolvedFunctionalCurrency:
+          line.functionalCurrency ?? functionalCurrency,
+        resolvedExchangeRate:
+          line.exchangeRate ??
+          (line.amount > 0 ? line.functionalAmount / line.amount : 1),
+      });
+    } else if (lineCurrency === functionalCurrency) {
+      translatedLines.push({
+        ...line,
+        currency: lineCurrency,
+        resolvedFunctionalAmount: line.amount,
+        resolvedFunctionalCurrency: functionalCurrency,
+        resolvedExchangeRate: 1,
+      });
+    } else {
+      const rate =
+        line.exchangeRate ??
+        (await lookupExchangeRate(tx, lineCurrency, functionalCurrency, date))
+          ?.rate;
+      if (!rate || !Number.isFinite(rate) || rate <= 0) {
+        params.logger.warn("Missing exchange rate for foreign-currency entry", {
+          companyId,
+          sourceType,
+          sourceId,
+          fromCurrency: lineCurrency,
+          toCurrency: functionalCurrency,
+        });
+        return null;
+      }
+      translatedLines.push({
+        ...line,
+        currency: lineCurrency,
+        resolvedFunctionalAmount: convertToFunctional(line.amount, rate),
+        resolvedFunctionalCurrency: functionalCurrency,
+        resolvedExchangeRate: rate,
+      });
+    }
+  }
+
+  const issue = validateJournalLines(
+    translatedLines.map((l) => ({
+      type: l.type,
+      amount: l.amount,
+      currency: l.currency,
+      functionalAmount: hasForeignLine ? l.resolvedFunctionalAmount : undefined,
+    })),
+    functionalCurrency,
+  );
   if (issue) {
     params.logger.warn("Invalid automatic journal entry", {
       companyId,
@@ -82,7 +156,7 @@ export async function postJournalEntry(
     return null;
   }
 
-  const accountConditions = lines.flatMap((line) =>
+  const accountConditions = translatedLines.flatMap((line) =>
     line.accountNodeId
       ? [eq(accountNodes.id, line.accountNodeId)]
       : [
@@ -109,7 +183,7 @@ export async function postJournalEntry(
     .for("share");
 
   const resolvedLines: Omit<NewJournalEntryLine, "journalEntryId">[] = [];
-  for (const [sortOrder, line] of lines.entries()) {
+  for (const [sortOrder, line] of translatedLines.entries()) {
     const account = line.accountNodeId
       ? accounts.find(({ id }) => id === line.accountNodeId)
       : (accounts.find(({ subtype }) => subtype === line.subtype) ??
@@ -122,6 +196,9 @@ export async function postJournalEntry(
       type: line.type,
       amount: line.amount,
       currency: line.currency,
+      functionalAmount: line.resolvedFunctionalAmount,
+      functionalCurrency: line.resolvedFunctionalCurrency,
+      exchangeRate: line.resolvedExchangeRate,
       description: line.description ?? null,
       sortOrder,
     });

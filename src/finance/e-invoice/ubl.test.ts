@@ -12,6 +12,7 @@ import {
   ublEndpoint,
   ublTotals,
   validateUblInput,
+  XRECHNUNG_CUSTOMIZATION_ID,
 } from "./ubl";
 
 const seller: UblParty = {
@@ -153,9 +154,9 @@ describe("buildUblInvoice", () => {
     expect(xml).toContain("<cbc:Note>Prenesenie daňovej povinnosti</cbc:Note>");
     expect(xml).toContain('<cbc:TaxAmount currencyID="EUR">0.00</cbc:TaxAmount>');
 
-    expect(
-      validateUblInput({ ...input, buyer: { ...czBuyer, vatNumber: null } }),
-    ).toContain("BT-48");
+    expect(validateUblInput({ ...input, buyer: { ...czBuyer, vatNumber: null } })).toContain(
+      "BT-48",
+    );
   });
 
   it("builds a credit note with a billing reference and positive amounts", () => {
@@ -177,7 +178,9 @@ describe("buildUblInvoice", () => {
     });
     const xml = buildUblInvoice(input);
     expect(validateUblInput(input)).toEqual([]);
-    expect(xml).toContain("<CreditNote xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2\"");
+    expect(xml).toContain(
+      '<CreditNote xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2"',
+    );
     expect(xml).toContain("<cbc:CreditNoteTypeCode>381</cbc:CreditNoteTypeCode>");
     expect(xml).toContain(
       "<cac:BillingReference><cac:InvoiceDocumentReference><cbc:ID>2026000042</cbc:ID><cbc:IssueDate>2026-11-20</cbc:IssueDate></cac:InvoiceDocumentReference></cac:BillingReference>",
@@ -267,16 +270,17 @@ describe("buildUblInvoice", () => {
       ],
     });
     const totals = ublTotals(input);
-    const gross = input.lines.reduce(
-      (sum, line) => sum + Math.round(line.lineTotal * 100),
-      0,
-    );
+    const gross = input.lines.reduce((sum, line) => sum + Math.round(line.lineTotal * 100), 0);
     expect(totals.taxInclusiveCents).toBe(gross);
     expect(totals.lineExtensionCents + totals.taxCents).toBe(totals.payableCents);
     const xml = buildUblInvoice(input);
     expect(count(xml, "<cac:TaxSubtotal>")).toBe(3);
-    expect(xml).toContain('<cbc:TaxInclusiveAmount currencyID="EUR">45.22</cbc:TaxInclusiveAmount>');
-    expect(xml).toContain('<cbc:LineExtensionAmount currencyID="EUR">40.02</cbc:LineExtensionAmount>');
+    expect(xml).toContain(
+      '<cbc:TaxInclusiveAmount currencyID="EUR">45.22</cbc:TaxInclusiveAmount>',
+    );
+    expect(xml).toContain(
+      '<cbc:LineExtensionAmount currencyID="EUR">40.02</cbc:LineExtensionAmount>',
+    );
   });
 
   it("reports missing mandatory fields", () => {
@@ -285,14 +289,7 @@ describe("buildUblInvoice", () => {
       seller: { ...seller, vatNumber: null, taxId: null, registrationNumber: null },
       buyer: null,
     });
-    expect(validateUblInput(input)).toEqual([
-      "BT-9",
-      "BT-31",
-      "BT-34",
-      "BT-44",
-      "BT-49",
-      "BT-55",
-    ]);
+    expect(validateUblInput(input)).toEqual(["BT-9", "BT-31", "BT-34", "BT-44", "BT-49", "BT-55"]);
   });
 
   it("resolves endpoint schemes", () => {
@@ -301,10 +298,62 @@ describe("buildUblInvoice", () => {
       id: "DE123456789",
     });
     expect(
-      ublEndpoint({ ...czBuyer, vatNumber: null, country: "BE", registrationNumber: "0123.456.789" }),
+      ublEndpoint({
+        ...czBuyer,
+        vatNumber: null,
+        country: "BE",
+        registrationNumber: "0123.456.789",
+      }),
     ).toEqual({ scheme: "0208", id: "0123456789" });
-    expect(
-      ublEndpoint({ ...skBuyer, vatNumber: null, taxId: null }),
-    ).toEqual({ scheme: "0158", id: "31322832" });
+    expect(ublEndpoint({ ...skBuyer, vatNumber: null, taxId: null })).toEqual({
+      scheme: "0158",
+      id: "31322832",
+    });
+  });
+});
+
+describe("country e-invoice formats", () => {
+  it("uses Slovak DIČ as the Peppol address and reports missing domestic street details", () => {
+    const input = base({ buyer: { ...skBuyer, addressLine1: null } });
+    expect(validateUblInput(input, "sk-efaktura")).toEqual(["BT-50"]);
+    expect(buildUblInvoice(input, "sk-efaktura")).toContain(
+      '<cbc:EndpointID schemeID="0245">2020123456</cbc:EndpointID>',
+    );
+  });
+
+  it("builds a German small-business XRechnung with buyer reference and card payment terms", () => {
+    const input = base({
+      seller: { ...seller, country: "DE", vatNumber: null, phone: "+49 30 123456" },
+      buyer: { ...skBuyer, country: "DE", vatNumber: null, email: "invoice@buyer.example" },
+      vatPayer: false,
+      smallBusinessExemption: true,
+      buyerReference: "ORDER-1",
+      paymentUrl: "https://pay.example/invoice?i=1&sig=2",
+      exemptionReason: "Steuerbefreiung für Kleinunternehmer gemäß § 19 UStG",
+      lines: [
+        {
+          description: "Design",
+          quantity: 1,
+          unitPrice: 50,
+          taxRate: 0,
+          taxAmount: 0,
+          lineTotal: 50,
+        },
+      ],
+    });
+    expect(validateUblInput(input, "xrechnung")).toEqual([]);
+    expect(validateUblInput({ ...input, buyerReference: null }, "xrechnung")).toContain("BT-10");
+    const xml = buildUblInvoice(input, "xrechnung");
+    expect(xml).toContain(
+      `<cbc:CustomizationID>${XRECHNUNG_CUSTOMIZATION_ID}</cbc:CustomizationID>`,
+    );
+    expect(xml).toContain('<cbc:EndpointID schemeID="EM">invoice@buyer.example</cbc:EndpointID>');
+    expect(xml).toContain("<cbc:BuyerReference>ORDER-1</cbc:BuyerReference>");
+    expect(xml).toContain("<cbc:ID>FC</cbc:ID>");
+    expect(xml).toContain("<cbc:PaymentMeansCode>48</cbc:PaymentMeansCode>");
+    expect(xml).toContain(
+      "<cac:PaymentTerms><cbc:Note>https://pay.example/invoice?i=1&amp;sig=2</cbc:Note></cac:PaymentTerms>",
+    );
+    expect(xml).toContain("<cac:TaxCategory><cbc:ID>E</cbc:ID><cbc:Percent>0</cbc:Percent>");
   });
 });

@@ -15,7 +15,7 @@ import { z } from "zod";
 
 import { bankErrorTypes } from "../endpoint-errors";
 import { scopedTranslation } from "../i18n";
-import { bankLineSchema } from "../schemas";
+import { bankAccountStatusSchema, bankLineSchema } from "../schemas";
 
 const BankListWidgetLazy = lazyWidget(() =>
   import("./widget").then((module) => ({ default: module.BankListWidget })),
@@ -64,6 +64,17 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.NUMBER,
         label: "fields.page",
         schema: z.coerce.number().int().min(1).default(1),
+      }),
+      status: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "fields.status",
+        options: [
+          { value: "open", label: "ui.unmatched" as const },
+          { value: "matched", label: "ui.matched" as const },
+          { value: "all", label: "ui.allLines" as const },
+        ],
+        schema: z.enum(["open", "matched", "all"]).optional(),
       }),
       lines: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -132,6 +143,16 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "fields.account",
         schema: z.string().nullable(),
+      }),
+      reconciliationStatus: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "reconciliation.statusTitle",
+        schema: bankAccountStatusSchema.optional(),
+      }),
+      accountStatuses: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "reconciliation.accountsTitle",
+        schema: z.array(bankAccountStatusSchema).optional(),
       }),
     },
   }),

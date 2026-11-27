@@ -45,6 +45,11 @@ export const translations: typeof enTranslations = {
       received: "Réceptionné",
       cancelled: "Annulé",
     },
+    negativeStockPolicy: {
+      block: "Bloquer le stock négatif",
+      warn: "Autoriser avec avertissement",
+      allow: "Autoriser le stock négatif",
+    },
   },
 
   // Warehouse create
@@ -87,6 +92,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Entrepôt par défaut",
         description: "Définir comme entrepôt par défaut de cette entreprise",
+      },
+      negativeStockPolicy: {
+        label: "Politique de stock négatif",
+        description:
+          "Comportement des ventes en caisse et sorties de stock en cas de stock insuffisant",
       },
       errors: {
         validation: {
@@ -137,6 +147,7 @@ export const translations: typeof enTranslations = {
         companyId: "ID de l'entreprise",
         isActive: "Actif",
         isDefault: "Par défaut",
+        negativeStockPolicy: "Politique de stock négatif",
       },
     },
   },
@@ -291,6 +302,7 @@ export const translations: typeof enTranslations = {
         address: "Adresse",
         isActive: "Actif",
         isDefault: "Par défaut",
+        negativeStockPolicy: "Politique de stock négatif",
         createdAt: "Créé le",
         updatedAt: "Modifié le",
       },
@@ -334,6 +346,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Entrepôt par défaut",
         description: "Définir comme entrepôt par défaut",
+      },
+      negativeStockPolicy: {
+        label: "Politique de stock négatif",
+        description:
+          "Comportement des ventes en caisse et sorties de stock en cas de stock insuffisant",
       },
       errors: {
         validation: {
@@ -383,6 +400,7 @@ export const translations: typeof enTranslations = {
         code: "Code",
         isActive: "Actif",
         isDefault: "Par défaut",
+        negativeStockPolicy: "Politique de stock négatif",
       },
     },
   },

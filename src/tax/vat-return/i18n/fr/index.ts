@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tags: { tax: "Fiscalité", vatReturn: "Déclaration de TVA" },
-  title: "Déclaration de TVA slovaque et relevé de contrôle",
-  titleShort: "Déclaration de TVA (SK)",
+  title: "Déclaration de TVA",
+  titleShort: "Déclaration de TVA",
   description:
-    "Préparez les lignes de la déclaration DPH et le XML du relevé de contrôle (kontrolný výkaz) pour un mois ou un trimestre.",
+    "Votre déclaration de TVA pour la période, au format officiel de votre pays.",
   company: {
     label: "Entreprise",
-    description: "L'entreprise assujettie à la TVA",
+    description: "L'entreprise concernée par la déclaration",
   },
   period: {
     label: "Période",
@@ -16,16 +16,64 @@ export const translations: typeof enTranslations = {
     month: "{{month}} {{year}}",
     quarter: "T{{quarter}} {{year}}",
   },
-  unsupportedCountry:
-    "La déclaration de TVA est préparée uniquement pour les entreprises slovaques. Définissez la Slovaquie comme pays de l'entreprise pour l'utiliser.",
   disclaimer:
-    "Nous fournissons des outils, pas de conseil fiscal. Faites vérifier vos déclarations par votre conseiller fiscal avant de les déposer dans eDane.",
+    "Nous fournissons des outils, pas de conseil fiscal. Faites vérifier vos déclarations par votre conseiller avant dépôt.",
   summary: "{{company}}, du {{from}} au {{to}}",
-  due: "À déposer par voie électronique au plus tard le 25 du mois suivant.",
+  formats: {
+    SK_DPH: "Lignes de la déclaration DPH (DPHv25)",
+    DE_USTVA: "Umsatzsteuer-Voranmeldung (UStVA)",
+    DE_EUR_SMALL_BUSINESS: "Synthèse EÜR (franchise § 19 UStG)",
+    AT_UVA: "Umsatzsteuervoranmeldung (U30)",
+    AT_EA_SMALL_BUSINESS: "Synthèse recettes-dépenses (§ 6 al. 1 Z 27 UStG)",
+    GENERIC_VAT: "Synthèse de TVA par taux",
+  },
+  dueByFormat: {
+    SK_DPH:
+      "À déposer par voie électronique au plus tard le 25 du mois suivant.",
+    DE_USTVA: "Échéance le 10 du mois suivant via ELSTER.",
+    DE_EUR_SMALL_BUSINESS:
+      "Synthèse annuelle EÜR avec la déclaration de revenus.",
+    AT_UVA: "Échéance le 15 du deuxième mois suivant via FinanzOnline.",
+    AT_EA_SMALL_BUSINESS: "Synthèse annuelle pour petites entreprises.",
+    GENERIC_VAT:
+      "Vérifiez la date limite auprès de votre administration fiscale.",
+  },
+  smallBusiness: {
+    title: "Aucune déclaration de TVA requise (franchise petite entreprise)",
+    body: {
+      SK_DPH: "Cette entreprise n'est pas assujettie à la TVA.",
+      DE_USTVA: "Aucune déclaration UStVA périodique n'est requise.",
+      DE_EUR_SMALL_BUSINESS:
+        "Cette entreprise applique le régime § 19 UStG. Aucune UStVA périodique n'est due. Voici votre synthèse EÜR pour la période.",
+      AT_UVA: "Aucune déclaration UVA périodique n'est requise.",
+      AT_EA_SMALL_BUSINESS:
+        "Cette entreprise applique la franchise § 6 al. 1 Z 27 UStG. Voici votre synthèse recettes-dépenses pour la période.",
+      GENERIC_VAT: "Aucune déclaration de TVA n'est requise pour ce régime.",
+    },
+  },
+  xmlSection: {
+    SK_DPH: "Relevé de contrôle (KV DPH)",
+    DE_USTVA: "XML ELSTER UStVA",
+    DE_EUR_SMALL_BUSINESS: "Export XML",
+    AT_UVA: "XML FinanzOnline UVA (U30)",
+    AT_EA_SMALL_BUSINESS: "Export XML",
+    GENERIC_VAT: "Export XML",
+  },
+  xmlNote: {
+    SK_DPH: "Téléversez le XML KVDPHv25 sur le portail eDane.",
+    DE_USTVA:
+      "XML ELSTER UStVA prêt pour l'import comptable ou la transmission ERiC. La transmission directe requiert un certificat ERiC; vous pouvez aussi saisir les cases dans Mein ELSTER ou télécharger le CSV.",
+    DE_EUR_SMALL_BUSINESS: "Utilisez l'export CSV structuré ci-dessus.",
+    AT_UVA:
+      "XML FinanzOnline U30 prêt pour le dépôt sur le portail ou la revue comptable.",
+    AT_EA_SMALL_BUSINESS: "Utilisez l'export CSV structuré ci-dessus.",
+    GENERIC_VAT: "Utilisez l'export CSV structuré ci-dessus.",
+  },
   lines: {
-    title: "Lignes de la déclaration DPH (DPHv25)",
+    title: "Lignes de déclaration",
     line: "Ligne",
     meaning: "Signification",
+    base: "Base imposable",
     amount: "Montant",
     r01: "Base imposable à 19 %",
     r02: "TVA à 19 %",
@@ -55,7 +103,7 @@ export const translations: typeof enTranslations = {
     r33: "Crédit de TVA (remboursement)",
   },
   sections: {
-    title: "Relevé de contrôle (KV DPH)",
+    title: "Relevé de contrôle",
     section: "Section",
     count: "Lignes",
     A1: "A.1 Factures émises à des assujettis",
@@ -64,22 +112,24 @@ export const translations: typeof enTranslations = {
     B2: "B.2 Factures nationales reçues avec déduction",
     B31: "B.3.1 Factures simplifiées reçues (total)",
     C1: "C.1 Avoirs émis",
-    D1: "D.1 Chiffre d'affaires eKasa",
-    D2: "D.2 Autres opérations (clients sans IČ DPH)",
+    D1: "D.1 Chiffre d'affaires de caisse",
+    D2: "D.2 Autres opérations (clients sans numéro de TVA)",
   },
   warnings: {
     noVatId:
-      "L'entreprise n'a pas de numéro de TVA (IČ DPH) valide. Le XML KV l'exige avant le dépôt.",
+      "L'entreprise n'a pas de numéro de TVA valide configuré. Ajoutez-le avant le dépôt.",
+    noTaxId:
+      "L'entreprise n'a pas de numéro fiscal configuré. Ajoutez-le avant l'export.",
     customerVatIds:
-      "{{count}} factures concernent des clients sans IČ DPH et sont déclarées en D.2.",
+      "{{count}} factures concernent des clients sans numéro de TVA et sont déclarées en D.2.",
     unmappedRates:
-      "{{count}} lignes utilisent des taux autres que 23 / 19 / 5 % et ne figurent pas dans la déclaration. Vérifiez-les.",
+      "{{count}} lignes utilisent des taux non standards et ne figurent pas dans les lignes mappées. Vérifiez-les.",
     b32Required:
       "La TVA déduite sur les factures simplifiées a atteint 3 000 EUR. Détaillez-les par fournisseur en B.3.2 avant le dépôt.",
   },
   actions: {
-    downloadKv: "Télécharger le XML KV DPH",
-    downloadCsv: "Télécharger les lignes de la déclaration (CSV)",
+    downloadXml: "Télécharger le XML",
+    downloadCsv: "Télécharger le CSV",
     showXml: "Afficher le XML",
     hideXml: "Masquer le XML",
     copy: "Copier",
@@ -88,7 +138,7 @@ export const translations: typeof enTranslations = {
       "Copie impossible. Sélectionnez le texte et copiez-le manuellement.",
   },
   pickCompany: "Choisissez une entreprise pour préparer sa déclaration de TVA.",
-  empty: "Aucun document soumis à la TVA sur cette période.",
+  empty: "Aucun document pertinent sur cette période.",
   errors: {
     validation: {
       title: "Requête invalide",
@@ -130,6 +180,6 @@ export const translations: typeof enTranslations = {
   success: {
     title: "Déclaration de TVA préparée",
     description:
-      "Les lignes et le relevé de contrôle reflètent les documents enregistrés.",
+      "Les lignes et les fichiers d'export reflètent les documents enregistrés.",
   },
 };

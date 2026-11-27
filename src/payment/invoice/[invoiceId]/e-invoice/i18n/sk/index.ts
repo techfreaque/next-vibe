@@ -1,13 +1,18 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Elektronická faktúra (Peppol)",
+  title: "Elektronická faktúra",
   titleShort: "E-faktúra",
   description:
     "Exportujte vystavenú faktúru alebo dobropis ako súbor Peppol BIS Billing 3.0 (UBL, EN 16931).",
   invoiceId: {
     label: "Faktúra",
     description: "Vystavená faktúra alebo dobropis na export",
+  },
+  buyerReference: {
+    label: "Referencia odberateľa",
+    description:
+      "Zadajte referenciu od odberateľa. Pri nemeckom verejnom úrade zadajte jeho Leitweg-ID.",
   },
   response: {
     invoiceNumber: "Číslo dokladu",
@@ -18,6 +23,12 @@ export const translations: typeof enTranslations = {
     xml: "XML",
   },
   widget: {
+    peppol: "Stiahnuť XML Peppol",
+    slovak: "Stiahnuť XML eFaktúry",
+    xrechnung: "XML XRechnung",
+    send: "Odoslať cez Peppol",
+    providerNeeded:
+      "Pripojte certifikovaného digitálneho poštára a zaregistrujte Peppol ID vystavovateľa.",
     back: "Späť",
     submit: "Pripraviť e-faktúru",
     invoice: "Faktúra {{number}}",
@@ -32,6 +43,15 @@ export const translations: typeof enTranslations = {
     disclaimer: "Poskytujeme nástroje, nie daňové poradenstvo.",
   },
   fields: {
+    bt10: "Referencia odberateľa",
+    bt35: "Ulica dodávateľa",
+    bt37: "Obec dodávateľa",
+    bt38: "PSČ dodávateľa",
+    bt42: "Telefón dodávateľa",
+    bt43: "E-mail dodávateľa",
+    bt50: "Ulica odberateľa",
+    bt52: "Obec odberateľa",
+    bt53: "PSČ odberateľa",
     bt1: "Číslo dokladu",
     bt2: "Dátum vyhotovenia",
     bt5: "Mena",

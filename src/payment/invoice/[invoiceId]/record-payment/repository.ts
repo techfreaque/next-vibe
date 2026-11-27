@@ -30,7 +30,12 @@ import {
   JournalSourceType,
   LineType,
 } from "@/chart-of-accounts/enum";
-import { postJournalEntry } from "@/chart-of-accounts/shared/auto-post";
+import { lookupExchangeRate } from "@/chart-of-accounts/exchange-rates/ecb";
+import {
+  type AutoPostLine,
+  postJournalEntry,
+} from "@/chart-of-accounts/shared/auto-post";
+import { buildRealizedFxSettlement } from "@/chart-of-accounts/shared/fx-settlement";
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { getInvoiceOpenBalanceParts } from "@/finance/document-balance";
 import { getDocumentAccess } from "@/finance/document-company-scope";
@@ -98,9 +103,9 @@ export class InvoiceRecordPaymentRepository {
       }
 
       return await db.transaction(async (tx) => {
-        if (observedInvoice.companyId) {
-          await lockLedgerCompany(tx, observedInvoice.companyId);
-        }
+        const companyRow = observedInvoice.companyId
+          ? await lockLedgerCompany(tx, observedInvoice.companyId)
+          : undefined;
 
         const [invoice] = await tx
           .select()
@@ -224,6 +229,8 @@ export class InvoiceRecordPaymentRepository {
                 .select({
                   accountId: journalEntryLines.accountId,
                   amount: journalEntryLines.amount,
+                  exchangeRate: journalEntryLines.exchangeRate,
+                  functionalAmount: journalEntryLines.functionalAmount,
                 })
                 .from(journalEntryLines)
                 .innerJoin(
@@ -288,6 +295,59 @@ export class InvoiceRecordPaymentRepository {
             }
           }
 
+          const functionalCurrency = (
+            companyRow?.currency ?? "EUR"
+          ).toUpperCase();
+          const invoiceCurrency = invoice.currency.toUpperCase();
+          const bankOrCashSubtype =
+            data.method === ManualPaymentMethod.CASH
+              ? AccountSubtype.CASH
+              : AccountSubtype.BANK;
+
+          let paymentLines: AutoPostLine[] = [
+            {
+              subtype: bankOrCashSubtype,
+              accountNodeId: data.accountNodeId,
+              type: LineType.DEBIT,
+              amount: data.amount,
+              currency: invoice.currency,
+            },
+            {
+              subtype: AccountSubtype.ACCOUNTS_RECEIVABLE,
+              accountNodeId: receivable.accountId,
+              type: LineType.CREDIT,
+              amount: data.amount,
+              currency: invoice.currency,
+            },
+          ];
+
+          if (invoiceCurrency !== functionalCurrency) {
+            const historicalRate =
+              receivable.exchangeRate ??
+              (receivable.functionalAmount && receivable.amount > 0
+                ? receivable.functionalAmount / receivable.amount
+                : undefined);
+            const settlementResolved = await lookupExchangeRate(
+              tx,
+              invoiceCurrency,
+              functionalCurrency,
+              paidAt,
+            );
+            if (historicalRate && settlementResolved) {
+              paymentLines = buildRealizedFxSettlement({
+                side: "AR",
+                amount: data.amount,
+                transactionCurrency: invoiceCurrency,
+                functionalCurrency,
+                historicalRate,
+                settlementRate: settlementResolved.rate,
+                bankOrCashSubtype,
+                bankOrCashAccountId: data.accountNodeId,
+                controlAccountId: receivable.accountId,
+              }).lines;
+            }
+          }
+
           journalEntryId = await postJournalEntry(
             {
               logger,
@@ -297,25 +357,7 @@ export class InvoiceRecordPaymentRepository {
               sourceType: JournalSourceType.AR_PAYMENT,
               sourceId: invoice.id,
               postedByUserId: userId,
-              lines: [
-                {
-                  subtype:
-                    data.method === ManualPaymentMethod.CASH
-                      ? AccountSubtype.CASH
-                      : AccountSubtype.BANK,
-                  accountNodeId: data.accountNodeId,
-                  type: LineType.DEBIT,
-                  amount: data.amount,
-                  currency: invoice.currency,
-                },
-                {
-                  subtype: AccountSubtype.ACCOUNTS_RECEIVABLE,
-                  accountNodeId: receivable.accountId,
-                  type: LineType.CREDIT,
-                  amount: data.amount,
-                  currency: invoice.currency,
-                },
-              ],
+              lines: paymentLines,
             },
             tx,
           );

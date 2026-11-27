@@ -1,0 +1,110 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: {
+    payment: "platby",
+    pdf: "pdf",
+    email: "email",
+  },
+  pdf: {
+    invoiceTitle: "Faktúra PDF",
+    invoiceDescription:
+      "Stiahnite si faktúru PDF/A-3 so zákonnými údajmi, platobným QR kódom a vloženým XML ZUGFeRD.",
+    estimateTitle: "Cenová ponuka PDF",
+    estimateDescription: "Stiahnite si cenovú ponuku vo formáte PDF.",
+    success: "PDF vygenerované",
+    downloadAction: "Stiahnuť PDF",
+    zugferdBadge: "Vložený ZUGFeRD / Factur-X EN 16931",
+    qrBadgeEpc: "Obsahuje SEPA QR EPC / GiroCode",
+    qrBadgePayBySquare: "Obsahuje QR kód PAY by square",
+    filename: "Názov súboru",
+    documentNumber: "Číslo dokladu",
+    paymentUrl: "Odkaz na online platbu",
+    qrSection: "Platobný QR kód",
+    back: "Späť",
+  },
+  deliver: {
+    logTitle: "Denník odoslaných e-mailov",
+    logDescription:
+      "Skontrolujte odoslané faktúry a znova odošlite prílohu PDF cez systémový mailer.",
+    logSuccess: "Denník načítaný",
+    sendTitle: "Odoslať doklad e-mailom",
+    sendDescription: "Odošlite PDF zákazníkovi zo systémového účtu hi@.",
+    sendSuccess: "E-mail s PDF prílohou bol odoslaný",
+    recipientEmail: "E-mail príjemcu",
+    recipientName: "Meno príjemcu",
+    customMessage: "Osobná správa (voliteľné)",
+    isResend: "Znova odoslať",
+    sendAction: "Odoslať e-mail s PDF",
+    resendAction: "Znova odoslať PDF",
+    emptyLog: "Zatiaľ neboli odoslané žiadne e-maily",
+    emptyLogHint: "Odošlite PDF vyššie a doručenie sa zaznamená sem.",
+    sentAt: "Odoslané",
+    sender: "Odosielateľ",
+    status: "Stav",
+    attachment: "Príloha",
+    statusSent: "Odoslané",
+    statusFailed: "Chyba",
+    resendBadge: "Znova odoslané",
+    subjectInvoice: "Faktúra {{number}} od {{company}}",
+    subjectCreditNote: "Dobropis {{number}} od {{company}}",
+    subjectEstimate: "Cenová ponuka {{number}} od {{company}}",
+    bodyIntro: "V prílohe posielame doklad {{document}} vo formáte PDF.",
+    bodyPayOnline: "Zaplatiť online:",
+    bodyViewLink: "Zobraziť doklad:",
+    theaBlocked: "ERP e-maily musia používať systémový účet hi@, nikdy thea@.",
+    mailerUnavailable:
+      "Systémový mailer nie je nakonfigurovaný. Skontrolujte predvolený SMTP účet.",
+  },
+  fields: {
+    invoiceId: "Faktúra",
+    estimateId: "Cenová ponuka",
+    documentType: "Typ dokladu",
+    pdfBase64: "Údaje PDF",
+    contentType: "Typ obsahu",
+    hasZugferd: "Vložený ZUGFeRD",
+    qrKind: "Formát QR",
+    qrSvg: "Náhľad QR",
+    deliveries: "Doručenia",
+    deliveryId: "Doručenie",
+    messageId: "ID správy",
+  },
+  errors: {
+    validation: {
+      title: "Skontrolujte zadanie",
+      description: "Zadajte platný doklad a e-mailovú adresu príjemcu.",
+    },
+    network: {
+      title: "Chyba siete",
+      description: "Skontrolujte pripojenie a skúste znova.",
+    },
+    unauthorized: {
+      title: "Vyžaduje sa prihlásenie",
+      description: "Prihláste sa pre prístup k PDF a odosielaniu dokladov.",
+    },
+    forbidden: {
+      title: "Prístup zamietnutý",
+      description: "Vaša rola vo firme nepovoľuje túto akciu.",
+    },
+    notFound: {
+      title: "Doklad sa nenašiel",
+      description: "Požadovaná faktúra, dobropis alebo ponuka neexistuje.",
+    },
+    server: {
+      title: "Odoslanie zlyhalo",
+      description: "Nepodarilo sa vytvoriť PDF alebo odoslať e-mail.",
+    },
+    unknown: {
+      title: "Neočakávaná chyba",
+      description: "Skúste znova.",
+    },
+    unsavedChanges: {
+      title: "Neuložené zmeny",
+      description: "Vaše zmeny sú stále vo formulári.",
+    },
+    conflict: {
+      title: "Doklad nie je pripravený",
+      description: "Pred odoslaním e-mailom doklad vystavte.",
+    },
+  },
+};

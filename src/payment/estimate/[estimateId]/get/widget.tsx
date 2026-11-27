@@ -29,6 +29,7 @@ import { type JSX } from "react";
 import { documentLineContext } from "@/finance/document-action-confirm";
 import { DocumentLineItems } from "@/finance/document-line-items";
 import { documentStatusVariant } from "@/finance/document-status";
+import { scopedTranslation as deliveryScopedTranslation } from "@/payment/document-delivery/i18n";
 import { EstimateStatus } from "@/payment/enum";
 
 import type definition from "./definition";
@@ -198,6 +199,15 @@ export function EstimateGetWidget({
     );
   };
 
+  const { t: deliveryT } = deliveryScopedTranslation.scopedT(locale);
+  const openEstimatePdf = (): void => {
+    void import("../pdf/definition").then((pdfDef) =>
+      navigate(pdfDef.default.GET, {
+        urlPathParams: { estimateId: data.id },
+        renderInModal: true,
+      }),
+    );
+  };
   const canManage = isInteractive && data.canManage;
   const isDraft = data.status === EstimateStatus.DRAFT;
   const isSent = data.status === EstimateStatus.SENT;
@@ -233,6 +243,15 @@ export function EstimateGetWidget({
       : []),
     ...(isInteractive && invoiceId
       ? [action("openInvoice", t("widget.openInvoice"), openInvoice)]
+      : []),
+    ...(isInteractive
+      ? [
+          action(
+            "downloadPdf",
+            deliveryT("pdf.downloadAction"),
+            openEstimatePdf,
+          ),
+        ]
       : []),
   ];
   const moreActions: AdminRecordAction[] = [

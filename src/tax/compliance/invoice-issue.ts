@@ -47,6 +47,7 @@ async function loadIssuer(
       taxId: companies.taxId,
       vatNumber: companies.vatNumber,
       email: companies.email,
+      phone: companies.phone,
     })
     .from(companies)
     .where(eq(companies.id, companyId))

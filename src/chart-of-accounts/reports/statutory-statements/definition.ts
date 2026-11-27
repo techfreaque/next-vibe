@@ -163,7 +163,7 @@ const { GET } = createEndpoint({
       layout: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.layout",
-        schema: z.enum(["SK_MUJ"]).nullable(),
+        schema: z.enum(["SK_MUJ", "DE_HGB", "AT_UGB", "IFRS"]).nullable(),
       }),
       available: responseField(scopedTranslation, {
         type: WidgetType.BADGE,

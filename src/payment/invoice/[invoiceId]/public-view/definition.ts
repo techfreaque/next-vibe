@@ -134,6 +134,36 @@ const { GET } = createEndpoint({
         schema: z.string().nullable(),
       }),
 
+      paymentUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.paymentUrl" as const,
+        schema: z.string().nullable(),
+      }),
+
+      bankIban: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.bankIban" as const,
+        schema: z.string().nullable(),
+      }),
+
+      bankBic: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.bankBic" as const,
+        schema: z.string().nullable(),
+      }),
+
+      qrKind: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.qrKind" as const,
+        schema: z.enum(["EPC", "PAY_BY_SQUARE"]).nullable(),
+      }),
+
+      qrSvg: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.qrSvg" as const,
+        schema: z.string().nullable(),
+      }),
+
       lines: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         columns: 12,
@@ -256,6 +286,11 @@ const { GET } = createEndpoint({
         createdAt: "2024-01-01T00:00:00.000Z",
         companyName: "Acme Corp",
         companyEmail: "billing@acme.com",
+        paymentUrl: null,
+        bankIban: null,
+        bankBic: null,
+        qrKind: null,
+        qrSvg: null,
         lines: [],
       },
     },

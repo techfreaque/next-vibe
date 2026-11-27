@@ -91,7 +91,7 @@ export const translations: typeof enTranslations = {
       title: "Co przygotowuje ERP",
       vatReturn: "Deklaracja VAT i raport kontrolny",
       statements: "Ustawowe sprawozdanie finansowe",
-      fiscal: "Paragony fiskalne (eKasa)",
+      fiscal: "Paragony fiskalne",
       eInvoicing: "Obowiązkowe e-faktury od",
       yes: "Dostępne",
       no: "Niedostępne dla tego kraju",

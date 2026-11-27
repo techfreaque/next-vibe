@@ -74,7 +74,7 @@ export const translations: typeof enTranslations = {
     row: "Wiersz",
     marker: "Oznaczenie",
     label: "Nazwa",
-    officialLabel: "Nazwa urzędowa (SK)",
+    officialLabel: "Nazwa urzędowa",
     current: "Bieżący okres",
     previous: "Poprzedni okres",
     currency: "Waluta",

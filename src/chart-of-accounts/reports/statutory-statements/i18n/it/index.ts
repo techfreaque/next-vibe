@@ -75,7 +75,7 @@ export const translations: typeof enTranslations = {
     row: "Riga",
     marker: "Voce",
     label: "Denominazione",
-    officialLabel: "Denominazione ufficiale (SK)",
+    officialLabel: "Denominazione ufficiale",
     current: "Periodo corrente",
     previous: "Periodo precedente",
     currency: "Valuta",

@@ -45,15 +45,38 @@ export function formatJournalUnits(
 }
 
 export function validateJournalLines(
-  lines: readonly { type: string; amount: number; currency: string }[],
+  lines: readonly {
+    type: string;
+    amount: number;
+    currency: string;
+    functionalAmount?: number | null;
+  }[],
   companyCurrency: string,
 ): "empty" | "currency" | "line" | "balance" | null {
   if (lines.length < 2) {
     return "empty";
   }
 
+  const hasMultiCurrencyTranslation = lines.some(
+    (l) => l.functionalAmount !== undefined && l.functionalAmount !== null,
+  );
   let balance = BigInt(0);
   for (const line of lines) {
+    if (hasMultiCurrencyTranslation) {
+      if (!/^[A-Z]{3}$/u.test(line.currency.trim().toUpperCase())) {
+        return "currency";
+      }
+      const origUnits = journalAmountUnits(line.amount);
+      const funcAmount = line.functionalAmount ?? line.amount;
+      const funcUnits = journalAmountUnits(funcAmount);
+      const type = journalLineType(line.type);
+      if (!type || origUnits === null || funcUnits === null) {
+        return "line";
+      }
+      balance += type === LineType.DEBIT ? funcUnits : -funcUnits;
+      continue;
+    }
+
     if (line.currency !== companyCurrency) {
       return "currency";
     }

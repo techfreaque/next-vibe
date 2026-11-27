@@ -1,7 +1,6 @@
 /**
  * Invoice E-Invoice Endpoint
- * GET: Peppol BIS Billing 3.0 (UBL 2.1, EN 16931) XML of an issued
- * invoice or credit note, plus the mandatory fields still missing.
+ * GET: structured XML and missing details for an issued sales document.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -15,6 +14,7 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
+  requestField,
   requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
@@ -48,7 +48,7 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: InvoiceEInvoiceWidgetLazy,
-    usage: { request: "urlPathParams", response: true },
+    usage: { request: "data&urlPathParams", response: true },
     children: {
       invoiceId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -61,6 +61,33 @@ const { GET } = createEndpoint({
         labelField: "invoiceSequenceNumber",
       }),
 
+      buyerReference: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "buyerReference.label",
+        description: "buyerReference.description",
+        schema: z.string().trim().min(1).max(100).optional(),
+      }),
+      jurisdiction: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.fileName",
+        hidden: true,
+        schema: z.enum(["peppol", "sk-efaktura"]),
+      }),
+      xrechnung: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.xrechnung",
+        hidden: true,
+        schema: z
+          .object({
+            fileName: z.string(),
+            xml: z.string(),
+            missingFields: z.array(
+              z.object({ field: z.enum(UBL_FIELD_IDS), label: z.string() }),
+            ),
+          })
+          .optional(),
+      }),
       invoiceNumber: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.invoiceNumber" as const,
@@ -137,12 +164,17 @@ const { GET } = createEndpoint({
   },
 
   examples: {
+    requests: {
+      default: {},
+      withBuyerReference: { buyerReference: "PURCHASE-42" },
+    },
     urlPathParams: {
       default: { invoiceId: "456e7890-e89b-12d3-a456-426614174000" },
     },
     responses: {
       default: {
         invoiceNumber: "2026000042",
+        jurisdiction: "peppol",
         isCreditNote: false,
         fileName: "invoice-2026000042.xml",
         ready: false,
@@ -158,6 +190,7 @@ const { GET } = createEndpoint({
   },
 });
 
+export type InvoiceEInvoiceRequestOutput = typeof GET.types.RequestOutput;
 export type InvoiceEInvoiceUrlPathParams = typeof GET.types.UrlVariablesOutput;
 export type InvoiceEInvoiceResponseOutput = typeof GET.types.ResponseOutput;
 

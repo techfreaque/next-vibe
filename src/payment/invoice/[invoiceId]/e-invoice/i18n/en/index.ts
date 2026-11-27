@@ -1,11 +1,16 @@
 export const translations = {
-  title: "E-invoice (Peppol)",
+  title: "E-invoice",
   titleShort: "E-invoice",
   description:
     "Export an issued invoice or credit note as a Peppol BIS Billing 3.0 file (UBL, EN 16931).",
   invoiceId: {
     label: "Invoice",
     description: "The issued invoice or credit note to export",
+  },
+  buyerReference: {
+    label: "Buyer reference",
+    description:
+      "Use the reference supplied by the buyer. For German public bodies, enter their Leitweg-ID.",
   },
   response: {
     invoiceNumber: "Document number",
@@ -16,6 +21,12 @@ export const translations = {
     xml: "XML",
   },
   widget: {
+    peppol: "Download Peppol XML",
+    slovak: "Download eFaktúra XML",
+    xrechnung: "XRechnung XML",
+    send: "Send via Peppol",
+    providerNeeded:
+      "Connect a certified Peppol access point and register the issuer’s Peppol ID to enable sending.",
     back: "Back",
     submit: "Prepare e-invoice",
     invoice: "Invoice {{number}}",
@@ -30,6 +41,15 @@ export const translations = {
     disclaimer: "We provide tooling, not tax advice.",
   },
   fields: {
+    bt10: "Buyer reference",
+    bt35: "Seller street",
+    bt37: "Seller city",
+    bt38: "Seller postal code",
+    bt42: "Seller phone",
+    bt43: "Seller email",
+    bt50: "Buyer street",
+    bt52: "Buyer city",
+    bt53: "Buyer postal code",
     bt1: "Document number",
     bt2: "Issue date",
     bt5: "Currency",

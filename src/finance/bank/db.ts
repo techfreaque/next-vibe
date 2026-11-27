@@ -17,7 +17,7 @@ import {
   journalEntryLines,
 } from "@/chart-of-accounts/db";
 import { companies } from "@/companies/db";
-import { paymentBills } from "@/payment/db";
+import { paymentBills, paymentInvoices } from "@/payment/db";
 
 import { bankStatementFormats } from "./statement-format";
 
@@ -67,7 +67,7 @@ export const bankStatementLines = pgTable(
     supplierBillId: uuid("supplier_bill_id").references(() => paymentBills.id, {
       onDelete: "restrict",
     }),
-    matchKind: text("match_kind", { enum: ["exact", "fee", "fx"] }),
+    matchKind: text("match_kind", { enum: ["exact", "fee", "fx", "split"] }),
     matchedByUserId: uuid("matched_by_user_id").references(() => users.id, {
       onDelete: "set null",
     }),
@@ -119,5 +119,49 @@ export const bankAccountReconciliationSettings = pgTable(
   },
   (table) => [
     index("idx_bank_reconciliation_settings_company").on(table.companyId),
+  ],
+);
+
+export const bankStatementLineSplits = pgTable(
+  "bank_statement_line_splits",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bankStatementLineId: uuid("bank_statement_line_id")
+      .notNull()
+      .references(() => bankStatementLines.id, { onDelete: "cascade" }),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id, { onDelete: "restrict" }),
+    targetType: text("target_type", {
+      enum: ["journal_line", "invoice", "bill", "account"],
+    }).notNull(),
+    journalLineId: uuid("journal_line_id").references(
+      () => journalEntryLines.id,
+      { onDelete: "restrict" },
+    ),
+    invoiceId: uuid("invoice_id").references(() => paymentInvoices.id, {
+      onDelete: "restrict",
+    }),
+    billId: uuid("bill_id").references(() => paymentBills.id, {
+      onDelete: "restrict",
+    }),
+    accountId: uuid("account_id").references(() => accountNodes.id, {
+      onDelete: "restrict",
+    }),
+    amount: numeric("amount", { precision: 14, scale: 4 }).notNull(),
+    description: text("description"),
+    createdJournalEntryId: uuid("created_journal_entry_id").references(
+      () => journalEntries.id,
+      { onDelete: "restrict" },
+    ),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_bank_splits_line").on(table.bankStatementLineId),
+    index("idx_bank_splits_company").on(table.companyId),
+    unique("uq_bank_split_journal_line").on(table.journalLineId),
   ],
 );

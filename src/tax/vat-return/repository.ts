@@ -1,7 +1,10 @@
 import "server-only";
 
 import { and, eq, gte, inArray, lt, sql } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  type CountryLanguage,
+  CurrenciesArr,
+} from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
@@ -13,13 +16,20 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
-import { journalEntries } from "@/chart-of-accounts/db";
 import {
+  accountNodes,
+  journalEntries,
+  journalEntryLines,
+} from "@/chart-of-accounts/db";
+import {
+  AccountType,
   JournalSourceType,
   ledgerEntryStatuses,
+  LineType,
 } from "@/chart-of-accounts/enum";
 import { companies } from "@/companies/db";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { excludePeriodClosing } from "@/finance/supplier-evidence/monthly";
 import {
   paymentBillLines,
   paymentBills,
@@ -32,15 +42,24 @@ import { VatTreatment } from "../compliance/enum";
 import { normalizeIdentifier, vatIdCountry } from "../compliance/identifiers";
 import { readLegalSnapshot } from "../compliance/legal-snapshot";
 import { getCountryProfile } from "../compliance/profiles";
+import { CompanyTaxRegime } from "../regime/enum";
+import { getCompanyTaxRegime } from "../regime/policy";
 import {
   TaxReportDirection,
   type TaxReportDirectionValue,
 } from "../report/enum";
 import { TaxReportRepository } from "../report/repository";
+import { buildAtUva } from "./at-uva";
+import {
+  buildDeUstva,
+  buildSmallBusinessEurSummary,
+  type EurAccountRow,
+} from "./de-ustva";
 import type {
   VatReturnRequestOutput,
   VatReturnResponseOutput,
 } from "./definition";
+import { buildGenericVatReturn } from "./generic-vat";
 import { scopedTranslation } from "./i18n";
 import { parseVatPeriod } from "./period";
 import {
@@ -96,6 +115,54 @@ function addTotals(
   totals.turnover = (totals.turnover ?? 0) + base + tax;
 }
 
+async function loadEurAccounts(
+  companyId: string,
+  currency: string,
+  start: Date,
+  end: Date,
+): Promise<EurAccountRow[]> {
+  const rows = await db
+    .select({
+      code: accountNodes.code,
+      name: accountNodes.name,
+      type: accountNodes.type,
+      netDebit:
+        sql<number>`sum(case when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount} else -${journalEntryLines.amount} end)`.mapWith(
+          Number,
+        ),
+    })
+    .from(journalEntryLines)
+    .innerJoin(
+      journalEntries,
+      eq(journalEntryLines.journalEntryId, journalEntries.id),
+    )
+    .innerJoin(accountNodes, eq(journalEntryLines.accountId, accountNodes.id))
+    .where(
+      and(
+        eq(journalEntries.companyId, companyId),
+        eq(accountNodes.companyId, companyId),
+        inArray(journalEntries.status, ledgerEntryStatuses),
+        excludePeriodClosing(),
+        eq(journalEntryLines.currency, currency),
+        gte(journalEntries.date, start),
+        lt(journalEntries.date, end),
+        inArray(accountNodes.type, [AccountType.REVENUE, AccountType.EXPENSE]),
+      ),
+    )
+    .groupBy(accountNodes.code, accountNodes.name, accountNodes.type)
+    .orderBy(accountNodes.code);
+
+  return rows.map((row) => ({
+    code: row.code,
+    name: row.name,
+    kind: row.type === AccountType.REVENUE ? "revenue" : "expense",
+    amount:
+      row.type === AccountType.REVENUE
+        ? round2(-row.netDebit)
+        : round2(row.netDebit),
+  }));
+}
+
 export class VatReturnRepository {
   static async prepare(
     data: VatReturnRequestOutput,
@@ -126,13 +193,6 @@ export class VatReturnRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-      const profile = getCountryProfile(company.country);
-      if (profile.vatReturn !== "SK_DPH") {
-        return fail({
-          message: t("unsupportedCountry"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        });
-      }
       const period = parseVatPeriod(data.period);
       if (!period) {
         return fail({
@@ -142,11 +202,60 @@ export class VatReturnRepository {
       }
       const { start, end } = period;
       const lastDay = new Date(end.getTime() - 86_400_000);
+      const periodFrom = start.toISOString().slice(0, 10);
+      const periodTo = lastDay.toISOString().slice(0, 10);
 
+      const profile = getCountryProfile(company.country);
+      const country = (company.country ?? profile.country).trim().toUpperCase();
+      const currency = (company.currency ?? "EUR").trim().toUpperCase();
+      const regime = await getCompanyTaxRegime(db, company.id, lastDay);
+
+      // ---- Small-business exemption (DE § 19 UStG / AT § 6 Abs. 1 Z 27) ----
+      if (
+        (profile.vatReturn === "DE_USTVA" &&
+          regime.code === CompanyTaxRegime.DE_SMALL_BUSINESS) ||
+        (profile.vatReturn === "AT_UVA" &&
+          regime.code === CompanyTaxRegime.AT_SMALL_BUSINESS)
+      ) {
+        const eurAccounts = await loadEurAccounts(
+          company.id,
+          currency,
+          start,
+          end,
+        );
+        const eur = buildSmallBusinessEurSummary(
+          eurAccounts,
+          data.period,
+          profile.country,
+        );
+        return success({
+          returnCompanyId: company.id,
+          returnCompanyName: company.name,
+          country,
+          currency,
+          filingFormat:
+            profile.vatReturn === "DE_USTVA"
+              ? "DE_EUR_SMALL_BUSINESS"
+              : "AT_EA_SMALL_BUSINESS",
+          smallBusinessExempt: true,
+          returnPeriod: data.period,
+          periodFrom,
+          periodTo,
+          lines: eur.lines,
+          sections: [],
+          warnings: [],
+          kvXml: "",
+          kvFileName: "",
+          exportCsv: eur.csv,
+          exportCsvFileName: eur.csvFileName,
+        });
+      }
+
+      const reportCurrency = CurrenciesArr.find((c) => c === currency) ?? "EUR";
       const report = await TaxReportRepository.getReport(
         {
           companyId: company.id,
-          currency: "EUR",
+          currency: reportCurrency,
           dateFrom: start,
           dateTo: lastDay,
         },
@@ -164,7 +273,7 @@ export class VatReturnRepository {
         taxAmount: row.taxAmount,
       }));
 
-      // ---- Issued documents (same document date as the tax report) ----
+      // ---- Issued documents (for zero-rated classification & SK KV) ----
       const documentDate = sql<Date>`coalesce(${journalEntries.date}, ${paymentInvoices.createdAt})`;
       const invoiceRows = await db
         .select({
@@ -199,7 +308,7 @@ export class VatReturnRepository {
         .where(
           and(
             eq(paymentInvoices.companyId, company.id),
-            eq(paymentInvoices.currency, "EUR"),
+            sql`${paymentInvoices.currency} = ${currency}`,
             inArray(paymentInvoices.status, [
               InvoiceStatus.OPEN,
               InvoiceStatus.PAID,
@@ -218,6 +327,152 @@ export class VatReturnRepository {
           paymentInvoiceLines.taxRate,
         );
 
+      const zeroRated: ZeroRatedSales & { euServicesReverseCharge: number } = {
+        euGoods: 0,
+        exports: 0,
+        otherExempt: 0,
+        euServicesReverseCharge: 0,
+      };
+      for (const row of invoiceRows) {
+        if (row.providerInvoiceId.startsWith("CN-")) {
+          continue;
+        }
+        if (row.rate === 0) {
+          const legal = readLegalSnapshot(row.metadata);
+          const treatment = legal?.treatment ?? VatTreatment.DOMESTIC;
+          const base = round2(row.base);
+          if (treatment === VatTreatment.EU_GOODS_EXEMPT) {
+            zeroRated.euGoods += base;
+          } else if (treatment === VatTreatment.EXPORT_EXEMPT) {
+            zeroRated.exports += base;
+          } else if (treatment === VatTreatment.EU_SERVICES_REVERSE_CHARGE) {
+            zeroRated.euServicesReverseCharge += base;
+          } else if (treatment === VatTreatment.EXEMPT) {
+            zeroRated.otherExempt += base;
+          }
+        }
+      }
+
+      // ---- German UStVA adapter ----
+      if (profile.vatReturn === "DE_USTVA") {
+        const ustva = buildDeUstva(
+          rows,
+          zeroRated,
+          {
+            companyName: company.name,
+            steuernummer: company.taxId,
+            vatId: normalizeIdentifier(company.vatNumber),
+            street: company.addressLine1,
+            postalCode: company.postalCode,
+            city: company.city,
+            email: company.email,
+          },
+          period.kv,
+          data.period,
+        );
+        const warnings: VatReturnResponseOutput["warnings"] = [];
+        if (ustva.missingSteuernummer) {
+          warnings.push({ code: "warnings.noTaxId" });
+        }
+        if (ustva.unmapped.length > 0) {
+          warnings.push({
+            code: "warnings.unmappedRates",
+            count: ustva.unmapped.length,
+          });
+        }
+        return success({
+          returnCompanyId: company.id,
+          returnCompanyName: company.name,
+          country,
+          currency,
+          filingFormat: "DE_USTVA",
+          smallBusinessExempt: false,
+          returnPeriod: data.period,
+          periodFrom,
+          periodTo,
+          lines: ustva.lines,
+          sections: [],
+          warnings,
+          kvXml: ustva.elsterXml,
+          kvFileName: ustva.elsterFileName,
+          exportCsv: ustva.csv,
+          exportCsvFileName: ustva.csvFileName,
+        });
+      }
+
+      // ---- Austrian UVA (U30) adapter ----
+      if (profile.vatReturn === "AT_UVA") {
+        const uva = buildAtUva(
+          rows,
+          zeroRated,
+          {
+            companyName: company.name,
+            taxId: company.taxId,
+            vatId: normalizeIdentifier(company.vatNumber),
+          },
+          period.kv,
+          data.period,
+        );
+        const warnings: VatReturnResponseOutput["warnings"] = [];
+        if (uva.missingVatId) {
+          warnings.push({ code: "warnings.noVatId" });
+        }
+        if (uva.unmapped.length > 0) {
+          warnings.push({
+            code: "warnings.unmappedRates",
+            count: uva.unmapped.length,
+          });
+        }
+        return success({
+          returnCompanyId: company.id,
+          returnCompanyName: company.name,
+          country,
+          currency,
+          filingFormat: "AT_UVA",
+          smallBusinessExempt: false,
+          returnPeriod: data.period,
+          periodFrom,
+          periodTo,
+          lines: uva.lines,
+          sections: [],
+          warnings,
+          kvXml: uva.xml,
+          kvFileName: uva.xmlFileName,
+          exportCsv: uva.csv,
+          exportCsvFileName: uva.csvFileName,
+        });
+      }
+
+      // ---- Generic country VAT summary adapter ----
+      if (profile.vatReturn !== "SK_DPH") {
+        const generic = buildGenericVatReturn(
+          rows,
+          zeroRated,
+          country,
+          currency,
+          data.period,
+        );
+        return success({
+          returnCompanyId: company.id,
+          returnCompanyName: company.name,
+          country,
+          currency,
+          filingFormat: "GENERIC_VAT",
+          smallBusinessExempt: false,
+          returnPeriod: data.period,
+          periodFrom,
+          periodTo,
+          lines: generic.lines,
+          sections: [],
+          warnings: [],
+          kvXml: "",
+          kvFileName: "",
+          exportCsv: generic.csv,
+          exportCsvFileName: generic.csvFileName,
+        });
+      }
+
+      // ---- Slovak DPHv25 + KVDPHv25 adapter ----
       const originalIds = [
         ...new Set(
           invoiceRows.flatMap((row) => {
@@ -246,12 +501,8 @@ export class VatReturnRepository {
       const a2: KvReverseChargeIssued[] = [];
       const c1: KvCorrectionRow[] = [];
       const d2 = emptyTotals();
-      const zeroRated: ZeroRatedSales = {
-        euGoods: 0,
-        exports: 0,
-        otherExempt: 0,
-      };
       let missingCustomerVatIds = 0;
+
       for (const row of invoiceRows) {
         const isCredit = row.providerInvoiceId.startsWith("CN-");
         const original = isCredit
@@ -280,13 +531,7 @@ export class VatReturnRepository {
           continue;
         }
         if (row.rate === 0) {
-          if (treatment === VatTreatment.EU_GOODS_EXEMPT) {
-            zeroRated.euGoods += base;
-          } else if (treatment === VatTreatment.EXPORT_EXEMPT) {
-            zeroRated.exports += base;
-          } else if (treatment === VatTreatment.EXEMPT) {
-            zeroRated.otherExempt += base;
-          } else if (
+          if (
             treatment === VatTreatment.REVERSE_CHARGE_DOMESTIC &&
             isSlovakVatId(partnerVatId)
           ) {
@@ -412,7 +657,6 @@ export class VatReturnRepository {
         }
       }
 
-      // ---- eKasa / POS turnover (D.1) ----
       const d1 = emptyTotals();
       for (const row of rows) {
         if (row.direction === "posSales" && row.rate !== null) {
@@ -463,13 +707,29 @@ export class VatReturnRepository {
         warnings.push({ code: "warnings.b32Required" });
       }
 
+      const skCsv = [
+        "line;meaning;amount",
+        ...dph.lines.map(
+          (l) => `${l.line};"${t(`lines.${l.line}`)}";${l.amount.toFixed(2)}`,
+        ),
+      ].join("\n");
+
       return success({
         returnCompanyId: company.id,
         returnCompanyName: company.name,
+        country: "SK",
+        currency: "EUR",
+        filingFormat: "SK_DPH",
+        smallBusinessExempt: false,
         returnPeriod: data.period,
-        periodFrom: start.toISOString().slice(0, 10),
-        periodTo: lastDay.toISOString().slice(0, 10),
-        lines: dph.lines,
+        periodFrom,
+        periodTo,
+        lines: dph.lines.map((l) => ({
+          line: l.line,
+          label: t(`lines.${l.line}`),
+          amount: l.amount,
+          isTotal: l.line === "r17" || l.line === "r32" || l.line === "r33",
+        })),
         sections: [
           { section: "A1", count: a1.length },
           { section: "A2", count: a2.length },
@@ -483,6 +743,8 @@ export class VatReturnRepository {
         warnings,
         kvXml: buildKvDphXml(kvInput),
         kvFileName: `KVDPH_${vatId ?? "SK"}_${data.period}.xml`,
+        exportCsv: skCsv,
+        exportCsvFileName: `DPH_${data.period}.csv`,
       });
     } catch (error) {
       logger.error("Could not prepare the VAT return", parseError(error));

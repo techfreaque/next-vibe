@@ -6,7 +6,10 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
@@ -39,7 +42,11 @@ import {
   isPosMinorUnitAmount,
   posSettlementAmounts,
 } from "../../settlement-amounts";
-import { issuePosOrderStock } from "../../stock";
+import {
+  buildPosCogsLines,
+  hasCogsAndInventoryAccounts,
+  issuePosOrderStock,
+} from "../../stock";
 import type { PosOrderCompletePostRequestOutput } from "./definition";
 
 export class PosOrderCompleteRepository {
@@ -75,7 +82,15 @@ export class PosOrderCompleteRepository {
       message: t("workflow.stockUnavailable"),
       errorType: ErrorResponseTypes.CONFLICT,
     });
-    let stockFailed = false;
+    const postingConflict = fail({
+      message: t("workflow.postingUnavailable"),
+      errorType: ErrorResponseTypes.CONFLICT,
+    });
+    const legacyPostingConflict = fail({
+      message: t("workflow.legacyPostingReview"),
+      errorType: ErrorResponseTypes.CONFLICT,
+    });
+    let rolledBack: ErrorResponseType | undefined;
 
     try {
       const conflict = fail({
@@ -188,19 +203,40 @@ export class PosOrderCompleteRepository {
           if (excess > 0) {
             return conflict;
           }
+          let totalCogs = 0;
+          if (order.warehouseId) {
+            const issued = await issuePosOrderStock(
+              tx,
+              { ...order, warehouseId: order.warehouseId },
+              userId,
+              logger,
+              t("workflow.stockUnavailable"),
+            );
+            if (!issued.success) {
+              rolledBack = stockConflict;
+              return tx.rollback();
+            }
+            totalCogs = issued.data.totalCogs;
+          }
           const [hasChart] = await tx
             .select({ id: accountNodes.id })
             .from(accountNodes)
             .where(eq(accountNodes.companyId, order.companyId))
             .limit(1);
+          const shouldPostCogs =
+            hasChart !== undefined &&
+            totalCogs > 0 &&
+            (await hasCogsAndInventoryAccounts(tx, order.companyId));
           let journalEntryId: string | null = null;
           if (
-            total > 0 &&
-            (hasChart ||
-              order.cashAccountId ||
-              payments.some((payment) => payment.accountNodeId))
+            (total > 0 &&
+              (hasChart ||
+                order.cashAccountId ||
+                payments.some((payment) => payment.accountNodeId))) ||
+            shouldPostCogs
           ) {
             if (
+              total > 0 &&
               ![
                 settlement.subtotal,
                 settlement.taxAmount,
@@ -208,10 +244,8 @@ export class PosOrderCompleteRepository {
                 ...lines.map(({ amount }) => amount),
               ].every(isPosMinorUnitAmount)
             ) {
-              return fail({
-                message: t("workflow.legacyPostingReview"),
-                errorType: ErrorResponseTypes.CONFLICT,
-              });
+              rolledBack = legacyPostingConflict;
+              return tx.rollback();
             }
             const explicit = lines.flatMap((line) =>
               line.accountNodeId ? [line.accountNodeId] : [],
@@ -236,7 +270,8 @@ export class PosOrderCompleteRepository {
                   (id) => !tenderAccounts.some((account) => account.id === id),
                 )
               ) {
-                return conflict;
+                rolledBack = conflict;
+                return tx.rollback();
               }
             }
             if (settlement.subtotal > 0) {
@@ -256,6 +291,15 @@ export class PosOrderCompleteRepository {
                 currency: order.currency,
               });
             }
+            if (shouldPostCogs) {
+              lines.push(
+                ...buildPosCogsLines({
+                  totalCogs,
+                  currency: order.currency,
+                  description: `${order.orderNumber} COGS`,
+                }),
+              );
+            }
             journalEntryId = await postJournalEntry(
               {
                 companyId: order.companyId,
@@ -270,22 +314,7 @@ export class PosOrderCompleteRepository {
               tx,
             );
             if (!journalEntryId) {
-              return fail({
-                message: t("workflow.postingUnavailable"),
-                errorType: ErrorResponseTypes.CONFLICT,
-              });
-            }
-          }
-          if (order.warehouseId) {
-            const issued = await issuePosOrderStock(
-              tx,
-              { ...order, warehouseId: order.warehouseId },
-              userId,
-              logger,
-              t("workflow.stockUnavailable"),
-            );
-            if (!issued.success) {
-              stockFailed = true;
+              rolledBack = postingConflict;
               return tx.rollback();
             }
           }
@@ -326,8 +355,8 @@ export class PosOrderCompleteRepository {
         },
       );
     } catch (error) {
-      if (stockFailed) {
-        return stockConflict;
+      if (rolledBack) {
+        return rolledBack;
       }
       logger.error("Error completing POS order", parseError(error));
       return fail({

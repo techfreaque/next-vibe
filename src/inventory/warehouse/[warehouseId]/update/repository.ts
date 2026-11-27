@@ -19,6 +19,7 @@ import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
 import { warehouses } from "../../../db";
+import type { NegativeStockPolicyDbValue } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
 import type { InventoryWarehouseUpdateRequestOutput } from "./definition";
 
@@ -37,6 +38,7 @@ export class InventoryWarehouseUpdateRepository {
         code: string;
         isActive: boolean;
         isDefault: boolean;
+        negativeStockPolicy: NegativeStockPolicyDbValue;
       };
     }>
   > {
@@ -109,6 +111,8 @@ export class InventoryWarehouseUpdateRepository {
           address: data.address !== undefined ? data.address : existing.address,
           isActive: data.isActive ?? existing.isActive,
           isDefault: data.isDefault ?? existing.isDefault,
+          negativeStockPolicy:
+            data.negativeStockPolicy ?? existing.negativeStockPolicy,
           updatedAt: new Date(),
         })
         .where(eq(warehouses.id, warehouseId))
@@ -128,6 +132,7 @@ export class InventoryWarehouseUpdateRepository {
           code: updated.code,
           isActive: updated.isActive,
           isDefault: updated.isDefault,
+          negativeStockPolicy: updated.negativeStockPolicy,
         },
       });
     } catch (error) {

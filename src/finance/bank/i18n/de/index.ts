@@ -132,6 +132,10 @@ export const translations: typeof enTranslations = {
     preview: "Vorschau (erste 5 Buchungen)",
     matchRow: "Zuordnen",
     unmatched: "Offen",
+    matched: "Abgeglichen",
+    allLines: "Alle",
+    splitMatched: "Aufgeteilt",
+    selectAccount: "Konto öffnen",
     csvHelp:
       "Wählen Sie einen Bankexport oder ordnen Sie die CSV-Spalten zu. Buchungsdatum und Betrag mit Vorzeichen sind Pflicht.",
     unsupported:
@@ -214,6 +218,77 @@ export const translations: typeof enTranslations = {
     journalMatch:
       "Wählen Sie eine offene Buchungszeile für dasselbe Bankkonto, denselben Betrag und dieselbe Währung.",
     confirmation: "Bestätigen Sie den Abgleich vor dem Speichern.",
+    splitTotalMismatch:
+      "Die Teilbeträge müssen exakt dem Betrag der Bankzeile entsprechen.",
+    splitTargetInvalid:
+      "Prüfen Sie, ob jede Rechnung, Eingangsrechnung oder jedes Konto zu dieser Firma und Zahlungsrichtung passt.",
+  },
+  reconciliation: {
+    statusTitle: "Abgleichsstatus",
+    accountsTitle: "Status der Bankkonten",
+    unmatchedLines: "Offen",
+    matchedLines: "Abgeglichen",
+    statementNet: "Auszugssaldo",
+    ledgerBalance: "Buchsaldo",
+    difference: "Differenz",
+  },
+  autoMatch: {
+    title: "Bankzeilen automatisch abgleichen",
+    description:
+      "Offene Bankzeilen anhand von Betrag, Referenz, IBAN, Datumsfenster und FX-Toleranz mit Rechnungen, Belegen und Zahlungen abgleichen.",
+    success: "Automatischer Abgleich abgeschlossen",
+    action: "Auto-Abgleich",
+    dryRun: "Nur Vorschau",
+    previewAction: "Vorschau prüfen",
+    applyAction: "Treffer anwenden",
+    previewBanner: "Vorschau: {{count}} eindeutige Treffer gefunden.",
+    appliedBanner: "{{count}} Bankzeilen automatisch abgeglichen.",
+    skippedHint:
+      "{{count}} mehrdeutige Zeilen zur manuellen Prüfung übersprungen.",
+    matchedCount: "Abgeglichen",
+    invoiceMatches: "Rechnungen",
+    billMatches: "Eingangsrechnungen",
+    journalMatches: "Buchungen",
+    skippedAmbiguous: "Übersprungen",
+    items: "Abgeglichene Positionen",
+    targetType: "Typ",
+    targetLabel: "Ziel",
+    basisLabel: "Kriterium",
+    emptyTitle: "Keine automatischen Treffer gefunden",
+    emptyHint:
+      "Prüfen Sie offene Zeilen manuell oder passen Sie Datumsfenster und FX-Einstellungen an.",
+    targets: {
+      journal_line: "Buchungszeile",
+      invoice: "Rechnung",
+      bill: "Eingangsrechnung",
+    },
+    basis: {
+      reference: "Belegreferenz",
+      iban: "IBAN",
+      amount_date: "Betrag und Datum",
+      fx_tolerance: "FX- oder Gebührentoleranz",
+    },
+  },
+  split: {
+    title: "Bankzeile aufteilen",
+    description:
+      "Eine Bankzeile auf mehrere Rechnungen, Eingangsrechnungen, Konten oder Buchungszeilen verteilen.",
+    success: "Bankzeile aufgeteilt und abgeglichen",
+    openAction: "Aufteilen",
+    allocations: "Aufteilungszeilen",
+    count: "Positionen",
+    remaining: "Restbetrag",
+    selectTarget: "Ziel wählen",
+    addRow: "Zeile hinzufügen",
+    removeRow: "Entfernen",
+    confirmAction: "Aufteilung bestätigen",
+    documentCandidates: "Offene Rechnungen und Belege",
+    types: {
+      journal_line: "Buchungszeile",
+      invoice: "Offene Rechnung",
+      bill: "Offener Beleg",
+      account: "Sachkonto",
+    },
   },
   import: {
     title: "Kontoauszug importieren",

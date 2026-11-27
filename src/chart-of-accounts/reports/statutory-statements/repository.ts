@@ -35,6 +35,10 @@ import {
   resolveLedgerReportCurrency,
 } from "../../shared/report-currency";
 import { templateAccountLabel } from "../../templates/labels";
+import {
+  buildCountryStatutoryStatement,
+  type SubtypedAccountBalance,
+} from "./country-layouts";
 import type {
   StatutoryStatementsRequestOutput,
   StatutoryStatementsResponseOutput,
@@ -42,7 +46,6 @@ import type {
 import { scopedTranslation } from "./i18n";
 import {
   buildMujStatement,
-  type LedgerAccountBalance,
   type StatementLineId,
   type StatementLineValue,
 } from "./layout";
@@ -58,12 +61,13 @@ function shiftYears(date: Date, years: number): Date {
 
 async function ledgerBalances(
   conditions: SQL[],
-): Promise<LedgerAccountBalance[]> {
+): Promise<SubtypedAccountBalance[]> {
   const rows = await db
     .select({
       code: accountNodes.code,
       name: accountNodes.name,
       type: accountNodes.type,
+      subtype: accountNodes.subtype,
       units: sql<string>`(sum(case
         when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount}
         else -${journalEntryLines.amount}
@@ -76,12 +80,18 @@ async function ledgerBalances(
     )
     .innerJoin(accountNodes, eq(journalEntryLines.accountId, accountNodes.id))
     .where(and(...conditions))
-    .groupBy(accountNodes.code, accountNodes.name, accountNodes.type)
+    .groupBy(
+      accountNodes.code,
+      accountNodes.name,
+      accountNodes.type,
+      accountNodes.subtype,
+    )
     .orderBy(accountNodes.code);
   return rows.map((row) => ({
     code: row.code,
     name: row.name,
     type: row.type,
+    subtype: row.subtype,
     units: Number(row.units),
   }));
 }
@@ -173,21 +183,7 @@ export class StatutoryStatementsRepository {
         previousToResponse: previousTo,
       };
 
-      if (layout !== "SK_MUJ") {
-        return success({
-          ...base,
-          layout: null,
-          available: false,
-          balanceSheet: [],
-          profitLoss: [],
-          unmapped: [],
-          difference: 0,
-          previousDifference: 0,
-          isBalanced: true,
-        });
-      }
-
-      const balancesAsOf = (day: Date): Promise<LedgerAccountBalance[]> =>
+      const balancesAsOf = (day: Date): Promise<SubtypedAccountBalance[]> =>
         ledgerBalances([
           ...companyConditions,
           lt(journalEntries.date, nextAccountingDay(day)),
@@ -195,7 +191,7 @@ export class StatutoryStatementsRepository {
       const movementsBetween = (
         start: Date,
         end: Date,
-      ): Promise<LedgerAccountBalance[]> =>
+      ): Promise<SubtypedAccountBalance[]> =>
         ledgerBalances([
           ...companyConditions,
           excludePeriodClosing(),
@@ -210,6 +206,35 @@ export class StatutoryStatementsRepository {
           balancesAsOf(previousTo),
           movementsBetween(previousFrom, shiftYears(to, -1)),
         ]);
+
+      if (layout !== "SK_MUJ") {
+        const generic = buildCountryStatutoryStatement(
+          layout,
+          { balances, movements },
+          { balances: previousBalances, movements: previousMovements },
+        );
+        return success({
+          ...base,
+          layout,
+          available: true,
+          balanceSheet: generic.balanceSheet.map((line) => ({
+            ...line,
+            current: line.current / UNITS,
+            previous: line.previous / UNITS,
+          })),
+          profitLoss: generic.profitLoss.map((line) => ({
+            ...line,
+            current: line.current / UNITS,
+            previous: line.previous / UNITS,
+          })),
+          unmapped: [],
+          difference: generic.difference.current / UNITS,
+          previousDifference: generic.difference.previous / UNITS,
+          isBalanced:
+            generic.difference.current === 0 &&
+            generic.difference.previous === 0,
+        });
+      }
 
       const statement = buildMujStatement(
         { balances, movements },

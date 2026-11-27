@@ -20,6 +20,11 @@ export const translations = {
       createdAt: "Issue date",
       companyName: "Company",
       companyEmail: "Company email",
+      paymentUrl: "Online payment link",
+      bankIban: "IBAN",
+      bankBic: "BIC",
+      qrKind: "QR payment standard",
+      qrSvg: "Payment QR code",
       lineId: "Line ID",
       lineDescription: "Description",
       productId: "Product",
@@ -70,5 +75,10 @@ export const translations = {
   },
   widget: {
     submit: "View invoice",
+    payOnline: "Pay online",
+    bankTransfer: "Bank transfer",
+    scanToPay: "Scan with your banking app",
+    epcQr: "SEPA GiroCode (EPC)",
+    payBySquareQr: "PAY by square",
   },
 };

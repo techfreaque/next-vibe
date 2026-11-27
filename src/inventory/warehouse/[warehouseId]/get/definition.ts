@@ -20,6 +20,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { NegativeStockPolicyDB } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
 
 const InventoryWarehouseGetWidget = lazyWidget(() =>
@@ -120,6 +121,11 @@ const { GET } = createEndpoint({
             label: "warehouseGet.get.response.isDefault" as const,
             schema: z.boolean(),
           }),
+          negativeStockPolicy: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "warehouseGet.get.response.negativeStockPolicy" as const,
+            schema: z.enum(NegativeStockPolicyDB),
+          }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "warehouseGet.get.response.createdAt" as const,
@@ -203,6 +209,7 @@ const { GET } = createEndpoint({
           address: "123 Storage Lane",
           isActive: true,
           isDefault: true,
+          negativeStockPolicy: "BLOCK",
           createdAt: new Date("2024-01-01T00:00:00.000Z"),
           updatedAt: new Date("2024-01-01T00:00:00.000Z"),
         },

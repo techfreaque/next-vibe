@@ -45,6 +45,11 @@ export const translations: typeof enTranslations = {
       received: "Ricevuto.",
       cancelled: "Annullamento",
     },
+    negativeStockPolicy: {
+      block: "Blocca giacenza negativa",
+      warn: "Consenti con avviso",
+      allow: "Consenti giacenza negativa",
+    },
   },
 
   // Warehouse create
@@ -87,6 +92,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Magazzino di default",
         description: "Impostare come magazzino predefinito per questa azienda",
+      },
+      negativeStockPolicy: {
+        label: "Regola giacenza negativa",
+        description:
+          "Comportamento delle vendite in cassa e scarichi con giacenza insufficiente",
       },
       errors: {
         validation: {
@@ -134,6 +144,7 @@ export const translations: typeof enTranslations = {
         companyId: "Società ID",
         isActive: "Attivo",
         isDefault: "Predefinito",
+        negativeStockPolicy: "Regola giacenza negativa",
       },
     },
   },
@@ -285,6 +296,7 @@ export const translations: typeof enTranslations = {
         address: "Indirizzo",
         isActive: "Attivo",
         isDefault: "Predefinito",
+        negativeStockPolicy: "Regola giacenza negativa",
         createdAt: "Creato a",
         updatedAt: "Aggiornato At",
       },
@@ -328,6 +340,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Magazzino di default",
         description: "Impostare come magazzino predefinito",
+      },
+      negativeStockPolicy: {
+        label: "Regola giacenza negativa",
+        description:
+          "Comportamento delle vendite in cassa e scarichi con giacenza insufficiente",
       },
       errors: {
         validation: {
@@ -377,6 +394,7 @@ export const translations: typeof enTranslations = {
         code: "Codice",
         isActive: "Attivo",
         isDefault: "Predefinito",
+        negativeStockPolicy: "Regola giacenza negativa",
       },
     },
   },

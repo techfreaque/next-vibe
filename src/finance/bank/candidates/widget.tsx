@@ -78,6 +78,18 @@ export function BankCandidatesWidget({
       });
     })();
   };
+  const openSplit = (): void => {
+    void import("../split/definition").then(({ default: routes }) =>
+      push(routes.POST, {
+        renderInModal: false,
+        popNavigationOnSuccess: 1,
+        data: {
+          companyId: data.selectedCompanyId,
+          lineId: statementLine.id,
+        },
+      }),
+    );
+  };
   const followup = (action: "release" | "draft"): void => {
     void import("../followup/definition").then(({ default: routes }) =>
       push(routes.POST, {
@@ -195,7 +207,12 @@ export function BankCandidatesWidget({
       </SectionGroup>
       {interactive && data.canMatch && (
         <Div className="flex flex-wrap gap-2">
-          {data.matchedJournalLineId && (
+          {!data.matchedJournalLineId && !data.matchedAt && (
+            <Button type="button" variant="outline" onClick={openSplit}>
+              {t("split.openAction")}
+            </Button>
+          )}
+          {(data.matchedJournalLineId || data.matchedAt) && (
             <Button
               type="button"
               variant="outline"
@@ -231,38 +248,144 @@ export function BankCandidatesWidget({
         </Div>
       )}
       <FormAlertWidget field={{}} />
-      {data.matchedJournalLineId ? (
-        <ResultBanner variant="success" title={t("ui.alreadyMatched")} />
-      ) : rows.length === 0 ? (
+      {data.matchedJournalLineId || data.matchedAt ? (
+        <>
+          <ResultBanner variant="success" title={t("ui.alreadyMatched")} />
+          {data.splits && data.splits.length > 0 && (
+            <SectionGroup title={t("split.allocations")}>
+              <RecordTable
+                label={t("split.allocations")}
+                columns={[
+                  { id: "targetType", label: t("autoMatch.targetType") },
+                  { id: "description", label: t("fields.description") },
+                  { id: "amount", label: t("fields.amount"), numeric: true },
+                ]}
+                rows={data.splits.map((s) => ({
+                  id: s.id,
+                  cells: {
+                    targetType: t(`split.types.${s.targetType}`),
+                    description: s.description ?? s.targetId,
+                    amount: formatMoney(
+                      s.amount,
+                      statementLine.currency,
+                      locale,
+                    ),
+                  },
+                }))}
+                compact={
+                  <Div className="flex flex-col gap-2">
+                    {data.splits.map((s) => (
+                      <ListItem
+                        key={s.id}
+                        title={t(`split.types.${s.targetType}`)}
+                        subtitle={s.description ?? s.targetId}
+                        meta={formatMoney(
+                          s.amount,
+                          statementLine.currency,
+                          locale,
+                        )}
+                      />
+                    ))}
+                  </Div>
+                }
+              />
+            </SectionGroup>
+          )}
+        </>
+      ) : rows.length === 0 && (data.documentCandidates?.length ?? 0) === 0 ? (
         <EmptyBlock
           title={t("ui.noCandidates")}
           message={t("ui.noCandidatesHint")}
         />
       ) : (
-        <RecordTable
-          label={t("candidates.title")}
-          columns={[
-            { id: "entryNumber", label: t("fields.entryNumber") },
-            { id: "description", label: t("fields.description") },
-            { id: "date", label: t("fields.journalDate") },
-            { id: "match", label: t("adjustment.kind") },
-            { id: "action", label: "" },
-          ]}
-          rows={rows.map(({ id, cells }) => ({ id, cells }))}
-          compact={
-            <Div className="flex flex-col gap-2">
-              {rows.map((row) => (
-                <ListItem
-                  key={row.id}
-                  title={row.cells.entryNumber}
-                  subtitle={row.cells.description}
-                  meta={`${row.date} · ${row.cells.match}${row.sameDay ? ` · ${t("ui.sameDay")}` : ""}`}
-                  onClick={row.onOpen}
-                />
-              ))}
-            </Div>
-          }
-        />
+        <>
+          {rows.length > 0 && (
+            <RecordTable
+              label={t("candidates.title")}
+              columns={[
+                { id: "entryNumber", label: t("fields.entryNumber") },
+                { id: "description", label: t("fields.description") },
+                { id: "date", label: t("fields.journalDate") },
+                { id: "match", label: t("adjustment.kind") },
+                { id: "action", label: "" },
+              ]}
+              rows={rows.map(({ id, cells }) => ({ id, cells }))}
+              compact={
+                <Div className="flex flex-col gap-2">
+                  {rows.map((row) => (
+                    <ListItem
+                      key={row.id}
+                      title={row.cells.entryNumber}
+                      subtitle={row.cells.description}
+                      meta={`${row.date} · ${row.cells.match}${row.sameDay ? ` · ${t("ui.sameDay")}` : ""}`}
+                      onClick={row.onOpen}
+                    />
+                  ))}
+                </Div>
+              }
+            />
+          )}
+          {data.documentCandidates && data.documentCandidates.length > 0 && (
+            <SectionGroup title={t("split.documentCandidates")}>
+              <RecordTable
+                label={t("split.documentCandidates")}
+                columns={[
+                  { id: "type", label: t("autoMatch.targetType") },
+                  { id: "number", label: t("autoMatch.targetLabel") },
+                  {
+                    id: "counterparty",
+                    label: t("statement.columns.counterparty"),
+                  },
+                  {
+                    id: "openAmount",
+                    label: t("fields.amount"),
+                    numeric: true,
+                  },
+                  { id: "action", label: "" },
+                ]}
+                rows={data.documentCandidates.map((doc) => ({
+                  id: `${doc.documentType}-${doc.id}`,
+                  cells: {
+                    type: t(`split.types.${doc.documentType}`),
+                    number: doc.documentNumber,
+                    counterparty: doc.counterpartyName,
+                    openAmount: formatMoney(
+                      doc.openAmount,
+                      doc.currency,
+                      locale,
+                    ),
+                    action:
+                      interactive && data.canMatch ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={openSplit}
+                        >
+                          {t("split.openAction")}
+                        </Button>
+                      ) : undefined,
+                  },
+                }))}
+                compact={
+                  <Div className="flex flex-col gap-2">
+                    {data.documentCandidates.map((doc) => (
+                      <ListItem
+                        key={`${doc.documentType}-${doc.id}`}
+                        title={doc.documentNumber}
+                        subtitle={`${t(`split.types.${doc.documentType}`)} · ${doc.counterpartyName}`}
+                        meta={formatMoney(doc.openAmount, doc.currency, locale)}
+                        onClick={
+                          interactive && data.canMatch ? openSplit : undefined
+                        }
+                      />
+                    ))}
+                  </Div>
+                }
+              />
+            </SectionGroup>
+          )}
+        </>
       )}
     </WidgetShell>
   );

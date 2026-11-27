@@ -6,6 +6,7 @@
 import {
   boolean,
   customType,
+  date,
   index,
   integer,
   pgTable,
@@ -48,6 +49,59 @@ const numericNumber = customType<{
     return Number(value);
   },
 });
+
+const numericRate = customType<{
+  data: number;
+  driverData: string;
+}>({
+  dataType() {
+    return "numeric(16, 8)";
+  },
+  toDriver(value: number): string {
+    return value.toString();
+  },
+  fromDriver(value: string): number {
+    return Number(value);
+  },
+});
+
+/**
+ * Exchange Rates table
+ * Daily ECB reference rates & manual FX rates for multi-currency ledger translation
+ */
+export const ExchangeRateSourceDB = ["ECB", "MANUAL"] as const;
+export type ExchangeRateSource = (typeof ExchangeRateSourceDB)[number];
+
+export const exchangeRates = pgTable(
+  "exchange_rates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    baseCurrency: text("base_currency").notNull(),
+    quoteCurrency: text("quote_currency").notNull(),
+    rate: numericRate("rate").notNull(),
+    rateDate: date("rate_date").notNull(),
+    source: text("source", { enum: ExchangeRateSourceDB })
+      .notNull()
+      .default("ECB"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    unique("uq_exchange_rate_pair_date_source").on(
+      table.baseCurrency,
+      table.quoteCurrency,
+      table.rateDate,
+      table.source,
+    ),
+    index("idx_exchange_rates_pair_date").on(
+      table.baseCurrency,
+      table.quoteCurrency,
+      table.rateDate,
+    ),
+  ],
+);
 
 /**
  * CoA Templates table
@@ -207,6 +261,9 @@ export const journalEntryLines = pgTable(
     type: text("type", { enum: LineTypeDB }).notNull(),
     amount: numericNumber("amount").notNull(), // always positive
     currency: text("currency").notNull(),
+    functionalAmount: numericNumber("functional_amount"), // translated amount in company functional currency
+    functionalCurrency: text("functional_currency"),
+    exchangeRate: numericRate("exchange_rate"), // 1 transaction currency = exchangeRate functional currency
     description: text("description"),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -27,7 +27,11 @@ import type { z } from "zod";
 
 import { companies } from "../companies/db";
 import { catalogProducts } from "../products/db";
-import { StockMovementTypeDB, TransferStatusDB } from "./enum";
+import {
+  NegativeStockPolicyDB,
+  StockMovementTypeDB,
+  TransferStatusDB,
+} from "./enum";
 
 /**
  * Custom numeric type that returns numbers instead of strings
@@ -62,6 +66,11 @@ export const warehouses = pgTable(
     name: text("name").notNull(),
     code: text("code").notNull(), // short code e.g. "WH-01"
     address: text("address"),
+    negativeStockPolicy: text("negative_stock_policy", {
+      enum: NegativeStockPolicyDB,
+    })
+      .notNull()
+      .default("BLOCK"),
     isActive: boolean("is_active").notNull().default(true),
     isDefault: boolean("is_default").notNull().default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),

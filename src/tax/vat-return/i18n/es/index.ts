@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tags: { tax: "Impuestos", vatReturn: "Declaración de IVA" },
-  title: "Declaración de IVA eslovaca y declaración de control",
-  titleShort: "Declaración de IVA (SK)",
+  title: "Declaración de IVA",
+  titleShort: "Declaración de IVA",
   description:
-    "Prepare las casillas de la declaración DPH y el XML de la declaración de control (kontrolný výkaz) de un mes o trimestre.",
+    "Su declaración de IVA del período, en el formato oficial de su país.",
   company: {
     label: "Empresa",
-    description: "La empresa dada de alta en el IVA",
+    description: "La empresa para la que se prepara la declaración",
   },
   period: {
     label: "Periodo",
@@ -16,16 +16,61 @@ export const translations: typeof enTranslations = {
     month: "{{month}} {{year}}",
     quarter: "T{{quarter}} {{year}}",
   },
-  unsupportedCountry:
-    "La declaración de IVA solo se prepara para empresas eslovacas. Indique Eslovaquia como país de la empresa para usarla.",
   disclaimer:
-    "Ofrecemos herramientas, no asesoría fiscal. Revise las declaraciones con su asesor fiscal antes de presentarlas en eDane.",
+    "Ofrecemos herramientas, no asesoría fiscal. Revise las declaraciones con su asesor antes de presentarlas.",
   summary: "{{company}}, del {{from}} al {{to}}",
-  due: "Vence el día 25 del mes siguiente, por vía electrónica.",
+  formats: {
+    SK_DPH: "Casillas de la declaración DPH (DPHv25)",
+    DE_USTVA: "Umsatzsteuer-Voranmeldung (UStVA)",
+    DE_EUR_SMALL_BUSINESS: "Resumen EÜR (exención § 19 UStG)",
+    AT_UVA: "Umsatzsteuervoranmeldung (U30)",
+    AT_EA_SMALL_BUSINESS: "Resumen de ingresos y gastos (§ 6 ap. 1 Z 27 UStG)",
+    GENERIC_VAT: "Resumen de IVA por tipo",
+  },
+  dueByFormat: {
+    SK_DPH: "Vence el día 25 del mes siguiente, por vía electrónica.",
+    DE_USTVA: "Vence el día 10 del mes siguiente mediante ELSTER.",
+    DE_EUR_SMALL_BUSINESS: "Resumen anual EÜR con la declaración de renta.",
+    AT_UVA: "Vence el día 15 del segundo mes siguiente mediante FinanzOnline.",
+    AT_EA_SMALL_BUSINESS: "Resumen anual para pequeñas empresas.",
+    GENERIC_VAT: "Consulte el plazo oficial de su administración tributaria.",
+  },
+  smallBusiness: {
+    title: "No se requiere declaración de IVA (régimen de pequeña empresa)",
+    body: {
+      SK_DPH: "Esta empresa no está dada de alta en el IVA.",
+      DE_USTVA: "No se requiere UStVA periódica.",
+      DE_EUR_SMALL_BUSINESS:
+        "Esta empresa aplica la exención § 19 UStG. No necesita presentar UStVA periódica. Abajo tiene su resumen EÜR del período.",
+      AT_UVA: "No se requiere UVA periódica.",
+      AT_EA_SMALL_BUSINESS:
+        "Esta empresa aplica la exención § 6 ap. 1 Z 27 UStG. Abajo tiene su resumen de ingresos y gastos.",
+      GENERIC_VAT: "No se requiere declaración de IVA para este régimen.",
+    },
+  },
+  xmlSection: {
+    SK_DPH: "Declaración de control (KV DPH)",
+    DE_USTVA: "XML ELSTER UStVA",
+    DE_EUR_SMALL_BUSINESS: "Exportación XML",
+    AT_UVA: "XML FinanzOnline UVA (U30)",
+    AT_EA_SMALL_BUSINESS: "Exportación XML",
+    GENERIC_VAT: "Exportación XML",
+  },
+  xmlNote: {
+    SK_DPH: "Suba el XML KVDPHv25 en el portal eDane.",
+    DE_USTVA:
+      "XML ELSTER UStVA listo para importación contable o envío por ERiC. El envío directo requiere certificado ERiC; también puede copiar las casillas en Mein ELSTER o descargar el CSV.",
+    DE_EUR_SMALL_BUSINESS: "Use la exportación CSV estructurada de arriba.",
+    AT_UVA:
+      "XML FinanzOnline U30 listo para subir al portal o revisar con su asesor.",
+    AT_EA_SMALL_BUSINESS: "Use la exportación CSV estructurada de arriba.",
+    GENERIC_VAT: "Use la exportación CSV estructurada de arriba.",
+  },
   lines: {
-    title: "Casillas de la declaración DPH (DPHv25)",
+    title: "Casillas de la declaración",
     line: "Casilla",
     meaning: "Concepto",
+    base: "Base imponible",
     amount: "Importe",
     r01: "Base imponible al 19 %",
     r02: "IVA al 19 %",
@@ -55,7 +100,7 @@ export const translations: typeof enTranslations = {
     r33: "IVA a devolver (exceso de deducción)",
   },
   sections: {
-    title: "Declaración de control (KV DPH)",
+    title: "Declaración de control",
     section: "Sección",
     count: "Filas",
     A1: "A.1 Facturas emitidas a sujetos pasivos",
@@ -64,22 +109,24 @@ export const translations: typeof enTranslations = {
     B2: "B.2 Facturas nacionales recibidas con deducción",
     B31: "B.3.1 Facturas simplificadas recibidas (total)",
     C1: "C.1 Facturas rectificativas emitidas",
-    D1: "D.1 Ventas eKasa",
-    D2: "D.2 Otras entregas (clientes sin IČ DPH)",
+    D1: "D.1 Ventas de caja fiscal",
+    D2: "D.2 Otras entregas (clientes sin NIF-IVA)",
   },
   warnings: {
     noVatId:
-      "La empresa no tiene un NIF-IVA (IČ DPH) válido. El XML KV lo exige antes de presentarlo.",
+      "La empresa no tiene un NIF-IVA válido configurado. Añádalo antes de presentar.",
+    noTaxId:
+      "La empresa no tiene un número fiscal configurado. Añádalo antes de exportar.",
     customerVatIds:
-      "{{count}} facturas a clientes sin IČ DPH se declaran en D.2.",
+      "{{count}} facturas a clientes sin NIF-IVA se declaran en D.2.",
     unmappedRates:
-      "{{count}} filas usan tipos distintos de 23 / 19 / 5 % y no entran en la declaración. Revíselas.",
+      "{{count}} filas usan tipos no estándar y no entran en las casillas asignadas. Revíselas.",
     b32Required:
       "El IVA deducido de facturas simplificadas ha llegado a 3.000 EUR. Detállelas por proveedor en B.3.2 antes de presentar.",
   },
   actions: {
-    downloadKv: "Descargar XML KV DPH",
-    downloadCsv: "Descargar casillas de la declaración (CSV)",
+    downloadXml: "Descargar XML",
+    downloadCsv: "Descargar CSV",
     showXml: "Mostrar XML",
     hideXml: "Ocultar XML",
     copy: "Copiar",
@@ -87,7 +134,7 @@ export const translations: typeof enTranslations = {
     copyError: "No se pudo copiar. Seleccione el texto y cópielo manualmente.",
   },
   pickCompany: "Elija una empresa para preparar su declaración de IVA.",
-  empty: "No hay documentos con relevancia para el IVA en este periodo.",
+  empty: "No hay documentos relevantes en este periodo.",
   errors: {
     validation: {
       title: "Solicitud no válida",
@@ -131,6 +178,6 @@ export const translations: typeof enTranslations = {
   success: {
     title: "Declaración de IVA preparada",
     description:
-      "Las casillas y la declaración de control reflejan los documentos guardados.",
+      "Las casillas y los archivos de exportación reflejan los documentos guardados.",
   },
 };

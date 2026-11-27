@@ -19,7 +19,7 @@ beforeAll(async () => {
   await pg.exec(`
  CREATE TABLE companies(id uuid PRIMARY KEY,currency text);
  CREATE TABLE company_members(id uuid,company_id uuid,user_id uuid,role text,is_active boolean,invited_by_user_id uuid,joined_at timestamp,created_at timestamp,updated_at timestamp);
- CREATE TABLE warehouses(id uuid PRIMARY KEY,company_id uuid,is_active boolean);
+ CREATE TABLE warehouses(id uuid PRIMARY KEY,company_id uuid,is_active boolean,negative_stock_policy text NOT NULL DEFAULT 'BLOCK');
  CREATE TABLE catalog_products(id uuid PRIMARY KEY,company_id uuid,owner_user_id uuid);
  CREATE TABLE purchase_orders(id uuid PRIMARY KEY,company_id uuid,status text,delivery_warehouse_id uuid,po_number text,currency text,received_at timestamp,updated_at timestamp);
  CREATE TABLE purchase_order_lines(id uuid PRIMARY KEY,po_id uuid,product_id uuid,quantity numeric,quantity_received numeric,unit_price numeric);

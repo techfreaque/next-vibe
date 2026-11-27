@@ -6,6 +6,8 @@
 import {
   boolean,
   customType,
+  date,
+  index,
   integer,
   jsonb,
   numeric,
@@ -418,6 +420,122 @@ export const paymentEstimateLines = pgTable("payment_estimate_lines", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * Per-company payment & billing settings:
+ * Bank IBAN/BIC for PDF/QR/e-invoices, Stripe checkout binding, and recurring invoicing opt-in.
+ */
+export const companyPaymentSettings = pgTable("company_payment_settings", {
+  companyId: uuid("company_id")
+    .primaryKey()
+    .references(() => companies.id, { onDelete: "cascade" }),
+  bankAccountHolder: text("bank_account_holder"),
+  bankIban: text("bank_iban"),
+  bankBic: text("bank_bic"),
+  stripeEnabled: boolean("stripe_enabled").notNull().default(false),
+  stripeAccountLabel: text("stripe_account_label"),
+  stripeClearingAccountId: uuid("stripe_clearing_account_id"),
+  autoBookStripePayments: boolean("auto_book_stripe_payments")
+    .notNull()
+    .default(true),
+  recurringInvoicesEnabled: boolean("recurring_invoices_enabled")
+    .notNull()
+    .default(false),
+  updatedByUserId: uuid("updated_by_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/**
+ * Document email delivery audit log (invoices, credit notes, estimates).
+ * Every send and resend through the platform mailer (hi@) is recorded here.
+ */
+export const documentEmailDeliveries = pgTable(
+  "document_email_deliveries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    companyId: uuid("company_id").references(() => companies.id, {
+      onDelete: "cascade",
+    }),
+    documentType: text("document_type", {
+      enum: ["invoice", "credit_note", "estimate"],
+    }).notNull(),
+    documentId: uuid("document_id").notNull(),
+    documentNumber: text("document_number").notNull(),
+    recipientEmail: text("recipient_email").notNull(),
+    senderEmail: text("sender_email").notNull(),
+    subject: text("subject").notNull(),
+    attachmentFilename: text("attachment_filename"),
+    status: text("status", { enum: ["sent", "failed"] }).notNull(),
+    messageId: text("message_id"),
+    errorMessage: text("error_message"),
+    isResend: boolean("is_resend").notNull().default(false),
+    sentByUserId: uuid("sent_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    sentAt: timestamp("sent_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_doc_email_deliveries_doc").on(
+      table.documentType,
+      table.documentId,
+      table.sentAt,
+    ),
+    index("idx_doc_email_deliveries_company").on(table.companyId, table.sentAt),
+  ],
+);
+
+/**
+ * Recurring invoice schedules per company.
+ * Disabled by default until enabled both at company and schedule level.
+ */
+export const recurringInvoiceSchedules = pgTable(
+  "recurring_invoice_schedules",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    customerId: uuid("customer_id"),
+    customerName: text("customer_name").notNull(),
+    customerEmail: text("customer_email"),
+    frequency: text("frequency", {
+      enum: ["MONTHLY", "QUARTERLY", "YEARLY"],
+    }).notNull(),
+    nextRunDate: date("next_run_date").notNull(),
+    endDate: date("end_date"),
+    dueDays: integer("due_days").notNull().default(14),
+    currency: text("currency", { enum: CurrencyDB }).notNull().default("EUR"),
+    notes: text("notes"),
+    lineTemplates: jsonb("line_templates")
+      .$type<
+        Array<{
+          description: string;
+          quantity: number;
+          unitPrice: number;
+          taxRate: number;
+          productId?: string | null;
+        }>
+      >()
+      .notNull(),
+    isEnabled: boolean("is_enabled").notNull().default(false),
+    autoIssue: boolean("auto_issue").notNull().default(true),
+    autoSendEmail: boolean("auto_send_email").notNull().default(false),
+    lastRunAt: timestamp("last_run_at"),
+    lastInvoiceId: uuid("last_invoice_id"),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_recurring_schedules_company").on(table.companyId),
+    index("idx_recurring_schedules_due").on(table.isEnabled, table.nextRunDate),
+  ],
+);
 
 // Zod schemas for new tables
 export const insertPaymentInvoiceLineSchema =

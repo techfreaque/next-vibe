@@ -22,6 +22,11 @@ export const translations: typeof enTranslations = {
       createdAt: "Data wystawienia",
       companyName: "Firma",
       companyEmail: "E-mail firmy",
+      paymentUrl: "Link do płatności online",
+      bankIban: "IBAN",
+      bankBic: "BIC",
+      qrKind: "Standard QR płatności",
+      qrSvg: "Kod QR płatności",
       lineId: "ID pozycji",
       lineDescription: "Opis",
       productId: "Produkt",
@@ -72,5 +77,10 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     submit: "Wyświetl fakturę",
+    payOnline: "Zapłać online",
+    bankTransfer: "Przelew bankowy",
+    scanToPay: "Zeskanuj w aplikacji bankowej",
+    epcQr: "SEPA GiroCode (EPC)",
+    payBySquareQr: "PAY by square",
   },
 };

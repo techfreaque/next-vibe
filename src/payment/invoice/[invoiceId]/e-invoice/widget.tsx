@@ -12,6 +12,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "next-vibe/ui/components/collapsible";
+import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Li } from "next-vibe/ui/components/li";
 import { Pre } from "next-vibe/ui/components/pre";
@@ -30,6 +31,7 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
@@ -111,12 +113,16 @@ export function InvoiceEInvoiceWidget({
         subtitle={t("title")}
         backButton={backButton}
         actions={
-          interactive ? (
+          interactive && data.ready ? (
             <DocumentTextExportButton
               filename={data.fileName}
               content={data.xml}
               mimeType="application/xml;charset=utf-8"
-              downloadLabel={t("widget.download")}
+              downloadLabel={t(
+                data.jurisdiction === "sk-efaktura"
+                  ? "widget.slovak"
+                  : "widget.peppol",
+              )}
               copyLabel={t("widget.copy")}
               copiedLabel={t("widget.copied")}
               copyErrorLabel={t("widget.copyFailed")}
@@ -133,9 +139,7 @@ export function InvoiceEInvoiceWidget({
             {data.missingFields.map((missing) => (
               <Li key={missing.field}>
                 {missing.label}
-                <Span className="text-xs text-muted-foreground">
-                  {` (${missing.field})`}
-                </Span>
+                <Span className="text-xs text-muted-foreground">{` (${missing.field})`}</Span>
               </Li>
             ))}
           </Ul>
@@ -153,7 +157,44 @@ export function InvoiceEInvoiceWidget({
           </Pre>
         </CollapsibleContent>
       </Collapsible>
-      <P className="text-xs text-muted-foreground">{t("widget.disclaimer")}</P>
+      {interactive && data.xrechnung && (
+        <Div className="flex flex-col gap-3 border-t pt-4">
+          <TextFieldWidget
+            fieldName="buyerReference"
+            field={field.children.buyerReference}
+          />
+          <SubmitButtonWidget<typeof definition.GET>
+            field={{ text: "widget.submit" }}
+          />
+          {data.xrechnung.missingFields.length > 0 ? (
+            <ResultBanner variant="warning" title={t("widget.xrechnung")}>
+              <Ul className="flex flex-col gap-1 text-sm">
+                {data.xrechnung.missingFields.map((missing) => (
+                  <Li key={missing.field}>{missing.label}</Li>
+                ))}
+              </Ul>
+            </ResultBanner>
+          ) : (
+            <DocumentTextExportButton
+              filename={data.xrechnung.fileName}
+              content={data.xrechnung.xml}
+              mimeType="application/xml;charset=utf-8"
+              downloadLabel={t("widget.xrechnung")}
+              copyLabel={t("widget.copy")}
+              copiedLabel={t("widget.copied")}
+              copyErrorLabel={t("widget.copyFailed")}
+            />
+          )}
+        </Div>
+      )}
+      <Div className="flex flex-col items-start gap-2 border-t pt-4">
+        <Button type="button" variant="outline" disabled>
+          {t("widget.send")}
+        </Button>
+        <P className="text-sm text-muted-foreground">
+          {t("widget.providerNeeded")}
+        </P>
+      </Div>
     </WidgetShell>
   );
 }

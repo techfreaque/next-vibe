@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
       title: "Ce que l'ERP prépare",
       vatReturn: "Déclaration de TVA et relevé de contrôle",
       statements: "Comptes annuels réglementaires",
-      fiscal: "Reçus fiscaux (eKasa)",
+      fiscal: "Reçus fiscaux",
       eInvoicing: "Facture électronique obligatoire à partir du",
       yes: "Disponible",
       no: "Non disponible pour ce pays",

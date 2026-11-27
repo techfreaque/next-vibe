@@ -19,8 +19,14 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies } from "@/companies/db";
+import { buildInvoicePaymentQr } from "@/finance/pdf/payment-qr";
 
-import { paymentInvoiceLines, paymentInvoices } from "../../../db";
+import {
+  companyPaymentSettings,
+  paymentInvoiceLines,
+  paymentInvoices,
+} from "../../../db";
+import { InvoiceStatus } from "../../../enum";
 import { verifyInvoiceViewToken } from "../../token";
 import type {
   InvoicePublicViewRequestOutput,
@@ -63,13 +69,22 @@ export class InvoicePublicViewRepository {
         });
       }
 
-      // Fetch company name and email if available
+      // Fetch company details & payment settings if available
       let companyName: string | null = null;
       let companyEmail: string | null = null;
+      let companyCountry: string | null = null;
+      let bankIban: string | null = null;
+      let bankBic: string | null = null;
+      let qrKind: "EPC" | "PAY_BY_SQUARE" | null = null;
+      let qrSvg: string | null = null;
 
       if (invoice.companyId) {
         const [company] = await db
-          .select({ name: companies.name, email: companies.email })
+          .select({
+            name: companies.name,
+            email: companies.email,
+            country: companies.country,
+          })
           .from(companies)
           .where(eq(companies.id, invoice.companyId))
           .limit(1);
@@ -77,8 +92,53 @@ export class InvoicePublicViewRepository {
         if (company) {
           companyName = company.name;
           companyEmail = company.email ?? null;
+          companyCountry = company.country ?? null;
+        }
+
+        const [paySettings] = await db
+          .select({
+            bankIban: companyPaymentSettings.bankIban,
+            bankBic: companyPaymentSettings.bankBic,
+            bankAccountHolder: companyPaymentSettings.bankAccountHolder,
+          })
+          .from(companyPaymentSettings)
+          .where(eq(companyPaymentSettings.companyId, invoice.companyId))
+          .limit(1);
+
+        if (paySettings?.bankIban) {
+          bankIban = paySettings.bankIban;
+          bankBic = paySettings.bankBic ?? null;
+          const amountNum = Number(invoice.amount);
+          const docNum = invoice.invoiceNumber ?? invoice.providerInvoiceId;
+          if (
+            invoice.status === InvoiceStatus.OPEN &&
+            Number.isFinite(amountNum) &&
+            amountNum > 0
+          ) {
+            const qr = buildInvoicePaymentQr(companyCountry, {
+              iban: paySettings.bankIban,
+              bic: paySettings.bankBic ?? undefined,
+              beneficiaryName:
+                paySettings.bankAccountHolder ?? companyName ?? "Company",
+              amount: amountNum,
+              currency: invoice.currency,
+              reference: docNum,
+              dueDate: invoice.dueDate
+                ? invoice.dueDate.toISOString().slice(0, 10)
+                : undefined,
+            });
+            if (qr) {
+              qrKind = qr.kind;
+              qrSvg = qr.svg;
+            }
+          }
         }
       }
+
+      const paymentUrl =
+        invoice.status === InvoiceStatus.OPEN && invoice.invoiceUrl
+          ? invoice.invoiceUrl
+          : null;
 
       const lines = await db
         .select()
@@ -99,6 +159,11 @@ export class InvoicePublicViewRepository {
         createdAt: invoice.createdAt,
         companyName,
         companyEmail,
+        paymentUrl,
+        bankIban,
+        bankBic,
+        qrKind,
+        qrSvg,
         lines: lines.map((l) => ({
           id: l.id,
           description: l.description,

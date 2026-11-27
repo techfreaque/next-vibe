@@ -43,6 +43,11 @@ export const translations = {
       received: "Received",
       cancelled: "Cancelled",
     },
+    negativeStockPolicy: {
+      block: "Block negative stock",
+      warn: "Allow with warning",
+      allow: "Allow negative stock",
+    },
   },
 
   // Warehouse create
@@ -85,6 +90,11 @@ export const translations = {
       isDefault: {
         label: "Default warehouse",
         description: "Set as the default warehouse for this company",
+      },
+      negativeStockPolicy: {
+        label: "Negative stock policy",
+        description:
+          "How till sales and stock issues behave when on-hand quantity is insufficient",
       },
       errors: {
         validation: {
@@ -132,6 +142,7 @@ export const translations = {
         companyId: "Company ID",
         isActive: "Active",
         isDefault: "Default",
+        negativeStockPolicy: "Negative stock policy",
       },
     },
   },
@@ -282,6 +293,7 @@ export const translations = {
         address: "Address",
         isActive: "Active",
         isDefault: "Default",
+        negativeStockPolicy: "Negative stock policy",
         createdAt: "Created at",
         updatedAt: "Updated at",
       },
@@ -325,6 +337,11 @@ export const translations = {
       isDefault: {
         label: "Default warehouse",
         description: "Set as the default warehouse",
+      },
+      negativeStockPolicy: {
+        label: "Negative stock policy",
+        description:
+          "How till sales and stock issues behave when on-hand quantity is insufficient",
       },
       errors: {
         validation: {
@@ -374,6 +391,7 @@ export const translations = {
         code: "Code",
         isActive: "Active",
         isDefault: "Default",
+        negativeStockPolicy: "Negative stock policy",
       },
     },
   },

@@ -22,6 +22,11 @@ export const translations: typeof enTranslations = {
       createdAt: "Ausstellungsdatum",
       companyName: "Unternehmen",
       companyEmail: "Unternehmens-E-Mail",
+      paymentUrl: "Online-Zahlungslink",
+      bankIban: "IBAN",
+      bankBic: "BIC",
+      qrKind: "QR-Zahlungsstandard",
+      qrSvg: "Zahlungs-QR-Code",
       lineId: "Positions-ID",
       lineDescription: "Beschreibung",
       productId: "Produkt",
@@ -78,5 +83,10 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     submit: "Rechnung anzeigen",
+    payOnline: "Online bezahlen",
+    bankTransfer: "Überweisung",
+    scanToPay: "Mit der Banking-App scannen",
+    epcQr: "SEPA GiroCode (EPC)",
+    payBySquareQr: "PAY by square",
   },
 };

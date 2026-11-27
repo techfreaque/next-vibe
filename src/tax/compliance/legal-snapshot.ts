@@ -25,6 +25,7 @@ export const partySnapshotSchema = z.object({
   taxId: z.string().nullable(),
   vatNumber: z.string().nullable(),
   email: z.string().nullable(),
+  phone: z.string().nullish(),
 });
 
 export type PartySnapshot = z.infer<typeof partySnapshotSchema>;

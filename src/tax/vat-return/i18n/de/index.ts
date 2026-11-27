@@ -1,31 +1,79 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { tax: "Steuern", vatReturn: "Umsatzsteuererklärung" },
-  title: "Slowakische Umsatzsteuererklärung und Kontrollmeldung",
-  titleShort: "USt-Erklärung (SK)",
+  tags: { tax: "Steuern", vatReturn: "Umsatzsteuer-Voranmeldung" },
+  title: "Umsatzsteuer-Voranmeldung",
+  titleShort: "USt-Voranmeldung",
   description:
-    "Bereiten Sie die Zeilen der DPH-Erklärung und das XML der Kontrollmeldung (kontrolný výkaz) für einen Monat oder ein Quartal vor.",
+    "Ihre Umsatzsteuer-Voranmeldung für den Zeitraum im amtlichen Format Ihres Landes.",
   company: {
     label: "Unternehmen",
-    description: "Das umsatzsteuerpflichtige Unternehmen",
+    description: "Das Unternehmen für die Meldung",
   },
   period: {
     label: "Zeitraum",
-    description: "Monat oder Quartal der Erklärung",
+    description: "Monat oder Quartal der Meldung",
     month: "{{month}} {{year}}",
     quarter: "Q{{quarter}} {{year}}",
   },
-  unsupportedCountry:
-    "Die Umsatzsteuererklärung gibt es nur für slowakische Unternehmen. Stellen Sie das Land des Unternehmens auf Slowakei um.",
   disclaimer:
-    "Wir liefern Werkzeuge, keine Steuerberatung. Lassen Sie Meldungen von Ihrer Steuerberatung prüfen, bevor Sie sie in eDane einreichen.",
+    "Wir liefern Werkzeuge, keine Steuerberatung. Lassen Sie Meldungen vor der Einreichung von Ihrer Steuerberatung prüfen.",
   summary: "{{company}}, {{from}} bis {{to}}",
-  due: "Fällig am 25. des Folgemonats, elektronisch.",
+  formats: {
+    SK_DPH: "Zeilen der DPH-Erklärung (DPHv25)",
+    DE_USTVA: "Umsatzsteuer-Voranmeldung (UStVA)",
+    DE_EUR_SMALL_BUSINESS: "EÜR-Übersicht (§ 19 UStG Kleinunternehmer)",
+    AT_UVA: "Umsatzsteuervoranmeldung (U30)",
+    AT_EA_SMALL_BUSINESS: "Einnahmen-Ausgaben-Übersicht (§ 6 Abs. 1 Z 27 UStG)",
+    GENERIC_VAT: "Umsatzsteuer-Übersicht nach Steuersatz",
+  },
+  dueByFormat: {
+    SK_DPH: "Fällig am 25. des Folgemonats, elektronisch.",
+    DE_USTVA: "Fällig am 10. des Folgemonats über ELSTER.",
+    DE_EUR_SMALL_BUSINESS: "Jährliche EÜR mit der Einkommensteuererklärung.",
+    AT_UVA: "Fällig am 15. des übernächsten Monats über FinanzOnline.",
+    AT_EA_SMALL_BUSINESS: "Jährliche Einnahmen-Ausgaben-Rechnung.",
+    GENERIC_VAT: "Prüfen Sie die Abgabefrist Ihrer Finanzbehörde.",
+  },
+  smallBusiness: {
+    title:
+      "Keine Umsatzsteuer-Voranmeldung wegen Kleinunternehmerregelung nötig",
+    body: {
+      SK_DPH: "Dieses Unternehmen ist nicht umsatzsteuerpflichtig.",
+      DE_USTVA: "Keine regelmäßige UStVA erforderlich.",
+      DE_EUR_SMALL_BUSINESS:
+        "Dieses Unternehmen nutzt die Kleinunternehmerregelung nach § 19 UStG. Eine reguläre UStVA ist nicht erforderlich. Unten sehen Sie Ihre EÜR-Übersicht für den Zeitraum.",
+      AT_UVA: "Keine regelmäßige UVA erforderlich.",
+      AT_EA_SMALL_BUSINESS:
+        "Dieses Unternehmen nutzt die Kleinunternehmerregelung nach § 6 Abs. 1 Z 27 UStG. Unten sehen Sie Ihre Einnahmen-Ausgaben-Übersicht.",
+      GENERIC_VAT: "Für diesen Steuerstatus ist keine USt-Meldung nötig.",
+    },
+  },
+  xmlSection: {
+    SK_DPH: "Kontrollmeldung (KV DPH)",
+    DE_USTVA: "ELSTER-UStVA-XML",
+    DE_EUR_SMALL_BUSINESS: "XML-Export",
+    AT_UVA: "FinanzOnline-UVA-XML (U30)",
+    AT_EA_SMALL_BUSINESS: "XML-Export",
+    GENERIC_VAT: "XML-Export",
+  },
+  xmlNote: {
+    SK_DPH: "Laden Sie das KVDPHv25-XML im eDane-Portal hoch.",
+    DE_USTVA:
+      "ELSTER-Anmeldungssteuern-XML für den Import beim Steuerberater oder den ERiC-Versand. Die direkte Übermittlung an ELSTER erfordert ein ERiC-Zertifikat; die Kennzahlen können auch direkt in Mein ELSTER übertragen oder als CSV geladen werden.",
+    DE_EUR_SMALL_BUSINESS:
+      "Nutzen Sie den strukturierten CSV-Export oben für Ihre EÜR.",
+    AT_UVA:
+      "FinanzOnline-U30-XML für den Portal-Upload oder Ihre Steuerberatung. Alternativ steht der strukturierte CSV-Export oben bereit.",
+    AT_EA_SMALL_BUSINESS: "Nutzen Sie den strukturierten CSV-Export oben.",
+    GENERIC_VAT:
+      "Nutzen Sie den strukturierten CSV-Export oben für Ihre Meldung.",
+  },
   lines: {
-    title: "Zeilen der DPH-Erklärung (DPHv25)",
+    title: "Erklärungszeilen",
     line: "Zeile",
     meaning: "Bedeutung",
+    base: "Bemessungsgrundlage",
     amount: "Betrag",
     r01: "Bemessungsgrundlage 19 %",
     r02: "Umsatzsteuer 19 %",
@@ -55,7 +103,7 @@ export const translations: typeof enTranslations = {
     r33: "Vorsteuerüberhang (Erstattung)",
   },
   sections: {
-    title: "Kontrollmeldung (KV DPH)",
+    title: "Kontrollmeldung",
     section: "Abschnitt",
     count: "Zeilen",
     A1: "A.1 Ausgangsrechnungen an Umsatzsteuerpflichtige",
@@ -64,22 +112,24 @@ export const translations: typeof enTranslations = {
     B2: "B.2 Inländische Eingangsrechnungen mit Vorsteuerabzug",
     B31: "B.3.1 Erhaltene vereinfachte Rechnungen (Summe)",
     C1: "C.1 Ausgestellte Gutschriften",
-    D1: "D.1 eKasa-Umsätze",
-    D2: "D.2 Sonstige Umsätze (Kunden ohne IČ DPH)",
+    D1: "D.1 Kassenumsätze",
+    D2: "D.2 Sonstige Umsätze (Kunden ohne USt-IdNr.)",
   },
   warnings: {
     noVatId:
-      "Das Unternehmen hat keine gültige USt-IdNr. (IČ DPH). Das KV-XML braucht sie vor der Einreichung.",
+      "Das Unternehmen hat keine gültige USt-IdNr. hinterlegt. Ergänzen Sie diese vor der Einreichung.",
+    noTaxId:
+      "Das Unternehmen hat keine Steuernummer hinterlegt. Ergänzen Sie diese in den Unternehmensdaten vor dem ELSTER-Export.",
     customerVatIds:
-      "{{count}} Rechnungen an Kunden ohne IČ DPH werden in D.2 gemeldet.",
+      "{{count}} Rechnungen an Kunden ohne USt-IdNr. werden in D.2 gemeldet.",
     unmappedRates:
-      "{{count}} Zeilen haben Steuersätze außerhalb von 23 / 19 / 5 % und fehlen in der Erklärung. Prüfen Sie diese.",
+      "{{count}} Zeilen haben abweichende Steuersätze und fehlen in den zugeordneten Zeilen. Prüfen Sie diese.",
     b32Required:
       "Die Vorsteuer aus vereinfachten Rechnungen hat 3.000 EUR erreicht. Melden Sie diese vor der Einreichung je Lieferant in B.3.2.",
   },
   actions: {
-    downloadKv: "KV-DPH-XML herunterladen",
-    downloadCsv: "Erklärungszeilen herunterladen (CSV)",
+    downloadXml: "XML herunterladen",
+    downloadCsv: "CSV herunterladen",
     showXml: "XML anzeigen",
     hideXml: "XML ausblenden",
     copy: "Kopieren",
@@ -88,8 +138,8 @@ export const translations: typeof enTranslations = {
       "Kopieren fehlgeschlagen. Markieren Sie den Text und kopieren Sie ihn manuell.",
   },
   pickCompany:
-    "Wählen Sie ein Unternehmen, um seine Umsatzsteuererklärung vorzubereiten.",
-  empty: "Keine umsatzsteuerrelevanten Belege in diesem Zeitraum.",
+    "Wählen Sie ein Unternehmen, um seine Umsatzsteuer-Voranmeldung vorzubereiten.",
+  empty: "Keine relevanten Belege in diesem Zeitraum.",
   errors: {
     validation: {
       title: "Ungültige Anfrage",
@@ -99,7 +149,7 @@ export const translations: typeof enTranslations = {
     unauthorized: {
       title: "Anmeldung erforderlich",
       description:
-        "Melden Sie sich an, um Umsatzsteuererklärungen vorzubereiten.",
+        "Melden Sie sich an, um Umsatzsteuer-Voranmeldungen vorzubereiten.",
     },
     forbidden: {
       title: "Kein Zugriff",
@@ -115,9 +165,9 @@ export const translations: typeof enTranslations = {
         "Die Daten wurden während der Vorbereitung geändert. Versuchen Sie es erneut.",
     },
     server: {
-      title: "Erklärung nicht vorbereitet",
+      title: "Meldung nicht vorbereitet",
       description:
-        "Die Umsatzsteuererklärung konnte nicht vorbereitet werden. Versuchen Sie es erneut.",
+        "Die Umsatzsteuer-Voranmeldung konnte nicht vorbereitet werden. Versuchen Sie es erneut.",
     },
     network: {
       title: "Netzwerkfehler",
@@ -133,8 +183,8 @@ export const translations: typeof enTranslations = {
     },
   },
   success: {
-    title: "Umsatzsteuererklärung vorbereitet",
+    title: "Umsatzsteuer-Voranmeldung vorbereitet",
     description:
-      "Zeilen und Kontrollmeldung entsprechen den gespeicherten Belegen.",
+      "Zeilen und Exportdateien entsprechen den gespeicherten Belegen.",
   },
 };

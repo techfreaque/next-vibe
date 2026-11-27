@@ -132,6 +132,10 @@ export const translations: typeof enTranslations = {
     preview: "Anteprima (prime 5 operazioni)",
     matchRow: "Abbina",
     unmatched: "Da abbinare",
+    matched: "Abbinata",
+    allLines: "Tutte",
+    splitMatched: "Suddivisa",
+    selectAccount: "Apri conto",
     csvHelp:
       "Scegli un’esportazione bancaria o associa le colonne CSV. Sono obbligatori data e importo con segno.",
     unsupported:
@@ -213,6 +217,76 @@ export const translations: typeof enTranslations = {
     journalMatch:
       "Scegli una riga registrata e non riconciliata per lo stesso conto, importo e valuta.",
     confirmation: "Conferma la riconciliazione prima di salvare.",
+    splitTotalMismatch:
+      "Le quote suddivise devono sommare esattamente all'importo della riga bancaria.",
+    splitTargetInvalid:
+      "Verifica che ogni fattura, spesa o conto appartenga a questa azienda e rispetti il segno del movimento.",
+  },
+  reconciliation: {
+    statusTitle: "Stato riconciliazione",
+    accountsTitle: "Stato dei conti bancari",
+    unmatchedLines: "Da abbinare",
+    matchedLines: "Abbinate",
+    statementNet: "Saldo estratto",
+    ledgerBalance: "Saldo contabile",
+    difference: "Differenza",
+  },
+  autoMatch: {
+    title: "Abbinamento automatico",
+    description:
+      "Abbina le righe bancarie aperte a fatture, spese e pagamenti registrati usando importo, riferimento, IBAN, finestra temporale e tolleranza cambi.",
+    success: "Abbinamento automatico completato",
+    action: "Abbina in automatico",
+    dryRun: "Solo anteprima",
+    previewAction: "Anteprima abbinamenti",
+    applyAction: "Applica abbinamenti",
+    previewBanner: "Anteprima: trovati {{count}} abbinamenti univoci.",
+    appliedBanner: "Abbinate automaticamente {{count}} righe bancarie.",
+    skippedHint: "{{count}} righe ambigue lasciate alla revisione manuale.",
+    matchedCount: "Abbinate",
+    invoiceMatches: "Fatture",
+    billMatches: "Spese",
+    journalMatches: "Scritture",
+    skippedAmbiguous: "Ambigue saltate",
+    items: "Elementi abbinati",
+    targetType: "Tipo",
+    targetLabel: "Destinazione",
+    basisLabel: "Criterio",
+    emptyTitle: "Nessun abbinamento automatico trovato",
+    emptyHint:
+      "Controlla le righe manualmente o modifica la finestra date e le impostazioni cambi.",
+    targets: {
+      journal_line: "Riga contabile",
+      invoice: "Fattura",
+      bill: "Spesa fornitore",
+    },
+    basis: {
+      reference: "Riferimento documento",
+      iban: "IBAN",
+      amount_date: "Importo e data",
+      fx_tolerance: "Tolleranza cambi o commissioni",
+    },
+  },
+  split: {
+    title: "Suddividi riga bancaria",
+    description:
+      "Ripartisci una riga bancaria tra più fatture, spese, conti o scritture contabili.",
+    success: "Riga bancaria suddivisa e riconciliata",
+    openAction: "Suddividi",
+    allocations: "Ripartizioni",
+    count: "Quote",
+    remaining: "Residuo da assegnare",
+    selectTarget: "Seleziona destinazione",
+    addRow: "Aggiungi riga",
+    removeRow: "Rimuovi",
+    confirmAction: "Conferma suddivisione",
+    documentCandidates: "Fatture e spese aperte",
+    types: {
+      journal_line: "Riga contabile",
+      invoice: "Fattura aperta",
+      bill: "Spesa aperta",
+      account: "Conto contabile",
+    },
   },
   import: {
     title: "Importa estratto conto",

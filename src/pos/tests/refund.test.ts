@@ -43,8 +43,8 @@ beforeAll(async () => {
       certified_until date, settings jsonb NOT NULL DEFAULT '{}'::jsonb, created_by uuid,
       created_at timestamp NOT NULL DEFAULT now(), updated_at timestamp NOT NULL DEFAULT now()
     );
-    CREATE TABLE users (id uuid PRIMARY KEY, private_name text NOT NULL);
     CREATE TABLE company_members (id uuid, company_id uuid, user_id uuid, is_active boolean, role text, invited_by_user_id uuid, joined_at timestamp, created_at timestamp, updated_at timestamp);
+    CREATE TABLE users (id uuid PRIMARY KEY, private_name text NOT NULL);
     CREATE TABLE account_nodes (
       id uuid PRIMARY KEY, company_id uuid NOT NULL, code text NOT NULL,
       name text NOT NULL, type text NOT NULL, subtype text NOT NULL,
@@ -71,7 +71,7 @@ beforeAll(async () => {
       journal_entry_id uuid NOT NULL REFERENCES journal_entries(id),
       account_id uuid NOT NULL REFERENCES account_nodes(id), type text NOT NULL,
       amount numeric(14, 4) NOT NULL, description text,
-      currency text NOT NULL, sort_order integer NOT NULL DEFAULT 0, created_at timestamp DEFAULT now()
+      currency text NOT NULL, functional_amount numeric(14, 4), functional_currency text, exchange_rate numeric(18, 8), sort_order integer NOT NULL DEFAULT 0, created_at timestamp DEFAULT now()
     );
     CREATE TABLE pos_terminals(id uuid PRIMARY KEY, company_id uuid, cash_account_node_id uuid, warehouse_id uuid, currency text, name text DEFAULT 'Counter');
     CREATE TABLE pos_sessions(id uuid PRIMARY KEY, terminal_id uuid, cashier_user_id uuid, status text, opened_at timestamp DEFAULT now(), opening_float numeric, closing_float numeric, closed_at timestamp);
@@ -80,7 +80,7 @@ beforeAll(async () => {
     CREATE TABLE pos_payments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), order_id uuid, method text, amount numeric, change numeric, account_node_id uuid, reference text, created_at timestamp DEFAULT now());
     CREATE TABLE pos_refunds(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), order_id uuid NOT NULL, session_id uuid, refund_number text NOT NULL, method text NOT NULL, currency text NOT NULL, subtotal numeric(12,4) NOT NULL, tax_amount numeric(12,4) NOT NULL, total numeric(12,4) NOT NULL, reason text NOT NULL, journal_entry_id uuid, created_by_user_id uuid NOT NULL, created_at timestamp NOT NULL DEFAULT now());
     CREATE TABLE pos_refund_lines(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), refund_id uuid NOT NULL REFERENCES pos_refunds(id), order_item_id uuid NOT NULL REFERENCES pos_order_items(id), quantity numeric(12,4) NOT NULL, line_total numeric(12,4) NOT NULL, tax_amount numeric(12,4) NOT NULL, created_at timestamp NOT NULL DEFAULT now());
-    CREATE TABLE warehouses(id uuid PRIMARY KEY, company_id uuid NOT NULL, is_active boolean NOT NULL);
+    CREATE TABLE warehouses(id uuid PRIMARY KEY, company_id uuid NOT NULL, is_active boolean NOT NULL, negative_stock_policy text NOT NULL DEFAULT 'BLOCK');
     CREATE TABLE catalog_products(id uuid PRIMARY KEY, company_id uuid, owner_user_id uuid, type text NOT NULL);
     CREATE TABLE stock_levels(
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), warehouse_id uuid NOT NULL,
@@ -94,8 +94,8 @@ beforeAll(async () => {
       type text, quantity numeric, unit_cost numeric, reference text, source_id uuid,
       source_type text, notes text, created_by_user_id uuid, created_at timestamp DEFAULT now()
     );
-    INSERT INTO users (id, private_name) VALUES ('${user}', 'Fixture cashier');
     INSERT INTO companies(id, currency, name) VALUES ('${company}', 'EUR', 'Shop');
+    INSERT INTO users(id, private_name) VALUES ('${user}', 'Fixture cashier');
     INSERT INTO company_members(company_id, user_id, role, is_active) VALUES ('${company}', '${user}', '${CompanyMemberRole.MEMBER}', true);
     INSERT INTO account_nodes(id, company_id, code, name, type, subtype) VALUES
       ('${cashAccount}', '${company}', '1000', 'Till', 'asset', '${AccountSubtype.CASH}'),

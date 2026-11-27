@@ -1,13 +1,18 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "E-faktura (Peppol)",
+  title: "E-faktura",
   titleShort: "E-faktura",
   description:
     "Wyeksportuj wystawioną fakturę lub fakturę korygującą jako plik Peppol BIS Billing 3.0 (UBL, EN 16931).",
   invoiceId: {
     label: "Faktura",
     description: "Wystawiona faktura lub korekta do eksportu",
+  },
+  buyerReference: {
+    label: "Numer referencyjny nabywcy",
+    description:
+      "Wpisz numer podany przez nabywcę. Dla urzędu w Niemczech wpisz jego Leitweg-ID.",
   },
   response: {
     invoiceNumber: "Numer dokumentu",
@@ -18,6 +23,12 @@ export const translations: typeof enTranslations = {
     xml: "XML",
   },
   widget: {
+    peppol: "Pobierz XML Peppol",
+    slovak: "Pobierz XML eFaktúra",
+    xrechnung: "XML XRechnung",
+    send: "Wyślij przez Peppol",
+    providerNeeded:
+      "Połącz certyfikowany punkt dostępowy Peppol i zarejestruj identyfikator Peppol wystawcy.",
     back: "Wstecz",
     submit: "Przygotuj e-fakturę",
     invoice: "Faktura {{number}}",
@@ -32,6 +43,15 @@ export const translations: typeof enTranslations = {
     disclaimer: "Dostarczamy narzędzia, nie doradztwo podatkowe.",
   },
   fields: {
+    bt10: "Numer referencyjny nabywcy",
+    bt35: "Ulica wystawcy",
+    bt37: "Miejscowość wystawcy",
+    bt38: "Kod pocztowy wystawcy",
+    bt42: "Telefon wystawcy",
+    bt43: "E-mail wystawcy",
+    bt50: "Ulica nabywcy",
+    bt52: "Miejscowość nabywcy",
+    bt53: "Kod pocztowy nabywcy",
     bt1: "Numer dokumentu",
     bt2: "Data wystawienia",
     bt5: "Waluta",

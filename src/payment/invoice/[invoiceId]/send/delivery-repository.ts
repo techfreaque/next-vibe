@@ -13,6 +13,7 @@ import {
 import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { createElement } from "react";
 import { z } from "zod";
 
 import {
@@ -20,8 +21,8 @@ import {
   lockLedgerCompany,
 } from "@/chart-of-accounts/shared/ledger-write";
 import { getDocumentAccess } from "@/finance/document-company-scope";
-import { scopedTranslation as systemMailboxTranslation } from "@/messenger/system-mailbox/i18n";
-import { SystemMailboxRepository } from "@/messenger/system-mailbox/repository";
+import { CampaignType } from "@/messenger/accounts/enum";
+import { EmailSendingRepository } from "@/messenger/providers/email/smtp-client/email-sending/repository";
 import { paymentInvoices } from "@/payment/db";
 import { InvoiceStatus } from "@/payment/enum";
 
@@ -301,16 +302,27 @@ export class InvoiceDeliveryRepository {
       warn: () => logger.warn("Invoice mailbox reported a warning"),
       error: () => logger.error("Invoice mailbox reported an error"),
     };
-    const sent = await SystemMailboxRepository.send(
-      { to: payload.to, subject: payload.subject, text: payload.text },
-      payload.actorId,
+    const html = createElement(
+      "div",
+      { style: { fontFamily: "sans-serif", lineHeight: "1.6" } },
+      createElement("p", null, payload.text),
+    );
+    const sent = await EmailSendingRepository.sendEmail(
+      {
+        jsx: html,
+        text: payload.text,
+        subject: payload.subject,
+        toEmail: payload.to,
+        toName: payload.to,
+        locale,
+        campaignType: CampaignType.SYSTEM,
+      },
       safeLogger,
-      systemMailboxTranslation.scopedT(locale).t,
+      locale,
     );
     if (sent.success) {
       return "accepted";
     }
-    // The mailbox returns these statuses only before handing a message to SMTP.
     if (
       sent.errorType === ErrorResponseTypes.NOT_FOUND ||
       sent.errorType === ErrorResponseTypes.FORBIDDEN ||

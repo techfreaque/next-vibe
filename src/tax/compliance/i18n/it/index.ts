@@ -92,7 +92,7 @@ export const translations: typeof enTranslations = {
       title: "Cosa prepara l'ERP",
       vatReturn: "Dichiarazione IVA e prospetto di controllo",
       statements: "Bilancio d'esercizio obbligatorio",
-      fiscal: "Scontrini fiscali (eKasa)",
+      fiscal: "Scontrini fiscali",
       eInvoicing: "Fattura elettronica obbligatoria dal",
       yes: "Disponibile",
       no: "Non disponibile per questo paese",

@@ -8,6 +8,7 @@ import {
   gt,
   gte,
   inArray,
+  isNotNull,
   isNull,
   lt,
   ne,
@@ -45,22 +46,35 @@ import { companies } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 import { screenBankFileRows } from "@/finance/bank-connections/privacy/repository";
+import { getInvoiceOpenBalanceParts } from "@/finance/document-balance";
 import {
   canManageCompanyDocuments,
   getDocumentAccess,
 } from "@/finance/document-company-scope";
 import { documentPage } from "@/finance/document-list";
-import { paymentBills } from "@/payment/db";
-import { BillStatus } from "@/payment/enum";
+import { paymentBills, paymentInvoices } from "@/payment/db";
+import { BillStatus, InvoiceStatus } from "@/payment/enum";
 import { purchasingVendors } from "@/purchasing/db";
 
 import { postBankAdjustment } from "./adjustment";
+import type {
+  BankAutoMatchRequest,
+  BankAutoMatchResponse,
+} from "./auto-match/definition";
+import {
+  getCompanyBankAccountStatuses,
+  runBankAutoMatch,
+} from "./auto-match-engine";
 import type {
   BankCandidatesPath,
   BankCandidatesRequest,
   BankCandidatesResponse,
 } from "./candidates/definition";
-import { bankAccountReconciliationSettings, bankStatementLines } from "./db";
+import {
+  bankAccountReconciliationSettings,
+  bankStatementLines,
+  bankStatementLineSplits,
+} from "./db";
 import { scopedTranslation } from "./i18n";
 import type {
   BankImportRequest,
@@ -74,6 +88,7 @@ import type {
 } from "./match/definition";
 import { getBankPaymentBasis } from "./payment-basis";
 import { bankUnits, planBankMatch } from "./reconciliation-plan";
+import { BankSplitRepository } from "./split-repository";
 import { parseStatementFile } from "./statement-file";
 import {
   type NormalizedBankImport,
@@ -84,6 +99,7 @@ import { keyStatementRows } from "./statement-identity";
 
 export class BankReconciliationRepository {
   private static readonly pageSize = 25;
+  static applySplit = BankSplitRepository.applySplit;
 
   static async importStatement(
     userId: string,
@@ -369,7 +385,7 @@ export class BankReconciliationRepository {
           );
         }
 
-        const autoMatched =
+        const supplierMatched =
           data.autoMatch && !data.dryRun
             ? await BankReconciliationRepository.matchSupplierPayments(tx, {
                 companyId: data.companyId,
@@ -379,9 +395,25 @@ export class BankReconciliationRepository {
                   ({ transactionId }) => transactionId,
                 ),
               })
-            : data.autoMatch
-              ? 0
-              : undefined;
+            : 0;
+        const engineSummary =
+          data.autoMatch && !data.dryRun
+            ? await runBankAutoMatch(tx, {
+                companyId: data.companyId,
+                accountId: data.accountId,
+                userId,
+                transactionIds: keyed.rows.map(
+                  ({ transactionId }) => transactionId,
+                ),
+                dryRun: false,
+                adjustmentDescription: (reference) =>
+                  t("adjustment.description", { reference }),
+                logger,
+              })
+            : null;
+        const autoMatched = data.autoMatch
+          ? supplierMatched + (engineSummary?.matchedCount ?? 0)
+          : undefined;
 
         return success({
           imported: newRows.length,
@@ -396,6 +428,78 @@ export class BankReconciliationRepository {
       });
     } catch {
       logger.error("Bank statement import failed");
+      return fail({
+        message: t("errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  static async autoMatchAccount(
+    userId: string,
+    data: BankAutoMatchRequest,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<BankAutoMatchResponse>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    const auth = await CompanyAuthRepository.requireMember(
+      userId,
+      data.companyId,
+      CompanyMemberRole.ACCOUNTANT,
+      logger,
+      locale,
+    );
+    if (!auth.success) {
+      return auth;
+    }
+    try {
+      return await db.transaction(async (tx) => {
+        const company = await lockLedgerCompany(tx, data.companyId);
+        const access = await getDocumentAccess(
+          userId,
+          { companyId: data.companyId },
+          tx,
+        );
+        if (!company || !access?.canManage) {
+          return fail({
+            message: t("errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+        const account = await BankReconciliationRepository.getBankAccount(
+          tx,
+          data.companyId,
+          data.accountId,
+          true,
+        );
+        if (!account) {
+          return fail({
+            message: t("errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+        const summary = await runBankAutoMatch(tx, {
+          companyId: data.companyId,
+          accountId: data.accountId,
+          userId,
+          dryRun: data.dryRun,
+          adjustmentDescription: (reference) =>
+            t("adjustment.description", { reference }),
+          logger,
+        });
+        return success({
+          preview: data.dryRun,
+          matchedCount: summary.matchedCount,
+          invoiceMatches: summary.invoiceMatches,
+          billMatches: summary.billMatches,
+          journalMatches: summary.journalMatches,
+          skippedAmbiguous: summary.skippedAmbiguous,
+          items: summary.items,
+          selectedAccountId: data.accountId,
+        });
+      });
+    } catch (error) {
+      logger.error("Bank auto-match failed", parseError(error));
       return fail({
         message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -420,6 +524,7 @@ export class BankReconciliationRepository {
       selectedAccountId: null,
       selectedAccountName: null,
       selectedCompanyName: null,
+      accountStatuses: [],
     };
     if (!companyId) {
       return success(empty);
@@ -436,24 +541,20 @@ export class BankReconciliationRepository {
     }
 
     try {
+      const accountStatuses = await getCompanyBankAccountStatuses(
+        db,
+        companyId,
+      );
       let accountId = data.accountId;
       if (!accountId) {
-        const accounts = await db
-          .select({ id: accountNodes.id })
-          .from(accountNodes)
-          .where(
-            and(
-              eq(accountNodes.companyId, companyId),
-              eq(accountNodes.subtype, AccountSubtype.BANK),
-              eq(accountNodes.isActive, true),
-              eq(accountNodes.isPostable, true),
-            ),
-          )
-          .limit(2);
-        if (accounts.length !== 1) {
-          return success(empty);
+        if (accountStatuses.length !== 1) {
+          return success({
+            ...empty,
+            selectedCompanyId: companyId,
+            accountStatuses,
+          });
         }
-        accountId = accounts[0].id;
+        accountId = accountStatuses[0].accountId;
       }
       const account = await BankReconciliationRepository.getBankAccount(
         db,
@@ -467,10 +568,23 @@ export class BankReconciliationRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
+      const statusFilter = data.status ?? "open";
+      const statusCondition =
+        statusFilter === "matched"
+          ? or(
+              isNotNull(bankStatementLines.matchedJournalLineId),
+              isNotNull(bankStatementLines.matchedAt),
+            )
+          : statusFilter === "all"
+            ? undefined
+            : and(
+                isNull(bankStatementLines.matchedJournalLineId),
+                isNull(bankStatementLines.matchedAt),
+              );
       const where = and(
         eq(bankStatementLines.companyId, companyId),
         eq(bankStatementLines.accountId, accountId),
-        isNull(bankStatementLines.matchedJournalLineId),
+        statusCondition,
       );
       const [{ total }] = await db
         .select({ total: count() })
@@ -478,19 +592,27 @@ export class BankReconciliationRepository {
         .where(where);
       const pageSize = BankReconciliationRepository.pageSize;
       const pagination = documentPage(total, data.page, pageSize);
-      const lines = await db
+      const rawLines = await db
         .select({
           id: bankStatementLines.id,
           transactionId: bankStatementLines.transactionId,
           bookedDate: bankStatementLines.bookedDate,
           amount: bankStatementLines.amount,
           currency: bankStatementLines.currency,
+          counterparty: bankStatementLines.counterparty,
+          description: bankStatementLines.description,
+          matchKind: bankStatementLines.matchKind,
+          matchedAt: bankStatementLines.matchedAt,
         })
         .from(bankStatementLines)
         .where(where)
         .orderBy(asc(bankStatementLines.bookedDate), asc(bankStatementLines.id))
         .limit(pageSize)
         .offset((pagination.currentPage - 1) * pageSize);
+      const lines = rawLines.map((row) => ({
+        ...row,
+        matchedAt: row.matchedAt?.toISOString() ?? null,
+      }));
       const canManage = canManageCompanyDocuments(auth.data.role);
       const [settings] = canManage
         ? await db
@@ -515,6 +637,9 @@ export class BankReconciliationRepository {
               ),
             )
         : [];
+      const reconciliationStatus = accountStatuses.find(
+        (s) => s.accountId === accountId,
+      );
       return success({
         lines,
         total,
@@ -527,6 +652,8 @@ export class BankReconciliationRepository {
         selectedCompanyName: account.companyName,
         canManage,
         settings,
+        reconciliationStatus,
+        accountStatuses,
       });
     } catch (error) {
       logger.error("Bank line listing failed", parseError(error));
@@ -681,6 +808,121 @@ export class BankReconciliationRepository {
       );
       const matches = matched.filter((row) => row !== null);
 
+      const splitsRows = await db
+        .select()
+        .from(bankStatementLineSplits)
+        .where(eq(bankStatementLineSplits.bankStatementLineId, line.id))
+        .orderBy(asc(bankStatementLineSplits.createdAt));
+      const splits = splitsRows.map((row) => ({
+        id: row.id,
+        targetType: row.targetType,
+        targetId:
+          row.journalLineId ??
+          row.invoiceId ??
+          row.billId ??
+          row.accountId ??
+          row.id,
+        amount: row.amount,
+        description: row.description,
+        createdJournalEntryId: row.createdJournalEntryId,
+      }));
+
+      const documentCandidates: Array<{
+        id: string;
+        documentType: "invoice" | "bill";
+        documentNumber: string;
+        counterpartyName: string;
+        openAmount: string;
+        currency: string;
+        dueDate: string | null;
+      }> = [];
+      if (!line.matchedJournalLineId && !line.matchedAt) {
+        const balanceParts = getInvoiceOpenBalanceParts(
+          db,
+          line.companyId,
+          line.currency,
+        );
+        const openInvoices = await db
+          .select({
+            id: paymentInvoices.id,
+            invoiceNumber: paymentInvoices.invoiceNumber,
+            providerInvoiceId: paymentInvoices.providerInvoiceId,
+            currency: paymentInvoices.currency,
+            dueDate: paymentInvoices.dueDate,
+            metadata: paymentInvoices.metadata,
+            openAmount: balanceParts.openAmount,
+          })
+          .from(paymentInvoices)
+          .leftJoin(balanceParts.payments, balanceParts.paymentJoin)
+          .leftJoin(balanceParts.credits, balanceParts.creditJoin)
+          .where(
+            and(
+              eq(paymentInvoices.companyId, line.companyId),
+              eq(paymentInvoices.status, InvoiceStatus.OPEN),
+              sql`${paymentInvoices.currency} = ${line.currency}`,
+            ),
+          )
+          .limit(30);
+        for (const inv of openInvoices) {
+          const openCents = Math.round(Number(inv.openAmount) * 100);
+          if (openCents <= 0) {
+            continue;
+          }
+          const customerName =
+            typeof inv.metadata === "object" &&
+            inv.metadata !== null &&
+            "customerName" in inv.metadata &&
+            typeof inv.metadata.customerName === "string"
+              ? inv.metadata.customerName
+              : "";
+          documentCandidates.push({
+            id: inv.id,
+            documentType: "invoice",
+            documentNumber: inv.invoiceNumber ?? inv.providerInvoiceId,
+            counterpartyName: customerName,
+            openAmount: (openCents / 100).toFixed(4),
+            currency: inv.currency,
+            dueDate: inv.dueDate?.toISOString().slice(0, 10) ?? null,
+          });
+        }
+
+        const openBills = await db
+          .select({
+            id: paymentBills.id,
+            billNumber: paymentBills.billNumber,
+            supplierName: paymentBills.supplierName,
+            total: paymentBills.total,
+            currency: paymentBills.currency,
+            dueDate: paymentBills.dueDate,
+          })
+          .from(paymentBills)
+          .where(
+            and(
+              eq(paymentBills.companyId, line.companyId),
+              inArray(paymentBills.status, [
+                BillStatus.RECEIVED,
+                BillStatus.APPROVED,
+              ]),
+              sql`${paymentBills.currency} = ${line.currency}`,
+            ),
+          )
+          .limit(30);
+        for (const bill of openBills) {
+          if (bill.total <= 0) {
+            continue;
+          }
+          documentCandidates.push({
+            id: bill.id,
+            documentType: "bill",
+            documentNumber: bill.billNumber ?? bill.id,
+            counterpartyName: bill.supplierName ?? "",
+            openAmount: bill.total.toFixed(4),
+            currency: bill.currency,
+            dueDate: bill.dueDate?.toISOString().slice(0, 10) ?? null,
+          });
+        }
+      }
+
       return success({
         statementLine: {
           id: line.id,
@@ -697,8 +939,12 @@ export class BankReconciliationRepository {
           counterparty: line.counterparty,
           supplierBillId: line.supplierBillId,
           adjustmentJournalEntryId: line.adjustmentJournalEntryId,
+          matchKind: line.matchKind,
+          matchedAt: line.matchedAt?.toISOString() ?? null,
         },
         matches,
+        documentCandidates,
+        splits,
         selectedCompanyId: line.companyId,
         matchedJournalLineId: line.matchedJournalLineId,
         matchedAt: line.matchedAt?.toISOString() ?? null,

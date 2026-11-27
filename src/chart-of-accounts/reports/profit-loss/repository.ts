@@ -35,7 +35,7 @@ import {
 } from "../../shared/journal-validation";
 import {
   findLedgerReportCompany,
-  resolveLedgerReportCurrency,
+  resolveLedgerReportScope,
 } from "../../shared/report-currency";
 import type { ProfitLossRequestOutput } from "./definition";
 
@@ -119,19 +119,27 @@ export class ProfitLossRepository {
         entryConditions.push(eq(journalEntries.periodId, data.periodId));
       }
 
-      // Sum net movement per account (credit - debit for revenue, debit - credit for expense)
-      const reportCurrency = await resolveLedgerReportCurrency(
+      // Sum net movement per account in functional currency when multi-currency
+      const scope = await resolveLedgerReportScope(
         company.currency,
         entryConditions,
         data.currency,
       );
-      if (!reportCurrency) {
+      if (!scope) {
         return fail({
           message: t("reports.mixedCurrency"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
-      entryConditions.push(eq(journalEntryLines.currency, reportCurrency));
+      const reportCurrency = scope.reportCurrency;
+      if (scope.filterCurrency) {
+        entryConditions.push(
+          eq(journalEntryLines.currency, scope.filterCurrency),
+        );
+      }
+      const lineAmountExpr = scope.useFunctionalAmount
+        ? sql`coalesce(${journalEntryLines.functionalAmount}, ${journalEntryLines.amount})`
+        : journalEntryLines.amount;
 
       const rows = await db
         .select({
@@ -142,10 +150,15 @@ export class ProfitLossRepository {
           subtype: accountNodes.subtype,
           debitUnits: sql<string>`(
             sum(case
-              when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount}
-              when ${journalEntryLines.type} = ${LineType.CREDIT} then -${journalEntryLines.amount}
+              when ${journalEntryLines.type} = ${LineType.DEBIT} then ${lineAmountExpr}
+              when ${journalEntryLines.type} = ${LineType.CREDIT} then -${lineAmountExpr}
               else 0 end) * 10000
           )::numeric(30, 0)`,
+          foreignSummary: scope.useFunctionalAmount
+            ? sql<
+                string | null
+              >`string_agg(distinct case when ${journalEntryLines.currency} <> ${reportCurrency} then ${journalEntryLines.currency} else null end, ', ')`
+            : sql<string | null>`null`,
         })
         .from(journalEntryLines)
         .innerJoin(
@@ -180,7 +193,9 @@ export class ProfitLossRepository {
         const account = {
           accountId: row.accountId,
           code: row.code,
-          name: row.name,
+          name: row.foreignSummary
+            ? `${row.name} (${row.foreignSummary})`
+            : row.name,
           amount: Number(units) / 10_000,
         };
         if (isRevenue) {

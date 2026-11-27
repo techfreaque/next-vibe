@@ -19,6 +19,7 @@ import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
 import { warehouses } from "../../db";
+import type { NegativeStockPolicyDbValue } from "../../enum";
 import { scopedTranslation } from "../../i18n";
 import type { InventoryWarehouseCreateRequestOutput } from "./definition";
 
@@ -37,6 +38,7 @@ export class InventoryWarehouseCreateRepository {
         code: string;
         isActive: boolean;
         isDefault: boolean;
+        negativeStockPolicy: NegativeStockPolicyDbValue;
       };
     }>
   > {
@@ -71,6 +73,7 @@ export class InventoryWarehouseCreateRepository {
           address: data.address ?? null,
           isActive: data.isActive ?? true,
           isDefault: data.isDefault ?? false,
+          negativeStockPolicy: data.negativeStockPolicy ?? "BLOCK",
         })
         .returning();
 
@@ -89,6 +92,7 @@ export class InventoryWarehouseCreateRepository {
           code: created.code,
           isActive: created.isActive,
           isDefault: created.isDefault,
+          negativeStockPolicy: created.negativeStockPolicy,
         },
       });
     } catch (error) {

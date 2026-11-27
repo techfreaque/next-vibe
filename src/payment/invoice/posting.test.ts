@@ -44,12 +44,19 @@ beforeAll(async () => {
     CREATE TABLE companies (
       id uuid PRIMARY KEY, currency text, name text, is_active boolean,
       address_line1 text, address_line2 text, city text, postal_code text, country text,
-      registration_number text, tax_id text, vat_number text, email text
+      registration_number text, tax_id text, vat_number text, email text, phone text
     );
     CREATE TABLE company_members (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), company_id uuid, user_id uuid,
       role text, is_active boolean, invited_by_user_id uuid, joined_at timestamp,
       created_at timestamp, updated_at timestamp
+    );
+    CREATE TABLE company_payment_settings (
+      company_id uuid PRIMARY KEY, bank_account_holder text, bank_iban text, bank_bic text,
+      stripe_enabled boolean NOT NULL DEFAULT false, stripe_account_label text,
+      stripe_clearing_account_id uuid, auto_book_stripe_payments boolean NOT NULL DEFAULT true,
+      recurring_invoices_enabled boolean NOT NULL DEFAULT false, updated_by_user_id uuid,
+      updated_at timestamp NOT NULL DEFAULT now()
     );
     CREATE TABLE payment_invoices (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid, company_id uuid,
@@ -89,6 +96,8 @@ beforeAll(async () => {
     CREATE TABLE journal_entry_lines (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), journal_entry_id uuid REFERENCES journal_entries(id),
       account_id uuid REFERENCES account_nodes(id), type text, amount numeric(14,4),
+      functional_amount numeric(14, 4), functional_currency text,
+      exchange_rate numeric(16, 8),
       currency text, description text, sort_order int, created_at timestamp
     );
     INSERT INTO companies VALUES

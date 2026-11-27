@@ -75,7 +75,7 @@ export const translations: typeof enTranslations = {
     row: "Zeile",
     marker: "Posten",
     label: "Bezeichnung",
-    officialLabel: "Amtliche Bezeichnung (SK)",
+    officialLabel: "Amtliche Bezeichnung",
     current: "Laufende Periode",
     previous: "Vorperiode",
     currency: "Währung",

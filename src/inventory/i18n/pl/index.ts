@@ -45,6 +45,11 @@ export const translations: typeof enTranslations = {
       received: "Przyjęty",
       cancelled: "Anulowany",
     },
+    negativeStockPolicy: {
+      block: "Blokuj ujemny stan",
+      warn: "Zezwalaj z ostrzeżeniem",
+      allow: "Zezwalaj na ujemny stan",
+    },
   },
 
   warehouseCreate: {
@@ -86,6 +91,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Magazyn domyślny",
         description: "Ustaw jako domyślny magazyn dla tej firmy",
+      },
+      negativeStockPolicy: {
+        label: "Polityka ujemnego stanu",
+        description:
+          "Jak zachowuje się kasa i wydanie towaru przy niewystarczającym stanie",
       },
       errors: {
         validation: {
@@ -136,6 +146,7 @@ export const translations: typeof enTranslations = {
         companyId: "ID firmy",
         isActive: "Aktywny",
         isDefault: "Domyślny",
+        negativeStockPolicy: "Polityka ujemnego stanu",
       },
     },
   },
@@ -285,6 +296,7 @@ export const translations: typeof enTranslations = {
         address: "Adres",
         isActive: "Aktywny",
         isDefault: "Domyślny",
+        negativeStockPolicy: "Polityka ujemnego stanu",
         createdAt: "Utworzono",
         updatedAt: "Zaktualizowano",
       },
@@ -327,6 +339,11 @@ export const translations: typeof enTranslations = {
       isDefault: {
         label: "Magazyn domyślny",
         description: "Ustaw jako magazyn domyślny",
+      },
+      negativeStockPolicy: {
+        label: "Polityka ujemnego stanu",
+        description:
+          "Jak zachowuje się kasa i wydanie towaru przy niewystarczającym stanie",
       },
       errors: {
         validation: {
@@ -376,6 +393,7 @@ export const translations: typeof enTranslations = {
         code: "Kod",
         isActive: "Aktywny",
         isDefault: "Domyślny",
+        negativeStockPolicy: "Polityka ujemnego stanu",
       },
     },
   },

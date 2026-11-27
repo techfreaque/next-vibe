@@ -23,6 +23,10 @@ import { CompanyAuthRepository } from "@/companies/repository";
 
 import { accountingPeriods, journalEntries, journalEntryLines } from "../../db";
 import { LineType, PeriodStatus } from "../../enum";
+import {
+  convertToFunctional,
+  lookupExchangeRate,
+} from "../../exchange-rates/ecb";
 import { scopedTranslation } from "../../i18n";
 import {
   accountingDay,
@@ -104,12 +108,59 @@ export class CoaJournalCreateRepository {
           });
         }
 
-        const currency = company.currency ?? "EUR";
-        const lines = data.lines.map((line) => ({
+        const currency = (company.currency ?? "EUR").toUpperCase();
+        const rawLines = data.lines.map((line) => ({
           ...line,
-          currency: line.currency ?? currency,
+          currency: (line.currency ?? currency).toUpperCase(),
         }));
-        const issue = validateJournalLines(lines, currency);
+        const hasForeign = rawLines.some((l) => l.currency !== currency);
+
+        const lines: Array<
+          (typeof rawLines)[number] & {
+            functionalAmount: number;
+            functionalCurrency: string;
+            exchangeRate: number;
+          }
+        > = [];
+        for (const line of rawLines) {
+          if (line.currency === currency) {
+            lines.push({
+              ...line,
+              functionalAmount: line.amount,
+              functionalCurrency: currency,
+              exchangeRate: 1,
+            });
+          } else {
+            const resolved = await lookupExchangeRate(
+              tx,
+              line.currency,
+              currency,
+              date,
+            );
+            if (!resolved) {
+              return fail({
+                message: t(journalValidationMessages.currency),
+                errorType: ErrorResponseTypes.VALIDATION_ERROR,
+              });
+            }
+            lines.push({
+              ...line,
+              functionalAmount: convertToFunctional(line.amount, resolved.rate),
+              functionalCurrency: currency,
+              exchangeRate: resolved.rate,
+            });
+          }
+        }
+
+        const issue = validateJournalLines(
+          lines.map((l) => ({
+            type: l.type,
+            amount: l.amount,
+            currency: l.currency,
+            functionalAmount: hasForeign ? l.functionalAmount : undefined,
+          })),
+          currency,
+        );
         if (issue) {
           return fail({
             message: t(journalValidationMessages[issue]),
@@ -164,6 +215,9 @@ export class CoaJournalCreateRepository {
             type: journalLineType(line.type) ?? LineType.CREDIT,
             amount: line.amount,
             currency: line.currency,
+            functionalAmount: line.functionalAmount,
+            functionalCurrency: line.functionalCurrency,
+            exchangeRate: line.exchangeRate,
             description: line.description ?? null,
             sortOrder,
           })),

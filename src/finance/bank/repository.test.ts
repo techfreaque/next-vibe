@@ -35,27 +35,44 @@ beforeAll(async () => {
       created_at timestamp, updated_at timestamp
     );
     CREATE TABLE account_nodes (
-      id uuid PRIMARY KEY, company_id uuid, name text, subtype text,
+      id uuid PRIMARY KEY, company_id uuid, code text NOT NULL DEFAULT '1200', name text, subtype text,
       is_active boolean, is_postable boolean
     );
     CREATE TABLE journal_entries (
       id uuid PRIMARY KEY, company_id uuid, entry_number text, description text,
-      date timestamp, status text, reversed_by_id uuid, source_id uuid,
+      date timestamp, status text, reversal_of_id uuid, reversed_by_id uuid, source_id uuid,
       source_type text NOT NULL DEFAULT 'manual' 
     );
     CREATE TABLE journal_entry_lines (
       id uuid PRIMARY KEY, journal_entry_id uuid, account_id uuid,
-      currency text, type text, amount numeric(14,4), description text
+      currency text, type text, amount numeric(14,4),
+      functional_amount numeric(14,4), functional_currency text,
+      exchange_rate numeric(16,8), description text
+    );
+    CREATE TABLE payment_invoices (
+      id uuid PRIMARY KEY, user_id uuid, company_id uuid, provider_invoice_id text,
+      invoice_number text, invoice_sequence_number int, amount numeric(10,2),
+      currency text, status text, invoice_url text, invoice_pdf text,
+      due_date timestamp, paid_at timestamp, callback_token text, notes text,
+      journal_entry_id uuid, metadata jsonb, created_at timestamp DEFAULT now(),
+      updated_at timestamp DEFAULT now()
+    );
+    CREATE TABLE payment_bills (
+      id uuid PRIMARY KEY, company_id uuid, supplier_name text, supplier_vat_number text,
+      bill_number text, bill_date timestamp, due_date timestamp, currency text,
+      subtotal numeric(12,4), tax_amount numeric(12,4), total numeric(12,4),
+      status text, paid_at timestamp, notes text, journal_entry_id uuid,
+      metadata jsonb, created_at timestamp DEFAULT now(), updated_at timestamp DEFAULT now()
     );
     INSERT INTO users VALUES ('${accountantId}'), ('${viewerId}');
     INSERT INTO companies VALUES ('${companyId}', true, 'EUR', 'Ledger Studio'), ('${otherCompanyId}', true, 'EUR', 'Foreign company');
     INSERT INTO company_members (company_id, user_id, role, is_active) VALUES
       ('${companyId}', '${accountantId}', '${CompanyMemberRole.ACCOUNTANT}', true),
       ('${companyId}', '${viewerId}', '${CompanyMemberRole.VIEWER}', true);
-    INSERT INTO account_nodes VALUES
-      ('${accountId}', '${companyId}', 'Main bank', '${AccountSubtype.BANK}', true, true),
-      ('${secondAccountId}', '${companyId}', 'Secondary bank', '${AccountSubtype.BANK}', true, true),
-      ('${foreignAccountId}', '${otherCompanyId}', 'Foreign bank', '${AccountSubtype.BANK}', true, true);
+    INSERT INTO account_nodes (id, company_id, code, name, subtype, is_active, is_postable) VALUES
+      ('${accountId}', '${companyId}', '1200', 'Main bank', '${AccountSubtype.BANK}', true, true),
+      ('${secondAccountId}', '${companyId}', '1210', 'Secondary bank', '${AccountSubtype.BANK}', true, true),
+      ('${foreignAccountId}', '${otherCompanyId}', '1200', 'Foreign bank', '${AccountSubtype.BANK}', true, true);
   `);
   await pg.exec(
     await Bun.file(
@@ -84,6 +101,21 @@ beforeAll(async () => {
       ADD COLUMN match_kind text;
     CREATE TABLE finance_bank_feed_mappings (
       consent_account_id uuid, actor_id uuid, company_id uuid, account_id uuid
+    );
+    CREATE TABLE bank_statement_line_splits (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      bank_statement_line_id uuid NOT NULL,
+      company_id uuid NOT NULL,
+      target_type text NOT NULL,
+      journal_line_id uuid,
+      invoice_id uuid,
+      bill_id uuid,
+      account_id uuid,
+      amount numeric(14,4) NOT NULL,
+      description text,
+      created_journal_entry_id uuid,
+      created_by_user_id uuid,
+      created_at timestamp DEFAULT now() NOT NULL
     );
     CREATE TABLE bank_account_reconciliation_settings (
       account_id uuid PRIMARY KEY, company_id uuid, booked_currency text,

@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
       title: "Was das ERP vorbereitet",
       vatReturn: "Umsatzsteuererklärung und Kontrollmeldung",
       statements: "Gesetzlicher Jahresabschluss",
-      fiscal: "Fiskalbelege (eKasa)",
+      fiscal: "Fiskalbelege",
       eInvoicing: "E-Rechnungspflicht ab",
       yes: "Verfügbar",
       no: "Für dieses Land nicht verfügbar",

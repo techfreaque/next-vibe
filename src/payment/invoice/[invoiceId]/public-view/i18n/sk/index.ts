@@ -22,6 +22,11 @@ export const translations: typeof enTranslations = {
       createdAt: "Dátum vystavenia",
       companyName: "Firma",
       companyEmail: "E-mail spoločnosti",
+      paymentUrl: "Odkaz na online platbu",
+      bankIban: "IBAN",
+      bankBic: "BIC",
+      qrKind: "Platobný QR štandard",
+      qrSvg: "Platobný QR kód",
       lineId: "ID riadku",
       lineDescription: "Opis",
       productId: "Produkt",
@@ -79,5 +84,10 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     submit: "Zobraziť faktúru",
+    payOnline: "Zaplatiť online",
+    bankTransfer: "Bankový prevod",
+    scanToPay: "Naskenujte v bankovej aplikácii",
+    epcQr: "SEPA GiroCode (EPC)",
+    payBySquareQr: "PAY by square",
   },
 };

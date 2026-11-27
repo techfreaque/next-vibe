@@ -132,6 +132,10 @@ export const translations: typeof enTranslations = {
     preview: "Aperçu (5 premières opérations)",
     matchRow: "Rapprocher",
     unmatched: "En attente",
+    matched: "Rapproché",
+    allLines: "Toutes",
+    splitMatched: "Ventilé",
+    selectAccount: "Ouvrir le compte",
     csvHelp:
       "Choisissez un export bancaire ou associez les colonnes CSV. La date comptable et le montant signé sont requis.",
     unsupported:
@@ -213,6 +217,77 @@ export const translations: typeof enTranslations = {
     journalMatch:
       "Choisissez une ligne comptabilisée et non rapprochée du même compte, du même montant et de la même devise.",
     confirmation: "Confirmez le rapprochement avant de l’enregistrer.",
+    splitTotalMismatch:
+      "La somme des lignes ventilées doit égaler exactement le montant de la ligne bancaire.",
+    splitTargetInvalid:
+      "Vérifiez que chaque facture, dépense ou compte appartient à cette société et correspond au sens du flux.",
+  },
+  reconciliation: {
+    statusTitle: "Statut du rapprochement",
+    accountsTitle: "Statut des comptes bancaires",
+    unmatchedLines: "En attente",
+    matchedLines: "Rapprochées",
+    statementNet: "Solde relevé",
+    ledgerBalance: "Solde comptable",
+    difference: "Écart",
+  },
+  autoMatch: {
+    title: "Rapprochement automatique",
+    description:
+      "Associez les lignes bancaires ouvertes aux factures, dépenses et paiements comptabilisés selon le montant, la référence, l’IBAN, la fenêtre de dates et la tolérance de change.",
+    success: "Rapprochement automatique terminé",
+    action: "Auto-rapprocher",
+    dryRun: "Aperçu uniquement",
+    previewAction: "Prévisualiser",
+    applyAction: "Appliquer les rapprochements",
+    previewBanner:
+      "Aperçu : {{count}} correspondances sans ambiguïté trouvées.",
+    appliedBanner: "{{count}} lignes bancaires rapprochées automatiquement.",
+    skippedHint: "{{count}} lignes ambiguës ignorées pour revue manuelle.",
+    matchedCount: "Rapprochées",
+    invoiceMatches: "Factures",
+    billMatches: "Factures fournisseurs",
+    journalMatches: "Écritures",
+    skippedAmbiguous: "Ambiguës ignorées",
+    items: "Éléments rapprochés",
+    targetType: "Type",
+    targetLabel: "Cible",
+    basisLabel: "Critère",
+    emptyTitle: "Aucune correspondance automatique",
+    emptyHint:
+      "Vérifiez les lignes manuellement ou ajustez la fenêtre de dates et la tolérance de change.",
+    targets: {
+      journal_line: "Ligne comptable",
+      invoice: "Facture",
+      bill: "Facture fournisseur",
+    },
+    basis: {
+      reference: "Référence document",
+      iban: "IBAN",
+      amount_date: "Montant et date",
+      fx_tolerance: "Tolérance change ou frais",
+    },
+  },
+  split: {
+    title: "Ventiler la ligne bancaire",
+    description:
+      "Répartissez une ligne bancaire sur plusieurs factures, dépenses, comptes ou écritures.",
+    success: "Ligne bancaire ventilée et rapprochée",
+    openAction: "Ventiler",
+    allocations: "Lignes de ventilation",
+    count: "Affectations",
+    remaining: "Reste à affecter",
+    selectTarget: "Choisir une cible",
+    addRow: "Ajouter une ligne",
+    removeRow: "Supprimer",
+    confirmAction: "Confirmer la ventilation",
+    documentCandidates: "Factures et dépenses ouvertes",
+    types: {
+      journal_line: "Ligne comptable",
+      invoice: "Facture ouverte",
+      bill: "Dépense ouverte",
+      account: "Compte comptable",
+    },
   },
   import: {
     title: "Importer un relevé bancaire",

@@ -32,7 +32,11 @@ import { configScopedTranslation } from "@/env/i18n";
 import type { CampaignTypeValue } from "../../../../accounts/enum";
 import { CampaignType } from "../../../../accounts/enum";
 import { scopedTranslation } from "../i18n";
-import type { SmtpSelectionCriteria, SmtpSendResult } from "../repository";
+import type {
+  SmtpAttachment,
+  SmtpSelectionCriteria,
+  SmtpSendResult,
+} from "../repository";
 import { SmtpSendingRepository } from "../sending/repository";
 
 interface SendEmailParams {
@@ -53,6 +57,7 @@ interface SendEmailParams {
   campaignId?: string;
   selectionCriteriaOverride?: SmtpSelectionCriteria;
   skipRateLimitCheck?: boolean;
+  attachments?: SmtpAttachment[];
 }
 
 interface SendEmailResult {
@@ -144,6 +149,7 @@ export class EmailSendingRepository {
           skipRateLimitCheck: params.skipRateLimitCheck,
           leadId: params.leadId,
           campaignId: params.campaignId,
+          attachments: params.attachments,
         },
         logger,
         t,

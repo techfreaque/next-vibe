@@ -17,6 +17,7 @@ import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-field
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import { NegativeStockPolicy } from "../../../enum";
 import type definition from "./definition";
 
 export function InventoryWarehouseGetWidget({
@@ -83,6 +84,7 @@ export function InventoryWarehouseGetWidget({
           address: result.address ?? "",
           isActive: result.isActive,
           isDefault: result.isDefault,
+          negativeStockPolicy: result.negativeStockPolicy,
         },
         popNavigationOnSuccess: 1,
         onSuccessCallback: () => read?.refetch(),
@@ -166,6 +168,10 @@ export function InventoryWarehouseGetWidget({
                 value={result.address}
               />
             )}
+            <DetailField
+              label={t("warehouseGet.get.response.negativeStockPolicy")}
+              value={t(NegativeStockPolicy[result.negativeStockPolicy])}
+            />
             <DetailField
               label={t("warehouseGet.get.response.createdAt")}
               value={date.format(new Date(result.createdAt))}

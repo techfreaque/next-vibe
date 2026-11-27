@@ -50,6 +50,11 @@ import {
 } from "../../../enum";
 import { getPosSessionCash } from "../../../session/cash-totals";
 import { isPosMinorUnitAmount } from "../../settlement-amounts";
+import {
+  buildPosCogsLines,
+  hasCogsAndInventoryAccounts,
+  roundCogsAmount,
+} from "../../stock";
 import { planPosRefund, type PosRefundSourceLine } from "./amounts";
 import type {
   PosOrderRefundPostRequestOutput,
@@ -424,12 +429,38 @@ export class PosOrderRefundRepository {
         const refundId = crypto.randomUUID();
         const refundNumber = `${order.orderNumber}-R${prior.count + 1}`;
 
+        // Put back what the sale took out of stock, never more.
+        const stockReturnResult = await PosOrderRefundRepository.returnStock(
+          tx,
+          {
+            orderId,
+            companyId,
+            refundId,
+            refundNumber,
+            userId,
+            logger,
+            lines: plan.lines.map((line) => ({
+              quantity: line.quantity,
+              productId:
+                lines.find((item) => item.orderItemId === line.orderItemId)
+                  ?.productId ?? null,
+            })),
+            insufficientStockError: t("messages.stockUnavailable"),
+          },
+        );
+        if (stockReturnResult === undefined) {
+          rolledBack = conflict("messages.stockUnavailable");
+          return tx.rollback();
+        }
+        const stockReturned = stockReturnResult.moved;
+
         // Reverse the sale in the books when the sale itself was posted.
         let journalEntryId: string | null = null;
         if (order.journalEntryId) {
           const amounts = [plan.subtotal, plan.taxAmount, plan.total];
           if (!amounts.every(isPosMinorUnitAmount)) {
-            return conflict("messages.rounding");
+            rolledBack = conflict("messages.rounding");
+            return tx.rollback();
           }
           const journalLines: AutoPostLine[] = [];
           if (plan.subtotal > 0) {
@@ -456,6 +487,19 @@ export class PosOrderRefundRepository {
             amount: plan.total,
             currency: order.currency,
           });
+          if (
+            stockReturnResult.totalCogsReversed > 0 &&
+            (await hasCogsAndInventoryAccounts(tx, companyId))
+          ) {
+            journalLines.push(
+              ...buildPosCogsLines({
+                totalCogs: stockReturnResult.totalCogsReversed,
+                currency: order.currency,
+                description: `${refundNumber} COGS reversal`,
+                reverse: true,
+              }),
+            );
+          }
           journalEntryId = await postJournalEntry(
             {
               companyId,
@@ -473,27 +517,6 @@ export class PosOrderRefundRepository {
             rolledBack = conflict("messages.postingUnavailable");
             return tx.rollback();
           }
-        }
-
-        // Put back what the sale took out of stock, never more.
-        const stockReturned = await PosOrderRefundRepository.returnStock(tx, {
-          orderId,
-          companyId,
-          refundId,
-          refundNumber,
-          userId,
-          logger,
-          lines: plan.lines.map((line) => ({
-            quantity: line.quantity,
-            productId:
-              lines.find((item) => item.orderItemId === line.orderItemId)
-                ?.productId ?? null,
-          })),
-          insufficientStockError: t("messages.stockUnavailable"),
-        });
-        if (stockReturned === undefined) {
-          rolledBack = conflict("messages.stockUnavailable");
-          return tx.rollback();
         }
 
         await tx.insert(posRefunds).values({
@@ -566,7 +589,7 @@ export class PosOrderRefundRepository {
       lines: { productId: string | null; quantity: number }[];
       insufficientStockError: TranslatedKeyType;
     },
-  ): Promise<number | undefined> {
+  ): Promise<{ moved: number; totalCogsReversed: number } | undefined> {
     const wanted = new Map<string, number>();
     for (const line of opts.lines) {
       if (line.productId) {
@@ -578,7 +601,7 @@ export class PosOrderRefundRepository {
       }
     }
     if (wanted.size === 0) {
-      return 0;
+      return { moved: 0, totalCogsReversed: 0 };
     }
     const productIds = [...wanted.keys()];
     const issued = await tx
@@ -600,7 +623,7 @@ export class PosOrderRefundRepository {
       .groupBy(stockMovements.productId, stockMovements.warehouseId)
       .orderBy(asc(stockMovements.productId), asc(stockMovements.warehouseId));
     if (issued.length === 0) {
-      return 0;
+      return { moved: 0, totalCogsReversed: 0 };
     }
     const returned = await tx
       .select({
@@ -620,6 +643,7 @@ export class PosOrderRefundRepository {
       .groupBy(stockMovements.productId, stockMovements.warehouseId);
 
     let moved = 0;
+    let totalCogsUnits = 0;
     for (const row of issued) {
       const left = wanted.get(row.productId) ?? 0;
       const already =
@@ -636,6 +660,10 @@ export class PosOrderRefundRepository {
       }
       wanted.set(row.productId, left - quantity);
       const unitCost = row.unitCost === null ? undefined : Number(row.unitCost);
+      const normalizedCost =
+        unitCost === undefined
+          ? undefined
+          : Math.round(unitCost * 10_000) / 10_000;
       const movement = await applyStockMovement(
         {
           warehouseId: row.warehouseId,
@@ -643,10 +671,7 @@ export class PosOrderRefundRepository {
           productId: row.productId,
           type: "RETURN",
           quantity: quantity / 10_000,
-          unitCost:
-            unitCost === undefined
-              ? undefined
-              : Math.round(unitCost * 10_000) / 10_000,
+          unitCost: normalizedCost,
           reference: opts.refundNumber,
           sourceId: opts.refundId,
           sourceType: POS_REFUND_STOCK_SOURCE,
@@ -659,8 +684,16 @@ export class PosOrderRefundRepository {
       if (!movement.success) {
         return undefined;
       }
+      if (normalizedCost !== undefined && normalizedCost > 0) {
+        totalCogsUnits += Math.round(
+          (quantity / 10_000) * normalizedCost * 10_000,
+        );
+      }
       moved += 1;
     }
-    return moved;
+    return {
+      moved,
+      totalCogsReversed: roundCogsAmount(totalCogsUnits / 10_000),
+    };
   }
 }

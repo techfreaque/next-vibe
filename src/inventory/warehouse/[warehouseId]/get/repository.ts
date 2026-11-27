@@ -88,6 +88,7 @@ export class InventoryWarehouseGetRepository {
           address: warehouse.address ?? null,
           isActive: warehouse.isActive,
           isDefault: warehouse.isDefault,
+          negativeStockPolicy: warehouse.negativeStockPolicy,
           createdAt: warehouse.createdAt,
           updatedAt: warehouse.updatedAt,
         },
