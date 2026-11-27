@@ -1775,7 +1775,7 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Witaj w {{appName}}!",
       description:
-        "Uwolnij się od cenzury AI. Dostęp do GPT-5.1, Claude Sonnet i niecenzurowanych modeli trenowanych na WikiLeaks i nie-mainstreamowych danych. Rozmawiaj prywatnie, anonimowo lub publicznie. Twoja platforma, twoje zasady.",
+        "Uwolnij się od cenzury AI. Dostęp do GPT-5.1, Claude Sonnet i UncensoredLM, trenowanego na książkach i dokumentach zakazanych w mainstreamowym internecie. Rozmawiaj prywatnie, anonimowo lub publicznie. Twoja platforma, twoje zasady.",
       subtitle: "Poznajmy, co nas wyróżnia:",
     },
     modelSelector: {

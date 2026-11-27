@@ -1795,7 +1795,7 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Bienvenue sur {{appName}} !",
       description:
-        "Libérez-vous de la censure des IA. Accédez à GPT-5.1, Claude Sonnet et à des modèles non censurés entraînés sur WikiLeaks et des données hors des sentiers battus. Discutez en privé, anonymement ou en public. Votre plateforme, vos règles.",
+        "Libérez-vous de la censure des IA. Accédez à GPT-5.1, Claude Sonnet et à UncensoredLM, entraîné sur des livres et des documents bannis de l'internet grand public. Discutez en privé, anonymement ou en public. Votre plateforme, vos règles.",
       subtitle: "Voici ce qui nous rend différents :",
     },
     modelSelector: {

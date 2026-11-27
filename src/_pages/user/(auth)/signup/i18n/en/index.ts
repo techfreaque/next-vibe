@@ -6,16 +6,15 @@ export const translations = {
   meta: {
     title: "Sign Up: {{appName}}",
     description:
-      "Create your {{appName}} account and start building amazing applications",
+      "Create your {{appName}} account and chat with mainstream and uncensored AI models. Free credits included.",
     category: "Authentication",
     imageAlt: "{{appName}} Sign Up",
     keywords: "signup, register, create account, {{appName}}",
     ogTitle: "Sign Up for {{appName}}",
     ogDescription:
-      "Join {{appName}} and start building amazing applications today",
+      "Join {{appName}} and chat with mainstream and uncensored AI models today",
     twitterTitle: "Sign Up for {{appName}}",
-    twitterDescription:
-      "Create your account and start building with {{appName}}",
+    twitterDescription: "Create your account and start chatting on {{appName}}",
   },
   post: {
     title: "Signup",

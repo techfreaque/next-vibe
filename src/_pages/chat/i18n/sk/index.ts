@@ -1780,7 +1780,7 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Vitaj na {{appName}}!",
       description:
-        "Chatuj bez cenzúry AI. Na výber máš GPT-5.1, Claude Sonnet aj modely bez cenzúry trénované na WikiLeaks a zdrojoch mimo hlavného prúdu. Rozprávaj sa súkromne, anonymne alebo verejne. Režim si vyberáš ty.",
+        "Chatuj bez cenzúry AI. Na výber máš GPT-5.1, Claude Sonnet aj UncensoredLM, trénovaný na knihách a dokumentoch zakázaných v mainstreamovom internete. Rozprávaj sa súkromne, anonymne alebo verejne. Režim si vyberáš ty.",
       subtitle: "Pozri sa, čo tu môžeš robiť:",
     },
     modelSelector: {

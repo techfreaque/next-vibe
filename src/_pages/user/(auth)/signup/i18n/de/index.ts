@@ -8,16 +8,16 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Registrieren: {{appName}}",
     description:
-      "Erstellen Sie Ihr {{appName}} Konto und beginnen Sie mit dem Aufbau erstaunlicher Anwendungen",
+      "Erstellen Sie Ihr {{appName}} Konto und chatten Sie mit Mainstream- und unzensierten KI-Modellen. Gratis-Credits inklusive.",
     category: "Authentifizierung",
     imageAlt: "{{appName}} Registrierung",
     keywords: "registrieren, anmelden, konto erstellen, {{appName}}",
     ogTitle: "Registrieren Sie sich für {{appName}}",
     ogDescription:
-      "Treten Sie {{appName}} bei und beginnen Sie noch heute mit dem Aufbau erstaunlicher Anwendungen",
+      "Treten Sie {{appName}} bei und chatten Sie noch heute mit Mainstream- und unzensierten KI-Modellen",
     twitterTitle: "Registrieren Sie sich für {{appName}}",
     twitterDescription:
-      "Erstellen Sie Ihr Konto und beginnen Sie mit {{appName}} zu bauen",
+      "Erstellen Sie Ihr Konto und chatten Sie auf {{appName}} los",
   },
   post: {
     title: "Titel",

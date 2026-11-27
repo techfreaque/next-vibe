@@ -1807,7 +1807,7 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "¡Bienvenido a {{appName}}!",
       description:
-        "Rompe libre de la censura AI. Acceso GPT-5.1, Claude Sonnet y modelos sin censura entrenados en WikiLeaks y datos no principales. Chatear en privado, anónimamente o públicamente. Tu plataforma, tus reglas.",
+        "Libérate de la censura de la IA. Usa GPT-5.1, Claude Sonnet y UncensoredLM, entrenado con libros y documentos prohibidos en el internet convencional. Chatea en privado, de forma anónima o en público. Tu plataforma, tus reglas.",
       subtitle: "Vamos a explorar lo que nos hace diferentes:",
     },
     modelSelector: {

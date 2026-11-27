@@ -8,15 +8,15 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Registrácia | {{appName}}",
     description:
-      "Vytvorte si účet na {{appName}} a začnite tvoriť vlastné aplikácie.",
+      "Vytvorte si účet na {{appName}} a rozprávajte sa s bežnými aj necenzurovanými AI modelmi. Kredity zdarma v cene.",
     category: "Autentifikácia",
     imageAlt: "Registrácia na {{appName}}",
     keywords: "registrácia, zaregistrovať sa, vytvoriť účet, {{appName}}",
     ogTitle: "Zaregistrujte sa na {{appName}}",
     ogDescription:
-      "Zaregistrujte sa na {{appName}} a začnite tvoriť aplikácie ešte dnes.",
+      "Zaregistrujte sa na {{appName}} a rozprávajte sa ešte dnes s bežnými aj necenzurovanými AI modelmi.",
     twitterTitle: "Zaregistrujte sa na {{appName}}",
-    twitterDescription: "Vytvorte si účet a začnite tvoriť na {{appName}}.",
+    twitterDescription: "Vytvorte si účet a začnite chatovať na {{appName}}.",
   },
   post: {
     title: "Registrácia",

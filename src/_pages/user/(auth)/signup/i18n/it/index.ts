@@ -8,16 +8,16 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Registrati a {{appName}}",
     description:
-      "Crea un account su {{appName}} e inizia a sviluppare le tue applicazioni.",
+      "Crea il tuo account su {{appName}} e chatta con modelli di IA tradizionali e senza censura. Crediti gratuiti inclusi.",
     category: "Autenticazione",
     imageAlt: "Registrazione a {{appName}}",
     keywords: "registrazione, iscriviti, crea un account, {{appName}}",
     ogTitle: "Registrati a {{appName}}",
     ogDescription:
-      "Registrati a {{appName}} e inizia oggi a sviluppare le tue applicazioni.",
+      "Registrati a {{appName}} e chatta oggi stesso con modelli di IA tradizionali e senza censura.",
     twitterTitle: "Registrati a {{appName}}",
     twitterDescription:
-      "Crea il tuo account e inizia a sviluppare con {{appName}}.",
+      "Crea il tuo account e inizia a chattare su {{appName}}.",
   },
   post: {
     title: "Registrazione",

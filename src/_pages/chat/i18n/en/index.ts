@@ -1772,7 +1772,7 @@ export const translations = {
     welcome: {
       title: "Welcome to {{appName}}!",
       description:
-        "Break free from AI censorship. Access GPT-5.1, Claude Sonnet, and uncensored models trained on WikiLeaks and non-mainstream data. Chat privately, anonymously, or publicly. Your platform, your rules.",
+        "Break free from AI censorship. Access GPT-5.1, Claude Sonnet, and UncensoredLM, trained on books and documents banned from the mainstream internet. Chat privately, anonymously, or publicly. Your platform, your rules.",
       subtitle: "Let's explore what makes us different:",
     },
     modelSelector: {
