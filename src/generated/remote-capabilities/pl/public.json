@@ -75635,6 +75635,10 @@
                     "pinned": "pinned",
                     "allowed": "allowed",
                     "webPinned": "webPinned",
+                    "hidden": "hidden",
+                    "chat": "chat",
+                    "chatPinned": "chatPinned",
+                    "chatHidden": "chatHidden",
                     "cliAllowed": "cliAllowed",
                     "mcpPinned": "mcpPinned",
                     "mcpAllowed": "mcpAllowed"
@@ -75647,6 +75651,10 @@
                   "pinned": "pinned",
                   "allowed": "allowed",
                   "webPinned": "webPinned",
+                  "hidden": "hidden",
+                  "chat": "chat",
+                  "chatPinned": "chatPinned",
+                  "chatHidden": "chatHidden",
                   "cliAllowed": "cliAllowed",
                   "mcpPinned": "mcpPinned",
                   "mcpAllowed": "mcpAllowed"
@@ -75657,6 +75665,10 @@
                   "pinned",
                   "allowed",
                   "webPinned",
+                  "hidden",
+                  "chat",
+                  "chatPinned",
+                  "chatHidden",
                   "cliAllowed",
                   "mcpPinned",
                   "mcpAllowed"
@@ -75666,6 +75678,118 @@
             "type": "optional"
           },
           "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "catalogNavigation": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "hidden": true,
+          "label": "Filtr narzędzi",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "chatRootFolderId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "hidden": true,
+          "label": "Filtr narzędzi",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "PRIVATE": "private",
+                    "SHARED": "shared",
+                    "PUBLIC": "public",
+                    "INCOGNITO": "incognito",
+                    "BACKGROUND": "cron",
+                    "REMOTE": "remote"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "PRIVATE": "private",
+                  "SHARED": "shared",
+                  "PUBLIC": "public",
+                  "INCOGNITO": "incognito",
+                  "BACKGROUND": "cron",
+                  "REMOTE": "remote"
+                },
+                "options": [
+                  "private",
+                  "shared",
+                  "public",
+                  "incognito",
+                  "cron",
+                  "remote"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "chatFavoriteId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "hidden": true,
+          "label": "Filtr narzędzi",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "chatSkillId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "hidden": true,
+          "label": "Filtr narzędzi",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
           "usage": {
             "request": "data"
           },
@@ -76898,6 +77022,292 @@
           },
           "schemaType": "primitive"
         },
+        "navigationCategories": {
+          "type": "text",
+          "label": "Kategorie narzędzi",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "name": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "count": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "subCategories": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "array",
+                                "element": {
+                                  "def": {
+                                    "type": "object",
+                                    "shape": {
+                                      "name": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "count": {
+                                        "def": {
+                                          "type": "number",
+                                          "checks": []
+                                        },
+                                        "type": "number",
+                                        "isFinite": true
+                                      }
+                                    }
+                                  },
+                                  "type": "object"
+                                }
+                              },
+                              "type": "array",
+                              "element": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "name": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    },
+                                    "count": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            }
+                          },
+                          "type": "optional"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "name": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "count": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "subCategories": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "array",
+                              "element": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "name": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    },
+                                    "count": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "name": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "count": {
+                                    "def": {
+                                      "type": "number",
+                                      "checks": []
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          }
+                        },
+                        "type": "optional"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "navigationPins": {
+          "type": "text",
+          "label": "Obszary robocze",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "web": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "chat": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "aiAvailableToolIds": {
+          "type": "text",
+          "label": "Obszary robocze",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "navigationScope": {
+          "type": "text",
+          "label": "Obszary robocze",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "adminCatalogDestinations": {
           "type": "text",
           "label": "Obszary robocze",
@@ -76924,6 +77334,18 @@
                           "type": "string"
                         },
                         "subCategory": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "title": {
                           "def": {
                             "type": "optional",
                             "innerType": {
@@ -76968,6 +77390,18 @@
                           }
                         },
                         "type": "optional"
+                      },
+                      "title": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
                       }
                     }
                   },
@@ -76977,7 +77411,6 @@
             },
             "type": "optional"
           },
-          "visibleFor": ["enums.userRole.admin"],
           "hiddenForPlatforms": [
             "ai",
             "mcp",
@@ -78007,88 +78440,6 @@
                   "type": "string"
                 },
                 "type": "string"
-              }
-            },
-            "type": "optional"
-          },
-          "visibleFor": ["enums.userRole.admin"],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp",
-            "cron",
-            "remote-skill",
-            "cli",
-            "cli-package"
-          ],
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "erpWorkflowAliases": {
-          "type": "text",
-          "label": "Centrum księgowości",
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "array",
-                  "element": {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string"
-                  }
-                },
-                "type": "array",
-                "element": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string"
-                }
-              }
-            },
-            "type": "optional"
-          },
-          "visibleFor": ["enums.userRole.admin"],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp",
-            "cron",
-            "remote-skill",
-            "cli",
-            "cli-package"
-          ],
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "erpNavigationAliases": {
-          "type": "text",
-          "label": "Centrum księgowości",
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "array",
-                  "element": {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string"
-                  }
-                },
-                "type": "array",
-                "element": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string"
-                }
               }
             },
             "type": "optional"

@@ -192907,6 +192907,105 @@
           },
           "schemaType": "primitive"
         },
+        "includeBots": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Includi crawler",
+          "description": "Mostra i lead contrassegnati come bot o crawler",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "out": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "out": {
+                        "def": {
+                          "type": "boolean"
+                        },
+                        "type": "boolean"
+                      }
+                    }
+                  ]
+                },
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  },
+                  {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "out": {
+                        "def": {
+                          "type": "boolean"
+                        },
+                        "type": "boolean"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "out": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    }
+                  }
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "sortingOptions": {
           "schemaType": "object-optional",
           "type": "container",
@@ -195431,6 +195530,19 @@
                     "schemaType": "primitive"
                   },
                   "hasLinkedUser": {
+                    "type": "text",
+                    "schema": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "usage": {
+                      "response": true
+                    },
+                    "schemaType": "primitive"
+                  },
+                  "isBot": {
                     "type": "text",
                     "schema": {
                       "def": {
@@ -394212,9 +394324,9 @@
   },
   {
     "toolName": "folders-list",
-    "title": "Get Folders",
-    "titleShort": "Folders",
-    "description": "Retrieve all folders for the current root folder",
+    "title": "Ottieni cartelle",
+    "titleShort": "Cartelle",
+    "description": "Recupera tutte le cartelle della cartella radice corrente",
     "fields": {
       "noFormElement": true,
       "usage": {
@@ -394225,8 +394337,8 @@
         "rootFolderId": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Root Folder",
-          "description": "The root folder to retrieve (private, shared, public, background, incognito)",
+          "label": "Cartella radice",
+          "description": "La cartella radice da recuperare (privato, condiviso, pubblico, background, incognito)",
           "columns": 12,
           "options": [
             {
@@ -394291,8 +394403,8 @@
         },
         "rootFolderPermissions": {
           "type": "container",
-          "title": "Root Folder Permissions",
-          "description": "Permissions for the root folder",
+          "title": "Permessi cartella radice",
+          "description": "Permessi per la cartella radice",
           "layoutType": "grid",
           "columns": 2,
           "usage": {
@@ -394301,7 +394413,7 @@
           "children": {
             "canCreateThread": {
               "type": "text",
-              "content": "Can Create Thread",
+              "content": "Può creare thread",
               "schema": {
                 "def": {
                   "type": "boolean"
@@ -394315,7 +394427,7 @@
             },
             "canCreateFolder": {
               "type": "text",
-              "content": "Can Create Folder",
+              "content": "Può creare cartelle",
               "schema": {
                 "def": {
                   "type": "boolean"
@@ -394358,7 +394470,7 @@
               },
               "userId": {
                 "type": "text",
-                "label": "User ID",
+                "label": "ID utente",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -394382,7 +394494,7 @@
               },
               "rootFolderId": {
                 "type": "text",
-                "content": "Root Folder",
+                "content": "Cartella radice",
                 "schema": {
                   "def": {
                     "type": "enum",
@@ -394420,7 +394532,7 @@
               },
               "name": {
                 "type": "text",
-                "label": "Name",
+                "label": "Nome",
                 "schema": {
                   "def": {
                     "type": "string"
@@ -394434,7 +394546,7 @@
               },
               "icon": {
                 "type": "text",
-                "label": "Icon",
+                "label": "Icona",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -394454,7 +394566,7 @@
               },
               "color": {
                 "type": "text",
-                "label": "Color",
+                "label": "Colore",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -394474,7 +394586,7 @@
               },
               "parentId": {
                 "type": "text",
-                "label": "Parent Folder",
+                "label": "Cartella padre",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -394498,7 +394610,7 @@
               },
               "expanded": {
                 "type": "text",
-                "label": "Expanded",
+                "label": "Espansa",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -394512,7 +394624,7 @@
               },
               "sortOrder": {
                 "type": "text",
-                "label": "Sort Order",
+                "label": "Ordine",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -394907,7 +395019,7 @@
               },
               "canManage": {
                 "type": "text",
-                "label": "Can Manage",
+                "label": "Può gestire",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -394921,7 +395033,7 @@
               },
               "canCreateThread": {
                 "type": "text",
-                "content": "Can Create Thread",
+                "content": "Può creare thread",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -394935,7 +395047,7 @@
               },
               "canModerate": {
                 "type": "text",
-                "content": "Can Moderate",
+                "content": "Può moderare",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -394949,7 +395061,7 @@
               },
               "canDelete": {
                 "type": "text",
-                "label": "Can Delete",
+                "label": "Può eliminare",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -394963,7 +395075,7 @@
               },
               "canManagePermissions": {
                 "type": "text",
-                "content": "Can Manage Permissions",
+                "content": "Può gestire i permessi",
                 "schema": {
                   "def": {
                     "type": "boolean"
@@ -394977,7 +395089,7 @@
               },
               "createdAt": {
                 "type": "text",
-                "label": "Created At",
+                "label": "Creata il",
                 "schema": {
                   "def": {
                     "type": "pipe",
@@ -395107,7 +395219,7 @@
               },
               "updatedAt": {
                 "type": "text",
-                "label": "Updated At",
+                "label": "Aggiornata il",
                 "schema": {
                   "def": {
                     "type": "pipe",
@@ -395251,7 +395363,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["Folders"],
+    "tags": ["Cartelle"],
     "aliases": ["folders-list", "folders"],
     "credits": 0
   },
@@ -402764,6 +402876,208 @@
           },
           "schemaType": "primitive"
         },
+        "toolPreferences": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "webPins": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "boolean"
+                            },
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "type": "optional"
+                    },
+                    "chatPins": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "boolean"
+                            },
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "type": "optional"
+                    },
+                    "webHidden": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "boolean"
+                            },
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "type": "optional"
+                    },
+                    "chatHidden": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "boolean"
+                            },
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "type": "optional"
+                    },
+                    "aiEnabled": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "boolean"
+                            },
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "type": "optional"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "dreamerSubFolderId": {
           "type": "text",
           "hidden": true,
@@ -404509,6 +404823,70 @@
                   }
                 },
                 "type": "nullable"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "toolPreference": {
+          "type": "form_field",
+          "fieldType": "json",
+          "hidden": true,
+          "label": "Strumenti fissati nella barra laterale web",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "toolId": {
+                      "def": {
+                        "type": "string",
+                        "checks": [{}, {}]
+                      },
+                      "type": "string"
+                    },
+                    "key": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "webPins": "webPins",
+                          "chatPins": "chatPins",
+                          "webHidden": "webHidden",
+                          "chatHidden": "chatHidden",
+                          "aiEnabled": "aiEnabled"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "webPins": "webPins",
+                        "chatPins": "chatPins",
+                        "webHidden": "webHidden",
+                        "chatHidden": "chatHidden",
+                        "aiEnabled": "aiEnabled"
+                      },
+                      "options": [
+                        "webPins",
+                        "chatPins",
+                        "webHidden",
+                        "chatHidden",
+                        "aiEnabled"
+                      ]
+                    },
+                    "value": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "type": "object"
               }
             },
             "type": "optional"
@@ -677161,6 +677539,10 @@
                     "pinned": "pinned",
                     "allowed": "allowed",
                     "webPinned": "webPinned",
+                    "hidden": "hidden",
+                    "chat": "chat",
+                    "chatPinned": "chatPinned",
+                    "chatHidden": "chatHidden",
                     "cliAllowed": "cliAllowed",
                     "mcpPinned": "mcpPinned",
                     "mcpAllowed": "mcpAllowed"
@@ -677173,6 +677555,10 @@
                   "pinned": "pinned",
                   "allowed": "allowed",
                   "webPinned": "webPinned",
+                  "hidden": "hidden",
+                  "chat": "chat",
+                  "chatPinned": "chatPinned",
+                  "chatHidden": "chatHidden",
                   "cliAllowed": "cliAllowed",
                   "mcpPinned": "mcpPinned",
                   "mcpAllowed": "mcpAllowed"
@@ -677183,6 +677569,10 @@
                   "pinned",
                   "allowed",
                   "webPinned",
+                  "hidden",
+                  "chat",
+                  "chatPinned",
+                  "chatHidden",
                   "cliAllowed",
                   "mcpPinned",
                   "mcpAllowed"
@@ -677192,6 +677582,118 @@
             "type": "optional"
           },
           "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "catalogNavigation": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "hidden": true,
+          "label": "Filtro di utensile",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "chatRootFolderId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "hidden": true,
+          "label": "Filtro di utensile",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "PRIVATE": "private",
+                    "SHARED": "shared",
+                    "PUBLIC": "public",
+                    "INCOGNITO": "incognito",
+                    "BACKGROUND": "cron",
+                    "REMOTE": "remote"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "PRIVATE": "private",
+                  "SHARED": "shared",
+                  "PUBLIC": "public",
+                  "INCOGNITO": "incognito",
+                  "BACKGROUND": "cron",
+                  "REMOTE": "remote"
+                },
+                "options": [
+                  "private",
+                  "shared",
+                  "public",
+                  "incognito",
+                  "cron",
+                  "remote"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "chatFavoriteId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "hidden": true,
+          "label": "Filtro di utensile",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "chatSkillId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "hidden": true,
+          "label": "Filtro di utensile",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
           "usage": {
             "request": "data"
           },
@@ -678424,6 +678926,292 @@
           },
           "schemaType": "primitive"
         },
+        "navigationCategories": {
+          "type": "text",
+          "label": "Categorie degli strumenti",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "name": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "count": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "subCategories": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "array",
+                                "element": {
+                                  "def": {
+                                    "type": "object",
+                                    "shape": {
+                                      "name": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "count": {
+                                        "def": {
+                                          "type": "number",
+                                          "checks": []
+                                        },
+                                        "type": "number",
+                                        "isFinite": true
+                                      }
+                                    }
+                                  },
+                                  "type": "object"
+                                }
+                              },
+                              "type": "array",
+                              "element": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "name": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    },
+                                    "count": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            }
+                          },
+                          "type": "optional"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "name": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "count": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "subCategories": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "array",
+                              "element": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "name": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    },
+                                    "count": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "name": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "count": {
+                                    "def": {
+                                      "type": "number",
+                                      "checks": []
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          }
+                        },
+                        "type": "optional"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "navigationPins": {
+          "type": "text",
+          "label": "Aree di lavoro",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "web": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "chat": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "aiAvailableToolIds": {
+          "type": "text",
+          "label": "Aree di lavoro",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "navigationScope": {
+          "type": "text",
+          "label": "Aree di lavoro",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "adminCatalogDestinations": {
           "type": "text",
           "label": "Aree di lavoro",
@@ -678450,6 +679238,18 @@
                           "type": "string"
                         },
                         "subCategory": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "title": {
                           "def": {
                             "type": "optional",
                             "innerType": {
@@ -678494,6 +679294,18 @@
                           }
                         },
                         "type": "optional"
+                      },
+                      "title": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
                       }
                     }
                   },
@@ -678503,7 +679315,6 @@
             },
             "type": "optional"
           },
-          "visibleFor": ["enums.userRole.admin"],
           "hiddenForPlatforms": [
             "ai",
             "mcp",
@@ -679533,88 +680344,6 @@
                   "type": "string"
                 },
                 "type": "string"
-              }
-            },
-            "type": "optional"
-          },
-          "visibleFor": ["enums.userRole.admin"],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp",
-            "cron",
-            "remote-skill",
-            "cli",
-            "cli-package"
-          ],
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "erpWorkflowAliases": {
-          "type": "text",
-          "label": "Area contabilità",
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "array",
-                  "element": {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string"
-                  }
-                },
-                "type": "array",
-                "element": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string"
-                }
-              }
-            },
-            "type": "optional"
-          },
-          "visibleFor": ["enums.userRole.admin"],
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp",
-            "cron",
-            "remote-skill",
-            "cli",
-            "cli-package"
-          ],
-          "usage": {
-            "response": true
-          },
-          "schemaType": "primitive"
-        },
-        "erpNavigationAliases": {
-          "type": "text",
-          "label": "Area contabilità",
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "array",
-                  "element": {
-                    "def": {
-                      "type": "string"
-                    },
-                    "type": "string"
-                  }
-                },
-                "type": "array",
-                "element": {
-                  "def": {
-                    "type": "string"
-                  },
-                  "type": "string"
-                }
               }
             },
             "type": "optional"

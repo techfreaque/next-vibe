@@ -4900,8 +4900,8 @@ export const ADMIN_GROUPS: AdminGroup[] = [
   "billing",
   "analytics",
   "content",
-  "business",
   "system",
+  "business",
   "comms",
   "platform",
 ];
