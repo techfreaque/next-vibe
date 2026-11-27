@@ -307,6 +307,8 @@ Action nodes are regular endpoints with `sideEffect: true` wired downstream of a
 
 The canonical graph pattern: `data source → indicator(s) → evaluator → action endpoint`. The evaluator produces signals; the action endpoint only executes when a signal fires.
 
+The engine keeps only signals whose bucket has closed (`onlyClosedBuckets` in `shared/range.ts`, bucket length = the upstream series' resolution, calendar months for 1M). A running bucket is partial (a day at 06:00 holds about a quarter of its total) and would fire false drops; it gets scored on the first run after it closes.
+
 In backtest mode, action nodes receive `actionMode: "simulate"` - endpoints that support this flag skip the actual side effect but return a response for PnL tracking and analysis.
 
 ### Error Handling

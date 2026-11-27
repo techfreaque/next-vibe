@@ -185,3 +185,33 @@ function buildWeekBuckets(range: TimeRange): number[] {
   }
   return result;
 }
+
+/**
+ * End (exclusive) of the bucket that starts at `bucketStart`. Monthly buckets
+ * follow the calendar (date_trunc('month')), everything else is fixed length.
+ */
+export function bucketEnd(bucketStart: Date, resolution: Resolution): Date {
+  if (resolution === GraphResolution.ONE_MONTH) {
+    return new Date(
+      Date.UTC(bucketStart.getUTCFullYear(), bucketStart.getUTCMonth() + 1, 1),
+    );
+  }
+  return new Date(bucketStart.getTime() + RESOLUTION_MS[resolution]);
+}
+
+/**
+ * Keep only events whose bucket has closed by `now`. A half-finished bucket
+ * (today at 06:00 for a daily series) holds a fraction of its final value, so
+ * scoring it reads as a false drop. It gets scored on the first run after it
+ * closes.
+ */
+export function onlyClosedBuckets<T extends { timestamp: Date }>(
+  events: readonly T[],
+  resolution: Resolution,
+  now: Date,
+): T[] {
+  return events.filter(
+    (event) =>
+      bucketEnd(event.timestamp, resolution).getTime() <= now.getTime(),
+  );
+}

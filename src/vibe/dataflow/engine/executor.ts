@@ -27,7 +27,11 @@ import {
   type SignalEvent,
   type TimeRange,
 } from "../shared/fields";
-import { needsScaleUp, scaleUpSeries } from "../shared/range";
+import {
+  needsScaleUp,
+  onlyClosedBuckets,
+  scaleUpSeries,
+} from "../shared/range";
 import { readDatapoints, writeDatapoints } from "../store/datapoints";
 import { writeSignals } from "../store/signals";
 
@@ -190,7 +194,7 @@ export async function executeNode(
   // Extract signals if response has them
   const rawSignals = response["signals"];
   if (Array.isArray(rawSignals)) {
-    const signals: SignalEvent[] = rawSignals.flatMap((item) => {
+    const parsedSignals: SignalEvent[] = rawSignals.flatMap((item) => {
       if (
         item !== null &&
         typeof item === "object" &&
@@ -219,6 +223,20 @@ export async function executeNode(
       }
       return [];
     });
+    // Evaluators only score closed buckets: the running bucket is partial
+    // (a day at 06:00 holds a quarter of its total) and would fire false
+    // drops / threshold misses. It is scored on the first run after it closes.
+    // Signal timestamps are the scored series' bucket starts, so the bucket
+    // length is the upstream series' resolution (falls back to this node's).
+    const scoredResolution =
+      incomingEdges
+        .map((edge) => ctx.nodeResolutions.get(edge.from))
+        .find((r): r is Resolution => r !== undefined) ?? resolution;
+    const signals = onlyClosedBuckets(
+      parsedSignals,
+      scoredResolution,
+      new Date(),
+    );
     if (!ctx.backtestRunId && !readOnly) {
       await writeSignals(nodeId, graphId, signals);
     }
