@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { pgliteReady } from "next-vibe/database/client";
 import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
@@ -17,6 +18,7 @@ import { StripeProvider } from "./repository";
 type StripeHttpRequest = InstanceType<typeof Stripe.HttpClient>["makeRequest"];
 
 it("creates the invoice on the selected account with its due date and validates the Stripe response", async () => {
+  await pgliteReady;
   const admin = await resolveTestAdminUser();
   const providerCustomer = "cus_invoice_fixture";
   const providerInvoice = "in_invoice_fixture";

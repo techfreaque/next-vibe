@@ -12,6 +12,7 @@ import "server-only";
 import { eq, inArray, sql } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { pgliteReady } from "next-vibe/database/client";
 import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import {
@@ -116,6 +117,7 @@ async function txStatus(sessionId: string): Promise<string | undefined> {
 
 describe.skipIf(!canSign)("async Stripe payments", () => {
   beforeAll(async () => {
+    await pgliteReady;
     const created = await createTestUser(`async-pay-${stamp}@example.com`);
     expect(created.success).toBe(true);
     if (created.success) {
@@ -125,7 +127,9 @@ describe.skipIf(!canSign)("async Stripe payments", () => {
 
   afterAll(async () => {
     await db.delete(paymentWebhooks).where(inArray(paymentWebhooks.providerEventId, [...eventIds]));
-    await deleteTestUser(user.user.id);
+    if (user) {
+      await deleteTestUser(user.user.id);
+    }
   }, 60_000);
 
   it("unpaid completion grants nothing; async success grants once", async () => {
