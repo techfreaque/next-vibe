@@ -242,14 +242,13 @@ export async function prepareStep(
     return finalStepGuard.toolChoice ? finalStepGuard : {};
   }
 
-  // endLoop fired before any answer text (decided in onStepFinish, which the
-  // SDK awaits before calling prepareStep): run ONE text-only answer step so
-  // the user gets a reply instead of a blank, billed turn.
+  // An unanswered endLoop or repeated rejected renames need one text-only
+  // answer step so the interactive turn can still deliver a reply.
   if (state.p.ctx.forceAnswerNextStep) {
     state.p.ctx.forceAnswerNextStep = false;
     state.p.ctx.forcedAnswerStepUsed = true;
     state.p.logger.info(
-      "[prepareStep] Forcing a text-only answer step after an unanswered endLoop",
+      "[prepareStep] Forcing a text-only answer step after tool calls",
       { stepNumber, threadId: state.p.threadId, model: state.p.model },
     );
     const answerMessages = JSON.parse(

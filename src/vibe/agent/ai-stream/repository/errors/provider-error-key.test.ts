@@ -9,7 +9,9 @@ import { providerErrorTranslationKey } from "./provider-error-key";
 
 describe("providerErrorTranslationKey", () => {
   it("identifies the provider's per-image limit without treating a token limit as an image error", () => {
-    expect(providerErrorTranslationKey("image exceeds 10 MB maximum")).toBe("errors.imageTooLarge");
+    expect(providerErrorTranslationKey("image exceeds 10 MB maximum")).toBe(
+      "errors.imageTooLarge",
+    );
     expect(providerErrorTranslationKey("Input exceeds 3000 tokens")).toBeNull();
   });
 
@@ -31,6 +33,9 @@ describe("providerErrorTranslationKey", () => {
       providerErrorTranslationKey(
         "Upstream error from Alibaba: Output data may contain inappropriate content.",
       ),
+    ).toBe("errors.contentFiltered");
+    expect(
+      providerErrorTranslationKey("Gemini finished with PROHIBITED_CONTENT"),
     ).toBe("errors.contentFiltered");
   });
 

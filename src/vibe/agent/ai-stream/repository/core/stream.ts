@@ -152,8 +152,12 @@ export class ToolExecutionContextImpl {
   reachedTurnStepLimit: number | null = null;
   /** Completed SDK steps before a queued user message started a new turn. */
   turnStepOffset = 0;
-  /** Input estimate for the refused step, when the budget ended the loop. */
-  creditBudgetNextInputTokens: number | null = null;
+  /** Affordability calculation for the step that the budget stopped. */
+  creditBudgetNextStep: {
+    inputTokens: number;
+    requiredCredits: number;
+    remainingCredits: number;
+  } | null = null;
 
   /** Text of the last provider `error` stream part (already logged, classified
    *  transient/real, where it arrived). finalize uses it to avoid re-logging a

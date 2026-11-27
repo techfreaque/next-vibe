@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -38,7 +38,7 @@ import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
 
 import { safeCallbackPath } from "../login/callback-url";
 import { sendSignupChallenge } from "./confirmation-mail";
-import { type PendingSignup, pendingSignups } from "./db";
+import { type PendingSignup, pendingSignups, signupEvents } from "./db";
 import type {
   SignupPatchRequestOutput,
   SignupPatchResponseOutput,
@@ -367,9 +367,33 @@ export class SignupRepository {
           .where(eq(pendingSignups.id, data.pendingId))
           .limit(1)
           .catch(() => null);
+        let lastPendingEvent:
+          | (typeof signupEvents.$inferSelect)["type"]
+          | null = null;
+        let pendingEventLookupFailed = false;
+        if (existing?.length === 0) {
+          // Confirmation consumes the pending row. The funnel event remains
+          // when the original tab checks status after another tab confirms.
+          const events = await db
+            .select({ type: signupEvents.type })
+            .from(signupEvents)
+            .where(
+              and(
+                eq(signupEvents.leadId, user.leadId),
+                eq(signupEvents.pendingId, data.pendingId),
+              ),
+            )
+            .orderBy(desc(signupEvents.occurredAt))
+            .limit(1)
+            .catch(() => null);
+          lastPendingEvent = events?.[0]?.type ?? null;
+          pendingEventLookupFailed = events === null;
+        }
         logger.warn("Signup confirmation has no pending signup for this lead", {
           resend: Boolean(data.resend),
           changeEmail: Boolean(data.newEmail),
+          lastPendingEvent,
+          pendingEventLookupFailed,
           pendingLookup:
             existing === null
               ? "diagnostic-unavailable"

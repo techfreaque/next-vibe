@@ -12,7 +12,7 @@ import type { AiStreamTranslationKey } from "../../stream/i18n";
 import { isContextOverflowText } from "../loop/prompt-size";
 
 const CONTENT_FILTER_PATTERN =
-  /inappropriate content|content.?filter|content.?policy|moderation|flagged/i;
+  /inappropriate content|\bprohibited[ _-]content\b|content.?filter|content.?policy|moderation|flagged/i;
 
 const BUSY_PATTERN =
   /\b(429|502|503|504|529)\b|overloaded|rate.?limit|temporarily unavailable|provider_unavailable|try again (later|after)/i;

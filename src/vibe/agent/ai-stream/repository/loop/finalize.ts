@@ -532,7 +532,11 @@ export async function complete(
         finishReason: finishReason ?? null,
         loopStopped: ctx.creditBudgetStopped,
         budgetCutStage: ctx.creditBudgetStopped ? "next-step-input" : "output",
-        budgetNextInputTokens: ctx.creditBudgetNextInputTokens,
+        budgetNextInputTokens: ctx.creditBudgetNextStep?.inputTokens ?? null,
+        budgetNextRequiredCredits:
+          ctx.creditBudgetNextStep?.requiredCredits ?? null,
+        budgetNextRemainingCredits:
+          ctx.creditBudgetNextStep?.remainingCredits ?? null,
         outputCapped: ctx.creditBudgetCapped,
         maxOutputTokens: ctx.creditBudgetOutputTokens,
         configuredOutputModalities: modelConfig.outputs,

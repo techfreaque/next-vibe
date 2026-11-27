@@ -172,6 +172,23 @@ describe("pending signup", () => {
     expect(confirmed.success && confirmed.data.redirectTo).toBe("/en-US/threads");
     const [account] = await db.select().from(users).where(eq(users.email, corrected));
     accountIds.push(account.id);
+    const warn = vi.spyOn(logger, "warn");
+    try {
+      const staleStatus = await act({});
+      expect(!staleStatus.success && staleStatus.message).toBe(
+        t("confirmation.expired"),
+      );
+      expect(warn).toHaveBeenCalledWith(
+        "Signup confirmation has no pending signup for this lead",
+        expect.objectContaining({
+          lastPendingEvent: "events.confirmed",
+          pendingEventLookupFailed: false,
+          pendingLookup: "missing-pending-row",
+        }),
+      );
+    } finally {
+      warn.mockRestore();
+    }
     expect(account.emailVerified).toBe(true);
     expect(await db.select({ id: sessions.id }).from(sessions).where(eq(sessions.userId, account.id))).toHaveLength(1);
     expect((await db.select({ skill: leads.skillId }).from(leads).where(eq(leads.id, user.leadId)))[0].skill).toBe(supportedSkillId);

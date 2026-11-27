@@ -8,6 +8,7 @@ import "server-only";
 
 import { and, eq, ilike, isNull, or, sql } from "drizzle-orm";
 
+import { DEFAULT_ENDPOINT_TIMEOUT_MS } from "../core/definition/create";
 import type { CountryLanguage } from "../core/i18n/core/config";
 import type { ResponseType } from "../core/route/response.schema";
 import {
@@ -329,6 +330,22 @@ export class VibeSenseRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<GraphGetResponse>> {
     const { t } = scopedTranslation.scopedT(locale);
+    const startedAt = performance.now();
+    let stage = "graph-lookup";
+    let activeNode: {
+      nodeId: string;
+      endpointPath: string | undefined;
+    } | null = null;
+    const slowGraphTimer = setTimeout(() => {
+      logger.warn("[vibe-sense] Graph data approaching handler deadline", {
+        graphId: id,
+        resolution: params.resolution,
+        elapsedMs: Math.round(performance.now() - startedAt),
+        timeoutMs: DEFAULT_ENDPOINT_TIMEOUT_MS,
+        stage,
+        activeNode,
+      });
+    }, DEFAULT_ENDPOINT_TIMEOUT_MS - 10_000);
     try {
       const rows = await db
         .select()
@@ -355,12 +372,21 @@ export class VibeSenseRepository {
       let series: GraphDataPayload["series"] = [];
       let signals: GraphDataPayload["signals"] = [];
 
+      stage = "prepare-data";
       const dataResult = await VibeSenseRepository.getGraphData(
         id,
         { resolution: params.resolution, cursor: params.cursor },
         user,
         logger,
         locale,
+        (nodeId, endpointPath) => {
+          stage = "execute-node";
+          activeNode = { nodeId, endpointPath };
+        },
+        () => {
+          stage = "map-results";
+          activeNode = null;
+        },
       );
       if (dataResult.success) {
         series = dataResult.data.series;
@@ -389,6 +415,8 @@ export class VibeSenseRepository {
         message: t("graphs.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    } finally {
+      clearTimeout(slowGraphTimer);
     }
   }
 
@@ -784,6 +812,8 @@ export class VibeSenseRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    onNodeStart: (nodeId: string, endpointPath: string | undefined) => void,
+    onMapResults: () => void,
   ): Promise<ResponseType<GraphDataPayload>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -824,8 +854,10 @@ export class VibeSenseRepository {
         readOnly: true,
         displayResolution: data.resolution,
         graphSlug: graph.slug,
+        onNodeStart,
       });
 
+      onMapResults();
       const series = [...result.series.entries()].map(([nodeId, points]) => ({
         nodeId,
         points: VibeSenseRepository.downsampleToResolution(points, resMs).map(

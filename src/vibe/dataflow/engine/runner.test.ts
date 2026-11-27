@@ -27,6 +27,11 @@ it("records a failed source and keeps dispatching unrelated nodes", async () => 
     .mockResolvedValue(healthySource)
     .mockResolvedValueOnce(healthySource)
     .mockResolvedValueOnce(failure);
+  const nodeProgress: Array<{
+    nodeId: string;
+    endpointPath: string | undefined;
+    previousDispatches: number;
+  }> = [];
 
   try {
     const result = await runGraph(
@@ -48,7 +53,16 @@ it("records a failed source and keeps dispatching unrelated nodes", async () => 
       },
       range,
       undefined,
-      { readOnly: true },
+      {
+        readOnly: true,
+        onNodeStart: (nodeId, endpointPath) => {
+          nodeProgress.push({
+            nodeId,
+            endpointPath,
+            previousDispatches: dispatch.mock.calls.length,
+          });
+        },
+      },
     );
 
     expect(result.errors).toEqual([
@@ -59,6 +73,11 @@ it("records a failed source and keeps dispatching unrelated nodes", async () => 
       "humans",
       "independent",
     ]);
+    expect(nodeProgress).toContainEqual({
+      nodeId: "denominator",
+      endpointPath: "humans",
+      previousDispatches: 1,
+    });
     expect([...result.series.keys()]).toEqual(["numerator", "independent"]);
   } finally {
     dispatch.mockRestore();

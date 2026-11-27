@@ -160,12 +160,24 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
         target instanceof HTMLImageElement || target instanceof HTMLMediaElement
           ? target.currentSrc || target.src
           : target instanceof HTMLScriptElement ||
-              target instanceof HTMLIFrameElement
+              target instanceof HTMLIFrameElement ||
+              target instanceof HTMLSourceElement
             ? target.src
             : target instanceof HTMLLinkElement
               ? target.href
               : null;
       const resource = describeUrl(src);
+      const media =
+        target instanceof HTMLSourceElement ? target.parentElement : target;
+      const mediaDiagnostics =
+        media instanceof HTMLMediaElement
+          ? {
+              mediaErrorCode: media.error?.code ?? null,
+              mediaNetworkState: media.networkState,
+              mediaReadyState: media.readyState,
+              mediaSelectedSource: Boolean(media.currentSrc),
+            }
+          : undefined;
       const details = {
         source: "window.error.resource",
         tag,
@@ -204,6 +216,9 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
         // Static requests from a tab that still runs an older build can
         // fail after a rollout even though the current assets are intact.
         pageBuildId: resource?.startsWith("/_next/") ? currentBuildId() : null,
+        // Native media errors can identify decode, network, and unsupported
+        // sources even when the failed load has no Resource Timing entry.
+        ...mediaDiagnostics,
         ...navigationTimingEvidence(),
         ...resourceTiming(src),
       };

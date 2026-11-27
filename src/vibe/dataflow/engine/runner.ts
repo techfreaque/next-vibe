@@ -138,6 +138,7 @@ export async function runGraph(
     displayResolution?: Resolution;
     /** Graph slug for log labels (e.g. failed endpoint calls). */
     graphSlug?: string;
+    onNodeStart?: (nodeId: string, endpointPath: string | undefined) => void;
   },
 ): Promise<GraphRunResult> {
   const readOnly = options?.readOnly ?? false;
@@ -249,6 +250,7 @@ export async function runGraph(
       }
 
       try {
+        options?.onNodeStart?.(nodeId, nodeConfig.endpointPath);
         const failure = await executeNode(nodeId, nodeConfig, ctx);
         if (!failure) {
           nodeCount++;

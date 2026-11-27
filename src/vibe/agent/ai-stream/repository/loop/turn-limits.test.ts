@@ -349,45 +349,53 @@ it("preserves a target validation error and lets the model correct an endLoop ca
   expect(stored.mock.calls[0]?.[0].toolCall.args).toEqual(missingTitle);
 });
 
-it("stops after one failed rename repair once the answer is visible", async () => {
-  const missingInput = { toolName: "rename-thread" };
-  const { loop, replay, dispatch, stored } = makeRenameReplay([
-    { answer: "Hello!", args: missingInput },
-    { args: missingInput },
-    { args: rename },
-  ]);
-  const handler = await getRouteHandler("rename-thread");
-  const validation = await handler?.({
-    data: {},
-    urlPathParams: {},
-    user: loop.p.user,
-    platform: Platform.AI,
-    locale,
-    logger: loop.p.logger,
-    toolExecutionContext: loop.p.toolExecutionContext,
-  });
-  expect(validation).toMatchObject({
-    success: false,
-    errorType: ErrorResponseTypes.VALIDATION_ERROR,
-  });
-  if (!validation || !("success" in validation) || validation.success) {
-    return;
-  }
-  dispatch.mockResolvedValue(validation);
+it.each(["Hello!", "<think>Pick a title.</think>"])(
+  "bounds rejected rename repairs when the model first writes %s",
+  async (answer) => {
+    const missingInput = { toolName: "rename-thread" };
+    const { loop, replay, dispatch, stored, requestBodies } = makeRenameReplay([
+      { answer, args: missingInput },
+      { args: missingInput },
+    ]);
+    const handler = await getRouteHandler("rename-thread");
+    const validation = await handler?.({
+      data: {},
+      urlPathParams: {},
+      user: loop.p.user,
+      platform: Platform.AI,
+      locale,
+      logger: loop.p.logger,
+      toolExecutionContext: loop.p.toolExecutionContext,
+    });
+    expect(validation).toMatchObject({
+      success: false,
+      errorType: ErrorResponseTypes.VALIDATION_ERROR,
+    });
+    if (!validation || !("success" in validation) || validation.success) {
+      return;
+    }
+    dispatch.mockResolvedValue(validation);
 
-  await loop.run();
+    await loop.run();
 
-  expect(replay).toHaveBeenCalledTimes(2);
-  expect(dispatch).toHaveBeenCalledTimes(2);
-  expect(stored).toHaveBeenCalledTimes(2);
-  expect(
-    stored.mock.calls.every(
-      ([result]) =>
-        result.toolCall.error?.errorType.errorKey ===
-        ErrorResponseTypes.VALIDATION_ERROR.errorKey,
-    ),
-  ).toBe(true);
-});
+    if (answer.startsWith("<think>")) {
+      expect(replay).toHaveBeenCalledTimes(3);
+      expect(requestBodies[2]).toContain("you have not written");
+      expect(requestBodies[2]).toContain('"tool_choice":"none"');
+    } else {
+      expect(replay).toHaveBeenCalledTimes(2);
+    }
+    expect(dispatch).toHaveBeenCalledTimes(2);
+    expect(stored).toHaveBeenCalledTimes(2);
+    expect(
+      stored.mock.calls.every(
+        ([result]) =>
+          result.toolCall.error?.errorType.errorKey ===
+          ErrorResponseTypes.VALIDATION_ERROR.errorKey,
+      ),
+    ).toBe(true);
+  },
+);
 
 it("asks for an answer once if the successful rename was preceded only by thinking", async () => {
   const { loop, replay, requestBodies } = makeRenameReplay([
@@ -483,12 +491,29 @@ it.each([
       model,
       modelCost,
     });
+    const warn = spyOn(loop.p.logger, "warn").mockImplementation(() => {});
 
     await loop.run();
 
     expect(replay).toHaveBeenCalledTimes(1);
     expect(execute).toHaveBeenCalledTimes(1);
     expect(loop.p.ctx.creditBudgetStopped).toBe(true);
+    const refusedStep = loop.p.ctx.creditBudgetNextStep;
+    if (!refusedStep) {
+      expect.unreachable("Expected affordability evidence for the refused step");
+    }
+    expect(refusedStep.inputTokens).toBeGreaterThan(0);
+    expect(refusedStep.requiredCredits).toBeGreaterThan(
+      refusedStep.remainingCredits,
+    );
+    expect(warn).toHaveBeenCalledWith(
+      "[AI Stream] Turn cut short by the remaining balance",
+      expect.objectContaining({
+        budgetNextInputTokens: refusedStep.inputTokens,
+        budgetNextRequiredCredits: refusedStep.requiredCredits,
+        budgetNextRemainingCredits: refusedStep.remainingCredits,
+      }),
+    );
     expect(notice).toHaveBeenCalledTimes(1);
     expect(notice).toHaveBeenCalledWith(
       expect.objectContaining({ content: t("errors.insufficientCredits") }),

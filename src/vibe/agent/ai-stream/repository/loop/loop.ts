@@ -238,7 +238,11 @@ export class StreamLoop implements StreamLoopState {
     });
     if (cap.kind === "unaffordable") {
       ctx.creditBudgetStopped = true;
-      ctx.creditBudgetNextInputTokens = inputTokens;
+      ctx.creditBudgetNextStep = {
+        inputTokens,
+        requiredCredits: cap.requiredCredits,
+        remainingCredits,
+      };
       logger.info("[AI Stream] Balance cannot pay another step - ending loop", {
         model: modelConfig.id,
         threadId: this.p.threadId,
@@ -375,6 +379,7 @@ export class StreamLoop implements StreamLoopState {
       });
       this.p.logger.warn("[AI Stream] Balance refused prepared model request", {
         model: modelConfig.id,
+        inputTokens,
         requiredCredits: cap.requiredCredits,
         remainingCredits,
         preparationCredits: ctx.dbWriter.totalCreditsDeducted,
@@ -546,17 +551,20 @@ export class StreamLoop implements StreamLoopState {
               ) {
                 return true;
               }
-              // One repair attempt is enough for metadata after an answer.
-              // Keep running if there is new user input or a completed tool to deliver.
+              // One repair attempt is enough for a housekeeping rename. If
+              // this turn still owes a reply, spend the next step on that.
+              // Pending user input and completed tools take precedence.
               if (
-                ctx.sdkTurnHasAnswerText &&
                 endLoopNeedsAnswerStep(toolExecutionContext) &&
                 steps.length - ctx.turnStepOffset >= 2 &&
                 ctx.pendingWakeUpInjections.length === 0 &&
                 !QueueRegistry.hasQueued(this.p.threadId) &&
                 steps.slice(-2).every(onlyRejectedRenames)
               ) {
-                return true;
+                if (ctx.sdkTurnHasAnswerText || ctx.forcedAnswerStepUsed) {
+                  return true;
+                }
+                ctx.forceAnswerNextStep = true;
               }
               if (maxToolCalls !== undefined) {
                 if (steps.length === maxToolCalls) {

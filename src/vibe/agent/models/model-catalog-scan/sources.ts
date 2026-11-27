@@ -106,22 +106,20 @@ async function fetchJson(
   }
 }
 
-const jsonValueSchema = z.json();
-
 function parseListing<TSchema extends z.ZodType>(
   json: string,
   schema: TSchema,
 ): { ok: true; data: z.infer<TSchema> } | { ok: false; error: string } {
-  let raw: z.infer<typeof jsonValueSchema>;
   try {
-    raw = jsonValueSchema.parse(JSON.parse(json));
+    // Detailed listings contain large provider-specific fields we do not use.
+    // The provider schema validates the catalog fields without walking those.
+    const parsed = schema.safeParse(JSON.parse(json));
+    return parsed.success
+      ? { ok: true, data: parsed.data }
+      : { ok: false, error: parsed.error.message };
   } catch (error) {
     return { ok: false, error: parseError(error).message };
   }
-  const parsed = schema.safeParse(raw);
-  return parsed.success
-    ? { ok: true, data: parsed.data }
-    : { ok: false, error: parsed.error.message };
 }
 
 function bearer(key: string | undefined): Record<string, string> {

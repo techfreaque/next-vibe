@@ -240,14 +240,12 @@ async function attemptBridgeModel(params: {
   // budget. Bound each attempt and retry once.
   const BRIDGE_ATTEMPT_TIMEOUT_MS = 150_000;
   for (let attempt = 0; attempt < 2; attempt++) {
+    const requestStartedAt = Date.now();
+    const attemptDeadline = AbortSignal.timeout(BRIDGE_ATTEMPT_TIMEOUT_MS);
     try {
-      const requestStartedAt = Date.now();
       const result = await aiGenerateText({
         model: provider.chat(model.providerModel) as LanguageModel,
-        abortSignal: AbortSignal.any([
-          abortSignal,
-          AbortSignal.timeout(BRIDGE_ATTEMPT_TIMEOUT_MS),
-        ]),
+        abortSignal: AbortSignal.any([abortSignal, attemptDeadline]),
         messages: [
           {
             role: "user" as const,
@@ -274,6 +272,16 @@ async function attemptBridgeModel(params: {
         upstreamStatus: apiError?.statusCode,
         upstreamRetryable: apiError?.isRetryable,
         error: parsedAttemptErr.message,
+        visionAttempt: {
+          number: attempt + 1,
+          elapsedMs: Date.now() - requestStartedAt,
+          deadlineMs: BRIDGE_ATTEMPT_TIMEOUT_MS,
+          endedBy: abortSignal.aborted
+            ? "parent-stream"
+            : attemptDeadline.aborted
+              ? "attempt-deadline"
+              : "provider-or-sdk",
+        },
       };
       // Parent stream cancelled -> stop immediately.
       if (abortSignal.aborted) {

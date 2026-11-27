@@ -130,6 +130,11 @@ function logValidationFailure(
     targetToolName: target ? loggedToolName(target) : undefined,
     args: toolArgsForLog(raw),
     issues: safeToolIssues(issues, raw),
+    toolValidationTurnEvidence: {
+      answerVisible: state.p.ctx.turnHasAnswerText,
+      completedSteps: state.p.ctx.tokenStepCount,
+      forcedAnswerStep: state.p.ctx.forcedAnswerStepUsed,
+    },
   });
 }
 

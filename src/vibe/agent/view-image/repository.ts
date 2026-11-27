@@ -13,6 +13,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { resolveImageMediaType } from "../ai-stream/repository/context/image-media-type";
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
+import { parseStorageFileRef } from "../chat/storage/storage-url";
 import {
   fetchStorageFileAsBase64,
   mimeFromUrl,
@@ -49,8 +50,31 @@ export class ViewImageRepository {
         ));
 
     if (!base64) {
+      const storageRef = parseStorageFileRef(url);
+      const extension = storageRef?.filename.split(".").at(-1)?.toLowerCase();
       logger.warn("[ViewImage] Image not found or fetch failed", {
-        url: source,
+        stage: !resolved
+          ? "reference-resolution"
+          : inline
+            ? "inline-media-type"
+            : "file-fetch",
+        sourceKind: storageRef
+          ? "thread-storage"
+          : url.startsWith("data:")
+            ? "inline"
+            : url.startsWith("/uploads/") ||
+                URL.parse(url)?.pathname.startsWith("/uploads/")
+              ? "cortex-upload"
+              : "external-or-unsupported",
+        suppliedExtension:
+          extension && /^(png|jpe?g|webp|avif|gif|svg|bmp)$/.test(extension)
+            ? extension
+            : undefined,
+        sameThread:
+          storageRef && toolExecutionContext.threadId
+            ? storageRef.threadId === toolExecutionContext.threadId
+            : undefined,
+        resolvedMediaType: inline?.mimeType,
       });
       return fail({
         message: t("post.errors.not_found.title"),

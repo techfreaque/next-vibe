@@ -30,12 +30,11 @@ export const FINAL_STEP_INSTRUCTIONS =
   "remains to be done.";
 
 /**
- * Injected on the forced answer step that follows an endLoop tool call made
- * before any visible answer (paired with toolChoice:"none"). The model's
- * tools already ran; without this step the turn ended blank but billed.
+ * Injected on the forced answer step that follows an unanswered endLoop or
+ * repeated rejected renames (paired with toolChoice:"none").
  */
 export const ANSWER_STEP_INSTRUCTIONS =
-  "Your tool calls ran, but you have not written a " +
+  "The tool steps have ended, but you have not written a " +
   "reply yet (thinking is not visible to the user). Tools are disabled now. " +
   "Write your reply to the user's last message in plain text, using the tool " +
   "results above. If a tool failed, say so plainly. Do not mention renaming " +
