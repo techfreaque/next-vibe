@@ -205,4 +205,13 @@ export const FEATURED_ON_BADGES: readonly FeaturedOnBadge[] = [
     href: "https://t0ai.com",
     rel: "noopener",
   },
+  {
+    // launched.tools free listing: their embed is an inline-styled link; a plain
+    // link to the listing page is what the badge verifier looks for.
+    kind: "text",
+    slug: "launchedtools",
+    name: "launched.tools",
+    href: "https://launched.tools/tools/unbottled-ai",
+    rel: "noopener",
+  },
 ];
