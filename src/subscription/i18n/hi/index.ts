@@ -420,6 +420,8 @@ export const translations: typeof enTranslations = {
     cancelAt: "रद्द होने की तारीख़",
     canceledAt: "रद्द किया गया",
     endedAt: "समाप्त हुआ",
+    checkoutProviders: "उपलब्ध पेमेंट तरीके",
+    nowPaymentsAcceptsCards: "क्रिप्टो चेकआउट में कार्ड चलता है",
     trialStart: "ट्रायल शुरू होने की तारीख़",
     trialEnd: "ट्रायल ख़त्म होने की तारीख़",
     success: "ऑपरेशन सफल रहा",

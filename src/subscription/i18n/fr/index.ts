@@ -448,6 +448,8 @@ export const translations: typeof enTranslations = {
     cancelAt: "Résiliation le",
     canceledAt: "Résilié le",
     endedAt: "Terminé le",
+    checkoutProviders: "Moyens de paiement disponibles",
+    nowPaymentsAcceptsCards: "Le paiement crypto accepte les cartes",
     trialStart: "Début de l'essai",
     trialEnd: "Fin de l'essai",
     success: "Opération réussie",

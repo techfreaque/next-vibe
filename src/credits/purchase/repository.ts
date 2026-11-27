@@ -23,6 +23,7 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getPaymentProvider } from "../../payment/providers";
+import { checkCheckoutProviderAvailable } from "../../payment/providers/availability";
 import type {
   CreditsPurchasePostRequestOutput,
   CreditsPurchasePostResponseOutput,
@@ -84,6 +85,16 @@ export class CreditPurchaseRepository {
           message: t("post.errors.planRequired.description"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
+      }
+
+      // A paused provider (e.g. Stripe with charges disabled) opens no session.
+      const unavailable = await checkCheckoutProviderAvailable(
+        data.provider,
+        locale,
+        logger,
+      );
+      if (unavailable) {
+        return unavailable;
       }
 
       const provider = getPaymentProvider(data.provider);

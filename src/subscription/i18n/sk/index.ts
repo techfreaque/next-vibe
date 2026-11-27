@@ -444,6 +444,8 @@ export const translations: typeof enTranslations = {
     cancelAt: "Plánované zrušenie",
     canceledAt: "Zrušené",
     endedAt: "Dátum skončenia",
+    checkoutProviders: "Dostupné spôsoby platby",
+    nowPaymentsAcceptsCards: "Krypto platba prijíma karty",
     trialStart: "Začiatok skúšobného obdobia",
     trialEnd: "Koniec skúšobného obdobia",
     success: "Operácia bola úspešná",

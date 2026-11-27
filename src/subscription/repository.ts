@@ -37,6 +37,11 @@ import { SubscriptionCheckoutRepository } from "../payment/checkout/repository";
 import { paymentTransactions } from "../payment/db";
 import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
 import { getPaymentProvider } from "../payment/providers";
+import {
+  checkCheckoutProviderAvailable,
+  getCheckoutProviders,
+  nowPaymentsAcceptsCards,
+} from "../payment/providers/availability";
 import { StripeProvider } from "../payment/providers/stripe/repository";
 import type { WebhookData } from "../payment/providers/types";
 import { getEnvAvailability } from "../vibe/agent/env-availability";
@@ -228,6 +233,31 @@ export class SubscriptionRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
     options: { syncWithProvider?: boolean } = {},
+  ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
+    const result = await SubscriptionRepository.readSubscription(
+      userId,
+      logger,
+      locale,
+      options,
+    );
+    // Live reads tell the buy UI which providers can open a checkout, so a
+    // paused Stripe account never reaches a doomed checkout. DB-only loader
+    // reads skip the (cached) Stripe account check.
+    if (!result.success || options.syncWithProvider === false) {
+      return result;
+    }
+    return success({
+      ...result.data,
+      checkoutProviders: await getCheckoutProviders(logger),
+      nowPaymentsAcceptsCards: nowPaymentsAcceptsCards(),
+    });
+  }
+
+  private static async readSubscription(
+    userId: string | undefined,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+    options: { syncWithProvider?: boolean },
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
     const syncWithProvider = options.syncWithProvider ?? true;
     if (!userId) {
@@ -790,6 +820,18 @@ export class SubscriptionRepository {
       }
 
       const writesPlanNow = kind === "upgrade" || kind === "interval";
+      if (writesPlanNow) {
+        // Upgrades charge the prorated difference now; a paused Stripe
+        // account would refuse it. Downgrades charge nothing and still run.
+        const unavailable = await checkCheckoutProviderAvailable(
+          PaymentProvider.STRIPE,
+          locale,
+          logger,
+        );
+        if (unavailable) {
+          return unavailable;
+        }
+      }
       if (writesPlanNow) {
         await db
           .update(subscriptions)

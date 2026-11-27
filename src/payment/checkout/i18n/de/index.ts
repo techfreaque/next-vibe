@@ -197,4 +197,13 @@ export const translations: typeof enTranslations = {
     monthly: "Monatlich",
     yearly: "Jährlich",
   },
+  availability: {
+    cardPaused:
+      "Kartenzahlung ist gerade pausiert. Krypto funktioniert sofort.",
+    cardPausedError:
+      "Kartenzahlung ist gerade pausiert. Wähle Krypto, um den Kauf abzuschließen.",
+    nowpaymentsCardLabel: "Karte oder Krypto (NOWPayments)",
+    nowpaymentsCardDescription:
+      "Visa, Mastercard, Apple Pay, Google Pay oder Bitcoin, Ethereum u.v.m.",
+  },
 };

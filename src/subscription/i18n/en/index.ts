@@ -441,6 +441,8 @@ export const translations = {
     cancelAt: "Cancel At",
     canceledAt: "Canceled At",
     endedAt: "Ended At",
+    checkoutProviders: "Available Payment Methods",
+    nowPaymentsAcceptsCards: "Crypto Checkout Takes Cards",
     trialStart: "Trial Start Date",
     trialEnd: "Trial End Date",
     success: "Operation successful",

@@ -134,8 +134,22 @@ export function CreditOffers({
     });
   };
 
+  // Card checkout paused (e.g. Stripe account on hold): the quick tiles open
+  // the buy page, which offers the providers that still work.
+  const cardCheckoutPaused =
+    subscriptionRead?.data?.checkoutProviders !== undefined &&
+    !subscriptionRead.data.checkoutProviders.includes(PaymentProvider.STRIPE);
+  const openBuyPage = (pendingKey: Pending): void => {
+    setPending(pendingKey);
+    assignUrl(`/${locale}/subscription/buy`);
+  };
+
   const buyPack = async (): Promise<void> => {
     setNotice({ kind: "none" });
+    if (cardCheckoutPaused) {
+      openBuyPage("pack");
+      return;
+    }
     setPending("pack");
     // mutateAsync resolves with the ErrorResponseType on failure
     leaveForCheckout(
@@ -151,6 +165,10 @@ export function CreditOffers({
 
   const startPlan = async (tier: SubscriptionTier): Promise<void> => {
     setNotice({ kind: "none" });
+    if (cardCheckoutPaused) {
+      openBuyPage(tier.productId);
+      return;
+    }
     setPending(tier.productId);
     leaveForCheckout(
       await planCheckout.mutateAsync({

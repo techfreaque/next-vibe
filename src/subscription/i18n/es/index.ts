@@ -444,6 +444,8 @@ export const translations: typeof enTranslations = {
     cancelAt: "Cancelar",
     canceledAt: "Cancelado",
     endedAt: "Finalizada el",
+    checkoutProviders: "Métodos de pago disponibles",
+    nowPaymentsAcceptsCards: "El pago cripto acepta tarjetas",
     trialStart: "Fecha de inicio del juicio",
     trialEnd: "Fecha final del juicio",
     success: "Operación con éxito",

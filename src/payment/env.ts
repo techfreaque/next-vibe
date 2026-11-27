@@ -24,6 +24,13 @@ export const {
     example: "whsec_your_stripe_webhook_secret",
     commented: true,
   },
+  STRIPE_CHECKOUT_PAUSED: {
+    schema: z.enum(["true", "false"]).optional().default("false"),
+    example: "false",
+    comment:
+      "Stop offering Stripe for new checkouts (subscriptions and credit packs). Checkout falls back to crypto. Existing subscriptions keep renewing. Stripe is also skipped automatically while the Stripe account reports charges disabled.",
+    commented: true,
+  },
 
   // NOWPayments
   NOWPAYMENTS_API_KEY: {
@@ -35,6 +42,13 @@ export const {
   NOWPAYMENTS_IPN_SECRET: {
     schema: z.string().min(1).optional(),
     example: "your_nowpayments_ipn_secret",
+    commented: true,
+  },
+  NOWPAYMENTS_FIAT_ENABLED: {
+    schema: z.enum(["true", "false"]).optional().default("false"),
+    example: "false",
+    comment:
+      "Set to true once card payments (fiat operations) are enabled in the NOWPayments Partner Profile. The buy page then labels NOWPayments as card or crypto.",
     commented: true,
   },
   NOWPAYMENTS_CALLBACK_DOMAIN: {

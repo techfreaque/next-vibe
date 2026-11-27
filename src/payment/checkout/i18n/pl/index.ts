@@ -197,4 +197,13 @@ export const translations: typeof enTranslations = {
     monthly: "Miesięcznie",
     yearly: "Rocznie",
   },
+  availability: {
+    cardPaused:
+      "Płatności kartą są chwilowo wstrzymane. Krypto działa od ręki.",
+    cardPausedError:
+      "Płatności kartą są chwilowo wstrzymane. Wybierz krypto, żeby dokończyć zakup.",
+    nowpaymentsCardLabel: "Karta lub krypto (NOWPayments)",
+    nowpaymentsCardDescription:
+      "Visa, Mastercard, Apple Pay, Google Pay albo Bitcoin, Ethereum i inne",
+  },
 };

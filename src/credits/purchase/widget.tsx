@@ -35,6 +35,7 @@ import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { ExternalLink, Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { assignUrl } from "next-vibe/ui/lib/location";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetForm,
   useWidgetLogger,
@@ -48,6 +49,7 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/n
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
+import { scopedTranslation as checkoutScopedTranslation } from "@/payment/checkout/i18n";
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
 import {
   getPricingParams,
@@ -115,6 +117,14 @@ export function CreditsPurchaseContainer({
   const totalCredits = packCredits * quantity;
 
   const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
+  const { t: tCheckout } = checkoutScopedTranslation.scopedT(locale);
+  // Unknown (older server, read still loading) keeps card offered; the
+  // server refuses a paused provider anyway.
+  const isCardCheckoutPaused =
+    subscription?.checkoutProviders !== undefined &&
+    !subscription.checkoutProviders.includes(PaymentProvider.STRIPE);
+  const nowPaymentsAcceptsCards =
+    subscription?.nowPaymentsAcceptsCards === true;
 
   function setQuantity(next: number): void {
     const clamped = Math.max(MIN_QTY, next);
@@ -153,14 +163,27 @@ export function CreditsPurchaseContainer({
             </DialogDescription>
           </DialogHeader>
           <Div className="grid gap-4 py-4">
+            {isCardCheckoutPaused && (
+              <Div
+                data-testid="card-checkout-paused"
+                className="flex items-start gap-2 rounded-lg border border-warning/50 bg-warning/15 p-3 text-sm text-warning"
+              >
+                <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                {tCheckout("availability.cardPaused")}
+              </Div>
+            )}
             <Button
               type="button"
               variant="outline"
-              className="h-auto p-4 justify-start"
+              className={cn(
+                "h-auto p-4 justify-start whitespace-normal",
+                isCardCheckoutPaused && "order-last",
+              )}
               onClick={() => handleProviderSelect(PaymentProvider.STRIPE)}
+              disabled={isCardCheckoutPaused}
             >
               <CreditCard className="h-6 w-6 text-primary mr-3" />
-              <Div className="text-left">
+              <Div className="min-w-0 text-left">
                 <Div className="font-semibold">{t("post.provider.stripe")}</Div>
                 <Div className="text-sm text-muted-foreground">
                   {t("post.provider.stripeDescription")}
@@ -170,17 +193,21 @@ export function CreditsPurchaseContainer({
             <Button
               type="button"
               variant="outline"
-              className="h-auto p-4 justify-start"
+              className="h-auto p-4 justify-start whitespace-normal"
               onClick={() => handleProviderSelect(PaymentProvider.NOWPAYMENTS)}
               disabled={isCryptoDisabled}
             >
               <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
-              <Div className="text-left">
+              <Div className="min-w-0 text-left">
                 <Div className="font-semibold">
-                  {t("post.provider.nowpayments")}
+                  {nowPaymentsAcceptsCards
+                    ? tCheckout("availability.nowpaymentsCardLabel")
+                    : t("post.provider.nowpayments")}
                 </Div>
                 <Div className="text-sm text-muted-foreground">
-                  {t("post.provider.nowpaymentsDescription")}
+                  {nowPaymentsAcceptsCards
+                    ? tCheckout("availability.nowpaymentsCardDescription")
+                    : t("post.provider.nowpaymentsDescription")}
                 </Div>
               </Div>
             </Button>

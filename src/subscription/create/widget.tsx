@@ -38,6 +38,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { H3 } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { assignUrl } from "next-vibe/ui/lib/location";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -61,6 +62,7 @@ import publicCapDefinitions from "@/credits/public-cap/definition";
 import { scopedTranslation as publicCapScopedTranslation } from "@/credits/public-cap/i18n";
 import purchaseDefinitions from "@/credits/purchase/definition";
 import { scopedTranslation as purchaseScopedTranslation } from "@/credits/purchase/i18n";
+import { scopedTranslation as checkoutScopedTranslation } from "@/payment/checkout/i18n";
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
 import { ProductIds, productsRepository } from "@/products/platform-products";
 import { getPricingParams } from "@/products/repository-client";
@@ -110,6 +112,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const { t: tCredits } = creditsScopedTranslation.scopedT(currentLocale);
   const { t: tCap } = publicCapScopedTranslation.scopedT(currentLocale);
   const { t: tPurchase } = purchaseScopedTranslation.scopedT(currentLocale);
+  const { t: tCheckout } = checkoutScopedTranslation.scopedT(currentLocale);
 
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
   const isAuthenticated = !user.isPublic;
@@ -140,6 +143,21 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const [checkingSubscription, setCheckingSubscription] = useState(false);
   const [subscriptionCheckError, setSubscriptionCheckError] = useState("");
   const [isPackProviderModalOpen, setIsPackProviderModalOpen] = useState(false);
+  // Providers from the re-check on subscribe; fresher than the cached read.
+  const [liveCheckout, setLiveCheckout] = useState<{
+    providers: (typeof PaymentProviderValue)[];
+    nowPaymentsAcceptsCards: boolean;
+  } | null>(null);
+  const checkoutProviders =
+    liveCheckout?.providers ?? currentSubscription?.checkoutProviders;
+  const nowPaymentsAcceptsCards =
+    liveCheckout?.nowPaymentsAcceptsCards ??
+    currentSubscription?.nowPaymentsAcceptsCards === true;
+  // Unknown (older server, read still loading) means card stays offered; the
+  // server refuses a paused provider anyway.
+  const isCardCheckoutPaused =
+    checkoutProviders !== undefined &&
+    !checkoutProviders.includes(PaymentProvider.STRIPE);
 
   // Crypto plans are one-off invoices. Starter monthly is below what crypto
   // payments accept, so Starter takes crypto yearly; bigger plans monthly too.
@@ -177,6 +195,12 @@ export function SubscriptionCreateContainer(): JSX.Element {
       if (!fresh.success) {
         setSubscriptionCheckError(fresh.message);
         return undefined;
+      }
+      if (fresh.data.checkoutProviders) {
+        setLiveCheckout({
+          providers: fresh.data.checkoutProviders,
+          nowPaymentsAcceptsCards: fresh.data.nowPaymentsAcceptsCards === true,
+        });
       }
       if (fresh.data.status === SubscriptionStatus.ACTIVE) {
         // Recovered: the cached read was stale and showed a subscribe button
@@ -474,14 +498,27 @@ export function SubscriptionCreateContainer(): JSX.Element {
             </DialogDescription>
           </DialogHeader>
           <Div className="grid gap-4 py-4">
+            {isCardCheckoutPaused && (
+              <Div
+                data-testid="card-checkout-paused"
+                className="flex items-start gap-2 rounded-lg border border-warning/50 bg-warning/15 p-3 text-sm text-warning"
+              >
+                <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                {tCheckout("availability.cardPaused")}
+              </Div>
+            )}
             <Button
               type="button"
               variant="outline"
-              className="h-auto p-4 justify-start"
+              className={cn(
+                "h-auto p-4 justify-start whitespace-normal",
+                isCardCheckoutPaused && "order-last",
+              )}
               onClick={() => handleSubProviderSelect(PaymentProvider.STRIPE)}
+              disabled={isCardCheckoutPaused}
             >
               <CreditCard className="h-6 w-6 text-primary mr-3" />
-              <Div className="text-left">
+              <Div className="min-w-0 text-left">
                 <Div className="font-semibold">{t("buy.provider.stripe")}</Div>
                 <Div className="text-sm text-muted-foreground">
                   {t("buy.provider.stripeDescription")}
@@ -491,19 +528,23 @@ export function SubscriptionCreateContainer(): JSX.Element {
             <Button
               type="button"
               variant="outline"
-              className="h-auto p-4 justify-start"
+              className="h-auto p-4 justify-start whitespace-normal"
               onClick={() =>
                 handleSubProviderSelect(PaymentProvider.NOWPAYMENTS)
               }
               disabled={isCryptoSubDisabled}
             >
               <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
-              <Div className="text-left">
+              <Div className="min-w-0 text-left">
                 <Div className="font-semibold">
-                  {t("buy.provider.nowpayments")}
+                  {nowPaymentsAcceptsCards
+                    ? tCheckout("availability.nowpaymentsCardLabel")
+                    : t("buy.provider.nowpayments")}
                 </Div>
                 <Div className="text-sm text-muted-foreground">
-                  {t("buy.provider.nowpaymentsDescription")}
+                  {nowPaymentsAcceptsCards
+                    ? tCheckout("availability.nowpaymentsCardDescription")
+                    : t("buy.provider.nowpaymentsDescription")}
                 </Div>
               </Div>
             </Button>
@@ -530,14 +571,27 @@ export function SubscriptionCreateContainer(): JSX.Element {
             </DialogDescription>
           </DialogHeader>
           <Div className="grid gap-4 py-4">
+            {isCardCheckoutPaused && (
+              <Div
+                data-testid="card-checkout-paused"
+                className="flex items-start gap-2 rounded-lg border border-warning/50 bg-warning/15 p-3 text-sm text-warning"
+              >
+                <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                {tCheckout("availability.cardPaused")}
+              </Div>
+            )}
             <Button
               type="button"
               variant="outline"
-              className="h-auto p-4 justify-start"
+              className={cn(
+                "h-auto p-4 justify-start whitespace-normal",
+                isCardCheckoutPaused && "order-last",
+              )}
               onClick={() => handlePackProviderSelect(PaymentProvider.STRIPE)}
+              disabled={isCardCheckoutPaused}
             >
               <CreditCard className="h-6 w-6 text-primary mr-3" />
-              <Div className="text-left">
+              <Div className="min-w-0 text-left">
                 <Div className="font-semibold">
                   {tPurchase("post.provider.stripe")}
                 </Div>
@@ -549,19 +603,23 @@ export function SubscriptionCreateContainer(): JSX.Element {
             <Button
               type="button"
               variant="outline"
-              className="h-auto p-4 justify-start"
+              className="h-auto p-4 justify-start whitespace-normal"
               onClick={() =>
                 handlePackProviderSelect(PaymentProvider.NOWPAYMENTS)
               }
               disabled={isCryptoPackDisabled}
             >
               <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
-              <Div className="text-left">
+              <Div className="min-w-0 text-left">
                 <Div className="font-semibold">
-                  {tPurchase("post.provider.nowpayments")}
+                  {nowPaymentsAcceptsCards
+                    ? tCheckout("availability.nowpaymentsCardLabel")
+                    : tPurchase("post.provider.nowpayments")}
                 </Div>
                 <Div className="text-sm text-muted-foreground">
-                  {tPurchase("post.provider.nowpaymentsDescription")}
+                  {nowPaymentsAcceptsCards
+                    ? tCheckout("availability.nowpaymentsCardDescription")
+                    : tPurchase("post.provider.nowpaymentsDescription")}
                 </Div>
               </Div>
             </Button>

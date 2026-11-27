@@ -106,6 +106,20 @@ const { GET } = createEndpoint({
         label: "response.endedAt",
         schema: z.string().optional(),
       }),
+      // Providers that can open a new checkout right now (Stripe drops out
+      // while its account is paused). Optional: older peers omit it, which
+      // the buy UI reads as "all providers".
+      checkoutProviders: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.checkoutProviders",
+        schema: z.array(z.enum(PaymentProviderDB)).optional(),
+      }),
+      // NOWPayments takes cards too once fiat operations are enabled there.
+      nowPaymentsAcceptsCards: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.nowPaymentsAcceptsCards",
+        schema: z.boolean().optional(),
+      }),
       provider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.provider",

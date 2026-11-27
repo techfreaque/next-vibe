@@ -197,4 +197,13 @@ export const translations: typeof enTranslations = {
     monthly: "Mensile",
     yearly: "Annuale",
   },
+  availability: {
+    cardPaused:
+      "I pagamenti con carta sono sospesi per ora. Con le criptovalute paghi subito.",
+    cardPausedError:
+      "I pagamenti con carta sono sospesi per ora. Scegli le criptovalute per completare l'acquisto.",
+    nowpaymentsCardLabel: "Carta o criptovalute (NOWPayments)",
+    nowpaymentsCardDescription:
+      "Visa, Mastercard, Apple Pay, Google Pay oppure Bitcoin, Ethereum e altre",
+  },
 };

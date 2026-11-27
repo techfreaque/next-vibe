@@ -195,4 +195,12 @@ export const translations = {
     monthly: "Monthly",
     yearly: "Yearly",
   },
+  availability: {
+    cardPaused: "Card payments are paused for now. Crypto works right away.",
+    cardPausedError:
+      "Card payments are paused for now. Pick crypto to finish checkout.",
+    nowpaymentsCardLabel: "Card or crypto (NOWPayments)",
+    nowpaymentsCardDescription:
+      "Visa, Mastercard, Apple Pay, Google Pay, or Bitcoin, Ethereum and more",
+  },
 };

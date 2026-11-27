@@ -197,4 +197,13 @@ export const translations: typeof enTranslations = {
     monthly: "Mesačne",
     yearly: "Ročne",
   },
+  availability: {
+    cardPaused:
+      "Platby kartou sú zatiaľ pozastavené. Kryptomenou zaplatíš hneď.",
+    cardPausedError:
+      "Platby kartou sú zatiaľ pozastavené. Vyber si kryptomenu a dokonči nákup.",
+    nowpaymentsCardLabel: "Karta alebo kryptomeny (NOWPayments)",
+    nowpaymentsCardDescription:
+      "Visa, Mastercard, Apple Pay, Google Pay alebo bitcoin, ether a ďalšie",
+  },
 };

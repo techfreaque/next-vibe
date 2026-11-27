@@ -28,6 +28,7 @@ import {
 import { BillingInterval } from "../../subscription/enum";
 import { PaymentProvider } from "../enum";
 import { getPaymentProvider } from "../providers";
+import { checkCheckoutProviderAvailable } from "../providers/availability";
 import type {
   CheckoutRequestOutput,
   CheckoutResponseOutput,
@@ -60,6 +61,16 @@ export class SubscriptionCheckoutRepository {
         provider: data.provider,
         locale,
       });
+
+      // A paused provider (e.g. Stripe with charges disabled) opens no session.
+      const unavailable = await checkCheckoutProviderAvailable(
+        data.provider,
+        locale,
+        logger,
+      );
+      if (unavailable) {
+        return unavailable;
+      }
 
       // Get payment provider from request data or default to stripe
       logger.debug("Step 3: Getting payment provider");

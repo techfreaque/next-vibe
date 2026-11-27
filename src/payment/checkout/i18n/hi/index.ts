@@ -187,4 +187,12 @@ export const translations: typeof enTranslations = {
     monthly: "मासिक",
     yearly: "सालाना",
   },
+  availability: {
+    cardPaused: "कार्ड पेमेंट अभी कुछ समय के लिए बंद है। क्रिप्टो से तुरंत पेमेंट करें।",
+    cardPausedError:
+      "कार्ड पेमेंट अभी कुछ समय के लिए बंद है। खरीदारी पूरी करने के लिए क्रिप्टो चुनें।",
+    nowpaymentsCardLabel: "कार्ड या क्रिप्टो (NOWPayments)",
+    nowpaymentsCardDescription:
+      "Visa, Mastercard, Apple Pay, Google Pay या Bitcoin, Ethereum और दूसरे",
+  },
 };

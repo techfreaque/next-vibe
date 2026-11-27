@@ -197,4 +197,13 @@ export const translations: typeof enTranslations = {
     monthly: "Mensual",
     yearly: "Anual",
   },
+  availability: {
+    cardPaused:
+      "Los pagos con tarjeta están en pausa por ahora. Con criptomonedas pagas al instante.",
+    cardPausedError:
+      "Los pagos con tarjeta están en pausa por ahora. Elige criptomonedas para completar la compra.",
+    nowpaymentsCardLabel: "Tarjeta o criptomonedas (NOWPayments)",
+    nowpaymentsCardDescription:
+      "Visa, Mastercard, Apple Pay, Google Pay o Bitcoin, Ethereum y más",
+  },
 };
