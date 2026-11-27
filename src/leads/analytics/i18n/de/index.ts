@@ -73,6 +73,7 @@ export const translations: typeof enTranslations = {
       device: "Gerät",
       browser: "Browser",
       os: "Betriebssystem",
+      browserLanguage: "Browsersprache",
       botFamily: "Agent",
     },
     abuse: {
@@ -127,6 +128,10 @@ export const translations: typeof enTranslations = {
       os: {
         label: "Betriebssystem",
         description: "Betriebssystem, z. B. Android",
+      },
+      browserLanguage: {
+        label: "Browsersprache",
+        description: "Hauptsprache des Browsers beim ersten Besuch, z. B. hi",
       },
       ipPrefix: {
         label: "IP-Präfix",

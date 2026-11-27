@@ -73,6 +73,7 @@ export const translations: typeof enTranslations = {
       device: "डिवाइस",
       browser: "ब्राउज़र",
       os: "OS",
+      browserLanguage: "ब्राउज़र भाषा",
       botFamily: "एजेंट",
     },
     abuse: {
@@ -127,6 +128,10 @@ export const translations: typeof enTranslations = {
       os: {
         label: "OS",
         description: "ऑपरेटिंग सिस्टम, जैसे Android",
+      },
+      browserLanguage: {
+        label: "ब्राउज़र भाषा",
+        description: "पहली विज़िट पर ब्राउज़र की मुख्य भाषा, जैसे hi",
       },
       ipPrefix: {
         label: "IP प्रीफ़िक्स",

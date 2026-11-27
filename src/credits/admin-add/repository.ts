@@ -91,6 +91,7 @@ export class AdminAddCreditsRepository {
           .select({
             amount: creditPacks.originalAmount,
             createdAt: creditPacks.createdAt,
+            reason: creditPacks.grantReason,
           })
           .from(creditPacks)
           .innerJoin(creditWallets, eq(creditPacks.walletId, creditWallets.id))
@@ -147,6 +148,7 @@ export class AdminAddCreditsRepository {
         recentGrants: recentGrants.map((grant) => ({
           amount: Number(grant.amount),
           createdAt: grant.createdAt,
+          reason: grant.reason,
         })),
         id: recipient.id,
         email: recipient.email,
@@ -190,6 +192,10 @@ export class AdminAddCreditsRepository {
       "bonus",
       logger,
       t,
+      undefined,
+      undefined,
+      undefined,
+      data.reason,
     );
     if (!result.success) {
       return result;

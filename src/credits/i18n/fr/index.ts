@@ -51,6 +51,13 @@ export const translations: typeof enTranslations = {
       referralEarning: "Gain de parrainage",
       referralPayout: "Versement de parrainage",
     },
+    grantReason: {
+      giftCreator: "Cadeau / partenariat créateur",
+      tester: "Crédits testeur",
+      compensation: "Compensation / remboursement",
+      goodwill: "Geste commercial",
+      feedback: "Récompense pour retour",
+    },
     fundingType: {
       freeAllowance: "Quota gratuit mensuel",
       freeBonus: "Bonus compte / newsletter",
@@ -651,6 +658,11 @@ export const translations: typeof enTranslations = {
         label: "Montant en crédits",
         description: "Saisissez au moins 1 crédit, en nombre entier.",
         placeholder: "p. ex. 25",
+      },
+      reason: {
+        label: "Motif",
+        description:
+          "Pourquoi ces crédits sont accordés. Les rapports séparent ainsi remboursements et compensations des cadeaux.",
       },
       packType: {
         label: "Type de pack",

@@ -9,6 +9,7 @@ import { authAtlas, saveAdminViewMatrix } from "@/chart-of-accounts/tests/atlas-
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 
 import { creditPacks, creditWallets } from "../db";
+import { CreditGrantReason } from "../enum";
 import { scopedTranslation as creditsCopy } from "../i18n";
 import definitions from "./definition";
 
@@ -55,6 +56,8 @@ describe("Admin credit grant", () => {
         .or(page.getByRole("textbox", { name: t("adminAdd.post.amount.label"), exact: true }))
         .filter({ visible: true }).first();
       await amount.fill("1234");
+      await page.getByRole("combobox", { name: t("adminAdd.post.reason.label"), exact: true }).filter({ visible: true }).click();
+      await page.getByRole("option", { name: t(CreditGrantReason.FEEDBACK), exact: true }).click();
       const submit = button(t("adminAdd.post.submitButton.label"));
       await submit.waitFor();
       await saveAdminViewMatrix(page, SHOTS, `grant-amount-${locale}`, async () => {
@@ -62,15 +65,21 @@ describe("Admin credit grant", () => {
       });
       const granted = await capture(definitions.POST, () => submit.click());
       expect(granted.response.success).toBe(true);
-      expect(granted.requestBody).toMatchObject({ targetUserId: userId, amount: 1234 });
+      expect(granted.requestBody).toMatchObject({ targetUserId: userId, amount: 1234, reason: CreditGrantReason.FEEDBACK });
 
       const packs = await db
-        .select({ originalAmount: creditPacks.originalAmount, remaining: creditPacks.remaining, source: creditPacks.source })
+        .select({
+          originalAmount: creditPacks.originalAmount,
+          remaining: creditPacks.remaining,
+          source: creditPacks.source,
+          grantReason: creditPacks.grantReason,
+        })
         .from(creditPacks)
         .innerJoin(creditWallets, eq(creditWallets.id, creditPacks.walletId))
         .where(and(eq(creditWallets.userId, userId), eq(creditPacks.originalAmount, 1234)));
       expect(packs).toHaveLength(1);
       expect(packs[0]?.remaining).toBe(1234);
+      expect(packs[0]?.grantReason).toBe(CreditGrantReason.FEEDBACK);
 
       const ledger = button(t("adminAdd.recipient.openLedger"));
       await ledger.waitFor();

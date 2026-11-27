@@ -50,6 +50,13 @@ export const translations: typeof enTranslations = {
       referralEarning: "Odmena za odporúčanie",
       referralPayout: "Výplata odmeny za odporúčanie",
     },
+    grantReason: {
+      giftCreator: "Darček / spolupráca s tvorcom",
+      tester: "Kredity pre testerov",
+      compensation: "Kompenzácia / refundácia",
+      goodwill: "Gesto dobrej vôle",
+      feedback: "Odmena za spätnú väzbu",
+    },
     fundingType: {
       freeAllowance: "Bezplatný mesačný limit",
       freeBonus: "Bonus za registráciu alebo newsletter",
@@ -632,6 +639,11 @@ export const translations: typeof enTranslations = {
         label: "Počet kreditov",
         description: "Zadajte aspoň 1 kredit. Použite celé číslo.",
         placeholder: "napr. 25",
+      },
+      reason: {
+        label: "Dôvod",
+        description:
+          "Prečo sa tieto kredity udeľujú. Reporty podľa toho oddelia refundácie a kompenzácie od darčekov.",
       },
       packType: {
         label: "Typ balíka",

@@ -72,6 +72,11 @@ export const leads = pgTable(
     // `country` above is the chosen locale's region, not where the visitor is.
     geoCountry: text("geo_country"),
 
+    // Primary language subtag of the browser's Accept-Language at creation
+    // ("hi" from "hi-IN,hi;q=0.9"). Measures demand for languages we do not
+    // serve yet; `language` above is the locale we actually rendered.
+    acceptLanguage: text("accept_language"),
+
     // Device / browser identity (latest, from user agent parsing)
     userAgent: text("user_agent"),
     deviceType: text("device_type", { enum: DeviceTypeDB }),

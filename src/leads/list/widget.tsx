@@ -642,6 +642,7 @@ export function LeadsListContainer({
     device: form.watch("device"),
     browser: form.watch("browser"),
     os: form.watch("os"),
+    browserLanguage: form.watch("browserLanguage"),
     ipPrefix: form.watch("ipPrefix"),
     uaFingerprint: form.watch("uaFingerprint"),
     createdFrom: form.watch("createdFrom"),

@@ -29,6 +29,7 @@ import type { z } from "zod";
 import type { AnyModelId, ApiProvider } from "../vibe/agent/models/models";
 import {
   CreditFundingTypeDB,
+  CreditGrantReasonDB,
   CreditPackTypeDB,
   CreditTransactionTypeDB,
 } from "./enum";
@@ -338,6 +339,8 @@ export const creditPacks = pgTable(
 
     // Source tracking
     source: text("source"), // 'stripe_subscription', 'stripe_purchase', 'admin_grant', etc.
+    // Why an admin granted this pack (admin-add only, null elsewhere).
+    grantReason: text("grant_reason", { enum: CreditGrantReasonDB }),
 
     // Metadata (typed)
     metadata: jsonb("metadata")
@@ -399,6 +402,9 @@ export const creditTransactions = pgTable(
     // Usage rows: which funding bucket paid this debit, stamped at write time
     // (the pack row can be deleted later, so pack_id alone is not enough).
     fundingType: text("funding_type", { enum: CreditFundingTypeDB }),
+    // Admin grant reason: on the grant row and on usage paid from that pack,
+    // so spend of refunds/compensation splits from gifts after the pack is gone.
+    grantReason: text("grant_reason", { enum: CreditGrantReasonDB }),
 
     // Journal entry reference (set after accounting entry is posted)
     journalEntryId: uuid("journal_entry_id"),

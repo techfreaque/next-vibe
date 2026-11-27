@@ -48,6 +48,13 @@ export const translations = {
       referralEarning: "Referral earning",
       referralPayout: "Referral payout",
     },
+    grantReason: {
+      giftCreator: "Gift / creator deal",
+      tester: "Tester credits",
+      compensation: "Compensation / refund",
+      goodwill: "Goodwill",
+      feedback: "Feedback reward",
+    },
     fundingType: {
       freeAllowance: "Free monthly allowance",
       freeBonus: "Signup / newsletter bonus",
@@ -623,6 +630,11 @@ export const translations = {
         label: "Amount in credits",
         description: "Enter at least 1 credit. Use whole numbers only.",
         placeholder: "e.g. 25",
+      },
+      reason: {
+        label: "Reason",
+        description:
+          "Why these credits are given. Reports split refunds and compensation from gifts by it.",
       },
       packType: {
         label: "Pack type",

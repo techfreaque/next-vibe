@@ -24,6 +24,7 @@ import {
 } from "next-vibe/core/utils/telemetry-url";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { primaryAcceptLanguage } from "next-vibe/identity/lead/accept-language";
 import { leads } from "next-vibe/identity/lead/db";
 import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import {
@@ -105,6 +106,7 @@ export class LeadTrackingRepository {
     referer: string;
     ipAddress: string;
     timestamp: string;
+    acceptLanguage?: string | null;
   } {
     if (!request) {
       return {
@@ -128,6 +130,9 @@ export class LeadTrackingRepository {
       referer,
       ipAddress: ip.split(",")[0].trim(), // Take first IP if multiple
       timestamp: new Date().toISOString(),
+      acceptLanguage: primaryAcceptLanguage(
+        request.headers.get("accept-language"),
+      ),
     };
   }
 
@@ -326,6 +331,7 @@ export class LeadTrackingRepository {
       referer: string;
       ipAddress: string;
       timestamp: string;
+      acceptLanguage?: string | null;
     },
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -391,6 +397,7 @@ export class LeadTrackingRepository {
         // Identity columns - first-touch, written once
         ipAddress: clientInfo.ipAddress,
         geoCountry: await geoCountryForIp(clientInfo.ipAddress, logger),
+        acceptLanguage: clientInfo.acceptLanguage ?? null,
         userAgent: clientInfo.userAgent,
         deviceType: parsedDevice.deviceType,
         browser: parsedDevice.browser,

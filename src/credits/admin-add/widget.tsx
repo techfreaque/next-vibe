@@ -35,6 +35,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
@@ -43,6 +44,7 @@ import { type JSX, useMemo, useState } from "react";
 
 import { scopedTranslation as subscriptionTranslation } from "@/subscription/i18n";
 
+import { CreditGrantReason } from "../enum";
 import definitions from "./definition";
 
 export function GrantRecipientContainer({
@@ -174,6 +176,7 @@ export function GrantRecipientContainer({
                     count: numbers.format(grant.amount),
                     date: formatDate(grant.createdAt, locale, "PP"),
                   })}
+                  {grant.reason && ` · ${t(grant.reason)}`}
                 </Span>
               ))
             )}
@@ -268,6 +271,7 @@ export function AdminAddCreditsContainer({
   const targetUserId = form?.watch("targetUserId");
   const [showRecipientDetails, setShowRecipientDetails] = useState(false);
   const grantAmount = Number(form?.watch("amount")) || 0;
+  const grantReason = form?.watch("reason");
   const validAmount =
     Number.isInteger(grantAmount) &&
     grantAmount > 0 &&
@@ -298,6 +302,7 @@ export function AdminAddCreditsContainer({
   const changeRecipient = (): void => {
     setShowRecipientDetails(false);
     form.resetField("amount");
+    form.resetField("reason");
     form.setValue("targetUserId", "", { shouldDirty: true });
   };
 
@@ -448,7 +453,10 @@ export function AdminAddCreditsContainer({
                                   locale,
                                   "PP",
                                 ),
-                              })
+                              }) +
+                              (recipient.recentGrants[0].reason
+                                ? ` · ${t(recipient.recentGrants[0].reason)}`
+                                : "")
                             : t("adminAdd.recipient.noGrants")
                         }
                       />
@@ -502,15 +510,19 @@ export function AdminAddCreditsContainer({
                   </FormItem>
                 )}
               />
+              <SelectFieldWidget field={children.reason} fieldName="reason" />
               <Div className="flex flex-wrap items-center gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   disabled={disabled || isSubmitting}
-                  onClick={() =>
-                    form.setValue("amount", 3000, { shouldDirty: true })
-                  }
+                  onClick={() => {
+                    form.setValue("amount", 3000, { shouldDirty: true });
+                    form.setValue("reason", CreditGrantReason.TESTER, {
+                      shouldDirty: true,
+                    });
+                  }}
                 >
                   {t("adminAdd.post.testerPreset", {
                     amount: numbers.format(3000),
@@ -533,7 +545,9 @@ export function AdminAddCreditsContainer({
               <Button
                 type="submit"
                 className="w-full disabled:border disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 @md:w-auto @md:self-start"
-                disabled={disabled || isSubmitting || !validAmount}
+                disabled={
+                  disabled || isSubmitting || !validAmount || !grantReason
+                }
               >
                 {isSubmitting
                   ? t("adminAdd.post.submitButton.loadingText")

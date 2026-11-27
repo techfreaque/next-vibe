@@ -125,6 +125,13 @@ export const translations: typeof enTranslations = {
       referralEarning: "Zarobki z polecenia",
       referralPayout: "Wypłata z polecenia",
     },
+    grantReason: {
+      giftCreator: "Prezent / współpraca z twórcą",
+      tester: "Kredyty testerskie",
+      compensation: "Rekompensata / zwrot",
+      goodwill: "Gest dobrej woli",
+      feedback: "Nagroda za opinię",
+    },
     fundingType: {
       freeAllowance: "Darmowy limit miesięczny",
       freeBonus: "Bonus za konto / newsletter",
@@ -628,6 +635,11 @@ export const translations: typeof enTranslations = {
         label: "Kwota w kredytach",
         description: "Wpisz co najmniej 1 kredyt. Użyj liczby całkowitej.",
         placeholder: "np. 25",
+      },
+      reason: {
+        label: "Powód",
+        description:
+          "Dlaczego przyznajesz te kredyty. Raporty oddzielają dzięki temu zwroty i rekompensaty od prezentów.",
       },
       packType: {
         label: "Typ pakietu",

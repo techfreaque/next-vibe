@@ -50,6 +50,13 @@ export const translations: typeof enTranslations = {
       referralEarning: "Guadagno da invito",
       referralPayout: "Prelievo dei guadagni da inviti",
     },
+    grantReason: {
+      giftCreator: "Regalo / accordo con creator",
+      tester: "Crediti tester",
+      compensation: "Compensazione / rimborso",
+      goodwill: "Gesto di cortesia",
+      feedback: "Premio per feedback",
+    },
     fundingType: {
       freeAllowance: "Quota gratuita mensile",
       freeBonus: "Bonus account / newsletter",
@@ -641,6 +648,11 @@ export const translations: typeof enTranslations = {
         label: "Importo dei crediti",
         description: "Inserisca almeno 1 credito. Usi un numero intero.",
         placeholder: "es. 25",
+      },
+      reason: {
+        label: "Motivo",
+        description:
+          "Perché vengono dati questi crediti. I report separano così rimborsi e compensazioni dai regali.",
       },
       packType: {
         label: "Tipo di pacchetto",

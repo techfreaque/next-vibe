@@ -34,6 +34,7 @@ beforeAll(async () => {
       language text NOT NULL DEFAULT 'en',
       ip_address text,
       geo_country text,
+      accept_language text,
       user_agent text,
       device_type text,
       browser text,

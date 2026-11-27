@@ -625,6 +625,7 @@ export class LeadsRepository {
             string | null
           >`coalesce(nullif(${leads.ipAddress}, ''), nullif(${leads.metadata}->>'ipAddress', ''))`,
           geoCountry: leads.geoCountry,
+          acceptLanguage: leads.acceptLanguage,
           userAgent: sql<
             string | null
           >`coalesce(nullif(${leads.userAgent}, ''), nullif(${leads.metadata}->>'userAgent', ''))`,

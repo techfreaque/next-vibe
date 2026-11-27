@@ -158,6 +158,14 @@ export const leadSegmentFields = {
     columns: 3,
     schema: text,
   }),
+  browserLanguage: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    label: "leadAnalytics.filters.browserLanguage.label",
+    description: "leadAnalytics.filters.browserLanguage.description",
+    columns: 3,
+    schema: text,
+  }),
   ipPrefix: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
@@ -239,6 +247,8 @@ export interface LeadSegmentFilters {
   device?: (typeof LeadDeviceFilter)[keyof typeof LeadDeviceFilter];
   browser?: string;
   os?: string;
+  /** Primary Accept-Language subtag at lead creation (e.g. hi) */
+  browserLanguage?: string;
   ipPrefix?: string;
   uaFingerprint?: string;
 }
@@ -264,6 +274,7 @@ export const LEAD_SEGMENT_TEXT_KEYS = [
   "localeCountry",
   "browser",
   "os",
+  "browserLanguage",
   "ipPrefix",
   "uaFingerprint",
 ] as const;
@@ -316,6 +327,7 @@ export const SEGMENT_KEYS = [
   "localeCountry",
   "browser",
   "os",
+  "browserLanguage",
   "ipPrefix",
   "uaFingerprint",
 ] as const;
@@ -334,5 +346,6 @@ export const DIMENSION_LABEL = {
   [LeadDimension.DEVICE]: "leadAnalytics.dimension.device",
   [LeadDimension.BROWSER]: "leadAnalytics.dimension.browser",
   [LeadDimension.OS]: "leadAnalytics.dimension.os",
+  [LeadDimension.BROWSER_LANGUAGE]: "leadAnalytics.dimension.browserLanguage",
   [LeadDimension.BOT_FAMILY]: "leadAnalytics.dimension.botFamily",
 } as const;

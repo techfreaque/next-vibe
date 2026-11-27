@@ -155,3 +155,27 @@ export const CreditFundingTypeDB = [
 ] as const;
 
 export type CreditFundingTypeDBValue = (typeof CreditFundingTypeDB)[number];
+
+/**
+ * Why an admin granted credits (credit_packs / credit_transactions
+ * .grant_reason). Lets reports split refunds and compensation from gifts.
+ * Null on every non-admin row and on grants made before the field existed.
+ */
+export const { enum: CreditGrantReason, options: CreditGrantReasonOptions } =
+  createEnumOptions(scopedTranslation, {
+    GIFT_CREATOR: "enums.grantReason.giftCreator",
+    TESTER: "enums.grantReason.tester",
+    COMPENSATION: "enums.grantReason.compensation",
+    GOODWILL: "enums.grantReason.goodwill",
+    FEEDBACK: "enums.grantReason.feedback",
+  });
+
+export const CreditGrantReasonDB = [
+  CreditGrantReason.GIFT_CREATOR,
+  CreditGrantReason.TESTER,
+  CreditGrantReason.COMPENSATION,
+  CreditGrantReason.GOODWILL,
+  CreditGrantReason.FEEDBACK,
+] as const;
+
+export type CreditGrantReasonValue = (typeof CreditGrantReasonDB)[number];

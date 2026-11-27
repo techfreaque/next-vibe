@@ -160,6 +160,7 @@ export const {
   DEVICE: "leadAnalytics.dimension.device",
   BROWSER: "leadAnalytics.dimension.browser",
   OS: "leadAnalytics.dimension.os",
+  BROWSER_LANGUAGE: "leadAnalytics.dimension.browserLanguage",
   BOT_FAMILY: "leadAnalytics.dimension.botFamily",
 });
 

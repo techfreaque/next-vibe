@@ -50,6 +50,7 @@ import {
 } from "../../../platforms/web/middleware/tools-document";
 import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
 import { leadFailureTimingHeader } from "../../../realtime/core/proxy-timing";
+import { primaryAcceptLanguage } from "../../lead/accept-language";
 import {
   GUEST_LEAD_DB_BUDGET_MS,
   GuestLeadDatabaseDeadlineError,
@@ -397,6 +398,9 @@ export async function createLeadId(
       userAgent: userAgent || undefined,
       referer: request.headers.get("referer") || undefined,
       ipAddress,
+      acceptLanguage: primaryAcceptLanguage(
+        request.headers.get("accept-language"),
+      ),
       geoCountry: await withinGuestBudget(
         geoCountryForIp(ipAddress, logger),
         deadlineMs,

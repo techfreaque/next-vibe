@@ -24,6 +24,7 @@ import { z } from "zod";
 
 import { SubscriptionPlan, SubscriptionStatus } from "@/subscription/enum";
 
+import { CreditGrantReason, CreditGrantReasonOptions } from "../enum";
 import { scopedTranslation } from "../i18n";
 
 const AdminAddCreditsContainer = lazyWidget(() =>
@@ -154,7 +155,11 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "adminAdd.recipient.recentGrants",
         schema: z.array(
-          z.object({ amount: z.number(), createdAt: dateSchema }),
+          z.object({
+            amount: z.number(),
+            createdAt: dateSchema,
+            reason: z.enum(CreditGrantReason).nullable(),
+          }),
         ),
       }),
     },
@@ -185,7 +190,13 @@ const { GET } = createEndpoint({
           lastChargeCurrency: "EUR",
         },
         linkedDevices: 2,
-        recentGrants: [{ amount: 3000, createdAt: "2026-11-17T10:00:00.000Z" }],
+        recentGrants: [
+          {
+            amount: 3000,
+            createdAt: "2026-11-17T10:00:00.000Z",
+            reason: CreditGrantReason.TESTER,
+          },
+        ],
       },
     },
   },
@@ -243,6 +254,15 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.coerce.number().int().positive().max(9_999_999_999),
       }),
+      reason: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "adminAdd.post.reason.label" as const,
+        description: "adminAdd.post.reason.description" as const,
+        options: CreditGrantReasonOptions,
+        columns: 12,
+        schema: z.enum(CreditGrantReason),
+      }),
       recipientId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.uuid().optional(),
@@ -286,14 +306,17 @@ const { POST } = createEndpoint({
       default: {
         targetUserId: "123e4567-e89b-12d3-a456-426614174000",
         amount: 100,
+        reason: CreditGrantReason.FEEDBACK,
       },
       exactAmount: {
         targetUserId: "123e4567-e89b-12d3-a456-426614174000",
         amount: 137,
+        reason: CreditGrantReason.COMPENSATION,
       },
       large: {
         targetUserId: "123e4567-e89b-12d3-a456-426614174000",
         amount: 500,
+        reason: CreditGrantReason.GIFT_CREATOR,
       },
     },
     responses: {

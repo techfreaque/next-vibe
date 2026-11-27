@@ -119,6 +119,8 @@ export function dimensionFilter(
       return { browser: text };
     case LeadDimension.OS:
       return { os: text };
+    case LeadDimension.BROWSER_LANGUAGE:
+      return { browserLanguage: text };
     default:
       return {};
   }
@@ -140,6 +142,7 @@ const CHIP_LABEL = {
   localeCountry: "leadAnalytics.filters.localeCountry.label",
   browser: "leadAnalytics.filters.browser.label",
   os: "leadAnalytics.filters.os.label",
+  browserLanguage: "leadAnalytics.filters.browserLanguage.label",
   ipPrefix: "leadAnalytics.filters.ipPrefix.label",
   uaFingerprint: "leadAnalytics.filters.uaFingerprint.label",
 } as const;
@@ -273,6 +276,10 @@ export function SegmentFilterInputs(): JSX.Element {
       <TextFieldWidget fieldName="browser" field={leadSegmentFields.browser} />
       <TextFieldWidget fieldName="os" field={leadSegmentFields.os} />
       <TextFieldWidget
+        fieldName="browserLanguage"
+        field={leadSegmentFields.browserLanguage}
+      />
+      <TextFieldWidget
         fieldName="ipPrefix"
         field={leadSegmentFields.ipPrefix}
       />
@@ -336,6 +343,7 @@ const DIMENSION_TABS = [
   LeadDimension.DEVICE,
   LeadDimension.BROWSER,
   LeadDimension.OS,
+  LeadDimension.BROWSER_LANGUAGE,
   LeadDimension.MEDIUM,
 ] as const;
 

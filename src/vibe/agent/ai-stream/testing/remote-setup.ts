@@ -38,6 +38,8 @@ import { RemoteTransport } from "next-vibe/remote-connection/transport";
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
 
+import { CreditGrantReason } from "@/credits/enum";
+
 import { rootlessToolExecutionContext } from "../../../core/execution-context";
 import { ThreadStreamingState } from "../../chat/enum";
 import * as fixtureSchema from "./fixtures.db";
@@ -405,7 +407,11 @@ export async function ensureRemoteUserCredits(
   const result = await sendTestRequest({
     toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: adminAddDefinitions.POST,
-    data: { targetUserId: userId, amount: Math.ceil(minCredits - current) },
+    data: {
+      targetUserId: userId,
+      amount: Math.ceil(minCredits - current),
+      reason: CreditGrantReason.TESTER,
+    },
     user: adminUser,
     instanceId: HERMES_INSTANCE_ID,
   });

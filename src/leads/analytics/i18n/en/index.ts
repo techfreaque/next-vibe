@@ -71,6 +71,7 @@ export const translations = {
       device: "Device",
       browser: "Browser",
       os: "OS",
+      browserLanguage: "Browser language",
       botFamily: "Agent",
     },
     abuse: {
@@ -125,6 +126,10 @@ export const translations = {
       os: {
         label: "OS",
         description: "Operating system, e.g. Android",
+      },
+      browserLanguage: {
+        label: "Browser language",
+        description: "Primary browser language at first visit, e.g. hi",
       },
       ipPrefix: {
         label: "IP prefix",

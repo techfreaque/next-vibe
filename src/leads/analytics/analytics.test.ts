@@ -37,7 +37,7 @@ beforeAll(async () => {
       id uuid PRIMARY KEY, created_at timestamp, country text, email text, business_name text,
       device_type text, browser text, os text, ip_address text, user_agent text,
       referral_code text, converted_user_id uuid, signed_up_at timestamp,
-      geo_country text, metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+      geo_country text, accept_language text, metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
       is_bot boolean NOT NULL DEFAULT false
     );
     CREATE TABLE users (id uuid PRIMARY KEY, created_at timestamp, email_verified boolean, email text);

@@ -74,6 +74,7 @@ export const translations: typeof enTranslations = {
       device: "Zariadenie",
       browser: "Prehliadač",
       os: "Operačný systém",
+      browserLanguage: "Jazyk prehliadača",
       botFamily: "Klient",
     },
     abuse: {
@@ -134,6 +135,10 @@ export const translations: typeof enTranslations = {
       os: {
         label: "Operačný systém",
         description: "Operačný systém, napríklad Android",
+      },
+      browserLanguage: {
+        label: "Jazyk prehliadača",
+        description: "Hlavný jazyk prehliadača pri prvej návšteve, napr. hi",
       },
       ipPrefix: {
         label: "Prefix IP",

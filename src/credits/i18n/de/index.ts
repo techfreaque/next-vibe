@@ -124,6 +124,13 @@ export const translations: typeof enTranslations = {
       referralEarning: "Empfehlungsverdienst",
       referralPayout: "Empfehlungsauszahlung",
     },
+    grantReason: {
+      giftCreator: "Geschenk / Creator-Deal",
+      tester: "Tester-Credits",
+      compensation: "Entschädigung / Erstattung",
+      goodwill: "Kulanz",
+      feedback: "Feedback-Belohnung",
+    },
     fundingType: {
       freeAllowance: "Monatliches Gratiskontingent",
       freeBonus: "Bonus für Konto / Newsletter",
@@ -629,6 +636,11 @@ export const translations: typeof enTranslations = {
         label: "Betrag in Credits",
         description: "Geben Sie mindestens 1 Credit als ganze Zahl ein.",
         placeholder: "z. B. 25",
+      },
+      reason: {
+        label: "Grund",
+        description:
+          "Warum diese Credits vergeben werden. Reports trennen damit Erstattungen und Entschädigungen von Geschenken.",
       },
       packType: {
         label: "Pakettyp",

@@ -50,6 +50,13 @@ export const translations: typeof enTranslations = {
       referralEarning: "रेफ़रल कमाई",
       referralPayout: "रेफ़रल पेआउट",
     },
+    grantReason: {
+      giftCreator: "गिफ़्ट / क्रिएटर डील",
+      tester: "टेस्टर क्रेडिट",
+      compensation: "मुआवज़ा / रिफ़ंड",
+      goodwill: "गुडविल",
+      feedback: "फ़ीडबैक इनाम",
+    },
     fundingType: {
       freeAllowance: "फ़्री मासिक कोटा",
       freeBonus: "साइन अप / न्यूज़लेटर बोनस",
@@ -619,6 +626,11 @@ export const translations: typeof enTranslations = {
         label: "क्रेडिट में राशि",
         description: "कम से कम 1 क्रेडिट डालें। सिर्फ़ पूरे नंबर।",
         placeholder: "जैसे 25",
+      },
+      reason: {
+        label: "कारण",
+        description:
+          "ये क्रेडिट क्यों दिए जा रहे हैं। रिपोर्ट इसी से रिफ़ंड और मुआवज़े को गिफ़्ट से अलग करती हैं।",
       },
       packType: {
         label: "पैक का प्रकार",

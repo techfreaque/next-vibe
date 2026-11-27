@@ -42,8 +42,9 @@ beforeAll(async () => {
       id uuid PRIMARY KEY, source text NOT NULL,
       converted_user_id uuid, converted_at timestamp,
       uncensored_consent_at timestamp, uncensored_consent_version integer,
-      created_at timestamp, signed_up_at timestamp, geo_country text, country text,
-      email text, business_name text, device_type text, browser text, os text,
+      created_at timestamp, signed_up_at timestamp, geo_country text, accept_language text, country text,
+      email text, business_name text, is_bot boolean NOT NULL DEFAULT false,
+      device_type text, browser text, os text,
       ip_address text, user_agent text, referral_code text,
       metadata jsonb NOT NULL DEFAULT '{}'::jsonb
     );

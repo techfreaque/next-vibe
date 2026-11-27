@@ -100,7 +100,8 @@ export function requestsBotTraffic(filters: LeadSegmentFilters): boolean {
 export function leadFactsSql(leadCondition: SQL = sql`TRUE`): SQL {
   return sql`
     SELECT l.id, l.created_at, l.geo_country AS country,
-      l.country AS locale_country, l.email, l.business_name, l.is_bot,
+      l.country AS locale_country, l.accept_language AS browser_language,
+      l.email, l.business_name, l.is_bot,
       ${leadDeviceSql(sql`l.device_type`, sql`ident.ua`, sql`fam.bot_family`)} AS device,
       ${leadBrowserSql(sql`l.browser`, sql`ident.ua`)} AS browser,
       ${leadOsSql(sql`l.os`, sql`ident.ua`)} AS os,
@@ -196,6 +197,7 @@ const TEXT_COLUMNS = {
   localeCountry: sql`f.locale_country`,
   browser: sql`f.browser`,
   os: sql`f.os`,
+  browserLanguage: sql`f.browser_language`,
   ipPrefix: sql`f.ip_prefix`,
   uaFingerprint: sql`f.ua_fp`,
 } as const;
@@ -235,7 +237,9 @@ export function segmentConditions(filters: LeadSegmentFilters): SQL[] {
           TEXT_COLUMNS[key],
           key === "country" || key === "localeCountry"
             ? value.toUpperCase()
-            : value,
+            : key === "browserLanguage"
+              ? value.toLowerCase()
+              : value,
         ),
       );
     }
@@ -383,6 +387,8 @@ export function dimensionColumn(dimension: LeadDimensionValue): SQL {
       return sql`f.browser`;
     case LeadDimension.OS:
       return sql`f.os`;
+    case LeadDimension.BROWSER_LANGUAGE:
+      return sql`f.browser_language`;
     case LeadDimension.BOT_FAMILY:
       return sql`f.bot_family`;
     default:

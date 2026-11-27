@@ -37,6 +37,8 @@ interface ClientInfo {
   referer?: string;
   /** Visitor country from the IP (ISO alpha-2), null when unresolved */
   geoCountry?: string | null;
+  /** Primary Accept-Language subtag ("hi"), null when absent */
+  acceptLanguage?: string | null;
 }
 
 /**
@@ -198,6 +200,7 @@ async function provisionAnonymousLead(
       country,
       language,
       geoCountry: clientInfo.geoCountry ?? null,
+      acceptLanguage: clientInfo.acceptLanguage ?? null,
       ipAddress: clientInfo.ipAddress ?? null,
       userAgent: clientInfo.userAgent ?? null,
       deviceType: parsed?.deviceType ?? null,

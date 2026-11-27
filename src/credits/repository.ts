@@ -132,6 +132,7 @@ import creditsDefinitions from "./definition";
 import {
   CreditFeature,
   CreditFundingType,
+  type CreditGrantReasonValue,
   CreditPackType,
   type CreditPackTypeValue,
   CreditTransactionType,
@@ -2570,6 +2571,8 @@ export class CreditRepository {
     expiresAt?: Date,
     sessionId?: string,
     paidInvoiceId?: string,
+    /** Admin grants only: why the credits were given (stored on pack + ledger). */
+    grantReason?: CreditGrantReasonValue,
   ): Promise<ResponseType<AddUserCreditsResult>> {
     try {
       // Add to user wallet (credits are pooled across user + linked leads)
@@ -2675,6 +2678,7 @@ export class CreditRepository {
               type: packType,
               expiresAt: finalExpiresAt,
               source: type === "bonus" ? type : `${type}_purchase`,
+              grantReason: grantReason ?? null,
               metadata: sessionId ? { sessionId } : {},
             })
             .onConflictDoNothing()
@@ -2714,6 +2718,7 @@ export class CreditRepository {
                   : CreditTransactionType.PURCHASE,
             packId: newPack.id,
             freePeriodId: wallet.freePeriodId,
+            grantReason: grantReason ?? null,
             metadata: purchaseMetadata,
           });
           return { packId: newPack.id, granted: true };
@@ -3246,6 +3251,7 @@ export class CreditRepository {
                 source: pack.source,
                 sessionId: pack.metadata.sessionId,
               }),
+              grantReason: pack.grantReason,
               modelId,
               feature,
               messageId,
@@ -3336,6 +3342,7 @@ export class CreditRepository {
                 source: pack.source,
                 sessionId: pack.metadata.sessionId,
               }),
+              grantReason: pack.grantReason,
               modelId,
               feature,
               messageId,
@@ -3426,6 +3433,7 @@ export class CreditRepository {
                 source: pack.source,
                 sessionId: pack.metadata.sessionId,
               }),
+              grantReason: pack.grantReason,
               modelId,
               feature,
               messageId,
