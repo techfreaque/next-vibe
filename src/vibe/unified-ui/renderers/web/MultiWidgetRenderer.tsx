@@ -26,8 +26,8 @@ import {
   useWidgetUser,
 } from "../../_shared/use-widget-context";
 import {
-  type ChildSlot,
   ChildrenDataRenderer,
+  type ChildSlot,
   isArrayChild,
   isUnionVariants,
   matchesSlot,
