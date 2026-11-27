@@ -48,28 +48,8 @@ import {
 } from "../../../text-to-speech/models";
 import { createFixtureFetch } from "../../testing/fetch-cache";
 import { serializeError } from "../errors/error-utils";
+import { findTtsChunkBoundary } from "./streaming-tts-boundary";
 import { toStoredAudioUrl } from "./streaming-tts-storage";
-
-/**
- * Minimum skills before emitting a TTS chunk
- * Avoids choppy audio from very short phrases
- */
-const MIN_CHUNK_SIZE = 50;
-
-/**
- * Maximum buffer size before forcing a chunk
- */
-const MAX_BUFFER_SIZE = 300;
-
-/**
- * Sentence ending pattern
- */
-const SENTENCE_ENDINGS = /[.!?]+\s*$/;
-
-/**
- * Natural break pattern (for large buffers)
- */
-const NATURAL_BREAKS = /[,;:\n]+\s*$/;
 
 /**
  * Streaming TTS Handler
@@ -245,35 +225,20 @@ export class StreamingTTSHandler {
    * generation is already running - but N+2 won't start until N+1 finishes.
    */
   private checkAndEmit(): void {
-    const cleanBuffer = this.stripSpecialTags(this.buffer).trim();
-
-    if (cleanBuffer.length < MIN_CHUNK_SIZE) {
-      return;
-    }
-
-    let shouldEmit = false;
-
-    // Check for sentence ending
-    if (SENTENCE_ENDINGS.test(cleanBuffer)) {
-      shouldEmit = true;
-    }
-
-    // Check for natural break if buffer is large
-    if (!shouldEmit && cleanBuffer.length >= MAX_BUFFER_SIZE) {
-      if (NATURAL_BREAKS.test(cleanBuffer)) {
-        shouldEmit = true;
+    // Several sentences can arrive in one burst: cut every complete chunk.
+    for (;;) {
+      const cleanBuffer = this.stripSpecialTags(this.buffer).trimStart();
+      const cut = findTtsChunkBoundary(cleanBuffer, this.chunkIndex === 0);
+      if (cut <= 0) {
+        return;
       }
-      // Force emit if buffer is too large
-      if (cleanBuffer.length >= MAX_BUFFER_SIZE * 1.5) {
-        shouldEmit = true;
+      // Capture text & index, keep the rest buffered so deltas keep flowing
+      const textToEmit = cleanBuffer.slice(0, cut).trim();
+      this.buffer = cleanBuffer.slice(cut);
+      if (textToEmit.length === 0) {
+        continue;
       }
-    }
-
-    if (shouldEmit) {
-      // Capture text & index, clear buffer immediately so deltas keep flowing
-      const textToEmit = cleanBuffer;
       const idx = this.chunkIndex++;
-      this.buffer = "";
 
       // Chain onto generationChain: sequential generation (1 API call at a time)
       // but non-blocking for delta processing

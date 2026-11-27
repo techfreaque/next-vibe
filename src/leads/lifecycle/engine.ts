@@ -18,11 +18,13 @@ import { coreEnv } from "next-vibe/core/env";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { databaseFailureDiagnostics } from "next-vibe/database/error-diagnostics";
 import { leads } from "next-vibe/identity/lead/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { growthJourneys } from "@/leads/growth/db";
 
+import { sendPaymentFailedNotices } from "./billing-notices";
 import type { LifecycleEnrollment, LifecycleSettings } from "./db";
 import { lifecycleEnrollments, lifecycleSends, lifecycleSettings } from "./db";
 import type { ContactSnapshot, HeldReasonValue } from "./eligibility";
@@ -32,6 +34,7 @@ import {
   hasUnsubscribed,
   isGoalMet,
   isSuppressed,
+  mayMentionPlans,
   staggerDueAt,
 } from "./eligibility";
 import { renderLifecycleEmail } from "./emails";
@@ -98,7 +101,7 @@ export async function getSettings(): Promise<SettingsValues> {
   return (
     again ?? {
       paused: true,
-      minHoursBetweenEmails: 48,
+      minHoursBetweenEmails: 72,
       maxSendsPerRun: 25,
       requireUserMarketingConsent: true,
       autoEnrollWindowDays: 14,
@@ -537,7 +540,9 @@ async function processEnrollment(
   const sendId = claimed[0].id;
 
   try {
-    const locale = enrollment.locale;
+    // Translate at send time in the contact's CURRENT locale (a user may have
+    // switched language since enrollment); enrollment locale is the fallback.
+    const locale = snapshot.locale ?? enrollment.locale;
     const rendered = await renderLifecycleEmail({
       template: step.template,
       locale,
@@ -546,6 +551,9 @@ async function processEnrollment(
       userId: snapshot.userId,
       name: snapshot.name,
       baseUrl: coreEnv.NEXT_PUBLIC_APP_URL,
+      lastActiveAt: snapshot.lastActivityAt,
+      marketingOk: mayMentionPlans(snapshot),
+      now: opts.now,
     });
     const sent = await opts.transport.send(
       {
@@ -605,7 +613,8 @@ async function processEnrollment(
           opts.logger.error("lifecycle.send.leadStampFailed", {
             enrollmentId: enrollment.id,
             leadId,
-            message: parseError(error).message,
+            sendId,
+            ...databaseFailureDiagnostics(parseError(error)),
           });
         });
     }
@@ -680,14 +689,28 @@ export async function runLifecycle(opts: {
     settings,
     onlyEmails: opts.onlyEmails,
   });
+  const transport = opts.transport ?? smtpLifecycleTransport;
   const advanced = await advanceDue({
     now,
     settings,
-    transport: opts.transport ?? smtpLifecycleTransport,
+    transport,
     logger: opts.logger,
     onlyEmails: opts.onlyEmails,
   });
-  return { ...empty, enrolled, ...advanced };
+  // Transactional: outside the journey cap and one-journey-at-a-time rule.
+  const billing = await sendPaymentFailedNotices({
+    now,
+    transport,
+    logger: opts.logger,
+    onlyEmails: opts.onlyEmails,
+  });
+  return {
+    ...empty,
+    enrolled,
+    ...advanced,
+    sent: advanced.sent + billing.sent,
+    failed: advanced.failed + billing.failed,
+  };
 }
 
 // ── Overview ────────────────────────────────────────────────────────────────

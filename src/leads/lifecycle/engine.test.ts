@@ -7,6 +7,7 @@
 
 import { eq, inArray } from "drizzle-orm";
 import { chatThreads } from "next-vibe/agent/chat/db";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -27,6 +28,10 @@ import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 import { paymentTransactions } from "@/payment/db";
 import { PaymentStatus } from "@/payment/enum";
 
+import { subscriptions } from "@/subscription/db";
+import { SubscriptionPlan, SubscriptionStatus } from "@/subscription/enum";
+
+import { sendPaymentFailedNotices } from "./billing-notices";
 import { lifecycleEnrollments, lifecycleSends } from "./db";
 import {
   advanceDue,
@@ -41,6 +46,7 @@ import {
   LifecycleExitReason,
   LifecycleJourney,
 } from "./enum";
+import { scopedTranslation } from "./i18n";
 import type { LifecycleMail, LifecycleTransport } from "./transport";
 
 const logger = createEndpointLogger(false, defaultLocale);
@@ -91,7 +97,9 @@ function recordingTransport(failFor?: string): {
       send: async (mail) => {
         if (failFor && mail.to === failFor) {
           return fail({
-            message: "mock transport failure",
+            message: scopedTranslation
+              .scopedT(defaultLocale)
+              .t("errors.server.description"),
             errorType: ErrorResponseTypes.EMAIL_ERROR,
           });
         }
@@ -126,7 +134,7 @@ async function makeChat(userId: string, at: Date = new Date()): Promise<void> {
   await db.insert(chatThreads).values({
     userId,
     title: "t",
-    rootFolderId: "private",
+    rootFolderId: DefaultFolderId.PRIVATE,
     createdAt: at,
     updatedAt: at,
   });
@@ -183,7 +191,10 @@ beforeAll(async () => {
   await makeChat(quiet, new Date(NOW.getTime() - 10 * 24 * HOUR));
   const gone = await makeUser(E.gone);
   await makeChat(gone, new Date(NOW.getTime() - 40 * 24 * HOUR));
-  await makeUser(E.noConsent, { marketingConsent: false });
+  // Quiet chatter without consent: WHATS_NEW is a marketing journey -> held.
+  // (Service journeys like FIRST_CHAT need no consent.)
+  const noConsent = await makeUser(E.noConsent, { marketingConsent: false });
+  await makeChat(noConsent, new Date(NOW.getTime() - 10 * 24 * HOUR));
   const paid = await makeUser(E.paid);
   await makeChat(paid);
   await db.insert(paymentTransactions).values({
@@ -275,7 +286,9 @@ describe("lifecycle engine", () => {
     expect(auto(LifecycleJourney.WIN_BACK)).toBe(1);
     expect(auto(LifecycleJourney.WHATS_NEW)).toBe(1);
     expect(result.held.noConsent).toBe(1);
-    expect(result.held.paid).toBe(1);
+    // The pack buyer (paid, no subscription, active today) is a lapsed payer
+    // with nothing due.
+    expect(result.held.nothingDue).toBeGreaterThanOrEqual(1);
     expect(result.held.suppressed).toBe(2); // unsubscribed user + unsubscribed newsletter
     expect(result.held.pendingNewsletter).toBe(1);
     expect(await enrollmentFor(E.inactive)).toBeUndefined();
@@ -375,10 +388,15 @@ describe("lifecycle engine", () => {
     expect(sent.find((m) => m.to === E.nlConfirmed)?.newsletterOnly).toBe(true);
     expect(sent.every((m) => m.html.includes("unsubscribe"))).toBe(true);
 
-    // Single-email journeys complete on send; the invite has a second step.
+    // Single-email journeys complete on send; first chat and the invite have
+    // a second step, scheduled from this send.
+    const gone = await enrollmentFor(E.gone);
+    expect(gone?.nextStep).toBe(1);
+    expect(gone?.status).toBe(LifecycleEnrollmentStatus.COMPLETED);
     const row = await enrollmentFor(E.inactive);
     expect(row?.nextStep).toBe(1);
-    expect(row?.status).toBe(LifecycleEnrollmentStatus.COMPLETED);
+    expect(row?.status).toBe(LifecycleEnrollmentStatus.ACTIVE);
+    expect(row?.nextDueAt.getTime()).toBe(LATER.getTime() + 96 * HOUR);
     expect((await enrollmentFor(E.nlConfirmed))?.status).toBe(
       LifecycleEnrollmentStatus.ACTIVE,
     );
@@ -543,5 +561,71 @@ describe("lifecycle engine", () => {
     });
     expect(retry.sent).toBe(1);
     expect((await enrollmentFor(email))?.nextStep).toBe(1);
+  });
+
+  it("payment failed: one transactional notice per dunning episode, ignores the marketing cap", async () => {
+    const email = addr("pastdue");
+    const userId = await makeUser(email, { marketingConsent: false });
+    const failedAt = new Date(NOW.getTime() - HOUR);
+    const [sub] = await db
+      .insert(subscriptions)
+      .values({
+        userId,
+        status: SubscriptionStatus.PAST_DUE,
+        planId: SubscriptionPlan.SUBSCRIPTION,
+        paymentFailedAt: failedAt,
+        gracePeriodEndsAt: new Date(NOW.getTime() + 6 * 24 * HOUR),
+      })
+      .returning({ id: subscriptions.id });
+    const { transport, sent } = recordingTransport();
+    const first = await sendPaymentFailedNotices({
+      now: NOW,
+      transport,
+      logger,
+      onlyEmails: [email],
+    });
+    expect(first.sent).toBe(1);
+    expect(sent[0].transactional).toBe(true);
+    // Billing notices are not optional: no opt-out link, no List-Unsubscribe.
+    expect(sent[0].unsubscribeUrl).toBeNull();
+    expect(sent[0].text).toContain("billing notice");
+    expect(sent[0].html).not.toContain("/newsletter/unsubscribe");
+    expect(sent[0].subject).toContain("didn't go through");
+    // Retries of the same failed invoice: nothing new.
+    const again = await sendPaymentFailedNotices({
+      now: NOW,
+      transport,
+      logger,
+      onlyEmails: [email],
+    });
+    expect(again.sent).toBe(0);
+    // Paid, then a new failure later: a new episode gets one new notice.
+    await db
+      .update(subscriptions)
+      .set({ paymentFailedAt: new Date(NOW.getTime() + 30 * 24 * HOUR) })
+      .where(eq(subscriptions.id, sub.id));
+    const next = await sendPaymentFailedNotices({
+      now: NOW,
+      transport,
+      logger,
+      onlyEmails: [email],
+    });
+    expect(next.sent).toBe(1);
+    expect(sent).toHaveLength(2);
+    // Grace period over: no notice.
+    await db
+      .update(subscriptions)
+      .set({
+        paymentFailedAt: new Date(NOW.getTime() + 60 * 24 * HOUR),
+        gracePeriodEndsAt: new Date(NOW.getTime() - HOUR),
+      })
+      .where(eq(subscriptions.id, sub.id));
+    const expired = await sendPaymentFailedNotices({
+      now: NOW,
+      transport,
+      logger,
+      onlyEmails: [email],
+    });
+    expect(expired.sent).toBe(0);
   });
 });

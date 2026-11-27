@@ -8,6 +8,8 @@ export const translations: typeof enTranslations = {
       outOfCredits: "Gratis-Credits aufgebraucht",
       whatsNew: "7 Tage inaktiv",
       winBack: "30 Tage inaktiv",
+      customerCheckin: "Aktives Abo: Feedback-Check-ins",
+      lapsedWinback: "Früher bezahlt, 14 Tage still",
       newsletterInvite: "Newsletter, kein Konto",
     },
     enrollmentStatus: {
@@ -28,9 +30,14 @@ export const translations: typeof enTranslations = {
     },
     template: {
       firstChatPrompts: "Erster Chat: drei Prompts",
+      firstChatSkills: "Erster Chat: Skill fängt an",
       outOfCredits: "Credits leer: Tarife",
       whatsNew: "Was ist neu",
       winBack: "Rückholung: letzte Mail",
+      paymentFailed: "Zahlung fehlgeschlagen",
+      customerLikes: "Kunde: was passt",
+      customerBuildNext: "Kunde: was als Nächstes",
+      lapsedWinback: "Ehemalig: warum aufgehört",
       inviteSignup: "Einladung: Konto erstellen",
       inviteReminder: "Einladung: Erinnerung",
     },
@@ -64,71 +71,146 @@ export const translations: typeof enTranslations = {
   emails: {
     greeting: "Hallo,",
     greetingNamed: "Hallo {{name}},",
-    signoff: "Max",
-    signature: "unbottled.ai",
-    senderName: "Max von unbottled.ai",
+    signoff: "Dein unbottled.ai-Team",
+    senderName: "unbottled.ai",
     unsubscribeText: "Abmelden:",
+    ctaLine: "{{text}}: {{url}}",
+    footerAccount:
+      "Du bekommst diese Mail, weil du ein unbottled.ai-Konto hast.",
+    footerAccountLink: "Diese Mails abbestellen",
+    footerBilling: "Dies ist ein Zahlungshinweis zu deinem Abo.",
+    newModels: {
+      one: "neues Modell",
+      few: "neue Modelle",
+      many: "neue Modelle",
+      other: "neue Modelle",
+    },
+    tier: {
+      mainstream: "Mainstream",
+      open: "Open Source",
+      uncensored: "Unzensiert",
+    },
     firstChatPrompts: {
-      subject: "Drei erste Nachrichten zum Kopieren",
+      subject: "Drei erste Nachrichten. Kopieren, einfügen, senden.",
       preview:
-        "Eine unzensiert, eine Mainstream, ein Bild. Aussuchen, abschicken.",
+        "Eine Frage, der gefilterte KIs ausweichen. Ein Modellduell. Ein Bild.",
       intro:
-        "Dein Konto steht, der Chat ist noch leer. Hier sind drei Nachrichten für den Anfang. Kopieren, einfügen, abschicken.",
-      uncensoredTitle: "Fragen ohne Belehrung",
+        "Dein Konto steht, dein Chat ist noch leer. Nimm eine davon, füg sie ein, schick sie ab.",
+      uncensoredTitle: "1. Frag, wo gefilterte KIs ausweichen",
       uncensoredPrompt:
-        "„Schreib eine düstere Krimigeschichte, in der der Täter gewinnt. Kein Happy End, keine Moral.“ Nimm eins der {{uncensoredCount}} unzensierten Modelle. Einmal bestätigen, dass du volljährig bist, fertig.",
-      mainstreamTitle: "Die Großen im direkten Vergleich",
+        "„Vertritt in einer Debatte die Seite, die du normalerweise ablehnst. Mit voller Wucht, ohne Disclaimer.“ Nimm eins der {{uncensoredCount}} unzensierten Modelle. Einmal bestätigen, dass du volljährig bist, fertig.",
+      mainstreamTitle: "2. Lass die Großen gegeneinander antreten",
       mainstreamPrompt:
-        "„Plane ein günstiges Wochenende in Lissabon. Wo essen, was auslassen?“ Frag zuerst GPT. Wechsle dann im selben Thread zu Claude oder Gemini und vergleiche.",
-      mediaTitle: "Bild, Video oder Song erstellen",
+        "„Plane ein günstiges Wochenende in Lissabon. Wo essen, was auslassen?“ Frag GPT. Wechsle dann im selben Thread zu Claude oder Gemini und vergleiche.",
+      mediaTitle: "3. Erstell ein Bild",
       mediaPrompt:
-        "„Ein Fuchs mit rotem Schal in einer verschneiten Straße in Tokio, nachts, analoges Foto.“ Ein Prompt, ein Bild. Kurze Videos und Musik funktionieren genauso.",
-      body: "Dein Gratis-Konto bekommt jeden Monat {{freeCreditsSignedIn}} Credits, mit Newsletter {{freeCreditsMax}}. Keine Karte nötig.",
-      cta: "Erste Nachricht senden",
-      ps: "P.S. Kein Plan, womit du anfangen sollst? Antworte einfach auf diese Mail. Wir lesen die Antworten.",
+        "„Ein Fuchs mit rotem Schal in einer verschneiten Straße in Tokio, nachts, analoges Foto.“ Ein Prompt, ein Bild.",
+      body: "Deine Gratis-Credits sind schon auf deinem Konto. Keine Kreditkarte nötig.",
+      cta: "Meinen Chat öffnen",
+      ps: "P.S. Hängst du fest? Antworte auf diese Mail. Wir antworten auf jede Nachricht.",
+    },
+    firstChatSkills: {
+      subject: "Keine Idee, was du schreiben sollst? Nimm einen Skill.",
+      preview:
+        "Charaktere und Spezialisten mit eigener Stimme, eigenem Modell, eigenen Tools.",
+      intro:
+        "Das leere Chatfenster ist die größte Hürde. Ein Skill gibt dem Chat eine Aufgabe, bevor du ein Wort tippst.",
+      characterTitle: "Charaktere",
+      characterBody:
+        "Begleiter, Rollenspielpartner, bissige Kritiker. Jeder hat seine eigene Stimme und bleibt dabei.",
+      specialistTitle: "Spezialisten",
+      specialistBody:
+        "Programmierer, Lektor, Rechercheur. Jeder bringt eigene Anweisungen, ein eigenes Modell und eigene Tools mit.",
+      body: "Such dir einen aus und sag Hallo.",
+      cta: "Skill aussuchen",
     },
     outOfCredits: {
-      subject: "Deine Gratis-Credits für diesen Monat sind aufgebraucht",
-      preview:
-        "Am 1. kommen sie zurück. Oder du machst jetzt weiter, Tarife ab {{subscriptionPrice}} im Monat.",
+      subject: "Gratis-Credits fast aufgebraucht. Neue am {{resetDate}}.",
+      preview: "Nichts geht verloren. Deine Threads und Einstellungen bleiben.",
       intro:
-        "Deine Gratis-Credits für diesen Monat sind weg. Am 1. kommen sie zurück. Keine Lust zu warten? Such dir einen Tarif aus. Klare Preise.",
-      starterTitle: "Starter: {{subscriptionPrice}}/Monat",
-      starterBody:
-        "{{subscriptionCredits}} Credits jeden Monat, jederzeit kündbar. Passt, wenn du fast täglich chattest.",
-      moreTitle: "Mehr nötig? Drei größere Tarife",
-      moreBody:
-        "Plus: {{plusCredits}} Credits für {{plusPrice}}. Pro: {{proCredits}} für {{proPrice}}. Ultra: {{ultraCredits}} für {{ultraPrice}}. Zu jedem Tarif gibt es Credit-Pakete zum Aufstocken, ohne Ablaufdatum.",
-      body: "Zahlung per Karte, PayPal oder Krypto. Gleiche Modelle, gleiche Filtereinstellungen.",
-      cta: "{{subscriptionCredits}} Credits für {{subscriptionPrice}}",
-      ps: "P.S. Bis zum 1. warten ist völlig in Ordnung. Deine Threads bleiben, wo sie sind.",
+        "Deine Gratis-Credits für diesen Monat sind fast aufgebraucht. Am {{resetDate}} werden sie aufgefüllt.",
+      cta: "Meine Credits ansehen",
+      plansLink: "Tarife ansehen",
+    },
+    paymentFailed: {
+      subject: "Deine Abo-Zahlung ist fehlgeschlagen",
+      preview:
+        "Dein Tarif bleibt bis zum {{graceDate}} aktiv. Aktualisiere deine Zahlungsmethode, um ihn zu behalten.",
+      intro: "Wir konnten die letzte Zahlung für dein Abo nicht einziehen.",
+      body: "Dein Tarif bleibt bis zum {{graceDate}} aktiv. Aktualisiere vorher deine Zahlungsmethode, um ihn zu behalten. Hat deine Bank die Abbuchung zur Freigabe zurückgehalten (häufig bei indischen Karten)? Gib sie auf deiner Kontoseite frei. Du kannst auch ein einmaliges Credit-Paket kaufen oder mit Krypto zahlen.",
+      cta: "Zahlungsmethode aktualisieren",
+      ps: "P.S. Schon erledigt? Dann ignoriere diese Mail.",
+    },
+    customerLikes: {
+      subject: "Eine Woche dabei. Was passt, was nicht?",
+      preview:
+        "Zwei Fragen. Eine Zeile Antwort reicht. Hilfreiches Feedback bringt {{feedbackCredits}} Credits.",
+      intro:
+        "Du nutzt deinen Tarif seit einer Woche. Danke dafür. Zwei Fragen:",
+      likeTitle: "Was gefällt dir?",
+      likeBody:
+        "Das Modell, die Funktion, der Moment, in dem es Klick gemacht hat. Sag uns, was bleiben soll.",
+      missingTitle: "Was fehlt oder hakt?",
+      missingBody:
+        "Ein Bug, eine verwirrende Einstellung, alles, was dich ausgebremst hat.",
+      body: "Eine Zeile zu einer der beiden Fragen reicht. Hilfreiches Feedback bringt dir {{feedbackCredits}} Credits.",
+      cta: "Feedback senden",
+    },
+    customerBuildNext: {
+      subject: "Was sollen wir als Nächstes bauen?",
+      preview: "Du bestimmst mit, was wir als Nächstes bauen.",
+      intro: "Du unterstützt uns seit über einem Monat. Danke.",
+      body: "Eine Frage: Was sollen wir als Nächstes für dich bauen? Ein Modell, eine Funktion, ein Fix. Antworte in einer Zeile. Hilfreiches Feedback bringt dir {{feedbackCredits}} Credits.",
+      cta: "Idee schicken",
+    },
+    lapsedWinback: {
+      subject: "Was hätten wir besser machen können?",
+      preview:
+        "Eine Zeile Antwort hilft. Hilfreiches Feedback bringt {{feedbackCredits}} Credits.",
+      intro:
+        "Du hast schon einmal für unbottled.ai bezahlt und warst länger nicht mehr da. Falls dich etwas gestört hat, sag es uns.",
+      body: "Eine Zeile als Antwort reicht: Preis, ein fehlendes Modell, ein Bug, egal was. Hilfreiches Feedback bringt dir {{feedbackCredits}} Credits.",
+      cta: "Feedback senden",
+      newsPs:
+        "P.S. Seit deinem letzten Besuch sind {{newModelCount}} {{newModelsPhrase}} dazugekommen, darunter {{modelList}}.",
+      newsPsAll: "P.S. Seit deinem letzten Besuch neu dabei: {{modelList}}.",
     },
     whatsNew: {
-      subject: "Das hat sich getan, seit du weg warst",
+      subject:
+        "{{newModelCount}} {{newModelsPhrase}} seit deinem letzten Besuch",
+      subjectOne: "Neu seit deinem letzten Besuch: {{newModelName}}",
       preview:
-        "{{modelCount}} Modelle, Video und Musik im Chat, sechs Sprachen.",
-      intro: "Dein letzter Chat ist über eine Woche her. Das ist neu.",
-      modelsTitle: "{{modelCount}} Chat-Modelle",
-      modelsBody:
-        "{{mainstreamCount}} Mainstream, {{openCount}} offen, {{uncensoredCount}} unzensiert. Wechsel mitten im Thread, wann immer du willst.",
-      mediaTitle: "Bilder, Videos und Musik",
-      mediaBody:
-        "Prompt in den Chat, zurück kommt ein Bild, ein kurzer Clip oder ein Track.",
-      languagesTitle: "Sechs Sprachen",
-      languagesBody:
-        "Die ganze App läuft auf Deutsch, Englisch, Polnisch, Französisch, Spanisch und Italienisch.",
-      body: "Deine Threads liegen genau da, wo du aufgehört hast.",
-      cta: "Alle Modelle ansehen",
-      ps: "P.S. Kennst du jemanden, für den das passt? Über deinen Empfehlungslink bekommst du {{referralPercent}} % von allem, was diese Person ausgibt, jeden Monat.",
+        "Nach deinem letzten Besuch dazugekommen. Schon in deiner Modellauswahl.",
+      intro:
+        "Seit deinem letzten Besuch sind {{newModelCount}} {{newModelsPhrase}} dazugekommen. Die neuesten:",
+      introOne: "Seit deinem letzten Besuch ist ein Modell dazugekommen:",
+      body: "Öffne einen Thread und wechsle das Modell. Dein Verlauf bleibt.",
+      bodyMore:
+        "Dazu {{moreCount}} weitere. Öffne einen Thread und wechsle das Modell mitten im Gespräch.",
+      cta: "Meine Chats öffnen",
+      introAll:
+        "Seit deinem letzten Besuch sind {{newModelCount}} {{newModelsPhrase}} dazugekommen:",
+    },
+    whatsNewQuiet: {
+      subject: "Frag ein Modell, dann ein anderes",
+      preview: "Wechsle im selben Chat das Modell und vergleiche.",
+      intro: "Probier das: Stell zwei Modellen dieselbe Frage.",
+      compareTitle: "Modellwechsel",
+      compareBody:
+        "Frag ein Modell, wechsle im selben Thread zu einem anderen, vergleiche die Antworten.",
+      body: "Deine Threads sind da, wo du sie gelassen hast.",
+      cta: "Meine Chats öffnen",
     },
     winBack: {
-      subject: "Eine letzte Mail von uns",
-      preview: "Konto, Threads und Gratis-Credits sind noch da.",
+      subject: "Was hat gefehlt?",
+      preview: "Was hat gefehlt? Eine Zeile Antwort reicht.",
       intro:
-        "Dein letzter Chat ist über einen Monat her. Das ist unsere letzte Erinnerung.",
-      body: "Dein Konto, deine Threads und deine monatlichen Gratis-Credits sind alle noch da. Mehr Modelle als beim letzten Mal, und den Filter stellst immer noch du ein.",
-      cta: "Zurück zu deinen Chats",
-      ps: "P.S. Was hat dich gestört? Antworte und sag es uns. Wir lesen jede Antwort.",
+        "Dein letzter Chat ist über einen Monat her. Eine Frage: Was hat gefehlt? Antworte einfach, eine Zeile reicht. Wir lesen jede Antwort und beheben, was wir können.",
+      body: "Dein Konto und deine Threads sind noch da, und deine Gratis-Credits werden weiter jeden Monat aufgefüllt.",
+      cta: "Sag uns, was gefehlt hat",
+      newsPs:
+        "P.S. Seit deinem letzten Besuch sind {{newModelCount}} {{newModelsPhrase}} dazugekommen, darunter {{modelList}}.",
+      newsPsAll: "P.S. Seit deinem letzten Besuch neu dabei: {{modelList}}.",
     },
     inviteSignup: {
       subject: "Du liest den Newsletter. Jetzt probier die App.",
@@ -169,20 +251,47 @@ export const translations: typeof enTranslations = {
     firstChatPrompts: {
       name: "Lifecycle: erster Chat",
       description:
-        "48 Std. nach Anmeldung, verifiziertes Konto, noch kein Chat. Drei konkrete Prompts.",
+        "Service. 24 Std. nach Anmeldung, verifiziertes Konto, noch kein Chat. Drei fertige erste Nachrichten.",
+    },
+    firstChatSkills: {
+      name: "Lifecycle: erster Chat, Skills",
+      description:
+        "Service. Tag 5, immer noch kein Chat. Skills geben dem Chat eine Aufgabe.",
     },
     outOfCredits: {
       name: "Lifecycle: Credits aufgebraucht",
       description:
-        "Gratis-Credits des Monats verbraucht, nie bezahlt. Tarifpreise.",
+        "Service. Gratis-Credits des Monats verbraucht, nie bezahlt. Auffülldatum und Tarife.",
+    },
+    paymentFailed: {
+      name: "Lifecycle: Zahlung fehlgeschlagen",
+      description:
+        "Transaktional. Abo überfällig: eine Mail pro fehlgeschlagener Zahlung, Tarif aktiv bis zum Ende der Kulanzfrist.",
+    },
+    customerLikes: {
+      name: "Lifecycle: Kunden-Check-in",
+      description:
+        "Service. Aktives Abo, 7 Tage im Tarif. Reine Feedback-Frage, Antwort per Reply, Feedback-Credits wie im Footer versprochen.",
+    },
+    customerBuildNext: {
+      name: "Lifecycle: was als Nächstes bauen",
+      description:
+        "Service. Aktives Abo, etwa 5 Wochen dabei. Fragt, was wir als Nächstes bauen sollen.",
+    },
+    lapsedWinback: {
+      name: "Lifecycle: ehemalige Kunden",
+      description:
+        "Marketing. Früher bezahlt, kein aktiver Tarif, 14 Tage still. Fragt nach dem Grund, listet neue Modelle.",
     },
     whatsNew: {
       name: "Lifecycle: Was ist neu",
-      description: "7 Tage ohne Chat. Modelle, Medien, Sprachen.",
+      description:
+        "Marketing. 7 Tage ohne Chat. Modelle, die seit dem letzten Chat dazugekommen sind.",
     },
     winBack: {
       name: "Lifecycle: Rückholung",
-      description: "30 Tage ohne Chat. Letzte Journey-Mail.",
+      description:
+        "Marketing. 30 Tage ohne Chat. Letzte Journey-Mail, fragt, was gefehlt hat.",
     },
     inviteSignup: {
       name: "Lifecycle: Newsletter-Einladung",

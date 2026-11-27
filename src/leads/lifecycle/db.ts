@@ -7,6 +7,9 @@
  * lifecycle_sends: one row per (enrollment, step). Unique, so a step can never be
  * sent twice. The row is claimed BEFORE the mail leaves.
  * lifecycle_settings: single global row. Defaults to PAUSED.
+ * lifecycle_billing_notices: one transactional "payment failed" email per
+ * subscription dunning episode (subscription + payment_failed_at). Unique, and
+ * claimed BEFORE the mail leaves, so S1/S2 runs and retries never double-send.
  */
 
 import { sql } from "drizzle-orm";
@@ -26,6 +29,8 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { leads } from "next-vibe/identity/lead/db";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
+
+import { subscriptions } from "@/subscription/db";
 
 import {
   LifecycleEnrollmentStatus,
@@ -85,6 +90,7 @@ export const lifecycleEnrollments = pgTable(
       ),
     index("idx_lifecycle_enrollment_due").on(table.status, table.nextDueAt),
     index("idx_lifecycle_enrollment_user").on(table.userId),
+    index("idx_lifecycle_enrollment_lead").on(table.leadId),
   ],
 );
 
@@ -112,6 +118,33 @@ export const lifecycleSends = pgTable(
       table.step,
     ),
     index("idx_lifecycle_send_email").on(table.email, table.sentAt),
+  ],
+);
+
+export const lifecycleBillingNotices = pgTable(
+  "lifecycle_billing_notices",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    subscriptionId: uuid("subscription_id")
+      .notNull()
+      .references(() => subscriptions.id, { onDelete: "cascade" }),
+    /** payment_failed_at of the episode (ISO): one notice per failing invoice run. */
+    episodeKey: text("episode_key").notNull(),
+    email: text("email").notNull(),
+    status: text("status", { enum: LifecycleSendStatusDB })
+      .notNull()
+      .default(LifecycleSendStatus.PENDING),
+    messageId: text("message_id"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    unique("uq_lifecycle_billing_notice_episode").on(
+      table.subscriptionId,
+      table.episodeKey,
+    ),
   ],
 );
 

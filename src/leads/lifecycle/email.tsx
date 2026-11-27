@@ -15,7 +15,7 @@ import type {
   TemplateMetadata,
 } from "@/messenger/registry/template";
 
-import { LifecycleEmail } from "./emails";
+import { buildCopyContext, LifecycleEmail } from "./emails";
 import type { LifecycleTemplateValue } from "./enum";
 import { LifecycleTemplate } from "./enum";
 import type { LifecycleTranslationKey } from "./i18n";
@@ -56,7 +56,7 @@ function lifecycleTemplate(
     scopedTranslation,
     meta: {
       ...meta,
-      version: "2.0.0",
+      version: "3.0.0",
       category: "emailTemplates.category",
       path: "/leads/lifecycle/email.tsx",
       previewFields: {
@@ -82,6 +82,14 @@ function lifecycleTemplate(
           openCount: props.openCount,
           uncensoredCount: props.uncensoredCount,
         }}
+        context={buildCopyContext({
+          locale,
+          now: new Date(),
+          lastActiveAt: null,
+          currentIds: null,
+          marketingOk: true,
+          graceEndsAt: new Date(Date.now() + 7 * 86_400_000),
+        })}
         tracking={tracking}
       />
     ),
@@ -111,6 +119,16 @@ export const lifecycleFirstChatEmailTemplate = lifecycleTemplate(
   },
 );
 
+export const lifecycleFirstChatSkillsEmailTemplate = lifecycleTemplate(
+  LifecycleTemplate.FIRST_CHAT_SKILLS,
+  {
+    id: "lifecycle-first-chat-skills",
+    name: "emailTemplates.firstChatSkills.name",
+    description: "emailTemplates.firstChatSkills.description",
+    defaultSubject: "emails.firstChatSkills.subject",
+  },
+);
+
 export const lifecycleOutOfCreditsEmailTemplate = lifecycleTemplate(
   LifecycleTemplate.OUT_OF_CREDITS,
   {
@@ -118,6 +136,46 @@ export const lifecycleOutOfCreditsEmailTemplate = lifecycleTemplate(
     name: "emailTemplates.outOfCredits.name",
     description: "emailTemplates.outOfCredits.description",
     defaultSubject: "emails.outOfCredits.subject",
+  },
+);
+
+export const lifecyclePaymentFailedEmailTemplate = lifecycleTemplate(
+  LifecycleTemplate.PAYMENT_FAILED,
+  {
+    id: "lifecycle-payment-failed",
+    name: "emailTemplates.paymentFailed.name",
+    description: "emailTemplates.paymentFailed.description",
+    defaultSubject: "emails.paymentFailed.subject",
+  },
+);
+
+export const lifecycleCustomerLikesEmailTemplate = lifecycleTemplate(
+  LifecycleTemplate.CUSTOMER_LIKES,
+  {
+    id: "lifecycle-customer-likes",
+    name: "emailTemplates.customerLikes.name",
+    description: "emailTemplates.customerLikes.description",
+    defaultSubject: "emails.customerLikes.subject",
+  },
+);
+
+export const lifecycleCustomerBuildNextEmailTemplate = lifecycleTemplate(
+  LifecycleTemplate.CUSTOMER_BUILD_NEXT,
+  {
+    id: "lifecycle-customer-build-next",
+    name: "emailTemplates.customerBuildNext.name",
+    description: "emailTemplates.customerBuildNext.description",
+    defaultSubject: "emails.customerBuildNext.subject",
+  },
+);
+
+export const lifecycleLapsedWinbackEmailTemplate = lifecycleTemplate(
+  LifecycleTemplate.LAPSED_WINBACK,
+  {
+    id: "lifecycle-lapsed-winback",
+    name: "emailTemplates.lapsedWinback.name",
+    description: "emailTemplates.lapsedWinback.description",
+    defaultSubject: "emails.lapsedWinback.subject",
   },
 );
 

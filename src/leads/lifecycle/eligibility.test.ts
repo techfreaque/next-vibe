@@ -9,11 +9,15 @@ import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 
 import type { ContactSnapshot } from "./eligibility";
 import {
+  canSendBillingNotice,
   capAllows,
   classifyContact,
   HeldReason,
   isGoalMet,
   isSuppressed,
+  mayMentionPlans,
+  PaymentSegment,
+  paymentSegment,
   staggerDueAt,
 } from "./eligibility";
 import { LifecycleJourney } from "./enum";
@@ -37,6 +41,8 @@ function snapshot(patch: Partial<ContactSnapshot>): ContactSnapshot {
     lastActivityAt: null,
     outOfCreditsAt: null,
     isPaid: false,
+    segment: PaymentSegment.NEVER_PAID,
+    activeSubSince: null,
     newsletter: null,
     leadStatus: null,
     lastEmailAt: null,
@@ -104,7 +110,7 @@ describe("classifyContact", () => {
       triggerAt: drainedAt,
       held: null,
     });
-    // Paid users never get the out-of-credits email
+    // Active subscribers never get the out-of-credits email
     expect(
       classifyContact(
         snapshot({
@@ -112,55 +118,161 @@ describe("classifyContact", () => {
           user: goodUser,
           hasChatted: true,
           isPaid: true,
+          segment: PaymentSegment.ACTIVE_SUB,
+          activeSubSince: daysAgo(3),
           lastActivityAt: drainedAt,
           outOfCreditsAt: drainedAt,
         }),
         strict,
         NOW,
-      ),
-    ).toEqual({ journey: null, held: HeldReason.PAID });
+      ).journey,
+    ).toBe(LifecycleJourney.CUSTOMER_CHECKIN);
   });
 
-  it("quiet 7-29 days -> WHATS_NEW, 30+ days -> WIN_BACK, paid users included", () => {
+  it("never paid / granted: quiet 7-29 days -> WHATS_NEW, 30+ days -> WIN_BACK", () => {
     const quiet = (
       days: number,
-      isPaid: boolean,
+      segment: ContactSnapshot["segment"] = PaymentSegment.NEVER_PAID,
     ): ReturnType<typeof classifyContact> =>
       classifyContact(
         snapshot({
           userId: "u",
           user: goodUser,
           hasChatted: true,
-          isPaid,
+          segment,
           lastActivityAt: daysAgo(days),
         }),
         strict,
         NOW,
       );
-    expect(quiet(6.9, false).journey).toBeNull();
-    expect(quiet(7, false)).toEqual({
+    expect(quiet(6.9).journey).toBeNull();
+    expect(quiet(7)).toEqual({
       journey: LifecycleJourney.WHATS_NEW,
       triggerAt: daysAgo(7),
       held: null,
     });
-    expect(quiet(29, true).journey).toBe(LifecycleJourney.WHATS_NEW);
-    expect(quiet(30, false).journey).toBe(LifecycleJourney.WIN_BACK);
-    expect(quiet(200, true).journey).toBe(LifecycleJourney.WIN_BACK);
+    expect(quiet(29, PaymentSegment.GRANTED).journey).toBe(
+      LifecycleJourney.WHATS_NEW,
+    );
+    expect(quiet(30).journey).toBe(LifecycleJourney.WIN_BACK);
   });
 
-  it("inactivity wins over a drained pool (they left, don't sell to them)", () => {
-    const c = classifyContact(
-      snapshot({
-        userId: "u",
-        user: goodUser,
-        hasChatted: true,
-        lastActivityAt: daysAgo(8),
-        outOfCreditsAt: daysAgo(8),
-      }),
-      strict,
-      NOW,
+  it("segments: active subscribers get check-ins only, lapsed payers a lapsed win-back", () => {
+    const at = (
+      segment: ContactSnapshot["segment"],
+      days: number,
+    ): ReturnType<typeof classifyContact> =>
+      classifyContact(
+        snapshot({
+          userId: "u",
+          user: goodUser,
+          hasChatted: true,
+          isPaid: segment !== PaymentSegment.NEVER_PAID,
+          segment,
+          activeSubSince:
+            segment === PaymentSegment.ACTIVE_SUB ? daysAgo(40) : null,
+          lastActivityAt: daysAgo(days),
+        }),
+        strict,
+        NOW,
+      );
+    for (const days of [1, 10, 60]) {
+      expect(at(PaymentSegment.ACTIVE_SUB, days)).toEqual({
+        journey: LifecycleJourney.CUSTOMER_CHECKIN,
+        triggerAt: daysAgo(40),
+        held: null,
+      });
+    }
+    expect(at(PaymentSegment.LAPSED, 13).journey).toBeNull();
+    expect(at(PaymentSegment.LAPSED, 14).journey).toBe(
+      LifecycleJourney.LAPSED_WINBACK,
     );
-    expect(c.journey).toBe(LifecycleJourney.WHATS_NEW);
+    expect(at(PaymentSegment.LAPSED, 200).journey).toBe(
+      LifecycleJourney.LAPSED_WINBACK,
+    );
+  });
+
+  it("customer check-ins need no marketing consent, lapsed win-back does", () => {
+    const noConsent = { ...goodUser, marketingConsent: false };
+    expect(
+      classifyContact(
+        snapshot({
+          userId: "u",
+          user: noConsent,
+          hasChatted: true,
+          isPaid: true,
+          segment: PaymentSegment.ACTIVE_SUB,
+          activeSubSince: daysAgo(8),
+        }),
+        strict,
+        NOW,
+      ).journey,
+    ).toBe(LifecycleJourney.CUSTOMER_CHECKIN);
+    expect(
+      classifyContact(
+        snapshot({
+          userId: "u",
+          user: noConsent,
+          hasChatted: true,
+          isPaid: true,
+          segment: PaymentSegment.LAPSED,
+          lastActivityAt: daysAgo(20),
+        }),
+        strict,
+        NOW,
+      ),
+    ).toEqual({ journey: null, held: HeldReason.NO_CONSENT });
+  });
+
+  it("plans links only for consenting never-paid or lapsed users, never for granted accounts", () => {
+    const withConsent = snapshot({ userId: "u", user: goodUser });
+    expect(mayMentionPlans(withConsent)).toBe(true);
+    expect(
+      mayMentionPlans({ ...withConsent, segment: PaymentSegment.GRANTED }),
+    ).toBe(false);
+    expect(
+      mayMentionPlans({ ...withConsent, segment: PaymentSegment.ACTIVE_SUB }),
+    ).toBe(false);
+    expect(
+      mayMentionPlans(
+        snapshot({
+          userId: "u",
+          user: { ...goodUser, marketingConsent: false },
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it("paymentSegment: live plan wins, real money beats grants", () => {
+    expect(paymentSegment({ paid: true, activeSub: true, granted: true })).toBe(
+      PaymentSegment.ACTIVE_SUB,
+    );
+    expect(
+      paymentSegment({ paid: true, activeSub: false, granted: true }),
+    ).toBe(PaymentSegment.LAPSED);
+    expect(
+      paymentSegment({ paid: false, activeSub: false, granted: true }),
+    ).toBe(PaymentSegment.GRANTED);
+    expect(
+      paymentSegment({ paid: false, activeSub: false, granted: false }),
+    ).toBe(PaymentSegment.NEVER_PAID);
+  });
+
+  it("billing notices: verified, active, not bounced; marketing opt-out does not matter", () => {
+    const base = snapshot({ userId: "u", user: goodUser });
+    expect(canSendBillingNotice(base)).toBe(true);
+    expect(
+      canSendBillingNotice({ ...base, leadStatus: LeadStatus.UNSUBSCRIBED }),
+    ).toBe(true);
+    expect(
+      canSendBillingNotice({ ...base, leadStatus: LeadStatus.BOUNCED }),
+    ).toBe(false);
+    expect(
+      canSendBillingNotice({
+        ...base,
+        user: { ...goodUser, emailVerified: false },
+      }),
+    ).toBe(false);
   });
 
   it("confirmed newsletter subscriber without account -> NEWSLETTER_INVITE", () => {
@@ -228,35 +340,99 @@ describe("classifyContact", () => {
     }
   });
 
-  it("already paid users are excluded", () => {
+  it("lapsed payers with credits and recent activity get nothing", () => {
     const c = classifyContact(
-      snapshot({ userId: "u", user: goodUser, hasChatted: true, isPaid: true }),
+      snapshot({
+        userId: "u",
+        user: goodUser,
+        hasChatted: true,
+        isPaid: true,
+        segment: PaymentSegment.LAPSED,
+        lastActivityAt: daysAgo(1),
+      }),
       strict,
       NOW,
     );
-    expect(c).toEqual({ journey: null, held: HeldReason.PAID });
+    expect(c).toEqual({ journey: null, held: HeldReason.NOTHING_DUE });
   });
 
-  it("users without marketing consent are held unless consent mode is relaxed", () => {
+  it("service journeys (first chat, out of credits) need no marketing consent", () => {
     const noConsent = { ...goodUser, marketingConsent: false };
     expect(
-      classifyContact(snapshot({ userId: "u", user: noConsent }), strict, NOW),
-    ).toEqual({ journey: null, held: HeldReason.NO_CONSENT });
-    expect(
-      classifyContact(snapshot({ userId: "u", user: noConsent }), relaxed, NOW)
+      classifyContact(snapshot({ userId: "u", user: noConsent }), strict, NOW)
         .journey,
     ).toBe(LifecycleJourney.FIRST_CHAT);
+    expect(
+      classifyContact(
+        snapshot({
+          userId: "u",
+          user: noConsent,
+          hasChatted: true,
+          lastChatAt: daysAgo(1),
+          lastActivityAt: daysAgo(1),
+          outOfCreditsAt: daysAgo(1),
+        }),
+        strict,
+        NOW,
+      ).journey,
+    ).toBe(LifecycleJourney.OUT_OF_CREDITS);
+  });
+
+  it("drained, unpaid and quiet for a week stays in OUT_OF_CREDITS (no what's new without credits)", () => {
+    const c = classifyContact(
+      snapshot({
+        userId: "u",
+        user: goodUser,
+        hasChatted: true,
+        lastChatAt: daysAgo(9),
+        lastActivityAt: daysAgo(9),
+        outOfCreditsAt: daysAgo(9),
+      }),
+      strict,
+      NOW,
+    );
+    expect(c.journey).toBe(LifecycleJourney.OUT_OF_CREDITS);
+  });
+
+  it("marketing journeys (what's new, win-back) are held without consent unless relaxed", () => {
+    const noConsent = { ...goodUser, marketingConsent: false };
+    const quiet = (days: number): ContactSnapshot =>
+      snapshot({
+        userId: "u",
+        user: noConsent,
+        hasChatted: true,
+        lastChatAt: daysAgo(days),
+        lastActivityAt: daysAgo(days),
+      });
+    expect(classifyContact(quiet(8), strict, NOW)).toEqual({
+      journey: null,
+      held: HeldReason.NO_CONSENT,
+    });
+    expect(classifyContact(quiet(31), strict, NOW)).toEqual({
+      journey: null,
+      held: HeldReason.NO_CONSENT,
+    });
+    expect(classifyContact(quiet(8), relaxed, NOW).journey).toBe(
+      LifecycleJourney.WHATS_NEW,
+    );
   });
 
   it("a confirmed newsletter opt-in counts as consent for a registered user", () => {
     const noConsent = { ...goodUser, marketingConsent: false };
     expect(
       classifyContact(
-        snapshot({ userId: "u", user: noConsent, newsletter: confirmed }),
+        snapshot({
+          userId: "u",
+          user: noConsent,
+          newsletter: confirmed,
+          hasChatted: true,
+          lastChatAt: daysAgo(8),
+          lastActivityAt: daysAgo(8),
+        }),
         strict,
         NOW,
       ).journey,
-    ).toBe(LifecycleJourney.FIRST_CHAT);
+    ).toBe(LifecycleJourney.WHATS_NEW);
   });
 
   it("unverified, banned and inactive users are held", () => {
@@ -308,7 +484,7 @@ describe("isGoalMet", () => {
     ).toBe(true);
   });
 
-  it("OUT_OF_CREDITS exits only on purchase", () => {
+  it("OUT_OF_CREDITS exits only when they subscribe", () => {
     const base = snapshot({ userId: "u", user: goodUser, hasChatted: true });
     expect(isGoalMet(LifecycleJourney.OUT_OF_CREDITS, base, enrolledAt)).toBe(
       false,
@@ -316,7 +492,7 @@ describe("isGoalMet", () => {
     expect(
       isGoalMet(
         LifecycleJourney.OUT_OF_CREDITS,
-        { ...base, isPaid: true },
+        { ...base, isPaid: true, segment: PaymentSegment.ACTIVE_SUB },
         enrolledAt,
       ),
     ).toBe(true);

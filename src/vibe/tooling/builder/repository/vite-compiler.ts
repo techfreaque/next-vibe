@@ -9,7 +9,6 @@ import {
   readFileSync,
   renameSync,
   statSync,
-  watch,
   writeFileSync,
 } from "node:fs";
 import type { Server as NodeHttpServer } from "node:http";
@@ -25,6 +24,7 @@ import {
   isRunnableDevEnvironment,
   type Plugin,
   type PluginOption,
+  type ViteDevServer,
 } from "vite";
 import type { EvaluatedModules } from "vite/module-runner";
 
@@ -46,6 +46,7 @@ import { serverFileLog } from "../../../logger/file";
 import { createNextjsFormatter } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
 import { applyResponseIdentityCookies } from "../../../platforms/web/middleware/utils";
+import { readLeadFailureTimingHeader } from "../../../realtime/core/proxy-timing";
 import type { BuildProfile, FileToCompile } from "../definition";
 import type { scopedTranslation } from "../i18n";
 import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
@@ -1549,6 +1550,29 @@ class ViteCompiler {
     | { success: false; message: string }
   > {
     snapshotEnvFile();
+    const renderer = new AbortController();
+    const closeServer = (server: ViteDevServer): Promise<void> => {
+      renderer.abort();
+      // Close the listener before clearing its connections, so an incoming
+      // connection cannot slip in between draining and closing.
+      const closing = server.close();
+      const http = server.httpServer;
+      if (
+        http &&
+        "closeAllConnections" in http &&
+        typeof http.closeAllConnections === "function"
+      ) {
+        http.closeAllConnections();
+      }
+      if (
+        http &&
+        "closeIdleConnections" in http &&
+        typeof http.closeIdleConnections === "function"
+      ) {
+        http.closeIdleConnections();
+      }
+      return closing;
+    };
     try {
       // Vite hashes NODE_ENV and the resulting plugin list for client deps.
       // This is always a dev server, even when launched from a production shell.
@@ -1794,88 +1818,38 @@ class ViteCompiler {
           {
             name: "bracket-path-rewrite",
             enforce: "pre",
-            configureServer(srv) {
-              // widget.tsx files under src/ domains are served on-demand via
-              // bracket-path-rewrite and are never in Vite's module graph, so
-              // Vite's own watcher never sees them until first served (see
-              // srv.watcher.add below). Watch the whole tree directly with
-              // fs.watch's recursive mode - proven to work under Bun on this
-              // OS by dev-watcher/task-runner.ts's generator watcher - so this
-              // has no dependency on a system `node` binary being installed.
-              const localeDir = getSrcDir();
-              const watcher = existsSync(localeDir)
-                ? watch(
-                    localeDir,
-                    { recursive: true },
-                    // oxlint-disable-next-line no-unused-vars -- eventType unused, filename is the second positional arg
-                    (_eventType, filename) => {
-                      if (!filename) {
-                        return;
-                      }
-                      // recursive fs.watch reports paths relative to localeDir,
-                      // using the OS separator - normalize to match the "/"-joined
-                      // absolute paths the rest of this handler expects.
-                      const file = `${localeDir}/${filename.replaceAll("\\", "/")}`;
-                      if (!file.endsWith("/widget.tsx")) {
-                        return;
-                      }
-                      // This fallback watcher operates outside Vite's change
-                      // hook, so the in-process runner needs host invalidation too.
-                      const ssrEnv = srv.environments?.["ssr"];
-                      if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
-                        const graph = ssrEnv.moduleGraph;
-                        graph.onFileChange(file);
-                        const ssrVisited = new Set<string>();
-                        const scoped = [
-                          ...(graph.getModulesByFile(file) ?? []),
-                        ].every((mod) => collectImporterIds(mod, ssrVisited));
-                        if (scoped) {
-                          evictSsrModules(
-                            ssrEnv.runner.evaluatedModules,
-                            ssrVisited,
-                          );
-                        } else {
-                          ssrEnv.runner.evaluatedModules.clear();
-                        }
-                      }
-                      // Derive the browser-relative URL (strip absolute prefix up to /src/)
-                      const srcIdx = file.indexOf("/src/");
-                      const browserPath =
-                        srcIdx !== -1 ? file.slice(srcIdx) : null;
-
-                      if (browserPath) {
-                        // Send a standard Vite js-update so the browser re-fetches the
-                        // widget module and triggers its injected hot.accept handler,
-                        // which calls window.__vibeWidgetHmr to swap the component.
-                        const timestamp = Date.now();
-                        srv.ws.send({
-                          type: "update",
-                          updates: [
-                            {
-                              type: "js-update",
-                              path: browserPath,
-                              acceptedPath: browserPath,
-                              timestamp,
-                              explicitImportRequired: false,
-                              isWithinCircularImport: false,
-                            },
-                          ],
-                        });
-                        serverFileLog(
-                          `[widget-hmr] sent js-update for ${browserPath}`,
-                        );
-                      }
+            hotUpdate: {
+              order: "post",
+              handler({ file, timestamp, type }) {
+                const sourceFile = file.replaceAll("\\", "/");
+                if (
+                  this.environment.config.consumer !== "client" ||
+                  type === "delete" ||
+                  !sourceFile.startsWith(sourceWatchPrefix) ||
+                  !sourceFile.endsWith("/widget.tsx")
+                ) {
+                  return;
+                }
+                // This also runs for on-demand widgets without a static
+                // importer. SSR eviction uses ssr-clear-on-hmr below.
+                const browserPath = `/src/${sourceFile.slice(sourceWatchPrefix.length)}`;
+                this.environment.hot.send({
+                  type: "update",
+                  updates: [
+                    {
+                      type: "js-update",
+                      path: browserPath,
+                      acceptedPath: browserPath,
+                      timestamp,
+                      explicitImportRequired: false,
+                      isWithinCircularImport: false,
                     },
-                  )
-                : null;
-              if (!watcher) {
-                serverFileLog(
-                  `[widget-hmr] locale dir not found at ${localeDir} - widget hot-reload-on-save disabled (hard refresh still works)`,
-                );
-              }
-              srv.httpServer?.on("close", () => {
-                watcher?.close();
-              });
+                  ],
+                });
+                serverFileLog(`[widget-hmr] sent js-update for ${browserPath}`);
+              },
+            },
+            configureServer(srv) {
               type ConnectHandle = (
                 req: { url?: string },
                 res: {
@@ -2369,7 +2343,8 @@ class ViteCompiler {
           {
             name: "nitro-restart-fix",
             configureServer(srv) {
-              srv.restart = async (): Promise<void> => {
+              let restart: Promise<void> | undefined;
+              const replaceServer = async (): Promise<void> => {
                 // The .env write that triggers this restart is usually still
                 // answering its own request (settings PATCH from the setup
                 // wizard). Closing at once kills that response and the
@@ -2377,20 +2352,15 @@ class ViteCompiler {
                 await new Promise<void>((_resolve) => {
                   setTimeout(_resolve, 1000);
                 });
+                if (renderer.signal.aborted) {
+                  return;
+                }
                 const address = srv.httpServer?.address();
                 const boundPort =
                   address && typeof address !== "string" ? address.port : port;
                 const boundUrls = srv.resolvedUrls;
                 try {
-                  // Use closeRef.fn (which calls closeAllConnections first) so the
-                  // TCP socket on port 3100 is released before we try to re-bind it.
-                  // Plain srv.close() leaves keep-alive proxy connections open, causing
-                  // EADDRINUSE on the fresh startTanstackDevServer call.
-                  if (closeRef?.fn) {
-                    await closeRef.fn();
-                  } else {
-                    await srv.close();
-                  }
+                  await closeServer(srv);
                 } catch (error) {
                   viteLogger.error(
                     `TanStack dev server failed to close before restart: ${parseError(error).message}`,
@@ -2422,6 +2392,7 @@ class ViteCompiler {
                 srv.resolvedUrls = boundUrls;
                 result.reportReady();
               };
+              srv.restart = (): Promise<void> => (restart ??= replaceServer());
             },
           } as Plugin,
           // Widget HMR self-accept: widget.tsx files are loaded via React.lazy()
@@ -2941,6 +2912,9 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
         } finally {
           clearTimeout(crawlTimer);
         }
+        if (renderer.signal.aborted) {
+          return;
+        }
         viteLogger.info(
           `Starting SSR graph priming after ${String(Math.round(performance.now() - primeQueuedAt))} ms`,
         );
@@ -2957,7 +2931,11 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           let primed = false;
           const primeStartedAt = performance.now();
           let lastFailure: string | undefined;
-          for (let attempt = 1; attempt <= 8 && !primed; attempt++) {
+          for (
+            let attempt = 1;
+            attempt <= 8 && !primed && !renderer.signal.aborted;
+            attempt++
+          ) {
             try {
               let target = new URL(path, url);
               const origin = target.origin;
@@ -2966,6 +2944,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 const response = await fetch(target, {
                   headers: primeHeaders,
                   redirect: "manual",
+                  signal: renderer.signal,
                 });
                 applyResponseIdentityCookies(
                   primeHeaders,
@@ -2988,6 +2967,12 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 target = next;
                 res = await readPage();
               }
+              if (renderer.signal.aborted) {
+                return;
+              }
+              const leadFailure = readLeadFailureTimingHeader(
+                res.headers.get("server-timing"),
+              );
               if (res.ok) {
                 primed = true;
                 const elapsedMs = Math.round(
@@ -3002,10 +2987,12 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 process.stdout.write(`${primeMsg}
 `);
                 serverFileLog(primeMsg);
-              } else if (attempt === 8) {
+              } else if (attempt === 8 || (res.status === 500 && leadFailure)) {
+                const leadDetail = leadFailure ? ` (lead ${leadFailure})` : "";
                 viteLogger.error(
-                  `SSR prime got HTTP ${String(res.status)} (${path}) after ${String(attempt)} attempts`,
+                  `SSR prime got HTTP ${String(res.status)} (${path}) after ${String(attempt)} attempt(s)${leadDetail}`,
                 );
+                break;
               } else {
                 lastFailure = `HTTP ${String(res.status)}`;
                 const retryAfter = Number(res.headers.get("retry-after"));
@@ -3018,6 +3005,9 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 });
               }
             } catch (error) {
+              if (renderer.signal.aborted) {
+                return;
+              }
               const cause = parseError(error);
               if (attempt === 8) {
                 viteLogger.error(
@@ -3034,20 +3024,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
         }
       })();
 
-      const closeFn = (): Promise<void> => {
-        // Close the listener before clearing its connections, so an incoming
-        // connection cannot slip in between draining and closing.
-        const closing = server.close();
-        if (server.httpServer) {
-          const h = server.httpServer as NodeHttpServer & {
-            closeAllConnections?: () => void;
-            closeIdleConnections?: () => void;
-          };
-          h.closeAllConnections?.();
-          h.closeIdleConnections?.();
-        }
-        return closing;
-      };
+      const closeFn = (): Promise<void> => closeServer(server);
       if (closeRef) {
         closeRef.fn = closeFn;
       }

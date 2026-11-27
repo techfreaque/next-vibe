@@ -10307,14 +10307,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["leads", "lifecycle", "backfill"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
-    title: "Lifecycle Backfill",
-    titleShort: "Backfill",
+    title: "Dodatočné zaradenie do sérií",
+    titleShort: "Dodatočne zaradiť",
     description:
-      "Preview, then enroll existing eligible contacts into the right journey. Starts at step 0, spread over a send window.",
+      "Zobrazte náhľad a dodatočne zaraďte existujúce kontakty, ktoré spĺňajú podmienky. Začnú krokom 0 a odosielanie sa rozloží do nastaveného obdobia.",
     icon: "users",
     category: "newsletter",
     subCategory: "emailCampaignsJourneys",
-    tags: ["Lifecycle"],
+    tags: ["Životný cyklus"],
     examples: {
       inputs: { default: { dryRun: true, spreadHours: 72 } },
       responses: {
@@ -10346,14 +10346,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["leads", "lifecycle", "overview"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
-    title: "Lifecycle Journeys",
-    titleShort: "Lifecycle",
+    title: "Automatické série e-mailov",
+    titleShort: "Životný cyklus",
     description:
-      "Journeys, enrollments, sends and conversions. Kill switch and backfill.",
+      "Prehľad sérií, zaradených kontaktov, odoslaných e-mailov a konverzií. Umožňuje pozastavenie aj dodatočné zaradenie kontaktov.",
     icon: "git-branch",
     category: "newsletter",
     subCategory: "emailCampaignsJourneys",
-    tags: ["Lifecycle"],
+    tags: ["Životný cyklus"],
     examples: {
       responses: {
         default: {
@@ -10387,14 +10387,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["leads", "lifecycle", "run"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.aiToolOff"],
     aliases: [],
-    title: "Run Lifecycle Journeys",
-    titleShort: "Run lifecycle",
+    title: "Spustiť automatické série e-mailov",
+    titleShort: "Spustiť série",
     description:
-      "Enroll newly eligible contacts and send due journey emails. Does nothing while the kill switch is on.",
+      "Zaradí kontakty, ktoré práve splnili podmienky, a odošle naplánované e-maily. Pri pozastavení sa spracovanie nevykoná.",
     icon: "send",
     category: "newsletter",
     subCategory: "emailCampaignsJourneys",
-    tags: ["Lifecycle"],
+    tags: ["Životný cyklus"],
     examples: {
       inputs: { default: { dryRun: false } },
       responses: {
@@ -10415,14 +10415,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["leads", "lifecycle", "settings"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
-    title: "Lifecycle Settings",
-    titleShort: "Lifecycle settings",
+    title: "Nastavenia automatických e-mailov",
+    titleShort: "Nastavenia automatických e-mailov",
     description:
-      "Kill switch, frequency cap, send throttle and consent mode for lifecycle emails.",
+      "Pozastavenie, najvyššia frekvencia odosielania, limit dávky a pravidlá súhlasu s automatickými e-mailmi.",
     icon: "settings",
     category: "newsletter",
     subCategory: "emailCampaignsJourneys",
-    tags: ["Lifecycle"],
+    tags: ["Životný cyklus"],
     examples: {
       inputs: { default: { paused: true } },
       responses: {
@@ -17513,7 +17513,7 @@ export const endpointsMeta: EndpointMeta[] = [
         default: {
           result: {
             id: "456e7890-e89b-12d3-a456-426614174000",
-            companyId: "00000000-0000-0000-0000-000000000001",
+            companyId: "00000000-0000-4000-8000-000000000001",
             companyName: "Tatra Ledger Studio",
             orderCount: 4,
             receivingCount: 2,

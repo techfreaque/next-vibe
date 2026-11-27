@@ -46,6 +46,26 @@ describe("databaseFailureDiagnostics", () => {
     expect(JSON.stringify(result)).not.toContain("example.invalid");
   });
 
+  it("identifies a missing column without exposing query values", () => {
+    const cause = new DatabaseError(
+      'column "accept_language" of relation "leads" does not exist',
+      0,
+      "error",
+    );
+    cause.code = "42703";
+    const result = databaseFailureDiagnostics(
+      new DrizzleQueryError(
+        "insert into leads (accept_language) values ($1)",
+        ["private parameter"],
+        cause,
+      ),
+    );
+    expect(result.databaseCode).toBe("42703");
+    expect(result.missingColumn).toBe("accept_language");
+    expect(result.driverFailure).toBeUndefined();
+    expect(JSON.stringify(result)).not.toContain("private");
+  });
+
   it("distinguishes foreign keys from client read timeouts without exposing query values", () => {
     const cause = new DatabaseError("foreign key violation", 0, "error");
     cause.code = "23503";

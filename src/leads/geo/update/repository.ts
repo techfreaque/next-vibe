@@ -6,7 +6,8 @@ import "server-only";
  * country yet, a bounded batch per run (small WAL bursts on the replica).
  */
 import { setImmediate as yieldToEventLoop } from "node:timers/promises";
-import { gunzipSync, gzipSync } from "node:zlib";
+import { promisify } from "node:util";
+import { gunzip, gunzipSync, gzip, gzipSync } from "node:zlib";
 
 import { sql } from "drizzle-orm";
 import {
@@ -36,6 +37,8 @@ import type {
 export const GEO_BACKFILL_BATCH = 2000;
 
 const DOWNLOAD_TIMEOUT_MS = 120_000;
+const inflateRelease = promisify(gunzip);
+const compressRelease = promisify(gzip);
 
 /** DB-IP publishes `dbip-country-lite-YYYY-MM.csv.gz` on the 1st of a month. */
 export function geoReleaseUrl(version: string): string {
@@ -111,8 +114,11 @@ export async function storeGeoRelease(
   version: string,
   csvGz: Buffer,
 ): Promise<StoredRelease> {
-  const table = buildGeoTable(gunzipSync(csvGz).toString("utf8"));
-  const data = gzipSync(encodeGeoTable(table), { level: 9 }).toString("base64");
+  const csv = await inflateRelease(csvGz);
+  const table = await buildGeoTable(csv.toString("utf8"));
+  const data = (
+    await compressRelease(encodeGeoTable(table), { level: 9 })
+  ).toString("base64");
   const values = {
     version,
     data,

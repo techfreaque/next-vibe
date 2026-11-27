@@ -189510,7 +189510,9 @@
                       "enums.journey.outOfCredits": "enums.journey.outOfCredits",
                       "enums.journey.whatsNew": "enums.journey.whatsNew",
                       "enums.journey.winBack": "enums.journey.winBack",
-                      "enums.journey.newsletterInvite": "enums.journey.newsletterInvite"
+                      "enums.journey.newsletterInvite": "enums.journey.newsletterInvite",
+                      "enums.journey.customerCheckin": "enums.journey.customerCheckin",
+                      "enums.journey.lapsedWinback": "enums.journey.lapsedWinback"
                     }
                   },
                   "type": "enum",
@@ -189519,14 +189521,18 @@
                     "enums.journey.outOfCredits": "enums.journey.outOfCredits",
                     "enums.journey.whatsNew": "enums.journey.whatsNew",
                     "enums.journey.winBack": "enums.journey.winBack",
-                    "enums.journey.newsletterInvite": "enums.journey.newsletterInvite"
+                    "enums.journey.newsletterInvite": "enums.journey.newsletterInvite",
+                    "enums.journey.customerCheckin": "enums.journey.customerCheckin",
+                    "enums.journey.lapsedWinback": "enums.journey.lapsedWinback"
                   },
                   "options": [
                     "enums.journey.firstChat",
                     "enums.journey.outOfCredits",
                     "enums.journey.whatsNew",
                     "enums.journey.winBack",
-                    "enums.journey.newsletterInvite"
+                    "enums.journey.newsletterInvite",
+                    "enums.journey.customerCheckin",
+                    "enums.journey.lapsedWinback"
                   ]
                 },
                 "usage": {
@@ -189838,7 +189844,9 @@
                       "enums.journey.outOfCredits": "enums.journey.outOfCredits",
                       "enums.journey.whatsNew": "enums.journey.whatsNew",
                       "enums.journey.winBack": "enums.journey.winBack",
-                      "enums.journey.newsletterInvite": "enums.journey.newsletterInvite"
+                      "enums.journey.newsletterInvite": "enums.journey.newsletterInvite",
+                      "enums.journey.customerCheckin": "enums.journey.customerCheckin",
+                      "enums.journey.lapsedWinback": "enums.journey.lapsedWinback"
                     }
                   },
                   "type": "enum",
@@ -189847,14 +189855,18 @@
                     "enums.journey.outOfCredits": "enums.journey.outOfCredits",
                     "enums.journey.whatsNew": "enums.journey.whatsNew",
                     "enums.journey.winBack": "enums.journey.winBack",
-                    "enums.journey.newsletterInvite": "enums.journey.newsletterInvite"
+                    "enums.journey.newsletterInvite": "enums.journey.newsletterInvite",
+                    "enums.journey.customerCheckin": "enums.journey.customerCheckin",
+                    "enums.journey.lapsedWinback": "enums.journey.lapsedWinback"
                   },
                   "options": [
                     "enums.journey.firstChat",
                     "enums.journey.outOfCredits",
                     "enums.journey.whatsNew",
                     "enums.journey.winBack",
-                    "enums.journey.newsletterInvite"
+                    "enums.journey.newsletterInvite",
+                    "enums.journey.customerCheckin",
+                    "enums.journey.lapsedWinback"
                   ]
                 },
                 "usage": {
@@ -699127,6 +699139,55 @@
                                 },
                                 "type": "optional"
                               },
+                              "allowance": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "object",
+                                      "shape": {
+                                        "scope": {
+                                          "def": {
+                                            "type": "enum",
+                                            "entries": {
+                                              "pool": "pool",
+                                              "caller": "caller",
+                                              "inFlight": "inFlight"
+                                            }
+                                          },
+                                          "type": "enum",
+                                          "enum": {
+                                            "pool": "pool",
+                                            "caller": "caller",
+                                            "inFlight": "inFlight"
+                                          },
+                                          "options": [
+                                            "pool",
+                                            "caller",
+                                            "inFlight"
+                                          ]
+                                        },
+                                        "remaining": {
+                                          "def": {
+                                            "type": "number",
+                                            "checks": []
+                                          },
+                                          "type": "number",
+                                          "isFinite": true
+                                        },
+                                        "resetsAt": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "type": "object"
+                                  }
+                                },
+                                "type": "optional"
+                              },
                               "errorType": {
                                 "def": {
                                   "type": "object",
@@ -699388,6 +699449,55 @@
                                   },
                                   "type": "literal",
                                   "values": {}
+                                }
+                              },
+                              "type": "optional"
+                            },
+                            "allowance": {
+                              "def": {
+                                "type": "optional",
+                                "innerType": {
+                                  "def": {
+                                    "type": "object",
+                                    "shape": {
+                                      "scope": {
+                                        "def": {
+                                          "type": "enum",
+                                          "entries": {
+                                            "pool": "pool",
+                                            "caller": "caller",
+                                            "inFlight": "inFlight"
+                                          }
+                                        },
+                                        "type": "enum",
+                                        "enum": {
+                                          "pool": "pool",
+                                          "caller": "caller",
+                                          "inFlight": "inFlight"
+                                        },
+                                        "options": [
+                                          "pool",
+                                          "caller",
+                                          "inFlight"
+                                        ]
+                                      },
+                                      "remaining": {
+                                        "def": {
+                                          "type": "number",
+                                          "checks": []
+                                        },
+                                        "type": "number",
+                                        "isFinite": true
+                                      },
+                                      "resetsAt": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "type": "object"
                                 }
                               },
                               "type": "optional"

@@ -16,9 +16,23 @@ interface HumanCTAButtonProps {
   text: string;
   variant?: ButtonStyle;
   tracking: TrackingContext;
+  /** Defaults to center for the brand button, left otherwise. */
+  align?: "left" | "center";
 }
 
 const BUTTON_STYLE = {
+  /** Solid button of the branded transactional template (EmailTemplate). */
+  brand: {
+    backgroundColor: "#2563eb",
+    borderRadius: "8px",
+    color: "#ffffff",
+    fontSize: "16px",
+    padding: "14px 40px",
+    textDecoration: "none",
+    fontWeight: "700",
+    display: "inline-block",
+    margin: "8px 0",
+  },
   primary: {
     color: "#3b82f6",
     textDecoration: "none",
@@ -52,9 +66,15 @@ export function HumanCTAButton({
   text,
   variant = "primary",
   tracking,
+  align = variant === "brand" ? "center" : "left",
 }: HumanCTAButtonProps): React.JSX.Element {
   return (
-    <div style={{ textAlign: "left", margin: "20px 0" }}>
+    <div
+      style={{
+        textAlign: align,
+        margin: "20px 0",
+      }}
+    >
       <TrackedLink
         href={href}
         style={BUTTON_STYLE[variant]}

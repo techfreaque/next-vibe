@@ -16,12 +16,10 @@ import { Section } from "@react-email/section";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX, ReactNode } from "react";
 
-import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
 
-import { scopedTranslation } from "../i18n";
 import { EmailLogo } from "./email-image.email";
-import { TrackedLink } from "./tracked_link.email";
+import { EmailLegalIdentity, EmailOptOutLine } from "./legal_identity.email";
 import { TrackedPixel } from "./tracked_pixel.email";
 import type { TrackingContext } from "./tracking_context.email";
 
@@ -29,8 +27,13 @@ interface CampaignEmailLayoutProps {
   previewText: string;
   children: ReactNode;
   locale: CountryLanguage;
-  unsubscribeUrl: string;
+  /** null = no opt-out link (transactional mail, e.g. billing notices). */
+  unsubscribeUrl: string | null;
   tracking: TrackingContext;
+  /** Replaces the default "Don't want to receive these emails?" line. */
+  footerText?: string;
+  /** Replaces the default "Unsubscribe" link label. */
+  footerLinkText?: string;
 }
 
 export function CampaignEmailLayout({
@@ -39,13 +42,10 @@ export function CampaignEmailLayout({
   locale,
   unsubscribeUrl,
   tracking,
+  footerText,
+  footerLinkText,
 }: CampaignEmailLayoutProps): JSX.Element {
-  const { t: st } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
-  const supportEmail = contactClientRepository.getSupportEmail(locale);
-  // Relative: TrackedLink resolves it against the campaign baseUrl.
-  const imprintUrl = `/${locale}/story/imprint`;
-  const linkStyle = { color: "#9ca3af", textDecoration: "underline" };
   return (
     <Html lang={locale.split("-")[0]}>
       <Head />
@@ -89,54 +89,14 @@ export function CampaignEmailLayout({
             <div style={{ display: "inline-block", marginBottom: "8px" }}>
               <EmailLogo alt={configT("appName")} />
             </div>
-            <div
-              style={{
-                fontSize: "12px",
-                color: "#9ca3af",
-              }}
-            >
-              {st("components.email.footer.unsubscribeText")}{" "}
-              <TrackedLink
-                href={unsubscribeUrl}
-                tracking={tracking}
-                style={{
-                  color: "#6b7280",
-                  textDecoration: "underline",
-                }}
-              >
-                {st("components.email.footer.unsubscribeLink")}
-              </TrackedLink>
-            </div>
-            <div
-              style={{
-                fontSize: "11px",
-                color: "#9ca3af",
-                marginTop: "12px",
-              }}
-            >
-              {st("components.email.footer.legalOperator", {
-                companyName: configT("group.name"),
-                owner: configT("group.responsiblePerson.name"),
-                address: configT("group.address.addressIn1Line"),
-              })}
-              <br />
-              {st("components.email.footer.legalContact")}:{" "}
-              <TrackedLink
-                href={`mailto:${supportEmail}`}
-                tracking={tracking}
-                style={linkStyle}
-              >
-                {supportEmail}
-              </TrackedLink>
-              {st("components.email.footer.footerSeparator")}
-              <TrackedLink
-                href={imprintUrl}
-                tracking={tracking}
-                style={linkStyle}
-              >
-                {st("components.email.footer.legalNotice")}
-              </TrackedLink>
-            </div>
+            <EmailOptOutLine
+              locale={locale}
+              tracking={tracking}
+              unsubscribeUrl={unsubscribeUrl}
+              text={footerText}
+              linkText={footerLinkText}
+            />
+            <EmailLegalIdentity locale={locale} tracking={tracking} />
           </Section>
         </Container>
         <TrackedPixel />

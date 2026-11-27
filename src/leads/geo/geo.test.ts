@@ -10,6 +10,7 @@
 
 import "server-only";
 
+import { setImmediate as yieldToEventLoop } from "node:timers/promises";
 import { gzipSync } from "node:zlib";
 
 import { eq, inArray } from "drizzle-orm";
@@ -55,13 +56,26 @@ const FIXTURE_CSV = [
 
 describe("compact geo table", () => {
   const table = buildGeoTable(FIXTURE_CSV);
-  const decoded = decodeGeoTable(encodeGeoTable(table));
+  const decoded = table.then((original) => decodeGeoTable(encodeGeoTable(original)));
 
-  it("round-trips through the binary format", () => {
-    expect(decoded).not.toBeNull();
-    expect(decoded?.codes).toEqual(table.codes);
-    expect(decoded?.v4Starts.length).toBe(table.v4Starts.length);
-    expect(decoded?.v6Hi.length).toBe(table.v6Hi.length);
+  it("round-trips through the binary format", async () => {
+    const original = await table;
+    const result = await decoded;
+    expect(result).not.toBeNull();
+    expect(result?.codes).toEqual(original.codes);
+    expect(result?.v4Starts.length).toBe(original.v4Starts.length);
+    expect(result?.v6Hi.length).toBe(original.v6Hi.length);
+  });
+
+  it("yields during large imports and parses the final row", async () => {
+    const repeated = `${"1.0.0.0,1.0.0.255,AU\n".repeat(4096)}1.0.1.0,1.0.1.255,CN`;
+    const build = buildGeoTable(repeated);
+    const first = await Promise.race([
+      build.then(() => "build"),
+      yieldToEventLoop("event-loop"),
+    ]);
+    expect(first).toBe("event-loop");
+    expect(lookupCountry(await build, "1.0.1.7")).toBe("CN");
   });
 
   it.each([
@@ -80,8 +94,9 @@ describe("compact geo table", () => {
     ["0.1.2.3", UNKNOWN_COUNTRY],
     ["2600::1", UNKNOWN_COUNTRY],
     ["not-an-ip", UNKNOWN_COUNTRY],
-  ])("%s -> %s", (ip, country) => {
-    expect(decoded && lookupCountry(decoded, ip)).toBe(country);
+  ])("%s -> %s", async (ip, country) => {
+    const result = await decoded;
+    expect(result && lookupCountry(result, ip)).toBe(country);
   });
 
   it("rejects bytes that are not a GEO1 table", () => {

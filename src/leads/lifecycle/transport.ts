@@ -28,9 +28,11 @@ export interface LifecycleMail {
   locale: CountryLanguage;
   /** Newsletter-only contact (no account) vs registered user. */
   newsletterOnly: boolean;
+  /** Billing notice (payment failed): sent as TRANSACTIONAL. */
+  transactional?: boolean;
   leadId: string | null;
-  /** Human unsubscribe page; its presence adds the RFC 8058 one-click headers. */
-  unsubscribeUrl: string;
+  /** Human unsubscribe page; its presence adds the RFC 8058 one-click headers. Null for billing notices. */
+  unsubscribeUrl: string | null;
   /** Display name of the sender (personal voice, localized). */
   senderName: string;
 }
@@ -42,7 +44,7 @@ export interface LifecycleTransport {
   ): Promise<ResponseType<{ messageId: string }>>;
 }
 
-/** Production transport: the same SMTP account selection the campaigns use. */
+/** Production transport: SMTP account selection by campaign type (messenger_accounts). */
 export const smtpLifecycleTransport: LifecycleTransport = {
   async send(mail, logger) {
     const { language, country } = getLanguageAndCountryFromLocale(mail.locale);
@@ -54,12 +56,18 @@ export const smtpLifecycleTransport: LifecycleTransport = {
         html: mail.html,
         text: mail.text,
         senderName: mail.senderName,
-        unsubscribeUrl: mail.unsubscribeUrl,
+        unsubscribeUrl: mail.unsubscribeUrl ?? undefined,
         replyTo: contactClientRepository.getSupportEmail(mail.locale),
         selectionCriteria: {
-          campaignType: mail.newsletterOnly
-            ? CampaignType.NEWSLETTER
-            : CampaignType.SIGNUP_NURTURE,
+          // Registered users get journey mail from the platform's own
+          // unbottled.ai account (NOTIFICATION = "System Email" on prod). The
+          // SIGNUP_NURTURE type routed it through the lead-campaign account
+          // (a different sending domain), which users don't recognize.
+          campaignType: mail.transactional
+            ? CampaignType.TRANSACTIONAL
+            : mail.newsletterOnly
+              ? CampaignType.NEWSLETTER
+              : CampaignType.NOTIFICATION,
           emailJourneyVariant: null,
           emailCampaignStage: null,
           country,

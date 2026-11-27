@@ -24,6 +24,8 @@
 
 import "server-only";
 
+import { join } from "node:path";
+
 import type { EndpointLogger } from "../../logger/types";
 import { realtimeEnv } from "../../realtime/server/env";
 import { serverSystemEnv } from "./env";
@@ -99,6 +101,9 @@ export const IOREDIS_WARM_STEPS = [
 ] as const;
 
 let realtimeWarmup: Promise<void> | undefined;
+const requireDependency = process
+  .getBuiltinModule("node:module")
+  .createRequire(join(process.cwd(), "package.json"));
 
 function yieldToLoop(): Promise<void> {
   return new Promise((resolve) => {
@@ -117,9 +122,11 @@ export function warmRealtimeModules(logger: EndpointLogger): Promise<void> {
     if (realtimeEnv.WS_PUBSUB_TYPE === "redis" && realtimeEnv.REDIS_URL) {
       const skipped: string[] = [];
       for (const step of IOREDIS_WARM_STEPS) {
-        await import(step).catch(() => {
+        try {
+          requireDependency(step);
+        } catch {
           skipped.push(step);
-        });
+        }
         await yieldToLoop();
       }
       if (skipped.length > 0) {

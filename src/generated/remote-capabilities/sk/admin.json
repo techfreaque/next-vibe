@@ -189391,13 +189391,13 @@
   },
   {
     "toolName": "lifecycle-backfill",
-    "title": "Lifecycle Backfill",
-    "titleShort": "Backfill",
-    "description": "Preview, then enroll existing eligible contacts into the right journey. Starts at step 0, spread over a send window.",
+    "title": "Dodatočné zaradenie do sérií",
+    "titleShort": "Dodatočne zaradiť",
+    "description": "Zobrazte náhľad a dodatočne zaraďte existujúce kontakty, ktoré spĺňajú podmienky. Začnú krokom 0 a odosielanie sa rozloží do nastaveného obdobia.",
     "fields": {
       "type": "container",
-      "title": "Backfill existing contacts",
-      "description": "Dry run is the default. Nothing is sent while paused.",
+      "title": "Dodatočne zaradiť existujúce kontakty",
+      "description": "Predvolene je zapnutý skúšobný beh. Pri pozastavení sa žiadne e-maily neodosielajú.",
       "layoutType": "grid",
       "columns": 12,
       "usage": {
@@ -189408,8 +189408,8 @@
         "dryRun": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Dry run",
-          "description": "Count only. Turn off to enroll.",
+          "label": "Skúšobný beh",
+          "description": "Iba spočíta kontakty. Vypnite skúšobný beh, ak ich chcete zaradiť.",
           "columns": 6,
           "schema": {
             "def": {
@@ -189431,8 +189431,8 @@
         "spreadHours": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Spread over (hours)",
-          "description": "Window the first emails are spread across",
+          "label": "Rozložiť v čase (h)",
+          "description": "Časový rozsah rozoslania prvých e-mailov",
           "columns": 6,
           "schema": {
             "def": {
@@ -189469,7 +189469,7 @@
         },
         "dryRunResult": {
           "type": "text",
-          "label": "Dry run",
+          "label": "Skúšobný beh",
           "schema": {
             "def": {
               "type": "boolean"
@@ -189483,8 +189483,8 @@
         },
         "segments": {
           "type": "container",
-          "title": "Segments",
-          "description": "Segments",
+          "title": "Segmenty",
+          "description": "Segmenty",
           "child": {
             "type": "container",
             "layoutType": "grid",
@@ -189495,7 +189495,7 @@
             "children": {
               "journey": {
                 "type": "text",
-                "label": "Journey",
+                "label": "Séria",
                 "schema": {
                   "def": {
                     "type": "enum",
@@ -189504,7 +189504,9 @@
                       "enums.journey.outOfCredits": "enums.journey.outOfCredits",
                       "enums.journey.whatsNew": "enums.journey.whatsNew",
                       "enums.journey.winBack": "enums.journey.winBack",
-                      "enums.journey.newsletterInvite": "enums.journey.newsletterInvite"
+                      "enums.journey.newsletterInvite": "enums.journey.newsletterInvite",
+                      "enums.journey.customerCheckin": "enums.journey.customerCheckin",
+                      "enums.journey.lapsedWinback": "enums.journey.lapsedWinback"
                     }
                   },
                   "type": "enum",
@@ -189513,14 +189515,18 @@
                     "enums.journey.outOfCredits": "enums.journey.outOfCredits",
                     "enums.journey.whatsNew": "enums.journey.whatsNew",
                     "enums.journey.winBack": "enums.journey.winBack",
-                    "enums.journey.newsletterInvite": "enums.journey.newsletterInvite"
+                    "enums.journey.newsletterInvite": "enums.journey.newsletterInvite",
+                    "enums.journey.customerCheckin": "enums.journey.customerCheckin",
+                    "enums.journey.lapsedWinback": "enums.journey.lapsedWinback"
                   },
                   "options": [
                     "enums.journey.firstChat",
                     "enums.journey.outOfCredits",
                     "enums.journey.whatsNew",
                     "enums.journey.winBack",
-                    "enums.journey.newsletterInvite"
+                    "enums.journey.newsletterInvite",
+                    "enums.journey.customerCheckin",
+                    "enums.journey.lapsedWinback"
                   ]
                 },
                 "usage": {
@@ -189530,7 +189536,7 @@
               },
               "eligible": {
                 "type": "text",
-                "label": "Eligible",
+                "label": "Spĺňajú podmienky",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189546,7 +189552,7 @@
               },
               "autoEligible": {
                 "type": "text",
-                "label": "Scheduled run would enroll",
+                "label": "Zaradí sa pri plánovanom spustení",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189562,7 +189568,7 @@
               },
               "alreadyEnrolled": {
                 "type": "text",
-                "label": "Already enrolled",
+                "label": "Už zaradené",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189578,7 +189584,7 @@
               },
               "enrolled": {
                 "type": "text",
-                "label": "Enrolled",
+                "label": "Zaradené",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189602,7 +189608,7 @@
         },
         "heldSuppressed": {
           "type": "text",
-          "label": "Held: unsubscribed / bounced",
+          "label": "Vynechané: zrušený odber alebo nedoručený e-mail",
           "schema": {
             "def": {
               "type": "number",
@@ -189618,7 +189624,7 @@
         },
         "heldPaid": {
           "type": "text",
-          "label": "Held: already paid",
+          "label": "Vynechané: už zaplatené",
           "schema": {
             "def": {
               "type": "number",
@@ -189634,7 +189640,7 @@
         },
         "heldNoConsent": {
           "type": "text",
-          "label": "Held: no marketing consent",
+          "label": "Vynechané: chýba súhlas s marketingom",
           "schema": {
             "def": {
               "type": "number",
@@ -189650,7 +189656,7 @@
         },
         "heldUnverified": {
           "type": "text",
-          "label": "Held: unverified email",
+          "label": "Vynechané: neoverený e-mail",
           "schema": {
             "def": {
               "type": "number",
@@ -189666,7 +189672,7 @@
         },
         "heldPendingNewsletter": {
           "type": "text",
-          "label": "Held: newsletter not confirmed",
+          "label": "Vynechané: nepotvrdený odber newsletteru",
           "schema": {
             "def": {
               "type": "number",
@@ -189682,7 +189688,7 @@
         },
         "heldInactiveAccount": {
           "type": "text",
-          "label": "Held: banned / inactive",
+          "label": "Vynechané: zablokovaný alebo neaktívny účet",
           "schema": {
             "def": {
               "type": "number",
@@ -189698,7 +189704,7 @@
         },
         "heldNothingDue": {
           "type": "text",
-          "label": "Held: nothing due (active, has credits)",
+          "label": "Vynechané: aktívny účet s kreditmi",
           "schema": {
             "def": {
               "type": "number",
@@ -189719,15 +189725,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "newsletter",
-    "tags": ["Lifecycle"],
+    "tags": ["Životný cyklus"],
     "aliases": ["lifecycle-backfill"],
     "credits": 0
   },
   {
     "toolName": "lifecycle",
-    "title": "Lifecycle Journeys",
-    "titleShort": "Lifecycle",
-    "description": "Journeys, enrollments, sends and conversions. Kill switch and backfill.",
+    "title": "Automatické série e-mailov",
+    "titleShort": "Životný cyklus",
+    "description": "Prehľad sérií, zaradených kontaktov, odoslaných e-mailov a konverzií. Umožňuje pozastavenie aj dodatočné zaradenie kontaktov.",
     "fields": {
       "usage": {
         "response": true
@@ -189735,7 +189741,7 @@
       "children": {
         "paused": {
           "type": "text",
-          "label": "Paused",
+          "label": "Pozastavené",
           "schema": {
             "def": {
               "type": "boolean"
@@ -189749,7 +189755,7 @@
         },
         "minHoursBetweenEmails": {
           "type": "text",
-          "label": "Min hours between emails",
+          "label": "Minimálny odstup medzi e-mailmi (h)",
           "schema": {
             "def": {
               "type": "number",
@@ -189765,7 +189771,7 @@
         },
         "maxSendsPerRun": {
           "type": "text",
-          "label": "Max emails per run",
+          "label": "Maximum e-mailov na jedno spustenie",
           "schema": {
             "def": {
               "type": "number",
@@ -189781,7 +189787,7 @@
         },
         "autoEnrollWindowDays": {
           "type": "text",
-          "label": "Auto-enroll window (days)",
+          "label": "Obdobie automatického zaradenia (dni)",
           "schema": {
             "def": {
               "type": "number",
@@ -189797,7 +189803,7 @@
         },
         "requireUserMarketingConsent": {
           "type": "text",
-          "label": "Marketing consent required",
+          "label": "Vyžaduje sa súhlas s marketingom",
           "schema": {
             "def": {
               "type": "boolean"
@@ -189811,8 +189817,8 @@
         },
         "journeys": {
           "type": "container",
-          "title": "Journeys",
-          "description": "Journeys",
+          "title": "Série",
+          "description": "Série",
           "child": {
             "type": "container",
             "layoutType": "grid",
@@ -189823,7 +189829,7 @@
             "children": {
               "journey": {
                 "type": "text",
-                "label": "Journeys",
+                "label": "Série",
                 "schema": {
                   "def": {
                     "type": "enum",
@@ -189832,7 +189838,9 @@
                       "enums.journey.outOfCredits": "enums.journey.outOfCredits",
                       "enums.journey.whatsNew": "enums.journey.whatsNew",
                       "enums.journey.winBack": "enums.journey.winBack",
-                      "enums.journey.newsletterInvite": "enums.journey.newsletterInvite"
+                      "enums.journey.newsletterInvite": "enums.journey.newsletterInvite",
+                      "enums.journey.customerCheckin": "enums.journey.customerCheckin",
+                      "enums.journey.lapsedWinback": "enums.journey.lapsedWinback"
                     }
                   },
                   "type": "enum",
@@ -189841,14 +189849,18 @@
                     "enums.journey.outOfCredits": "enums.journey.outOfCredits",
                     "enums.journey.whatsNew": "enums.journey.whatsNew",
                     "enums.journey.winBack": "enums.journey.winBack",
-                    "enums.journey.newsletterInvite": "enums.journey.newsletterInvite"
+                    "enums.journey.newsletterInvite": "enums.journey.newsletterInvite",
+                    "enums.journey.customerCheckin": "enums.journey.customerCheckin",
+                    "enums.journey.lapsedWinback": "enums.journey.lapsedWinback"
                   },
                   "options": [
                     "enums.journey.firstChat",
                     "enums.journey.outOfCredits",
                     "enums.journey.whatsNew",
                     "enums.journey.winBack",
-                    "enums.journey.newsletterInvite"
+                    "enums.journey.newsletterInvite",
+                    "enums.journey.customerCheckin",
+                    "enums.journey.lapsedWinback"
                   ]
                 },
                 "usage": {
@@ -189858,7 +189870,7 @@
               },
               "steps": {
                 "type": "text",
-                "label": "Steps",
+                "label": "Kroky",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189874,7 +189886,7 @@
               },
               "enrolled": {
                 "type": "text",
-                "label": "Enrolled",
+                "label": "Zaradené",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189890,7 +189902,7 @@
               },
               "active": {
                 "type": "text",
-                "label": "Active",
+                "label": "Aktívne",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189906,7 +189918,7 @@
               },
               "completed": {
                 "type": "text",
-                "label": "Completed",
+                "label": "Dokončené",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189922,7 +189934,7 @@
               },
               "exited": {
                 "type": "text",
-                "label": "Exited",
+                "label": "Ukončené",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189938,7 +189950,7 @@
               },
               "converted": {
                 "type": "text",
-                "label": "Converted",
+                "label": "S konverziou",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189954,7 +189966,7 @@
               },
               "unsubscribed": {
                 "type": "text",
-                "label": "Unsubscribed",
+                "label": "Odhlásené z odberu",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189970,7 +189982,7 @@
               },
               "sent": {
                 "type": "text",
-                "label": "Sent",
+                "label": "Odoslané",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -189986,7 +189998,7 @@
               },
               "sent24h": {
                 "type": "text",
-                "label": "Sent (24h)",
+                "label": "Odoslané (24 h)",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -190002,7 +190014,7 @@
               },
               "attributedPaid": {
                 "type": "text",
-                "label": "Paid after enrollment",
+                "label": "Zaplatili po zaradení",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -190032,19 +190044,19 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "newsletter",
-    "tags": ["Lifecycle"],
+    "tags": ["Životný cyklus"],
     "aliases": ["lifecycle"],
     "credits": 0
   },
   {
     "toolName": "lifecycle-settings",
-    "title": "Lifecycle Settings",
-    "titleShort": "Lifecycle settings",
-    "description": "Kill switch, frequency cap, send throttle and consent mode for lifecycle emails.",
+    "title": "Nastavenia automatických e-mailov",
+    "titleShort": "Nastavenia automatických e-mailov",
+    "description": "Pozastavenie, najvyššia frekvencia odosielania, limit dávky a pravidlá súhlasu s automatickými e-mailmi.",
     "fields": {
       "type": "container",
-      "title": "Lifecycle settings",
-      "description": "Leave a field empty to keep its current value.",
+      "title": "Nastavenia automatických e-mailov",
+      "description": "Ak pole necháte prázdne, zostane v ňom aktuálna hodnota.",
       "layoutType": "grid",
       "columns": 12,
       "usage": {
@@ -190055,8 +190067,8 @@
         "paused": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Pause all lifecycle sending",
-          "description": "On = nothing is enrolled or sent",
+          "label": "Pozastaviť všetky automatické e-maily",
+          "description": "Pri zapnutí sa kontakty nezaraďujú a e-maily sa neodosielajú",
           "columns": 12,
           "schema": {
             "def": {
@@ -190078,8 +190090,8 @@
         "minHoursBetweenEmails": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Min hours between emails",
-          "description": "Frequency cap per contact, across lifecycle and campaigns",
+          "label": "Minimálny odstup medzi e-mailmi (h)",
+          "description": "Najvyššia povolená frekvencia e-mailov na kontakt naprieč automatickými sériami a kampaňami",
           "columns": 6,
           "schema": {
             "def": {
@@ -190117,8 +190129,8 @@
         "maxSendsPerRun": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Max emails per run",
-          "description": "Throttle for each scheduled run",
+          "label": "Maximum e-mailov na jedno spustenie",
+          "description": "Limit odoslaných správ pri každom plánovanom spustení",
           "columns": 6,
           "schema": {
             "def": {
@@ -190156,8 +190168,8 @@
         "autoEnrollWindowDays": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Auto-enroll window (days)",
-          "description": "The scheduled run only enrolls contacts whose trigger is this recent. Older contacts go through the backfill.",
+          "label": "Obdobie automatického zaradenia (dni)",
+          "description": "Pri plánovanom spustení sa zaradia len kontakty, ktoré splnili podmienky v tomto období. Staršie kontakty sa zaraďujú dodatočne.",
           "columns": 6,
           "schema": {
             "def": {
@@ -190195,8 +190207,8 @@
         "requireUserMarketingConsent": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Require marketing consent for users",
-          "description": "On = registered users need marketing consent or a confirmed newsletter opt-in",
+          "label": "Vyžadovať súhlas používateľov s marketingom",
+          "description": "Pri zapnutí potrebujú registrovaní používatelia súhlas s marketingom alebo potvrdený odber newsletteru",
           "columns": 6,
           "schema": {
             "def": {
@@ -190217,7 +190229,7 @@
         },
         "currentPaused": {
           "type": "text",
-          "label": "Paused",
+          "label": "Pozastavené",
           "schema": {
             "def": {
               "type": "boolean"
@@ -190231,7 +190243,7 @@
         },
         "currentMinHoursBetweenEmails": {
           "type": "text",
-          "label": "Min hours between emails",
+          "label": "Minimálny odstup medzi e-mailmi (h)",
           "schema": {
             "def": {
               "type": "number",
@@ -190247,7 +190259,7 @@
         },
         "currentMaxSendsPerRun": {
           "type": "text",
-          "label": "Max emails per run",
+          "label": "Maximum e-mailov na jedno spustenie",
           "schema": {
             "def": {
               "type": "number",
@@ -190263,7 +190275,7 @@
         },
         "currentAutoEnrollWindowDays": {
           "type": "text",
-          "label": "Auto-enroll window (days)",
+          "label": "Obdobie automatického zaradenia (dni)",
           "schema": {
             "def": {
               "type": "number",
@@ -190279,7 +190291,7 @@
         },
         "currentRequireUserMarketingConsent": {
           "type": "text",
-          "label": "Marketing consent required",
+          "label": "Vyžaduje sa súhlas s marketingom",
           "schema": {
             "def": {
               "type": "boolean"
@@ -190298,7 +190310,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "newsletter",
-    "tags": ["Lifecycle"],
+    "tags": ["Životný cyklus"],
     "aliases": ["lifecycle-settings"],
     "credits": 0
   },
@@ -699121,6 +699133,55 @@
                                 },
                                 "type": "optional"
                               },
+                              "allowance": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "object",
+                                      "shape": {
+                                        "scope": {
+                                          "def": {
+                                            "type": "enum",
+                                            "entries": {
+                                              "pool": "pool",
+                                              "caller": "caller",
+                                              "inFlight": "inFlight"
+                                            }
+                                          },
+                                          "type": "enum",
+                                          "enum": {
+                                            "pool": "pool",
+                                            "caller": "caller",
+                                            "inFlight": "inFlight"
+                                          },
+                                          "options": [
+                                            "pool",
+                                            "caller",
+                                            "inFlight"
+                                          ]
+                                        },
+                                        "remaining": {
+                                          "def": {
+                                            "type": "number",
+                                            "checks": []
+                                          },
+                                          "type": "number",
+                                          "isFinite": true
+                                        },
+                                        "resetsAt": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "type": "object"
+                                  }
+                                },
+                                "type": "optional"
+                              },
                               "errorType": {
                                 "def": {
                                   "type": "object",
@@ -699382,6 +699443,55 @@
                                   },
                                   "type": "literal",
                                   "values": {}
+                                }
+                              },
+                              "type": "optional"
+                            },
+                            "allowance": {
+                              "def": {
+                                "type": "optional",
+                                "innerType": {
+                                  "def": {
+                                    "type": "object",
+                                    "shape": {
+                                      "scope": {
+                                        "def": {
+                                          "type": "enum",
+                                          "entries": {
+                                            "pool": "pool",
+                                            "caller": "caller",
+                                            "inFlight": "inFlight"
+                                          }
+                                        },
+                                        "type": "enum",
+                                        "enum": {
+                                          "pool": "pool",
+                                          "caller": "caller",
+                                          "inFlight": "inFlight"
+                                        },
+                                        "options": [
+                                          "pool",
+                                          "caller",
+                                          "inFlight"
+                                        ]
+                                      },
+                                      "remaining": {
+                                        "def": {
+                                          "type": "number",
+                                          "checks": []
+                                        },
+                                        "type": "number",
+                                        "isFinite": true
+                                      },
+                                      "resetsAt": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "type": "object"
                                 }
                               },
                               "type": "optional"

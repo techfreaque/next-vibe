@@ -9,6 +9,7 @@ export function databaseFailureDiagnostics(error: Error): {
   errorType: string;
   databaseCode?: string;
   constraint?: string;
+  missingColumn?: string;
   driverFailure?: string;
   waitingForAdvisoryLock?: boolean;
 } {
@@ -29,10 +30,17 @@ export function databaseFailureDiagnostics(error: Error): {
     "Connection terminated unexpectedly",
     "Connection terminated due to connection timeout",
   ].find((message) => message === driver.message);
+  const missingColumn =
+    databaseCode === "42703"
+      ? /^column "([a-z_][a-z_0-9]{0,62})"(?: of relation "[a-z_][a-z_0-9]{0,62}")? does not exist$/.exec(
+          driver.message,
+        )?.[1]
+      : undefined;
   return {
     errorType: driver.name,
     databaseCode,
     constraint: driver instanceof DatabaseError ? driver.constraint : undefined,
+    missingColumn,
     driverFailure:
       driverFailure ??
       (databaseCode &&

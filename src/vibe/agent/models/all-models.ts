@@ -36,6 +36,7 @@ import {
   videoGenModelDefinitions,
   videoGenModelOptions,
 } from "../video-generation/models";
+import { ModelUtility } from "./enum";
 import {
   type AnyModelId,
   type AnyModelOption,
@@ -343,4 +344,25 @@ export function getAvailableChatModelCountsByContentLevel(
     }
   }
   return counts;
+}
+
+/**
+ * Ids of the chat models a user can pick right now (same rule as
+ * {@link getAvailableChatModelCount}), legacy models excluded. Used to filter
+ * changelog "added" events down to models that are still current.
+ */
+export function getCurrentChatModelIds(
+  isAdmin: boolean,
+  availability: AgentEnvAvailability,
+): Set<string> {
+  const ids = new Set<string>();
+  for (const [id, def] of Object.entries(chatModelDefinitions)) {
+    if (
+      isChatModelOffered(def, isAdmin, availability) &&
+      !def.utilities.includes(ModelUtility.LEGACY)
+    ) {
+      ids.add(id);
+    }
+  }
+  return ids;
 }

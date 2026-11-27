@@ -17,6 +17,8 @@ export const {
   WHATS_NEW: "enums.journey.whatsNew",
   WIN_BACK: "enums.journey.winBack",
   NEWSLETTER_INVITE: "enums.journey.newsletterInvite",
+  CUSTOMER_CHECKIN: "enums.journey.customerCheckin",
+  LAPSED_WINBACK: "enums.journey.lapsedWinback",
 });
 
 export const LifecycleJourneyDB = [
@@ -25,6 +27,8 @@ export const LifecycleJourneyDB = [
   LifecycleJourney.WHATS_NEW,
   LifecycleJourney.WIN_BACK,
   LifecycleJourney.NEWSLETTER_INVITE,
+  LifecycleJourney.CUSTOMER_CHECKIN,
+  LifecycleJourney.LAPSED_WINBACK,
 ] as const;
 
 export const {
@@ -85,18 +89,28 @@ export const {
   Value: LifecycleTemplateValue,
 } = createEnumOptions(scopedTranslation, {
   FIRST_CHAT_PROMPTS: "enums.template.firstChatPrompts",
+  FIRST_CHAT_SKILLS: "enums.template.firstChatSkills",
   OUT_OF_CREDITS: "enums.template.outOfCredits",
   WHATS_NEW: "enums.template.whatsNew",
   WIN_BACK: "enums.template.winBack",
+  PAYMENT_FAILED: "enums.template.paymentFailed",
+  CUSTOMER_LIKES: "enums.template.customerLikes",
+  CUSTOMER_BUILD_NEXT: "enums.template.customerBuildNext",
+  LAPSED_WINBACK: "enums.template.lapsedWinback",
   INVITE_SIGNUP: "enums.template.inviteSignup",
   INVITE_REMINDER: "enums.template.inviteReminder",
 });
 
 export const LifecycleTemplateDB = [
   LifecycleTemplate.FIRST_CHAT_PROMPTS,
+  LifecycleTemplate.FIRST_CHAT_SKILLS,
   LifecycleTemplate.OUT_OF_CREDITS,
   LifecycleTemplate.WHATS_NEW,
   LifecycleTemplate.WIN_BACK,
+  LifecycleTemplate.PAYMENT_FAILED,
+  LifecycleTemplate.CUSTOMER_LIKES,
+  LifecycleTemplate.CUSTOMER_BUILD_NEXT,
+  LifecycleTemplate.LAPSED_WINBACK,
   LifecycleTemplate.INVITE_SIGNUP,
   LifecycleTemplate.INVITE_REMINDER,
 ] as const;

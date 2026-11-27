@@ -13,6 +13,7 @@ import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "../i18n";
 import { EmailLogo } from "./email-image.email";
+import { EmailLegalIdentity, EmailOptOutLine } from "./legal_identity.email";
 import { TrackedLink } from "./tracked_link.email";
 import { TrackedPixel } from "./tracked_pixel.email";
 import type { TrackingContext } from "./tracking_context.email";
@@ -32,6 +33,17 @@ interface EmailTemplateProps {
   locale: CountryLanguage;
   tracking: TrackingContext;
   recipientEmail: string;
+  /**
+   * Optional mail (journeys, check-ins, billing notices): the opt-out line
+   * plus sender identification (operator, address, imprint). Omit for pure
+   * transactional mail (confirmations, receipts). `unsubscribeUrl` null shows
+   * the notice without an opt-out link.
+   */
+  optOut?: {
+    unsubscribeUrl: string | null;
+    text?: string;
+    linkText?: string;
+  };
 }
 
 export function EmailTemplate({
@@ -40,6 +52,7 @@ export function EmailTemplate({
   children,
   locale,
   tracking,
+  optOut,
 }: EmailTemplateProps): JSX.Element {
   const currentYear = getCurrentYear();
   const { t: globalT } = configScopedTranslation.scopedT(locale);
@@ -226,7 +239,7 @@ export function EmailTemplate({
               }}
             >
               <TrackedLink
-                href={envClient.NEXT_PUBLIC_APP_URL}
+                href={tracking.baseUrl || envClient.NEXT_PUBLIC_APP_URL}
                 tracking={tracking}
                 style={{ color: "#9ca3af", textDecoration: "none" }}
               >
@@ -246,6 +259,19 @@ export function EmailTemplate({
                 appName: globalT("appName"),
               })}
             </div>
+
+            {optOut && (
+              <div style={{ marginTop: "16px", textAlign: "center" }}>
+                <EmailOptOutLine
+                  locale={locale}
+                  tracking={tracking}
+                  unsubscribeUrl={optOut.unsubscribeUrl}
+                  text={optOut.text}
+                  linkText={optOut.linkText}
+                />
+                <EmailLegalIdentity locale={locale} tracking={tracking} />
+              </div>
+            )}
           </Section>
         </Container>
 

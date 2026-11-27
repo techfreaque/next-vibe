@@ -1,5 +1,5 @@
 /**
- * Compact offline IP -> country table (pure, no I/O).
+ * Compact offline IP -> country table.
  *
  * Source: DB-IP "IP to Country Lite" CSV (start_ip,end_ip,country), CC BY 4.0,
  * https://db-ip.com. The CSV (~730k ranges) is folded into sorted range-start
@@ -14,6 +14,8 @@
  *   v6Count x (u32 hi, u32 lo) start | v6Count x u8 code index
  */
 
+import { setImmediate as yieldToEventLoop } from "node:timers/promises";
+
 import { parseIp } from "next-vibe/identity/lead/ip-key";
 
 import { UNKNOWN_COUNTRY } from "./constants";
@@ -22,6 +24,7 @@ export { UNKNOWN_COUNTRY };
 
 const MAGIC = "GEO1";
 const COUNTRY_CODE = /^[A-Z]{2}$/;
+const ROWS_PER_SLICE = 1024;
 
 export interface GeoTable {
   codes: string[];
@@ -84,7 +87,7 @@ class CodeIndex {
 }
 
 /** Build the table from the DB-IP country CSV text. */
-export function buildGeoTable(csv: string): GeoTable {
+export async function buildGeoTable(csv: string): Promise<GeoTable> {
   const codes = new CodeIndex();
   const v4Starts: number[] = [];
   const v4Codes: number[] = [];
@@ -119,7 +122,18 @@ export function buildGeoTable(csv: string): GeoTable {
     v6Codes.push(code);
   };
 
-  for (const line of csv.split("\n")) {
+  let offset = 0;
+  let rowsInSlice = 0;
+  while (offset < csv.length) {
+    if (rowsInSlice >= ROWS_PER_SLICE) {
+      await yieldToEventLoop();
+      rowsInSlice = 0;
+    }
+    const newline = csv.indexOf("\n", offset);
+    const endOfLine = newline < 0 ? csv.length : newline;
+    const line = csv.slice(offset, endOfLine);
+    offset = endOfLine + 1;
+    rowsInSlice++;
     const [rawStart, rawEnd, rawCode] = line.trim().split(",");
     if (!rawStart || !rawEnd || !rawCode) {
       continue;

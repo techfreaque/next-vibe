@@ -47,6 +47,10 @@ function journeyLabel(
       return t("enums.journey.winBack");
     case LifecycleJourney.NEWSLETTER_INVITE:
       return t("enums.journey.newsletterInvite");
+    case LifecycleJourney.CUSTOMER_CHECKIN:
+      return t("enums.journey.customerCheckin");
+    case LifecycleJourney.LAPSED_WINBACK:
+      return t("enums.journey.lapsedWinback");
   }
 }
 

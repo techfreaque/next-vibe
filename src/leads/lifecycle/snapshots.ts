@@ -26,6 +26,7 @@ import { SubscriptionStatus } from "@/subscription/enum";
 
 import { lifecycleSends } from "./db";
 import type { ContactSnapshot } from "./eligibility";
+import { PaymentSegment, paymentSegment } from "./eligibility";
 import { LifecycleSendStatus } from "./enum";
 import { OUT_OF_CREDITS_THRESHOLD } from "./journeys";
 
@@ -42,6 +43,13 @@ function chunk<T>(items: readonly T[]): T[][] {
   }
   return out;
 }
+
+/** A subscription in these states is a live, paying customer. */
+const ACTIVE_SUBSCRIPTION_STATUSES: readonly string[] = [
+  SubscriptionStatus.ACTIVE,
+  SubscriptionStatus.TRIALING,
+  SubscriptionStatus.PAST_DUE,
+];
 
 const BLOCKED_LEAD_STATUSES: readonly string[] = [
   LeadStatus.UNSUBSCRIBED,
@@ -111,10 +119,19 @@ export async function loadSnapshots(
             .where(inArray(chatThreads.userId, userIds))
             .groupBy(chatThreads.userId);
 
+    // paidIds = real money ever (payment, subscription row, growth first paid).
+    // grantIds = purchase/subscription credit rows without real money: admin
+    // grants (testers, creators). activeSince = live subscription start.
     const paidIds = new Set<string>();
+    const grantIds = new Set<string>();
+    const activeSince = new Map<string, Date>();
     if (userIds.length > 0) {
       const subRows = await db
-        .select({ userId: subscriptions.userId })
+        .select({
+          userId: subscriptions.userId,
+          status: subscriptions.status,
+          createdAt: subscriptions.createdAt,
+        })
         .from(subscriptions)
         .where(
           and(
@@ -130,6 +147,12 @@ export async function loadSnapshots(
         );
       for (const r of subRows) {
         paidIds.add(r.userId);
+        if (ACTIVE_SUBSCRIPTION_STATUSES.includes(r.status)) {
+          const prev = activeSince.get(r.userId);
+          if (!prev || r.createdAt < prev) {
+            activeSince.set(r.userId, r.createdAt);
+          }
+        }
       }
       const txRows = await db
         .selectDistinct({ userId: creditWallets.userId })
@@ -149,7 +172,7 @@ export async function loadSnapshots(
         );
       for (const r of txRows) {
         if (r.userId) {
-          paidIds.add(r.userId);
+          grantIds.add(r.userId);
         }
       }
       const payRows = await db
@@ -288,6 +311,14 @@ export async function loadSnapshots(
         lastActivityAt,
         outOfCreditsAt: poolInfo?.outOfCreditsAt ?? null,
         isPaid: user ? paidIds.has(user.id) : false,
+        segment: user
+          ? paymentSegment({
+              paid: paidIds.has(user.id),
+              activeSub: activeSince.has(user.id),
+              granted: grantIds.has(user.id),
+            })
+          : PaymentSegment.NEVER_PAID,
+        activeSubSince: user ? (activeSince.get(user.id) ?? null) : null,
         newsletter: newsletter
           ? {
               status: newsletter.status,
