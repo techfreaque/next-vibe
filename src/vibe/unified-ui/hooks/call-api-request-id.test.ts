@@ -16,10 +16,18 @@ import {
   mock,
   spyOn,
 } from "bun:test";
+import { EngagementTypes } from "next-vibe/identity/lead/enum";
+import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
+import * as cookies from "next-vibe/ui/lib/cookies";
 
 import ledgerDefinition from "@/chart-of-accounts/ledger/[accountId]/definition";
 import creditsDefinition from "@/credits/definition";
-import { REQUEST_ID_HEADER_NAME } from "@/env/constants";
+import {
+  CSRF_TOKEN_COOKIE_NAME,
+  CSRF_TOKEN_HEADER_NAME,
+  REQUEST_ID_HEADER_NAME,
+} from "@/env/constants";
+import trackingDefinition from "@/leads/tracking/definition";
 
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { EndpointLogger, LoggerMetadata } from "../../logger/types";
@@ -171,6 +179,46 @@ describe("request id propagation", () => {
 
   afterAll(() => {
     globalThis.fetch = originalFetch;
+  });
+
+  it("sends the CSRF cookie header for a visit POST and omits it for a read", async () => {
+    const { callApi } = await import("./call-api");
+    const getCookie = spyOn(cookies, "getCookie").mockResolvedValue(
+      "fixture-csrf-token",
+    );
+    const logger = recordingLogger([]);
+    const user: JWTPublicPayloadType = {
+      isPublic: true,
+      leadId: "00000000-0000-4000-8000-000000000002",
+      roles: [],
+    };
+    try {
+      await callApi<CreateApiEndpointAny>(
+        trackingDefinition.POST,
+        logger,
+        user,
+        "en-GLOBAL",
+        { engagementType: EngagementTypes.WEBSITE_VISIT },
+        undefined,
+      );
+      expect(getCookie.mock.calls[0]?.[0]).toBe(CSRF_TOKEN_COOKIE_NAME);
+      expect(sentHeaders.at(-1)?.[CSRF_TOKEN_HEADER_NAME]).toBe(
+        "fixture-csrf-token",
+      );
+      getCookie.mockClear();
+      await callApi<CreateApiEndpointAny>(
+        creditsDefinition.GET,
+        logger,
+        user,
+        "en-GLOBAL",
+        undefined,
+        undefined,
+      );
+      expect(getCookie).not.toHaveBeenCalled();
+      expect(sentHeaders.at(-1)?.[CSRF_TOKEN_HEADER_NAME]).toBeUndefined();
+    } finally {
+      getCookie.mockRestore();
+    }
   });
 
   it("reports a proxy error envelope without handing a malformed error to callers", async () => {

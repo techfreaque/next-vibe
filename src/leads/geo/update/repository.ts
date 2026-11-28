@@ -7,7 +7,7 @@ import "server-only";
  */
 import { setImmediate as yieldToEventLoop } from "node:timers/promises";
 import { promisify } from "node:util";
-import { gunzip, gunzipSync, gzip, gzipSync } from "node:zlib";
+import { gunzip, gzip } from "node:zlib";
 
 import { sql } from "drizzle-orm";
 import {
@@ -146,8 +146,11 @@ export async function storeAsnRelease(
   version: string,
   csvGz: Buffer,
 ): Promise<StoredRelease> {
-  const table = buildAsnTable(gunzipSync(csvGz).toString("utf8"));
-  const data = gzipSync(encodeAsnTable(table), { level: 9 }).toString("base64");
+  const csv = await inflateRelease(csvGz);
+  const table = await buildAsnTable(csv.toString("utf8"));
+  const data = (
+    await compressRelease(encodeAsnTable(table), { level: 9 })
+  ).toString("base64");
   const values = {
     version,
     data,

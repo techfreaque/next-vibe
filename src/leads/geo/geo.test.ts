@@ -23,6 +23,12 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
+  buildAsnTable,
+  decodeAsnTable,
+  encodeAsnTable,
+  lookupHostingAsn,
+} from "./asn/compact";
+import {
   buildGeoTable,
   decodeGeoTable,
   encodeGeoTable,
@@ -54,6 +60,22 @@ const FIXTURE_CSV = [
   "2a03:2880::,2a03:2880:ffff:ffff:ffff:ffff:ffff:ffff,IE",
 ].join("\n");
 
+it("yields while building an ASN release and preserves the final quoted row", async () => {
+  const repeated = `${'1.0.0.0,1.0.0.255,13335,"Cloudflare, Inc."\n'.repeat(8192)}1.0.1.0,1.0.1.255,16509,"Example Hosting, Inc."`;
+  const build = buildAsnTable(
+    repeated,
+    (_asn, org) => org === "Example Hosting, Inc.",
+  );
+  const first = await Promise.race([
+    build.then(() => "build"),
+    yieldToEventLoop("event-loop"),
+  ]);
+  expect(first).toBe("event-loop");
+  const decoded = decodeAsnTable(encodeAsnTable(await build));
+  expect(decoded && lookupHostingAsn(decoded, "1.0.0.7")).toBeNull();
+  expect(decoded && lookupHostingAsn(decoded, "1.0.1.7")).toBe(16509);
+});
+
 describe("compact geo table", () => {
   const table = buildGeoTable(FIXTURE_CSV);
   const decoded = table.then((original) => decodeGeoTable(encodeGeoTable(original)));
@@ -68,7 +90,7 @@ describe("compact geo table", () => {
   });
 
   it("yields during large imports and parses the final row", async () => {
-    const repeated = `${"1.0.0.0,1.0.0.255,AU\n".repeat(4096)}1.0.1.0,1.0.1.255,CN`;
+    const repeated = `${"1.0.0.0,1.0.0.255,AU\n".repeat(8192)}1.0.1.0,1.0.1.255,CN`;
     const build = buildGeoTable(repeated);
     const first = await Promise.race([
       build.then(() => "build"),

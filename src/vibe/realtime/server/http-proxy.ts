@@ -254,6 +254,9 @@ async function forwardHttpRequest(
 ): Promise<Response> {
   const { nextPort, logger, isShuttingDown } = ctx;
   const isApi = url.pathname.startsWith("/api/");
+  const isSourceScript =
+    url.pathname.startsWith("/src/") &&
+    req.headers.get("sec-fetch-dest") === "script";
   const clientRequestId = req.headers.get(REQUEST_ID_HEADER_NAME);
   const requestId =
     clientRequestId && /^[A-Za-z0-9_-]{8,64}$/.test(clientRequestId)
@@ -324,9 +327,10 @@ async function forwardHttpRequest(
   let retryRequestId: string | undefined;
   const proxyStartMs = Date.now();
   trackRequest(req.method, url.pathname);
-  const pageDeadline = isPageRender(req, url.pathname)
-    ? performance.now() + (ctx.pageRenderTimeoutMs ?? PAGE_RENDER_TIMEOUT_MS)
-    : undefined;
+  const pageDeadline =
+    !isSourceScript && isPageRender(req, url.pathname)
+      ? performance.now() + (ctx.pageRenderTimeoutMs ?? PAGE_RENDER_TIMEOUT_MS)
+      : undefined;
   const remainingPageTime = (): number =>
     pageDeadline === undefined
       ? Infinity
@@ -515,7 +519,17 @@ async function forwardHttpRequest(
             isApi &&
             req.headers.get("accept")?.includes("application/json") &&
             responseContentType?.includes("text/html");
-          if (status >= 500 || unexpectedApiNotFound) {
+          const unexpectedSourceResponse =
+            isSourceScript &&
+            (status >= 400 ||
+              (status >= 200 &&
+                status < 300 &&
+                responseContentType?.includes("text/html")));
+          if (
+            status >= 500 ||
+            unexpectedApiNotFound ||
+            unexpectedSourceResponse
+          ) {
             const retryAfter = proxyRes.headers["retry-after"];
             logger.error("[Proxy] Upstream returned an HTTP failure", {
               requestId,
@@ -571,13 +585,17 @@ async function forwardHttpRequest(
             }
           }
           if (
-            (isApi || (status >= 500 && isToolsDocument(req, url.pathname))) &&
+            (isApi ||
+              isSourceScript ||
+              (status >= 500 && isToolsDocument(req, url.pathname))) &&
             !resHeaders.has(REQUEST_ID_HEADER_NAME)
           ) {
             resHeaders.set(REQUEST_ID_HEADER_NAME, requestId);
           }
           if (
-            (isApi || url.pathname.startsWith("/_next/static/")) &&
+            (isApi ||
+              isSourceScript ||
+              url.pathname.startsWith("/_next/static/")) &&
             readProxyTimingHeader(resHeaders.get("server-timing")) === null
           ) {
             resHeaders.append(

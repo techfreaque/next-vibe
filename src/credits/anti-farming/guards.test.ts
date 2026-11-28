@@ -247,10 +247,9 @@ afterAll(async () => {
 }, TIMEOUT_MS);
 
 describe("hosting ASN table", () => {
-  const table = buildAsnTable(ASN_FIXTURE_CSV);
-  const decoded = decodeAsnTable(encodeAsnTable(table));
-
-  it("keeps only hosting ranges and round-trips", () => {
+  it("keeps only hosting ranges and round-trips", async () => {
+    const table = await buildAsnTable(ASN_FIXTURE_CSV);
+    const decoded = decodeAsnTable(encodeAsnTable(table));
     expect(decoded).not.toBeNull();
     if (!decoded) {
       return;

@@ -15,6 +15,8 @@
  *
  * Shared by the TS pool resolver (credits/repository.ts) and the PL/v8 balance
  * function (credits/db-functions.ts) so both always agree on who is in the pool.
+ * A lateral ownership probe allows PostgreSQL to memoize the decision per
+ * neighbor as the same lead is reached through multiple edges.
  */
 
 import "server-only";
@@ -50,13 +52,12 @@ export function userPoolLeadIdsSql(
         SELECT ll.lead_id_1 FROM ${leadLeadLinks} ll
         WHERE ll.lead_id_2 = pl.lead_id AND ll.link_reason <> 'ip_match'
       ) nxt
-      WHERE NOT EXISTS (
-        SELECT 1 FROM ${userLeadLinks} other_ull
+      LEFT JOIN LATERAL (
+        SELECT true AS blocked FROM ${userLeadLinks} other_ull
         WHERE other_ull.lead_id = nxt.lead_id
           AND other_ull.user_id <> ${userId}::uuid
-      )
-      AND NOT EXISTS (
-        SELECT 1 FROM ${leads} other_l
+        UNION ALL
+        SELECT true FROM ${leads} other_l
         WHERE other_l.id = nxt.lead_id
           AND (
             other_l.is_bot = true
@@ -65,7 +66,9 @@ export function userPoolLeadIdsSql(
               AND other_l.converted_user_id <> ${userId}::uuid
             )
           )
-      )
+        LIMIT 1
+      ) ownership ON true
+      WHERE ownership.blocked IS NULL
     )
     SELECT lead_id FROM pool_leads
   `;
@@ -92,15 +95,16 @@ export function guestPoolLeadIdsSql(
         SELECT ll.lead_id_1 FROM ${leadLeadLinks} ll
         WHERE ll.lead_id_2 = gl.lead_id
       ) nxt
-      WHERE NOT EXISTS (
-        SELECT 1 FROM ${userLeadLinks} owned_ull
+      LEFT JOIN LATERAL (
+        SELECT true AS blocked FROM ${userLeadLinks} owned_ull
         WHERE owned_ull.lead_id = nxt.lead_id
-      )
-      AND NOT EXISTS (
-        SELECT 1 FROM ${leads} owned_l
+        UNION ALL
+        SELECT true FROM ${leads} owned_l
         WHERE owned_l.id = nxt.lead_id
           AND (owned_l.converted_user_id IS NOT NULL OR owned_l.is_bot = true)
-      )
+        LIMIT 1
+      ) ownership ON true
+      WHERE ownership.blocked IS NULL
     )
     SELECT lead_id FROM guest_leads
   `;

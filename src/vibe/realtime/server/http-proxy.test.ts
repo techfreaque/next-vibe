@@ -58,6 +58,20 @@ beforeAll(() => {
       if (path === "/api/en-US/missing-resource") {
         return Response.json({ success: false }, { status: 404 });
       }
+      if (path === "/src/missing.tsx") {
+        return new Response("Not Found", { status: 404 });
+      }
+      if (path === "/src/rewritten.tsx") {
+        return new Response("<h1>Page</h1>", {
+          headers: { "content-type": "text/html" },
+        });
+      }
+      if (path === "/src/slow-module.tsx") {
+        await Bun.sleep(50);
+        return new Response("export default 1", {
+          headers: { "content-type": "text/javascript" },
+        });
+      }
       if (path === "/api/en-US/preflight") {
         return new Response(null, { status: 204 });
       }
@@ -218,6 +232,57 @@ it("correlates framework API failures and preserves the upstream responses", asy
       status: 404,
     }),
   );
+});
+
+it("correlates missing and rewritten development modules", async () => {
+  const error = mock<EndpointLogger["error"]>();
+  const context = {
+    nextPort,
+    logger: { ...logger, error },
+    isShuttingDown: (): boolean => false,
+  };
+  for (const [module, status] of [
+    ["missing.tsx", 404],
+    ["rewritten.tsx", 200],
+  ] as const) {
+    const response = await handleHttpProxy(
+      new Request(`http://127.0.0.1:3000/src/${module}?t=123`, {
+        headers: { "sec-fetch-dest": "script" },
+      }),
+      context,
+    );
+    expect(response.status).toBe(status);
+    expect(readProxyTimingHeader(response.headers.get("server-timing"))).toBe(
+      "upstream-response",
+    );
+    const requestId = response.headers.get("x-request-id");
+    expect(requestId).toBeTruthy();
+    expect(error).toHaveBeenCalledWith(
+      "[Proxy] Upstream returned an HTTP failure",
+      expect.objectContaining({
+        requestId,
+        path: `/src/${module}`,
+        status,
+      }),
+    );
+    await response.text();
+  }
+});
+
+it("gives development source modules the asset deadline", async () => {
+  const response = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/src/slow-module.tsx", {
+      headers: { "sec-fetch-dest": "script" },
+    }),
+    {
+      nextPort,
+      logger,
+      pageRenderTimeoutMs: 10,
+      isShuttingDown: () => false,
+    },
+  );
+  expect(response.status).toBe(200);
+  expect(await response.text()).toBe("export default 1");
 });
 
 it("forwards bodyless upstream responses", async () => {

@@ -13,11 +13,14 @@
  *   v6Count x (u32 hi, u32 lo) start | v6Count x u32 asn
  */
 
+import { setImmediate as yieldToEventLoop } from "node:timers/promises";
+
 import { parseIp } from "next-vibe/identity/lead/ip-key";
 
 import { isHostingAsn } from "./hosting-asns";
 
 const MAGIC = "ASN1";
+const ROWS_PER_SLICE = 4096;
 
 export interface AsnTable {
   v4Starts: Uint32Array;
@@ -83,10 +86,10 @@ function splitCsvLine(line: string): string[] {
  * Build the table from the DB-IP ASN CSV text.
  * `classify` decides which ASNs are kept (default: the hosting/VPN list).
  */
-export function buildAsnTable(
+export async function buildAsnTable(
   csv: string,
   classify: (asn: number, org: string) => boolean = isHostingAsn,
-): AsnTable {
+): Promise<AsnTable> {
   const v4Starts: number[] = [];
   const v4Asns: number[] = [];
   let v4NextFree = 0;
@@ -121,7 +124,18 @@ export function buildAsnTable(
   };
 
   const verdicts = new Map<number, boolean>();
-  for (const line of csv.split("\n")) {
+  let offset = 0;
+  let rowsInSlice = 0;
+  while (offset < csv.length) {
+    if (rowsInSlice >= ROWS_PER_SLICE) {
+      await yieldToEventLoop();
+      rowsInSlice = 0;
+    }
+    const newline = csv.indexOf("\n", offset);
+    const endOfLine = newline < 0 ? csv.length : newline;
+    const line = csv.slice(offset, endOfLine);
+    offset = endOfLine + 1;
+    rowsInSlice++;
     const [rawStart, rawEnd, rawAsn, rawOrg] = splitCsvLine(line.trim());
     if (!rawStart || !rawEnd || !rawAsn) {
       continue;

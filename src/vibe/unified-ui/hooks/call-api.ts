@@ -51,13 +51,6 @@ import { containsFile, objectToFormData } from "./api-utils-shared";
 import { callApiReportsFailure } from "./call-api-report-policy";
 import { scopedTranslation as hooksTranslation } from "./i18n";
 
-const MUTATING_METHODS = new Set([
-  Methods.POST,
-  Methods.PUT,
-  Methods.DELETE,
-  Methods.PATCH,
-]);
-
 async function getCsrfToken(logger: EndpointLogger): Promise<string | null> {
   return (await getCookie(CSRF_TOKEN_COOKIE_NAME, logger)) ?? null;
 }
@@ -810,15 +803,16 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
       headers["Content-Type"] = "application/json";
     }
 
-    const sentCsrfToken = MUTATING_METHODS.has(endpoint.method)
-      ? await getCsrfToken(logger)
-      : null;
+    const isMutatingMethod =
+      endpoint.method === Methods.POST ||
+      endpoint.method === Methods.PUT ||
+      endpoint.method === Methods.DELETE ||
+      endpoint.method === Methods.PATCH;
+    const sentCsrfToken = isMutatingMethod ? await getCsrfToken(logger) : null;
     if (sentCsrfToken) {
       headers[CSRF_TOKEN_HEADER_NAME] = sentCsrfToken;
     }
-    diag.csrfHeaderSent = MUTATING_METHODS.has(endpoint.method)
-      ? sentCsrfToken !== null
-      : null;
+    diag.csrfHeaderSent = isMutatingMethod ? sentCsrfToken !== null : null;
 
     if (platform.isReactNative) {
       const { t: authT } = authScopedTranslation.scopedT(locale);
