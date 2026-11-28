@@ -20,9 +20,22 @@ export const translations: typeof enTranslations = {
       "Ouvre le paiement chez le nouveau prestataire pour votre forfait actuel. Votre ancien forfait par carte s'arrête une fois le nouveau payé. Aucun double prélèvement.",
   },
 
+  form: {
+    fields: {
+      provider: {
+        label: "Moyen de paiement",
+        description:
+          "Carte (Whop) ou crypto (NOWPayments). Par défaut, le moyen principal.",
+      },
+    },
+  },
+
   response: {
     offer: "Offre",
     targetProvider: "Nouveau prestataire",
+    providers: "Moyens de paiement",
+    nowPaymentsAcceptsCards: "Paiements par carte via NOWPayments",
+    cryptoMinUsd: "Montant crypto minimum (USD)",
     plan: "Forfait",
     billingInterval: "Fréquence de facturation",
     pastDue: "Paiement en retard",
@@ -51,7 +64,6 @@ export const translations: typeof enTranslations = {
       "Le nouveau paiement par carte ne propose pas encore ce forfait en mensuel. Choisissez la facturation annuelle ou payez en crypto.",
     cta: "Transférer mon forfait",
     ctaLoading: "Ouverture du paiement...",
-    otherOptions: "Autres moyens de paiement",
     noDoubleCharge:
       "Votre ancien forfait par carte s'arrête dès que le nouveau est payé. Vous ne payez jamais deux fois.",
     checkoutReady: "Le paiement est prêt.",
@@ -66,6 +78,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+      whop: "Whop",
+    },
     carryOver: {
       extendFirstPeriod:
         "Prélèvement immédiat, le temps payé prolonge la première période",

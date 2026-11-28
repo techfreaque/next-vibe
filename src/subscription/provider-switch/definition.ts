@@ -10,16 +10,24 @@ import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
-import { responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import {
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { PaymentProvider, PaymentProviderDB } from "../../payment/enum";
+import {
+  PaymentProvider,
+  PaymentProviderDB,
+  PaymentProviderOptions,
+} from "../../payment/enum";
 import { BillingInterval, SubscriptionPlan } from "../enum";
 import {
   SwitchCarryOver,
@@ -108,6 +116,21 @@ const { GET } = createEndpoint({
         label: "response.targetProvider",
         schema: z.enum(PaymentProviderDB).optional(),
       }),
+      providers: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.providers",
+        schema: z.array(z.enum(PaymentProviderDB)).optional(),
+      }),
+      nowPaymentsAcceptsCards: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.nowPaymentsAcceptsCards",
+        schema: z.boolean().optional(),
+      }),
+      cryptoMinUsd: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.cryptoMinUsd",
+        schema: z.number().optional(),
+      }),
       plan: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.plan",
@@ -187,8 +210,16 @@ const { POST } = createEndpoint({
   aliases: ["subscription-provider-switch-start"],
   fields: customWidgetObject({
     render: ProviderSwitchWidget,
-    usage: { response: true } as const,
+    usage: { request: "data", response: true } as const,
     children: {
+      provider: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "form.fields.provider.label" as const,
+        description: "form.fields.provider.description" as const,
+        options: PaymentProviderOptions,
+        schema: z.enum(PaymentProviderDB).optional(),
+      }),
       checkoutUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.checkoutUrl",
@@ -207,6 +238,9 @@ const { POST } = createEndpoint({
     description: "success.description",
   },
   examples: {
+    requests: {
+      default: { provider: PaymentProvider.WHOP },
+    },
     responses: {
       default: {
         checkoutUrl: "https://nowpayments.io/payment/?iid=123456",

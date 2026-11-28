@@ -20,9 +20,21 @@ export const translations: typeof enTranslations = {
       "आपके मौजूदा प्लान के लिए नए प्रोवाइडर पर चेकआउट खोलता है। नया प्लान पेड होते ही पुराना कार्ड प्लान बंद हो जाता है। दो बार पेमेंट नहीं।",
   },
 
+  form: {
+    fields: {
+      provider: {
+        label: "भुगतान का तरीका",
+        description: "कार्ड (Whop) या क्रिप्टो (NOWPayments)। डिफ़ॉल्ट मुख्य तरीका है।",
+      },
+    },
+  },
+
   response: {
     offer: "ऑफ़र",
     targetProvider: "नया प्रोवाइडर",
+    providers: "भुगतान के तरीके",
+    nowPaymentsAcceptsCards: "NOWPayments के जरिए कार्ड भुगतान",
+    cryptoMinUsd: "न्यूनतम क्रिप्टो राशि (USD)",
     plan: "प्लान",
     billingInterval: "बिलिंग अवधि",
     pastDue: "बकाया",
@@ -49,7 +61,6 @@ export const translations: typeof enTranslations = {
       "नया कार्ड चेकआउट यह प्लान अभी मंथली बिलिंग पर नहीं बेच सकता। ईयरली बिलिंग चुनें या क्रिप्टो से पेमेंट करें।",
     cta: "मेरा प्लान शिफ़्ट करें",
     ctaLoading: "चेकआउट खुल रहा है...",
-    otherOptions: "पेमेंट के दूसरे तरीके",
     noDoubleCharge:
       "नया प्लान पेड होते ही पुराना कार्ड प्लान बंद हो जाता है। आपसे कभी दो बार पैसे नहीं कटेंगे।",
     checkoutReady: "चेकआउट तैयार है।",
@@ -63,6 +74,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+      whop: "Whop",
+    },
     carryOver: {
       extendFirstPeriod: "अभी चार्ज, पेड समय पहली अवधि को बढ़ाता है",
       deferredStart: "पेड समय खत्म होने पर बिलिंग शुरू",

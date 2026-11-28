@@ -31,9 +31,13 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { PaymentProvider } from "../../payment/enum";
+import { PaymentProvider, type PaymentProviderValue } from "../../payment/enum";
 import { getPaymentProvider } from "../../payment/providers";
-import { getCheckoutProviders } from "../../payment/providers/availability";
+import {
+  getCheckoutProviders,
+  nowPaymentsAcceptsCards,
+} from "../../payment/providers/availability";
+import { getCryptoMinimumUsd } from "../../payment/providers/nowpayments/min-amounts";
 import { StripeProvider } from "../../payment/providers/stripe/repository";
 import {
   getTierProductForPlan,
@@ -63,7 +67,7 @@ import {
   type SwitchedPeriod,
 } from "./rules";
 import {
-  getActiveSwitchTarget,
+  getActiveSwitchTargets,
   type SubscriptionSwitchTarget,
   type SwitchInterval,
 } from "./targets";
@@ -100,8 +104,12 @@ export class ProviderSwitchRepository {
   private static async findCandidate(
     userId: string,
     logger: EndpointLogger,
+    provider?: typeof PaymentProviderValue,
   ): Promise<SwitchCandidate | null> {
-    const target = getActiveSwitchTarget();
+    const available = getActiveSwitchTargets();
+    const target = provider
+      ? available.find((entry) => entry.provider === provider)
+      : available[0];
     if (!target) {
       return null;
     }
@@ -168,6 +176,11 @@ export class ProviderSwitchRepository {
           ? SwitchOfferState.AVAILABLE
           : SwitchOfferState.PLAN_NOT_SUPPORTED,
         targetProvider: target.provider,
+        providers: (await getCheckoutProviders(logger)).filter((entry) =>
+          getActiveSwitchTargets().some((option) => option.provider === entry),
+        ),
+        nowPaymentsAcceptsCards: nowPaymentsAcceptsCards(),
+        cryptoMinUsd: await getCryptoMinimumUsd(logger),
         plan: subscription.planId,
         billingInterval: subscription.billingInterval,
         pastDue: subscription.status === SubscriptionStatus.PAST_DUE,
@@ -190,11 +203,13 @@ export class ProviderSwitchRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: SubscriptionProviderSwitchT,
+    provider?: typeof PaymentProviderValue,
   ): Promise<ResponseType<ProviderSwitchPostResponseOutput>> {
     try {
       const candidate = await ProviderSwitchRepository.findCandidate(
         user.id,
         logger,
+        provider,
       );
       if (!candidate) {
         return fail({
@@ -228,8 +243,8 @@ export class ProviderSwitchRepository {
         });
       }
 
-      const provider = getPaymentProvider(target.provider);
-      const customer = await provider.ensureCustomer(
+      const paymentProvider = getPaymentProvider(target.provider);
+      const customer = await paymentProvider.ensureCustomer(
         user.id,
         account.data.email,
         account.data.publicName || "",
@@ -261,7 +276,7 @@ export class ProviderSwitchRepository {
 
       const callbackToken = crypto.randomUUID();
       const appUrl = envClient.NEXT_PUBLIC_APP_URL;
-      const session = await provider.createCheckoutSession(
+      const session = await paymentProvider.createCheckoutSession(
         {
           userId: user.id,
           productId: tierProductId,

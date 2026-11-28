@@ -18,9 +18,22 @@ export const translations = {
       "Opens checkout at the new payment provider for your current plan. Your old card plan stops once it is paid. No double charge.",
   },
 
+  form: {
+    fields: {
+      provider: {
+        label: "Payment method",
+        description:
+          "Card (Whop) or crypto (NOWPayments). Defaults to the main method.",
+      },
+    },
+  },
+
   response: {
     offer: "Offer",
     targetProvider: "New provider",
+    providers: "Payment methods",
+    nowPaymentsAcceptsCards: "Card payments via NOWPayments",
+    cryptoMinUsd: "Lowest crypto amount (USD)",
     plan: "Plan",
     billingInterval: "Billing interval",
     pastDue: "Past due",
@@ -49,7 +62,6 @@ export const translations = {
       "The new card checkout cannot sell this plan on monthly billing yet. Pick yearly billing or pay with crypto.",
     cta: "Move my plan",
     ctaLoading: "Opening checkout...",
-    otherOptions: "Other ways to pay",
     noDoubleCharge:
       "Your old card plan stops as soon as the new one is paid. You are never charged twice.",
     checkoutReady: "Checkout is ready.",
@@ -63,6 +75,11 @@ export const translations = {
   },
 
   enums: {
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+      whop: "Whop",
+    },
     carryOver: {
       extendFirstPeriod: "Charge now, paid time extends the first period",
       deferredStart: "Billing starts when the paid time ends",

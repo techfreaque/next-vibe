@@ -86,6 +86,7 @@ import { useSubscription } from "../hooks";
 import { getPlanOfferState } from "../plan-offers";
 import type definition from "./definition";
 import { type PlanInterval, PlanPicker } from "./plan-picker";
+import { PlanProviderDialog } from "./plan-provider-dialog";
 import { PricingFaq } from "./pricing-faq";
 
 const MIN_QTY = 1;
@@ -515,92 +516,16 @@ export function SubscriptionCreateContainer(): JSX.Element {
       <CreditsTabHeader activeTab="buy" />
 
       {/* Subscription provider modal */}
-      <Dialog
+      <PlanProviderDialog
         open={isSubProviderModalOpen}
         onOpenChange={setIsSubProviderModalOpen}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {t("checkout.form.fields.provider.label")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("checkout.form.fields.provider.description")}
-            </DialogDescription>
-          </DialogHeader>
-          <Div className="grid gap-4 py-4">
-            {isCardCheckoutPaused && (
-              <Div
-                data-testid="card-checkout-paused"
-                className="flex items-start gap-2 rounded-lg border border-warning/50 bg-warning/15 p-3 text-sm text-warning"
-              >
-                <Info className="h-4 w-4 mt-0.5 shrink-0" />
-                {tCheckout("availability.cardPaused")}
-              </Div>
-            )}
-            {whopAvailable && (
-              <Button
-                type="button"
-                variant="outline"
-                data-testid="whop-card-option"
-                className="h-auto p-4 justify-start whitespace-normal"
-                onClick={() => handleSubProviderSelect(PaymentProvider.WHOP)}
-              >
-                <CreditCard className="h-6 w-6 text-primary mr-3" />
-                <Div className="min-w-0 text-left">
-                  <Div className="font-semibold">
-                    {tCheckout("availability.whopCardLabel")}
-                  </Div>
-                  <Div className="text-sm text-muted-foreground">
-                    {tCheckout("availability.whopCardDescription")}
-                  </Div>
-                </Div>
-              </Button>
-            )}
-            {showStripeOption && (
-              <Button
-                type="button"
-                variant="outline"
-                className={cn(
-                  "h-auto p-4 justify-start whitespace-normal",
-                  isCardCheckoutPaused && "order-last",
-                )}
-                onClick={() => handleSubProviderSelect(PaymentProvider.STRIPE)}
-                disabled={isCardCheckoutPaused}
-              >
-                <CreditCard className="h-6 w-6 text-primary mr-3" />
-                <Div className="min-w-0 text-left">
-                  <Div className="font-semibold">
-                    {t("buy.provider.stripe")}
-                  </Div>
-                  <Div className="text-sm text-muted-foreground">
-                    {t("buy.provider.stripeDescription")}
-                  </Div>
-                </Div>
-              </Button>
-            )}
-            <CryptoCheckoutOption
-              amountUsd={pendingPlanUsd}
-              minimumUsd={cryptoMinUsd}
-              acceptsCards={nowPaymentsAcceptsCards}
-              title={
-                nowPaymentsAcceptsCards
-                  ? tCheckout("availability.nowpaymentsCardLabel")
-                  : t("buy.provider.nowpayments")
-              }
-              description={
-                nowPaymentsAcceptsCards
-                  ? tCheckout("availability.nowpaymentsCardDescription")
-                  : t("buy.provider.nowpaymentsDescription")
-              }
-              belowMinimumNotice={t("buy.provider.cryptoAmountTooLow")}
-              onSelect={() =>
-                handleSubProviderSelect(PaymentProvider.NOWPAYMENTS)
-              }
-            />
-          </Div>
-        </DialogContent>
-      </Dialog>
+        locale={currentLocale}
+        checkoutProviders={checkoutProviders}
+        nowPaymentsAcceptsCards={nowPaymentsAcceptsCards}
+        cryptoMinUsd={cryptoMinUsd}
+        amountUsd={pendingPlanUsd}
+        onSelect={handleSubProviderSelect}
+      />
 
       {/* Pack provider modal */}
       <Dialog

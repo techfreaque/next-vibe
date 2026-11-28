@@ -30,6 +30,15 @@ import {
 import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { type JSX, useState } from "react";
 
+import {
+  CRYPTO_FALLBACK_MIN_USD,
+  cryptoAmountUsd,
+} from "@/payment/checkout/crypto-coins";
+import type { PaymentProviderValue } from "@/payment/enum";
+import { getTierProductForPlan } from "@/products/repository-client";
+
+import { PlanProviderDialog } from "../create/plan-provider-dialog";
+import { BillingInterval } from "../enum";
 import { PROVIDER_SWITCH_ANCHOR } from "./anchor";
 import definitions from "./definition";
 import { SwitchCarryOver, SwitchOfferState } from "./enum";
@@ -73,6 +82,7 @@ function ProviderSwitchCard(): JSX.Element {
   const user = useWidgetUser();
   const mutation = useApiMutation(definitions.POST, logger, user);
   const [error, setError] = useState<string | null>(null);
+  const [choiceOpen, setChoiceOpen] = useState(false);
 
   if (
     !data ||
@@ -84,11 +94,20 @@ function ProviderSwitchCard(): JSX.Element {
 
   const fmt = (value: Date | string | undefined): string =>
     value ? formatSimpleDate(new Date(value), locale) : "";
-  const buyPath = `/${locale}/subscription/buy`;
+  const tierProductId = data.plan ? getTierProductForPlan(data.plan) : null;
+  const planUsd = tierProductId
+    ? cryptoAmountUsd(
+        tierProductId,
+        data.billingInterval === BillingInterval.YEARLY ? "year" : "month",
+      )
+    : 0;
 
-  const handleMove = async (): Promise<void> => {
+  const handleMove = async (
+    provider: typeof PaymentProviderValue,
+  ): Promise<void> => {
+    setChoiceOpen(false);
     setError(null);
-    const result = await mutation.mutateAsync({});
+    const result = await mutation.mutateAsync({ requestData: { provider } });
     if (result.success) {
       assignUrl(result.data.checkoutUrl);
       return;
@@ -108,19 +127,19 @@ function ProviderSwitchCard(): JSX.Element {
   return (
     <Div
       id={PROVIDER_SWITCH_ANCHOR}
-      className="mb-4 scroll-mt-24 rounded-lg border-2 border-warning/50 bg-warning/10 p-4 sm:p-5"
+      className="mb-4 w-full min-w-0 max-w-full scroll-mt-24 rounded-lg border-2 border-warning/50 bg-warning/10 p-4 sm:p-5"
     >
-      <Div className="flex flex-col gap-3">
+      <Div className="flex min-w-0 flex-col gap-3">
         <Div className="flex flex-wrap items-center gap-2">
           <Badge className="bg-warning text-warning-foreground">
             {t("widget.badge")}
           </Badge>
         </Div>
-        <Div className="flex flex-col gap-1">
-          <P className="m-0 text-lg font-semibold text-foreground">
+        <Div className="flex min-w-0 flex-col gap-1">
+          <P className="m-0 break-words text-lg font-semibold text-foreground">
             {t("widget.title")}
           </P>
-          <P className="m-0 text-sm text-foreground">
+          <P className="m-0 break-words text-sm text-foreground">
             {t("widget.description")}
           </P>
         </Div>
@@ -128,22 +147,26 @@ function ProviderSwitchCard(): JSX.Element {
         {data.pastDue ? (
           <Div className="flex items-start gap-2 text-sm text-foreground">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-            <P className="m-0 leading-5">{t("widget.pastDue")}</P>
+            <P className="m-0 min-w-0 break-words leading-5">
+              {t("widget.pastDue")}
+            </P>
           </Div>
         ) : (
           data.deadline && (
-            <P className="m-0 text-sm font-medium text-foreground">
+            <P className="m-0 break-words text-sm font-medium text-foreground">
               {t("widget.deadline", { date: fmt(data.deadline) })}
             </P>
           )
         )}
 
         {carryLine && (
-          <P className="m-0 text-sm text-muted-foreground">{carryLine}</P>
+          <P className="m-0 break-words text-sm text-muted-foreground">
+            {carryLine}
+          </P>
         )}
 
         {data.offer === SwitchOfferState.PLAN_NOT_SUPPORTED && (
-          <P className="m-0 text-sm text-muted-foreground">
+          <P className="m-0 break-words text-sm text-muted-foreground">
             {t("widget.unsupportedPlan")}
           </P>
         )}
@@ -151,7 +174,7 @@ function ProviderSwitchCard(): JSX.Element {
         {error && (
           <Div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <P className="m-0 leading-5">{error}</P>
+            <P className="m-0 min-w-0 break-words leading-5">{error}</P>
           </Div>
         )}
 
@@ -160,7 +183,7 @@ function ProviderSwitchCard(): JSX.Element {
             <Button
               type="button"
               onClick={() => {
-                void handleMove();
+                setChoiceOpen(true);
               }}
               disabled={mutation.isPending}
               className="h-auto min-h-10 whitespace-normal"
@@ -169,18 +192,27 @@ function ProviderSwitchCard(): JSX.Element {
               {!mutation.isPending && <ArrowRight className="ml-2 h-4 w-4" />}
             </Button>
           )}
-          <Button
-            asChild
-            variant="outline"
-            className="h-auto min-h-10 whitespace-normal"
-          >
-            <Link href={buyPath}>{t("widget.otherOptions")}</Link>
-          </Button>
         </Div>
+
+        <PlanProviderDialog
+          open={choiceOpen}
+          onOpenChange={setChoiceOpen}
+          locale={locale}
+          checkoutProviders={data.providers}
+          nowPaymentsAcceptsCards={data.nowPaymentsAcceptsCards === true}
+          cryptoMinUsd={data.cryptoMinUsd ?? CRYPTO_FALLBACK_MIN_USD}
+          amountUsd={planUsd}
+          allowStripe={false}
+          onSelect={(provider) => {
+            void handleMove(provider);
+          }}
+        />
 
         <Div className="flex items-start gap-2 text-xs text-muted-foreground">
           <Shield className="mt-0.5 h-4 w-4 shrink-0" />
-          <P className="m-0 leading-5">{t("widget.noDoubleCharge")}</P>
+          <P className="m-0 min-w-0 break-words leading-5">
+            {t("widget.noDoubleCharge")}
+          </P>
         </Div>
       </Div>
     </Div>

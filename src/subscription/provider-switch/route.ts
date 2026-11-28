@@ -18,7 +18,13 @@ export const { GET, POST, tools } = endpointsHandler({
       ProviderSwitchRepository.getOffer(user, logger, t),
   },
   [Methods.POST]: {
-    handler: ({ user, locale, logger, t }) =>
-      ProviderSwitchRepository.startSwitch(user, locale, logger, t),
+    handler: ({ data, user, locale, logger, t }) =>
+      ProviderSwitchRepository.startSwitch(
+        user,
+        locale,
+        logger,
+        t,
+        data.provider,
+      ),
   },
 });

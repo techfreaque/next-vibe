@@ -32,6 +32,7 @@ import definitions from "./definition";
 import { scopedTranslation } from "./i18n";
 
 const OVERVIEW_PAGE = "/subscription/overview";
+const NOWPAYMENTS_CHECKOUT = /^https:\/\/(sandbox\.)?nowpayments\.io\//;
 const WHOP_CHECKOUT = /^https:\/\/(sandbox\.)?whop\.com\//;
 const SHOT_DIR = process.env.SWITCH_CARD_SHOT_DIR;
 
@@ -40,9 +41,11 @@ const { t } = scopedTranslation.scopedT(defaultLocale);
 describe("E2E: provider switch card", () => {
   const e2e = useE2E("subscription/provider-switch-card");
 
-  e2e.it(
-    "shows Move my plan for a Stripe Starter monthly plan and opens a Whop checkout",
-    async (fixtures) => {
+  const defineCase = (
+    name: string,
+    choice: "card" | "crypto",
+  ): void => {
+    e2e.it(name, async (fixtures) => {
       const { page } = fixtures;
       const created = await createTestUser(
         fixtures.uniqueEmail("switch-card"),
@@ -100,6 +103,13 @@ describe("E2E: provider switch card", () => {
         currentPeriodEnd: new Date(now + 28 * 86_400_000),
       });
       await fixtures.loginAs(account.user);
+      await page.route(NOWPAYMENTS_CHECKOUT, (route) =>
+        route.fulfill({
+          status: 200,
+          contentType: "text/html",
+          body: "<!doctype html><title>nowpayments stub</title>",
+        }),
+      );
       await page.route(WHOP_CHECKOUT, (route) =>
         route.fulfill({
           status: 200,
@@ -139,6 +149,19 @@ describe("E2E: provider switch card", () => {
       });
       expect(Math.abs(offset)).toBeLessThanOrEqual(1);
 
+      // The description wraps inside the card at desktop and phone widths.
+      for (const width of [1280, 390]) {
+        await page.setViewportSize({ width, height: 900 });
+        const fits = await card.evaluate((el) =>
+          [...el.querySelectorAll("p")].every(
+            (p) =>
+              p.getBoundingClientRect().right <=
+              el.getBoundingClientRect().right + 0.5,
+          ),
+        );
+        expect(fits, `text overflows the card at ${width}px`).toBe(true);
+      }
+
       if (SHOT_DIR) {
         await page.screenshot({
           path: `${SHOT_DIR}/overview-desktop.png`,
@@ -177,15 +200,35 @@ describe("E2E: provider switch card", () => {
         });
       }
 
+      // "Move my plan" asks how to pay: the same Card / Crypto choice as the
+      // regular plan purchase (no Stripe option).
+      await move.click();
+      await page.getByTestId("whop-card-option").waitFor();
+      expect(
+        await page.getByTestId("crypto-checkout-option").isVisible(),
+      ).toBe(true);
       const call = await fixtures.capture(definitions.POST, async () => {
-        await move.click();
+        await (choice === "card"
+          ? page.getByTestId("whop-card-option")
+          : page.getByTestId("crypto-checkout-option").getByRole("button")
+        ).click();
       });
       expect(call.response.success, JSON.stringify(call.response)).toBe(true);
       if (!call.response.success) {
         return;
       }
-      expect(call.response.data.checkoutUrl).toMatch(WHOP_CHECKOUT);
-      await page.waitForURL(WHOP_CHECKOUT);
-    },
+      const expected = choice === "card" ? WHOP_CHECKOUT : NOWPAYMENTS_CHECKOUT;
+      expect(call.response.data.checkoutUrl).toMatch(expected);
+      await page.waitForURL(expected);
+    });
+  };
+
+  defineCase(
+    "Move my plan offers Card and Crypto; Card opens a Whop checkout",
+    "card",
+  );
+  defineCase(
+    "Move my plan: Crypto opens a NOWPayments invoice for the same plan",
+    "crypto",
   );
 });

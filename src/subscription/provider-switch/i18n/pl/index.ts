@@ -20,9 +20,22 @@ export const translations: typeof enTranslations = {
       "Otwiera płatność u nowego operatora dla Twojego obecnego planu. Stary plan kartowy kończy się po opłaceniu nowego. Bez podwójnej opłaty.",
   },
 
+  form: {
+    fields: {
+      provider: {
+        label: "Metoda płatności",
+        description:
+          "Karta (Whop) lub krypto (NOWPayments). Domyślnie główna metoda.",
+      },
+    },
+  },
+
   response: {
     offer: "Oferta",
     targetProvider: "Nowy operator",
+    providers: "Metody płatności",
+    nowPaymentsAcceptsCards: "Płatności kartą przez NOWPayments",
+    cryptoMinUsd: "Najniższa kwota krypto (USD)",
     plan: "Plan",
     billingInterval: "Okres rozliczeniowy",
     pastDue: "Zaległość",
@@ -51,7 +64,6 @@ export const translations: typeof enTranslations = {
       "Nowa płatność kartą nie obsługuje jeszcze tego planu w rozliczeniu miesięcznym. Wybierz rozliczenie roczne albo zapłać krypto.",
     cta: "Przenieś mój plan",
     ctaLoading: "Otwieranie płatności...",
-    otherOptions: "Inne sposoby płatności",
     noDoubleCharge:
       "Stary plan kartowy kończy się, gdy tylko opłacisz nowy. Nigdy nie płacisz podwójnie.",
     checkoutReady: "Płatność gotowa.",
@@ -66,6 +78,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+      whop: "Whop",
+    },
     carryOver: {
       extendFirstPeriod: "Opłata teraz, opłacony czas wydłuża pierwszy okres",
       deferredStart: "Rozliczanie zaczyna się po końcu opłaconego czasu",

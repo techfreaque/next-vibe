@@ -20,9 +20,22 @@ export const translations: typeof enTranslations = {
       "Apre il pagamento presso il nuovo fornitore per il tuo piano attuale. Il vecchio piano con carta si ferma una volta pagato il nuovo. Nessun doppio addebito.",
   },
 
+  form: {
+    fields: {
+      provider: {
+        label: "Metodo di pagamento",
+        description:
+          "Carta (Whop) o cripto (NOWPayments). Predefinito: il metodo principale.",
+      },
+    },
+  },
+
   response: {
     offer: "Offerta",
     targetProvider: "Nuovo fornitore",
+    providers: "Metodi di pagamento",
+    nowPaymentsAcceptsCards: "Pagamenti con carta tramite NOWPayments",
+    cryptoMinUsd: "Importo cripto minimo (USD)",
     plan: "Piano",
     billingInterval: "Frequenza di fatturazione",
     pastDue: "Pagamento scaduto",
@@ -51,7 +64,6 @@ export const translations: typeof enTranslations = {
       "Il nuovo pagamento con carta non offre ancora questo piano con fatturazione mensile. Scegli la fatturazione annuale o paga in crypto.",
     cta: "Sposta il mio piano",
     ctaLoading: "Apertura del pagamento...",
-    otherOptions: "Altri metodi di pagamento",
     noDoubleCharge:
       "Il vecchio piano con carta si ferma appena paghi il nuovo. Non paghi mai due volte.",
     checkoutReady: "Il pagamento è pronto.",
@@ -66,6 +78,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+      whop: "Whop",
+    },
     carryOver: {
       extendFirstPeriod:
         "Addebito ora, il tempo pagato allunga il primo periodo",

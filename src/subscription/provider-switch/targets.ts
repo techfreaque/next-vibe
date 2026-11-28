@@ -62,6 +62,20 @@ const whopCardTarget: SubscriptionSwitchTarget = {
   supportsPlan: () => true,
 };
 
+/**
+ * NOWPayments crypto: a one-off invoice (any coin; cards too when fiat is on).
+ * Offered next to the main target while the switch is on. Same carry-over as
+ * the card target: the paid days extend the first period, so the new plan is
+ * paid and then the old card plan stops. Every plan sells: the crypto floor
+ * is enforced by the NOWPayments checkout itself and shown in the dialog.
+ */
+const nowPaymentsCryptoTarget: SubscriptionSwitchTarget = {
+  provider: PaymentProvider.NOWPAYMENTS,
+  carryOver: SwitchCarryOver.EXTEND_FIRST_PERIOD,
+  isReady: () => Boolean(paymentEnv.NOWPAYMENTS_API_KEY),
+  supportsPlan: () => true,
+};
+
 const targets = new Map<keyof typeof PaymentProvider, SubscriptionSwitchTarget>(
   [
     ["NOWPAYMENTS", nowPaymentsCardTarget],
@@ -103,6 +117,30 @@ export function resolveSwitchTarget(
 /** The configured, enabled and ready target, or null. */
 export function getActiveSwitchTarget(): SubscriptionSwitchTarget | null {
   return resolveSwitchTarget({
+    enabled: providerSwitchEnv.SUBSCRIPTION_SWITCH_ENABLED === "true",
+    providerKey: providerSwitchEnv.SUBSCRIPTION_SWITCH_PROVIDER,
+  });
+}
+
+/**
+ * Every provider this account may move to right now: the configured target
+ * plus NOWPayments crypto. Empty while the switch is off.
+ */
+export function getSwitchTargets(
+  config: SwitchTargetConfig,
+): SubscriptionSwitchTarget[] {
+  const main = resolveSwitchTarget(config);
+  if (!main) {
+    return [];
+  }
+  return main.provider === PaymentProvider.NOWPAYMENTS ||
+    !nowPaymentsCryptoTarget.isReady()
+    ? [main]
+    : [main, nowPaymentsCryptoTarget];
+}
+
+export function getActiveSwitchTargets(): SubscriptionSwitchTarget[] {
+  return getSwitchTargets({
     enabled: providerSwitchEnv.SUBSCRIPTION_SWITCH_ENABLED === "true",
     providerKey: providerSwitchEnv.SUBSCRIPTION_SWITCH_PROVIDER,
   });

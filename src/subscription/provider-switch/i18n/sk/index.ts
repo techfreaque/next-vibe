@@ -20,9 +20,22 @@ export const translations: typeof enTranslations = {
       "Otvorí platbu u nového poskytovateľa pre tvoj aktuálny plán. Starý kartový plán sa zastaví po zaplatení nového. Žiadna dvojitá platba.",
   },
 
+  form: {
+    fields: {
+      provider: {
+        label: "Spôsob platby",
+        description:
+          "Karta (Whop) alebo krypto (NOWPayments). Predvolene hlavný spôsob.",
+      },
+    },
+  },
+
   response: {
     offer: "Ponuka",
     targetProvider: "Nový poskytovateľ",
+    providers: "Spôsoby platby",
+    nowPaymentsAcceptsCards: "Platby kartou cez NOWPayments",
+    cryptoMinUsd: "Najnižšia suma v krypte (USD)",
     plan: "Plán",
     billingInterval: "Fakturačné obdobie",
     pastDue: "Po splatnosti",
@@ -50,7 +63,6 @@ export const translations: typeof enTranslations = {
       "Nová platba kartou zatiaľ neponúka tento plán s mesačnou fakturáciou. Vyber ročnú fakturáciu alebo zaplať kryptom.",
     cta: "Presunúť môj plán",
     ctaLoading: "Otvára sa platba...",
-    otherOptions: "Iné spôsoby platby",
     noDoubleCharge:
       "Starý kartový plán sa zastaví hneď, ako zaplatíš nový. Nikdy neplatíš dvakrát.",
     checkoutReady: "Platba je pripravená.",
@@ -64,6 +76,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+      whop: "Whop",
+    },
     carryOver: {
       extendFirstPeriod: "Platba teraz, zaplatený čas predĺži prvé obdobie",
       deferredStart: "Fakturácia začne, keď skončí zaplatený čas",

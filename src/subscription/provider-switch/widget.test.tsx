@@ -69,7 +69,6 @@ it("explains an unsupported plan without a move button", async () => {
   const markup = await renderCard();
   expect(markup).toContain("widget.unsupportedPlan");
   expect(markup).not.toContain("widget.cta");
-  expect(markup).toContain("widget.otherOptions");
 });
 
 it("leads with the failed renewal for a past-due plan", async () => {

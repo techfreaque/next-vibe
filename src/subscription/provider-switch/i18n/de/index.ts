@@ -20,9 +20,22 @@ export const translations: typeof enTranslations = {
       "Öffnet den Checkout beim neuen Zahlungsanbieter für deinen aktuellen Plan. Dein alter Kartenplan endet, sobald der neue bezahlt ist. Keine Doppelabbuchung.",
   },
 
+  form: {
+    fields: {
+      provider: {
+        label: "Zahlungsart",
+        description:
+          "Karte (Whop) oder Krypto (NOWPayments). Standard ist die Hauptzahlungsart.",
+      },
+    },
+  },
+
   response: {
     offer: "Angebot",
     targetProvider: "Neuer Anbieter",
+    providers: "Zahlungsarten",
+    nowPaymentsAcceptsCards: "Kartenzahlung über NOWPayments",
+    cryptoMinUsd: "Niedrigster Krypto-Betrag (USD)",
     plan: "Plan",
     billingInterval: "Abrechnungsintervall",
     pastDue: "Überfällig",
@@ -51,7 +64,6 @@ export const translations: typeof enTranslations = {
       "Der neue Kartencheckout kann diesen Plan noch nicht monatlich anbieten. Wähl jährliche Abrechnung oder zahl mit Krypto.",
     cta: "Plan umziehen",
     ctaLoading: "Checkout wird geöffnet...",
-    otherOptions: "Andere Zahlungswege",
     noDoubleCharge:
       "Dein alter Kartenplan endet, sobald der neue bezahlt ist. Du zahlst nie doppelt.",
     checkoutReady: "Checkout ist bereit.",
@@ -65,6 +77,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+      whop: "Whop",
+    },
     carryOver: {
       extendFirstPeriod:
         "Jetzt abbuchen, bezahlte Zeit verlängert den ersten Zeitraum",
