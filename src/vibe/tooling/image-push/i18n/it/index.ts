@@ -228,7 +228,7 @@ export const translations: typeof enTranslations = {
           " ⁇  Pruned Docker costruiscono la cache per indirizzare {{size}} GB ({{reclaimed}} recuperato)",
         cleanupCacheFailed: "Pruning the Docker build cache fail: {{error}}",
         cleanupExportsParked:
-          " ⁇  Esportazione di vecchi impegni {{count}} (s) in {{dir}}",
+          "🧹 Eliminate {{count}} vecchie esportazioni di build in {{dir}}",
         cleanupExportFailed:
           "Spostare l'export di commit {{dir}} ha fallito: {{error}}",
         diskLow:

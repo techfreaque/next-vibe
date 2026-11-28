@@ -219,7 +219,7 @@ export const translations = {
           "🧹 Pruned Docker build cache to target {{size}} GB ({{reclaimed}} reclaimed)",
         cleanupCacheFailed: "Pruning the Docker build cache failed: {{error}}",
         cleanupExportsParked:
-          "🧹 Moved {{count}} old commit export(s) to {{dir}}",
+          "🧹 Deleted {{count}} old build export(s) under {{dir}}",
         cleanupExportFailed:
           "Moving old commit export {{dir}} failed: {{error}}",
         diskLow:

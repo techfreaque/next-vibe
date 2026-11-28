@@ -228,7 +228,7 @@ export const translations: typeof enTranslations = {
         cleanupCacheFailed:
           "Czyszczenie cache buildów Dockera nie powiodło się: {{error}}",
         cleanupExportsParked:
-          "🧹 Przeniesiono {{count}} starych eksportów commitów do {{dir}}",
+          "🧹 Usunięto {{count}} starych eksportów buildów w {{dir}}",
         cleanupExportFailed:
           "Przeniesienie starego eksportu commita {{dir}} nie powiodło się: {{error}}",
         diskLow:

@@ -230,7 +230,7 @@ export const translations: typeof enTranslations = {
         cleanupCacheFailed:
           "Čistenie vyrovnávacej pamäte zostáv Dockeru zlyhalo: {{error}}",
         cleanupExportsParked:
-          "🧹 Staré exporty commitov sa presunuli do {{dir}}. Počet: {{count}}.",
+          "🧹 Zmazané staré exporty buildov: {{count}} v {{dir}}",
         cleanupExportFailed:
           "Presun starého exportu commitu {{dir}} zlyhal: {{error}}",
         diskLow:

@@ -229,7 +229,7 @@ export const translations: typeof enTranslations = {
         cleanupCacheFailed:
           "Löschen des Docker-Build-Caches fehlgeschlagen: {{error}}",
         cleanupExportsParked:
-          "🧹 {{count}} alte Commit-Export(e) nach {{dir}} verschoben",
+          "🧹 {{count}} alte Build-Export(e) unter {{dir}} gelöscht",
         cleanupExportFailed:
           "Verschieben des alten Commit-Exports {{dir}} fehlgeschlagen: {{error}}",
         diskLow:

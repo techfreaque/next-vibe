@@ -14,7 +14,8 @@
  *
  * Every temporary gate artifact (`node_modules` symlink, `.git`, `.tmp`,
  * temporary `.env`, untracked generated files) is restored/parked to
- * `.tmp/todelete/image-build-gate/` in a `finally` block (never `rm`ed) so the
+ * `.tmp/todelete/image-build-gate/` in a `finally` block; cleanup.ts deletes all
+ * but the newest 2 of those copies after a push, so the
  * Docker build context always matches the exact committed tree.
  */
 

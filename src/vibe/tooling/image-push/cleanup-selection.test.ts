@@ -15,7 +15,7 @@ import {
   remoteInventoryScript,
   remotePinnedTags,
   remoteRetentionScript,
-  selectExportEntriesToPark,
+  selectExportEntriesToRemove,
   selectImageRefsToRemove,
   selectLocalImageRefsToRemove,
 } from "./cleanup-selection";
@@ -176,7 +176,7 @@ describe("selectImageRefsToRemove", () => {
 });
 
 describe("selectLocalImageRefsToRemove", () => {
-  it("keeps only the build identified by the commit tag and images used by containers", () => {
+  it("keeps the current build, the newest other build and images used by containers", () => {
     const entries = [
       ...build(6, ["newer"]),
       ...build(5, ["rollback", "old-custom"]),
@@ -188,6 +188,7 @@ describe("selectLocalImageRefsToRemove", () => {
       ...build(2, ["in-use", "in-use-alias"]),
       ...build(1, ["current-sha", "custom-tag", "latest"]),
     ];
+    // current (1) + container (2) + the newest other build (6) are protected.
     expect(
       selectLocalImageRefsToRemove({
         entries,
@@ -195,24 +196,18 @@ describe("selectLocalImageRefsToRemove", () => {
         containerImageIds: [id(2)],
       }),
     ).toEqual(
-      [
-        "newer",
-        "rollback",
-        "old-custom",
-        "prod-current-good",
-        "unreadable-date",
-      ].map((tag) => `${REPO}:${tag}`),
+      ["rollback", "old-custom", "prod-current-good", "unreadable-date"].map(
+        (tag) => `${REPO}:${tag}`,
+      ),
     );
   });
 
-  it("untags stale latest after a registry-only push and scopes cleanup to named app refs", () => {
+  it("keeps the two newest builds after a registry-only push and scopes cleanup to the repository", () => {
     const entries = [
-      ...build(3, ["current-sha"]).map((entry) => ({
-        ...entry,
-        repository: "postgres",
-      })),
-      ...build(2, ["<none>"]),
-      ...build(1, ["current-sha", "latest"]),
+      ...build(4, ["x"]).map((entry) => ({ ...entry, repository: "postgres" })),
+      ...build(3, ["c"]),
+      ...build(2, ["b"]),
+      ...build(1, ["a", "latest"]),
     ];
     expect(
       selectLocalImageRefsToRemove({
@@ -220,7 +215,23 @@ describe("selectLocalImageRefsToRemove", () => {
         currentTag: undefined,
         containerImageIds: [],
       }),
-    ).toEqual([`${REPO}:current-sha`, `${REPO}:latest`]);
+    ).toEqual([`${REPO}:a`, `${REPO}:latest`]);
+  });
+
+  it("trims other repositories independently", () => {
+    const entries = [
+      ...build(3, ["c"]).map((e) => ({ ...e, repository: "next-vibe-commit-proof" })),
+      ...build(2, ["b"]).map((e) => ({ ...e, repository: "next-vibe-commit-proof" })),
+      ...build(1, ["a"]).map((e) => ({ ...e, repository: "next-vibe-commit-proof" })),
+    ];
+    expect(
+      selectLocalImageRefsToRemove({
+        repository: "next-vibe-commit-proof",
+        entries,
+        currentTag: undefined,
+        containerImageIds: [],
+      }),
+    ).toEqual(["next-vibe-commit-proof:a"]);
   });
 
   it("skips image cleanup if the expected local commit tag is missing", () => {
@@ -246,29 +257,29 @@ const exportFile = (name: string): ExportEntry => ({
   isFile: true,
 });
 
-describe("selectExportEntriesToPark", () => {
-  it("parks every other export and its marker, including incomplete exports", () => {
+describe("selectExportEntriesToRemove", () => {
+  it("keeps the previous export (newest mtime) and removes the rest, including incomplete exports", () => {
     const entries = [
       exportDir("a"),
       exportFile(`${exportSha("a")}.done`),
-      exportDir("b"),
+      { ...exportDir("b"), mtimeMs: 10 },
       exportFile(`${exportSha("b")}.done`),
-      exportDir("c"),
-      exportDir("d"),
+      { ...exportDir("c"), mtimeMs: 30 },
+      { ...exportDir("d"), mtimeMs: 20 },
       exportFile(`${exportSha("d")}.done`),
     ];
+    // c is the newest other export: it is the kept "previous" one.
     expect(
-      selectExportEntriesToPark({ entries, currentSha: exportSha("a") }),
+      selectExportEntriesToRemove({ entries, currentSha: exportSha("a") }),
     ).toEqual(
       new Map([
         [exportSha("b"), [exportSha("b"), `${exportSha("b")}.done`]],
-        [exportSha("c"), [exportSha("c")]],
         [exportSha("d"), [exportSha("d"), `${exportSha("d")}.done`]],
       ]),
     );
   });
 
-  it("parks orphaned old markers including .checked and .gate-dirty, and skips unrelated entries", () => {
+  it("removes orphaned old markers including .checked and .gate-dirty, and skips unrelated entries", () => {
     const entries: ExportEntry[] = [
       exportFile(`${exportSha("a")}.done`),
       exportFile(`${exportSha("a")}.checked`),
@@ -283,7 +294,11 @@ describe("selectExportEntriesToPark", () => {
       { name: exportSha("d"), isDirectory: false, isFile: false },
     ];
     expect(
-      selectExportEntriesToPark({ entries, currentSha: exportSha("a") }),
+      selectExportEntriesToRemove({
+        entries,
+        currentSha: exportSha("a"),
+        keep: 1,
+      }),
     ).toEqual(
       new Map([
         [

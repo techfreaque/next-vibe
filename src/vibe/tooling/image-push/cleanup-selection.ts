@@ -17,7 +17,7 @@ export const PINNED_TAGS: readonly string[] = [
 export const KEEP_BUILDS = 3;
 
 /** Age and size targets for unused local Docker build cache. */
-export const BUILD_CACHE_KEEP_HOURS = 24;
+export const BUILD_CACHE_KEEP_HOURS = 48;
 export const BUILD_CACHE_KEEP_GB = 30;
 
 /** Below this many free GB on the docker root, prune before building. */
@@ -38,6 +38,8 @@ export interface ExportEntry {
   name: string;
   isDirectory: boolean;
   isFile: boolean;
+  /** Last modification time, used to keep the newest exports. */
+  mtimeMs?: number;
 }
 
 const DANGLING_TAG = "<none>";
@@ -124,45 +126,89 @@ export function selectImageRefsToRemove(params: {
   return refs;
 }
 
+/** Local builds kept per image repository after a push (current + previous). */
+export const LOCAL_KEEP_BUILDS = 2;
+
+/** Local export dirs (`.tmp/image-build/<sha>/`) kept (current + previous). */
+export const KEEP_EXPORTS = 2;
+
+/** Extra local repositories trimmed to LOCAL_KEEP_BUILDS after a push. */
+export const LOCAL_TRIMMED_REPOS: readonly string[] = [
+  CLEANUP_IMAGE_REPO,
+  "next-vibe-commit-proof",
+];
+
 /**
- * After a successful push, pick every local app tag except tags of the
- * just-built image and images referenced by containers. A registry-only push
- * has no local build to keep. An expected tag missing from the list means
- * the current image could not be identified safely.
+ * After a successful push, pick the local tags of every build except the
+ * newest `keepBuilds` (which always include the just-built image) and images
+ * referenced by containers. Builds with an unreadable creation time are kept.
+ * An expected tag missing from the list means the current image could not be
+ * identified safely.
  */
 export function selectLocalImageRefsToRemove(params: {
+  repository?: string;
   entries: LocalImageEntry[];
   currentTag: string | undefined;
   containerImageIds: readonly string[];
+  keepBuilds?: number;
 }): string[] | undefined {
-  const { entries, currentTag, containerImageIds } = params;
+  const {
+    repository = CLEANUP_IMAGE_REPO,
+    entries,
+    currentTag,
+    containerImageIds,
+    keepBuilds = LOCAL_KEEP_BUILDS,
+  } = params;
   const appEntries = entries.filter(
-    ({ repository, id }) => repository === CLEANUP_IMAGE_REPO && id,
+    (entry) => entry.repository === repository && entry.id,
   );
   const currentImageId = appEntries.find(({ tag }) => tag === currentTag)?.id;
   if (currentTag !== undefined && currentImageId === undefined) {
     return undefined;
   }
-  const protectedIds = new Set(containerImageIds);
+  const keptIds = new Set<string>();
   if (currentImageId !== undefined) {
-    protectedIds.add(currentImageId);
+    keptIds.add(currentImageId);
   }
+  const created = new Map<string, number>();
+  for (const entry of appEntries) {
+    created.set(entry.id, parseDockerCreatedAt(entry.createdAt));
+  }
+  const newestFirst = [...created.entries()]
+    .filter(([, ms]) => !Number.isNaN(ms))
+    .toSorted(([, a], [, b]) => b - a)
+    .map(([id]) => id);
+  // The current build already holds one slot, so it counts against the cap.
+  for (const id of newestFirst) {
+    if (keptIds.size >= keepBuilds) {
+      break;
+    }
+    keptIds.add(id);
+  }
+  const protectedIds = new Set([...keptIds, ...containerImageIds]);
   return appEntries
     .filter(
       ({ tag, id }) => tag && tag !== DANGLING_TAG && !protectedIds.has(id),
     )
-    .map(({ repository, tag }) => `${repository}:${tag}`);
+    .map((entry) => `${entry.repository}:${entry.tag}`);
 }
 
 const EXPORT_MARKER_SUFFIXES = [".done", ".checked", ".gate-dirty"] as const;
 
-/** Groups old full-SHA export dirs and sibling markers by commit. */
-export function selectExportEntriesToPark(params: {
+/**
+ * Groups old full-SHA export dirs and sibling markers by commit, skipping the
+ * current commit and the newest `keep - 1` others (by dir mtime) so the
+ * current plus the previous export survive.
+ */
+export function selectExportEntriesToRemove(params: {
   entries: ExportEntry[];
   currentSha: string;
+  keep?: number;
 }): Map<string, string[]> {
-  const exportsToPark = new Map<string, string[]>();
-  for (const { name, isDirectory, isFile } of params.entries) {
+  const { keep = KEEP_EXPORTS } = params;
+  const exportsToRemove = new Map<string, string[]>();
+  const newest = new Map<string, number>();
+  for (const { name, isDirectory, isFile, mtimeMs } of params.entries) {
     const markerSuffix = isFile
       ? EXPORT_MARKER_SUFFIXES.find((suffix) => name.endsWith(suffix))
       : undefined;
@@ -174,11 +220,20 @@ export function selectExportEntriesToPark(params: {
     ) {
       continue;
     }
-    const names = exportsToPark.get(sha) ?? [];
+    const names = exportsToRemove.get(sha) ?? [];
     names.push(name);
-    exportsToPark.set(sha, names);
+    exportsToRemove.set(sha, names);
+    newest.set(sha, Math.max(newest.get(sha) ?? 0, mtimeMs ?? 0));
   }
-  return exportsToPark;
+  const keepOthers = Math.max(0, keep - 1);
+  const keptShas = [...newest.entries()]
+    .toSorted(([, a], [, b]) => b - a)
+    .slice(0, keepOthers)
+    .map(([sha]) => sha);
+  for (const sha of keptShas) {
+    exportsToRemove.delete(sha);
+  }
+  return exportsToRemove;
 }
 
 // ============================================================================
