@@ -157,17 +157,20 @@ export const translations: typeof enTranslations = {
         dockerBuildFailed: "Docker बिल्ड फ़ेल हुआ: {{error}}",
         commitResolveFailed: "कमिट '{{ref}}' नहीं मिल सका",
         commitResolveFailedDetail: "कमिट '{{ref}}' नहीं मिल सका: {{error}}",
-        commitResolved: "📌 कमिट {{sha}} बिल्ड हो रहा है ({{ref}}): {{subject}}",
+        commitResolved:
+          "📌 कमिट {{sha}} बिल्ड हो रहा है ({{ref}}): {{subject}}",
         dirtyTreeWarning:
           "⚠️ वर्किंग ट्री में {{count}} बिना कमिट बदलाव हैं। वे इमेज से बाहर हैं। सिर्फ़ कमिट {{sha}} बिल्ड होता है।",
-        deployedShaRecorded: "📝 डिप्लॉय किया कमिट {{sha}} {{path}} में दर्ज हुआ",
+        deployedShaRecorded:
+          "📝 डिप्लॉय किया कमिट {{sha}} {{path}} में दर्ज हुआ",
         deployedShaRecordFailed:
           "डिप्लॉय सफल रहा, पर {{path}} लिखना फ़ेल हुआ: {{error}}",
         exportStart: "📦 कमिट {{sha}} {{dir}} में एक्सपोर्ट हो रहा है ...",
         exportReused:
           "📦 {{sha}} का एक्सपोर्ट किया ट्री {{dir}} से दोबारा इस्तेमाल हो रहा है",
         exportFailed: "कमिट {{sha}} एक्सपोर्ट करना फ़ेल हुआ: {{error}}",
-        sshTransferStart: "📡 {{refs}} को ssh से {{target}} पर भेजा जा रहा है ...",
+        sshTransferStart:
+          "📡 {{refs}} को ssh से {{target}} पर भेजा जा रहा है ...",
         sshTransferSuccess: "🚀 {{refs}} ssh से {{target}} पर भेजी गईं",
         sshTransferFailed: "{{target}} पर ssh ट्रांसफ़र फ़ेल हुआ: {{error}}",
         scriptSynced: "📜 कमिट {{sha}} से {{target}} पर {{script}} सिंक हुई",
@@ -176,6 +179,10 @@ export const translations: typeof enTranslations = {
         scriptMissing: "कमिट {{sha}} में {{path}} ग़ायब है",
         scriptSyntaxInvalid:
           "bash -n ने कमिट {{sha}} की {{path}} अस्वीकार की। लाइव स्क्रिप्ट नहीं छुई गई।",
+        pgGuardFailed:
+          "{{target}} पर Postgres गार्ड ने डिप्लॉय रोक दिया, कुछ नहीं बदला: {{error}}",
+        pgGuardMissing: "इस चेकआउट में {{path}} नहीं है",
+        pgGuardPassed: "🛡️ {{target}} पर Postgres गार्ड पास",
         scriptRemoteExit: "रिमोट कमांड कोड {{code}} के साथ बाहर निकली",
         secondaryStart:
           "🔁 सर्वर 1 लाइव है। सर्वर 2 ({{target}}) रोल हो रहा है ...",
@@ -202,7 +209,8 @@ export const translations: typeof enTranslations = {
           "कमिट {{sha}} में scripts/ha-node-drain.sh ग़ायब है: ड्रेन के बिना डिप्लॉय हो रहा है",
         drainStepFailed:
           "{{target}} पर ha-node-drain.sh {{step}} फ़ेल हुआ: {{error}}",
-        envSyncFailed: "सर्वर 1 की .env सर्वर 2 पर कॉपी करना फ़ेल हुआ: {{error}}",
+        envSyncFailed:
+          "सर्वर 1 की .env सर्वर 2 पर कॉपी करना फ़ेल हुआ: {{error}}",
         cleanupSkippedImage:
           "🧹 लोकल क्लीनअप छोड़ा गया: {{image}} {{allowed}} नहीं है",
         cleanupListFailed:
@@ -251,14 +259,16 @@ export const translations: typeof enTranslations = {
           "डिप्लॉय रुका: कमिट {{sha}} में जेनरेट फ़ाइलें पुरानी हैं (vibe gen ने {{count}} फ़ाइल बदली): {{files}}",
         gateCheckStart:
           "🔍 एक्सपोर्ट किए कमिट {{sha}} में पूरे रेपो का vibe check चल रहा है ...",
-        gateCheckPassed: "✅ कमिट {{sha}} के लिए पूरे रेपो का vibe check पास हुआ",
+        gateCheckPassed:
+          "✅ कमिट {{sha}} के लिए पूरे रेपो का vibe check पास हुआ",
         gateCheckFailed:
           "डिप्लॉय रुका: कमिट {{sha}} के लिए vibe check फ़ेल हुआ: {{error}}",
         gateCheckIncomplete:
           "डिप्लॉय रुका: कमिट {{sha}} के लिए vibe check पूरा नहीं हुआ: {{error}}",
         gateSetupFailed:
           "डिप्लॉय रुका: सेफ़्टी गेट के लिए एक्सपोर्ट किया कमिट {{sha}} तैयार नहीं हो सका: {{error}}",
-        gateCleanupWarn: "⚠️ {{dir}} के लिए सेफ़्टी गेट क्लीनअप चेतावनी: {{error}}",
+        gateCleanupWarn:
+          "⚠️ {{dir}} के लिए सेफ़्टी गेट क्लीनअप चेतावनी: {{error}}",
         gateMarkerWarn:
           "⚠️ {{sha}} के लिए सेफ़्टी गेट पास हुआ, पर कैश मार्कर {{path}} लिखना फ़ेल हुआ: {{error}}",
         gatePassed: "✅ कमिट {{sha}} के लिए डिप्लॉय सेफ़्टी गेट पास हुआ",

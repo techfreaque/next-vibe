@@ -174,6 +174,10 @@ export const translations = {
         scriptMissing: "{{path}} is missing from commit {{sha}}",
         scriptSyntaxInvalid:
           "bash -n rejected {{path}} from commit {{sha}}. Live script untouched.",
+        pgGuardFailed:
+          "Postgres guard on {{target}} refused the deploy, nothing was changed: {{error}}",
+        pgGuardMissing: "{{path}} is missing from this checkout",
+        pgGuardPassed: "🛡️ Postgres guard passed on {{target}}",
         scriptRemoteExit: "remote command exited with code {{code}}",
         secondaryStart: "🔁 Server 1 live. Rolling Server 2 ({{target}}) ...",
         secondarySuccess:

@@ -182,6 +182,10 @@ export const translations: typeof enTranslations = {
         scriptMissing: "{{path}} está desaparecido de comprometer {{sha}}",
         scriptSyntaxInvalid:
           "bash -n rechazado {{path}} de comprometer {{sha}}. Guión vivo sin tocar.",
+        pgGuardFailed:
+          "El guardián de Postgres en {{target}} detuvo el despliegue, no se cambió nada: {{error}}",
+        pgGuardMissing: "Falta {{path}} en este checkout",
+        pgGuardPassed: "🛡️ Guardián de Postgres superado en {{target}}",
         scriptRemoteExit: "mando remoto salida con código {{code}}",
         secondaryStart: " ⁇  Servidor 1 vivo. Rolling Server 2 ({{target}})...",
         secondarySuccess:

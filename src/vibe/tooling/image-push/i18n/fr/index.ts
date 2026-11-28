@@ -184,6 +184,10 @@ export const translations: typeof enTranslations = {
         scriptMissing: "{{path}} est absent du commit {{sha}}",
         scriptSyntaxInvalid:
           "bash -n a rejeté {{path}} du commit {{sha}}. Script en place inchangé.",
+        pgGuardFailed:
+          "Le garde-fou Postgres sur {{target}} a bloqué le déploiement, rien n'a été modifié : {{error}}",
+        pgGuardMissing: "{{path}} manque dans ce checkout",
+        pgGuardPassed: "🛡️ Garde-fou Postgres validé sur {{target}}",
         scriptRemoteExit:
           "la commande distante s'est terminée avec le code {{code}}",
         secondaryStart:

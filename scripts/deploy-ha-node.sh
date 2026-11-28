@@ -75,7 +75,9 @@ if [ -n "${HA_NEW_IMAGE_REF:-}" ]; then
 fi
 
 # 3. Sanity: the stack renders and points at the expected image.
-REF="$(compose config --images app | head -1)"
+# Read the app service image from the rendered config: `config --images app`
+# also lists depends_on images in random order (incident 2026-11-28).
+REF="$(compose config --format json | python3 -c 'import json,sys; print(json.load(sys.stdin)["services"]["app"].get("image", ""))')"
 [ "$REF" = "${IMAGE_NAME}:${IMAGE_TAG}" ] || { log "ERROR: compose resolves app image to '$REF', expected ${IMAGE_NAME}:${IMAGE_TAG}"; exit 1; }
 docker image inspect "$REF" >/dev/null
 

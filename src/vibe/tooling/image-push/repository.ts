@@ -54,6 +54,8 @@ import {
 const DRAIN_SCRIPT = "scripts/ha-node-drain.sh";
 const STAGE_ASSETS_SCRIPT = "scripts/ha-stage-next-assets.py";
 const EDGE_CANARY_SCRIPT = "scripts/ha-edge-canary.sh";
+/** Read-only check that prod-postgres and its compose image are real postgres. */
+const PG_GUARD_SCRIPT = "scripts/pg-image-guard.sh";
 
 /** One HA box as the drain orchestration reaches it. */
 interface DrainBox {
@@ -233,6 +235,27 @@ export class ImagePushRepository {
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
           });
         }
+      }
+    }
+
+    // Refuse before the ~40 min build when Server 1's database or its compose
+    // service image is not a real, matching postgres image (incident
+    // 2026-11-28: an app image tagged as unbottled-postgres took the DB down).
+    if (
+      data.push &&
+      data.primary &&
+      transferTarget &&
+      imagePushEnv.SSH_DEPLOY_SCRIPT
+    ) {
+      const guard = await ImagePushRepository.runPgGuard(
+        transferTarget,
+        imagePushEnv.SSH_DEPLOY_SCRIPT,
+        imagePushEnv.SSH_SERVER_PWD,
+        logger,
+        t,
+      );
+      if (!guard.success) {
+        return guard;
       }
     }
 
@@ -1663,6 +1686,19 @@ export class ImagePushRepository {
       return syncResult;
     }
 
+    // Again right before the script: the build and transfer take ~40 min, and
+    // an older commit's script would not run the guard itself.
+    const guard = await ImagePushRepository.runPgGuard(
+      sshTarget,
+      script,
+      password,
+      logger,
+      t,
+    );
+    if (!guard.success) {
+      return guard;
+    }
+
     logger.info("Running deploy script on remote server", {
       sshTarget,
       script,
@@ -1714,6 +1750,64 @@ export class ImagePushRepository {
     }
 
     logger.info("Deploy script completed successfully", { sshTarget });
+    return success(undefined);
+  }
+
+  /**
+   * Runs scripts/pg-image-guard.sh (from this checkout, always the newest
+   * guard) on the deploy target via `bash -s`. Read-only: it fails when
+   * prod-postgres is down, runs a non-postgres image, or its compose service
+   * would resolve to a different image or config (compose would recreate it).
+   */
+  private static async runPgGuard(
+    sshTarget: string,
+    script: string,
+    password: string | undefined,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const guardPath = join(
+      ImagePushRepository.buildPaths().repoRoot,
+      PG_GUARD_SCRIPT,
+    );
+    if (!existsSync(guardPath)) {
+      return fail({
+        message: t("post.repository.messages.pgGuardFailed", {
+          target: sshTarget,
+          error: t("post.repository.messages.pgGuardMissing", {
+            path: PG_GUARD_SCRIPT,
+          }),
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+    const result = await ImagePushRepository.runRemote(
+      sshTarget,
+      `cd ${ImagePushRepository.projectDirOf(script)} && bash -s`,
+      createReadStream(guardPath),
+      password,
+    );
+    if (result.error !== undefined || result.exitCode !== 0) {
+      logger.error("Postgres guard refused the deploy", {
+        sshTarget,
+        exitCode: result.exitCode,
+        error: result.error,
+      });
+      return fail({
+        message: t("post.repository.messages.pgGuardFailed", {
+          target: sshTarget,
+          error:
+            result.error ??
+            t("post.repository.messages.scriptRemoteExit", {
+              code: result.exitCode,
+            }),
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+    logger.info(
+      t("post.repository.messages.pgGuardPassed", { target: sshTarget }),
+    );
     return success(undefined);
   }
 

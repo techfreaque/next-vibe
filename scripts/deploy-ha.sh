@@ -171,7 +171,7 @@ migrate_once() {
     local tagenv=""; [ -n "$IMAGE_TAG" ] && tagenv="DOCKER_IMAGE_TAG=$IMAGE_TAG "
     # pull new image, then run a one-off container that ONLY migrates and exits.
     ssh_run "$host" "$pw" "cd $cdir && ${tagenv}docker compose $cfiles pull app"
-    if ! ssh_run "$host" "$pw" "cd $cdir && ${tagenv}docker compose $cfiles run --rm app bun src/vibe/platforms/cli/vibe-runtime.ts migrate"; then
+    if ! ssh_run "$host" "$pw" "cd $cdir && ${tagenv}docker compose $cfiles run --rm --no-deps app bun src/vibe/platforms/cli/vibe-runtime.ts migrate"; then
       log "✗ MIGRATION FAILED — aborting. No replica was touched. Fleet unchanged."
       exit 1
     fi

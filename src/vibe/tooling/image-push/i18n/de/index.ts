@@ -180,6 +180,10 @@ export const translations: typeof enTranslations = {
         scriptMissing: "{{path}} fehlt in Commit {{sha}}",
         scriptSyntaxInvalid:
           "bash -n lehnt {{path}} aus Commit {{sha}} ab. Live-Skript unverändert.",
+        pgGuardFailed:
+          "Postgres-Wächter auf {{target}} hat das Deployment gestoppt, nichts wurde verändert: {{error}}",
+        pgGuardMissing: "{{path}} fehlt in diesem Checkout",
+        pgGuardPassed: "🛡️ Postgres-Wächter auf {{target}} bestanden",
         scriptRemoteExit: "Remote-Befehl mit Code {{code}} beendet",
         secondaryStart: "🔁 Server 1 läuft. Rolle Server 2 ({{target}}) ...",
         secondarySuccess:

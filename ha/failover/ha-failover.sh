@@ -173,7 +173,7 @@ switch_app_local() (
   cd "$APP_DIR" || return 1
   local url ts img ref
   local -a compose=(docker compose -p unbottled --env-file .env -f docker-compose.prod.yml -f docker-compose.standalone.yml -f docker-compose.s2-ha.yml)
-  ref="$("${compose[@]}" config --images app)" && img="$(docker image inspect -f '{{.Id}}' "$ref")" || return 1
+  ref="$("${compose[@]}" config --format json | python3 -c 'import json,sys; print(json.load(sys.stdin)["services"]["app"].get("image", ""))')" && img="$(docker image inspect -f '{{.Id}}' "$ref")" || return 1
   [ "$img" = "$(docker inspect -f '{{.Image}}' unbottled-app)" ] || { echo "app image drift"; return 1; }
   umask 077
   ts="$(date -u +%Y%m%d%H%M%S)"

@@ -181,6 +181,10 @@ export const translations: typeof enTranslations = {
         scriptMissing: "V commite {{sha}} chýba {{path}}",
         scriptSyntaxInvalid:
           "Kontrola bash -n odmietla {{path}} z commitu {{sha}}. Nasadený skript zostal nezmenený.",
+        pgGuardFailed:
+          "Strážca Postgresu na {{target}} zastavil nasadenie, nič sa nezmenilo: {{error}}",
+        pgGuardMissing: "{{path}} v tomto checkoute chýba",
+        pgGuardPassed: "🛡️ Strážca Postgresu na {{target}} prešiel",
         scriptRemoteExit: "Vzdialený príkaz skončil s kódom {{code}}",
         secondaryStart:
           "🔁 Server 1 je v prevádzke. Aktualizuje sa server 2 ({{target}})…",

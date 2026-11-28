@@ -4,6 +4,23 @@ set -e
 compose() { docker compose -f docker-compose.prod.yml "$@" 2>/dev/null; }
 COMPOSE=compose
 
+# The app service's image ref, read from the rendered config. NEVER use
+# `config --images app | head -1`: compose also prints the images of the app's
+# depends_on services (postgres) in random order. That once returned
+# `unbottled-postgres`, and the rollback below tagged the previous APP image as
+# the postgres image; the next deploy's migrate run recreated prod-postgres on
+# it and took the database down (incident 2026-11-28).
+app_image_ref() {
+  $COMPOSE config --format json | python3 -c '
+import json, sys
+print(json.load(sys.stdin)["services"]["app"].get("image", ""))
+'
+}
+# A postgres image always sets PGDATA; the app image never does.
+is_pg_image() {
+  docker image inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$1" 2>/dev/null | grep -q '^PGDATA='
+}
+
 # DESTRUCTIVE: this is a DEPLOY/UPDATE script for a dedicated deploy box. It
 # force-syncs the checkout to origin, DISCARDING any uncommitted local changes.
 # Do NOT run it on a working tree you have edits in. Set NO_GIT_RESET=1 to skip.
@@ -38,6 +55,11 @@ if [ "${DEPLOY_POSTGRES:-0}" = "1" ] || [ "$(docker inspect -f '{{.State.Running
   $COMPOSE up -d postgres
 else
   echo "Postgres $PG_CONTAINER running: left alone (DEPLOY_POSTGRES=1 rebuilds it)"
+  # Refuse to deploy when the running DB or its compose service image is not a
+  # real, matching postgres image (see scripts/pg-image-guard.sh).
+  if [ -f scripts/pg-image-guard.sh ]; then
+    PG_CONTAINER_NAME="$PG_CONTAINER" bash scripts/pg-image-guard.sh || { echo "ERROR: Postgres guard failed. Nothing was changed."; exit 1; }
+  fi
 fi
 echo "Waiting for postgres..."
 until $COMPOSE exec -T postgres pg_isready -U "${POSTGRES_USER:-postgres}" > /dev/null 2>&1; do
@@ -51,7 +73,7 @@ done
 # entry to pull from - pull failure there is expected, not fatal, as long as the image exists.
 echo "Pulling app image..."
 if ! $COMPOSE pull app; then
-  IMAGE_REF=$($COMPOSE config --images app 2>/dev/null | head -1)
+  IMAGE_REF=$(app_image_ref)
   if [ -n "$IMAGE_REF" ] && docker image inspect "$IMAGE_REF" > /dev/null 2>&1; then
     echo "Pull failed, but $IMAGE_REF is already present locally (e.g. via 'vibe image-push --sshTarget=...') - continuing with it."
   else
@@ -62,8 +84,11 @@ if ! $COMPOSE pull app; then
 fi
 
 # Run migrations using the new image (separate one-off container, old app still serving)
+# --no-deps: `run` otherwise (re)creates every depends_on service whose config
+# or image drifted, including the shared prod Postgres. Postgres was verified
+# running and ready above; redis/minio are not needed by migrate.
 echo "Running migrations..."
-if ! $COMPOSE run --rm app \
+if ! $COMPOSE run --rm --no-deps app \
   bun src/vibe/platforms/cli/vibe-runtime.ts migrate; then
   echo "ERROR: Migration failed! Old container is still running - prod is NOT down."
   echo "Fix the migration and re-run this script."
@@ -148,9 +173,14 @@ if ! wait_app_healthy; then
   docker logs --tail=50 "$APP_CONTAINER" 2>&1 || true
   # Roll back to the image that ran before this deploy (image-push points
   # :rollback at the previous :latest before loading the new one).
-  IMAGE_REF=$($COMPOSE config --images app 2>/dev/null | head -1)
+  IMAGE_REF=$(app_image_ref)
   ROLLBACK_REF="${IMAGE_REF%:*}:rollback"
   ROLLBACK_REF=${previous_image:-$ROLLBACK_REF}
+  # Never re-tag anything that is (or would become) a postgres image.
+  if [ -n "$IMAGE_REF" ] && { is_pg_image "$IMAGE_REF" || is_pg_image "$ROLLBACK_REF"; }; then
+    echo "ERROR: rollback target $IMAGE_REF resolves to a postgres image; refusing to re-tag it."
+    IMAGE_REF=""
+  fi
   if [ "${HA_NO_ROLLBACK:-0}" != "1" ] && [ -n "$IMAGE_REF" ] && docker image inspect "$ROLLBACK_REF" > /dev/null 2>&1; then
     echo "Rolling back: $ROLLBACK_REF -> $IMAGE_REF"
     docker tag "$ROLLBACK_REF" "$IMAGE_REF"

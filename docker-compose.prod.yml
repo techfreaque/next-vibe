@@ -3,6 +3,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.postgres
+    # Pinned, distinct tag: without `image:` compose names the build
+    # `<project>-postgres:latest`, a generic tag a buggy re-tag once overwrote
+    # with the APP image (incident 2026-11-28). Built only when missing; deploys
+    # never rebuild it (scripts/install-docker.sh, DEPLOY_POSTGRES=1 to opt in).
+    # Server 1 runs its own drifted compose file: pin it there as
+    # PG_IMAGE=unbottled-postgres:prod-s1 at the next planned postgres restart
+    # (adding the line changes the service config hash, so do it together with
+    # that restart; scripts/pg-image-guard.sh blocks deploys until then).
+    image: ${PG_IMAGE:-vibe-postgres:16}
     # Parameterized so unbottled can run its OWN postgres ALONGSIDE another vibe
     # site's `prod-postgres` on the same host (Server 2 / heilpraktiker) without
     # a container-name clash. Default keeps Server 1 EXACTLY as before.

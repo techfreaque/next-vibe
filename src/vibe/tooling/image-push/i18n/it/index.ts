@@ -182,6 +182,10 @@ export const translations: typeof enTranslations = {
         scriptMissing: "{{path}} manca dal commit {{sha}}",
         scriptSyntaxInvalid:
           "bash -n ha respinto {{path}} dal commit {{sha}}. Scritto dal vivo intatto.",
+        pgGuardFailed:
+          "Il controllo Postgres su {{target}} ha bloccato il deploy, nulla è stato modificato: {{error}}",
+        pgGuardMissing: "{{path}} manca in questo checkout",
+        pgGuardPassed: "🛡️ Controllo Postgres superato su {{target}}",
         scriptRemoteExit: "comando remoto uscito con codice {{code}}",
         secondaryStart: " ⁇  Server 1 live. Rolling Server 2 ({{target}})...",
         secondarySuccess:

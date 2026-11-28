@@ -180,6 +180,10 @@ export const translations: typeof enTranslations = {
         scriptMissing: "Brak {{path}} w commicie {{sha}}",
         scriptSyntaxInvalid:
           "bash -n odrzucił {{path}} z commita {{sha}}. Działający skrypt nietknięty.",
+        pgGuardFailed:
+          "Strażnik Postgresa na {{target}} zatrzymał wdrożenie, nic nie zmieniono: {{error}}",
+        pgGuardMissing: "Brak {{path}} w tym checkoucie",
+        pgGuardPassed: "🛡️ Strażnik Postgresa na {{target}}: OK",
         scriptRemoteExit: "Polecenie zdalne zakończyło się kodem {{code}}",
         secondaryStart:
           "🔁 Server 1 działa. Aktualizuję Server 2 ({{target}}) ...",
