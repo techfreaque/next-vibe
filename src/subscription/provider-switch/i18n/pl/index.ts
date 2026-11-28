@@ -59,6 +59,12 @@ export const translations: typeof enTranslations = {
     notEligible: "Brak planu kartowego do przeniesienia.",
   },
 
+  manage: {
+    cancelOld: "Anuluj stary plan kartowy",
+    moveFirst:
+      "Chcesz zachować plan? Przenieś go powyżej. Anulowanie tutaj go kończy.",
+  },
+
   enums: {
     carryOver: {
       extendFirstPeriod: "Opłata teraz, opłacony czas wydłuża pierwszy okres",

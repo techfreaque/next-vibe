@@ -59,6 +59,12 @@ export const translations: typeof enTranslations = {
     notEligible: "Nessun piano con carta da spostare.",
   },
 
+  manage: {
+    cancelOld: "Annulla il vecchio piano con carta",
+    moveFirst:
+      "Vuoi tenere il piano? Spostalo qui sopra. Annullare qui lo chiude.",
+  },
+
   enums: {
     carryOver: {
       extendFirstPeriod:

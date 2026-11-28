@@ -20,6 +20,7 @@ import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
 import { MotionDiv } from "next-vibe/ui/components/motion";
+import { P } from "next-vibe/ui/components/typography";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl, getCurrentOrigin } from "next-vibe/ui/lib/location";
 import {
@@ -45,6 +46,8 @@ import type definition from "./definition";
 import { SubscriptionStatus } from "./enum";
 import { SubscriptionPastDueNotice } from "./past-due-notice";
 import providerSwitchDefinitions from "./provider-switch/definition";
+import { useProviderSwitchOfferLive } from "./provider-switch/hooks";
+import { scopedTranslation as providerSwitchScopedTranslation } from "./provider-switch/i18n";
 
 /**
  * Format date for display
@@ -76,6 +79,18 @@ export function SubscriptionOverviewContainer(_props: {
   const platform = useWidgetPlatform();
   const portal = useCustomerPortal(logger, user);
   const { t: productsT } = productsScopedTranslation.scopedT(locale);
+  const { t: switchT } = providerSwitchScopedTranslation.scopedT(locale);
+  // Card plans on the paused processor get the "move your plan" card; it
+  // renders nothing until a switch provider is live.
+  const canMoveProvider =
+    Boolean(subscription?.hasSubscription) &&
+    subscription?.provider === PaymentProvider.STRIPE &&
+    subscription?.status !== SubscriptionStatus.CANCELED;
+  const moveOfferLive = useProviderSwitchOfferLive(
+    logger,
+    user,
+    canMoveProvider,
+  );
 
   if (!subscription) {
     return <Div />;
@@ -165,11 +180,6 @@ export function SubscriptionOverviewContainer(_props: {
       },
     });
   };
-
-  // Card plans on the paused processor get the "move your plan" card; it
-  // renders nothing until a switch provider is live.
-  const canMoveProvider =
-    subscription.provider === PaymentProvider.STRIPE && !isCanceled;
 
   return (
     <MotionDiv
@@ -340,19 +350,26 @@ export function SubscriptionOverviewContainer(_props: {
 
           {/* Management Button */}
           {!isCanceled && (
-            <Div className="mt-6 pt-4 border-t">
+            <Div className="mt-6 pt-4 border-t flex flex-col gap-2">
+              {moveOfferLive && (
+                <P className="m-0 text-sm text-muted-foreground">
+                  {switchT("manage.moveFirst")}
+                </P>
+              )}
               <Button
                 type="button"
                 onClick={() => {
                   void handleManageSubscription();
                 }}
                 variant="outline"
-                className="w-full"
+                className="w-full h-auto min-h-10 whitespace-normal"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
-                {subscription.provider === PaymentProvider.NOWPAYMENTS
-                  ? t("manage.nowpayments.button")
-                  : t("manage.stripe.button")}
+                {moveOfferLive
+                  ? switchT("manage.cancelOld")
+                  : subscription.provider === PaymentProvider.NOWPAYMENTS
+                    ? t("manage.nowpayments.button")
+                    : t("manage.stripe.button")}
               </Button>
             </Div>
           )}

@@ -58,6 +58,11 @@ export const translations: typeof enTranslations = {
     notEligible: "Žiadny kartový plán na presun.",
   },
 
+  manage: {
+    cancelOld: "Zrušiť starý kartový plán",
+    moveFirst: "Chceš si plán nechať? Presuň ho vyššie. Zrušenie tu ho ukončí.",
+  },
+
   enums: {
     carryOver: {
       extendFirstPeriod: "Platba teraz, zaplatený čas predĺži prvé obdobie",

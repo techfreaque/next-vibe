@@ -59,6 +59,12 @@ export const translations: typeof enTranslations = {
     notEligible: "Aucun forfait par carte à transférer.",
   },
 
+  manage: {
+    cancelOld: "Résilier l'ancien forfait par carte",
+    moveFirst:
+      "Pour garder votre forfait, transférez-le ci-dessus. Résilier ici y met fin.",
+  },
+
   enums: {
     carryOver: {
       extendFirstPeriod:

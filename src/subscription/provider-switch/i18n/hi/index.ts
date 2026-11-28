@@ -57,6 +57,11 @@ export const translations: typeof enTranslations = {
     notEligible: "शिफ़्ट करने के लिए कोई कार्ड प्लान नहीं।",
   },
 
+  manage: {
+    cancelOld: "पुराना कार्ड प्लान रद्द करें",
+    moveFirst: "प्लान रखना है? ऊपर से उसे शिफ़्ट करें। यहाँ रद्द करने पर वह खत्म हो जाएगा।",
+  },
+
   enums: {
     carryOver: {
       extendFirstPeriod: "अभी चार्ज, पेड समय पहली अवधि को बढ़ाता है",

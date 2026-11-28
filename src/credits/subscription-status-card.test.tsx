@@ -10,6 +10,51 @@ void mock.module("@/payment/portal/hooks", () => ({
   useCustomerPortal: () => ({}),
 }));
 
+let switchOfferLive = false;
+const switchCalls: boolean[] = [];
+void mock.module("@/subscription/provider-switch/hooks", () => ({
+  useProviderSwitchOfferLive: (_logger: unknown, _user: unknown, enabled: boolean) => {
+    switchCalls.push(enabled);
+    return enabled && switchOfferLive;
+  },
+}));
+void mock.module("next-vibe/unified-ui/renderers/web/EndpointsPage", () => ({
+  EndpointsPage: () => <div data-testid="move-plan-card" />,
+}));
+
+it("mounts the move-plan card for Stripe plans and puts it before the Stripe portal", async () => {
+  const { SubscriptionStatusCard } = await import("./subscription-status-card");
+  const { scopedTranslation } = await import("@/subscription/provider-switch/i18n");
+  const { t } = scopedTranslation.scopedT(defaultLocale);
+  const render = (provider: typeof PaymentProvider.STRIPE | typeof PaymentProvider.WHOP): string =>
+    renderToStaticMarkup(
+      <SubscriptionStatusCard
+        locale={defaultLocale}
+        user={{ id: "fixture-user", leadId: "fixture-lead", roles: [], isPublic: false }}
+        logger={createEndpointLogger(false, defaultLocale)}
+        initialSubscription={{
+          hasSubscription: true,
+          status: SubscriptionStatus.ACTIVE,
+          billingInterval: BillingInterval.MONTHLY,
+          plan: SubscriptionPlan.SUBSCRIPTION,
+          provider,
+        }}
+      />,
+    );
+  switchOfferLive = true;
+  const stripe = render(PaymentProvider.STRIPE);
+  expect(stripe).toContain('data-testid="move-plan-card"');
+  expect(stripe.indexOf("move-plan-card")).toBeLessThan(stripe.indexOf(t("manage.cancelOld")));
+  expect(stripe).toContain(t("manage.moveFirst"));
+  const whop = render(PaymentProvider.WHOP);
+  expect(whop).not.toContain("move-plan-card");
+  expect(whop).not.toContain(t("manage.cancelOld"));
+  expect(switchCalls.at(-1)).toBe(false);
+  switchOfferLive = false;
+  const noOffer = render(PaymentProvider.STRIPE);
+  expect(noOffer).not.toContain(t("manage.cancelOld"));
+});
+
 it("renders plan management as a non-submit action inside the checkout form", async () => {
   const { SubscriptionStatusCard } = await import("./subscription-status-card");
   const markup = renderToStaticMarkup(

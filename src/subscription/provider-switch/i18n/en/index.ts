@@ -57,6 +57,11 @@ export const translations = {
     notEligible: "No card plan to move.",
   },
 
+  manage: {
+    cancelOld: "Cancel old card plan",
+    moveFirst: "Keep your plan: move it above. Cancelling here ends it.",
+  },
+
   enums: {
     carryOver: {
       extendFirstPeriod: "Charge now, paid time extends the first period",

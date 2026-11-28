@@ -4,6 +4,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import {
@@ -18,7 +19,9 @@ import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
+import { P } from "next-vibe/ui/components/typography";
 import { assignUrl, getCurrentOrigin } from "next-vibe/ui/lib/location";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
 import { scopedTranslation as appScopedTranslation } from "@/_pages/i18n";
@@ -36,6 +39,9 @@ import { type SubscriptionGetResponseOutput } from "@/subscription/definition";
 import { SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
 import { SubscriptionPastDueNotice } from "@/subscription/past-due-notice";
+import providerSwitchDefinitions from "@/subscription/provider-switch/definition";
+import { useProviderSwitchOfferLive } from "@/subscription/provider-switch/hooks";
+import { scopedTranslation as providerSwitchScopedTranslation } from "@/subscription/provider-switch/i18n";
 
 interface SubscriptionStatusCardProps {
   locale: CountryLanguage;
@@ -64,9 +70,22 @@ export function SubscriptionStatusCard({
   const { t: subscriptionT } = subscriptionScopedTranslation.scopedT(locale);
   const { t: paymentT } = paymentScopedTranslation.scopedT(locale);
   const { t: productsT } = productsScopedTranslation.scopedT(locale);
+  const { t: switchT } = providerSwitchScopedTranslation.scopedT(locale);
   const portal = useCustomerPortal(logger, user);
 
   const { status, billingInterval, currentPeriodStart } = initialSubscription;
+
+  // Card plans on the paused processor get the "move your plan" card above
+  // this one; it renders nothing until a switch provider is live.
+  const canMoveProvider =
+    Boolean(initialSubscription.hasSubscription) &&
+    initialSubscription.provider === PaymentProvider.STRIPE &&
+    status !== SubscriptionStatus.CANCELED;
+  const moveOfferLive = useProviderSwitchOfferLive(
+    logger,
+    user,
+    canMoveProvider,
+  );
 
   if (!initialSubscription.hasSubscription || !status || !billingInterval) {
     return <Div />;
@@ -115,194 +134,213 @@ export function SubscriptionStatusCard({
   };
 
   return (
-    <Card className="border-2 border-primary">
-      <CardHeader>
-        <Div className="flex flex-wrap items-start justify-between gap-3">
-          <Div className="flex flex-col gap-1">
-            <CardTitle className="flex items-center gap-3">
-              <Div className="p-2 rounded-lg bg-primary/10">
-                <CreditCard className="h-6 w-6 text-primary" />
-              </Div>
-              {t("subscription.title")}
-            </CardTitle>
-            <CardDescription>
-              {tier
-                ? subscriptionT("tiers.picked", {
-                    plan: productsT(tier.name),
-                    credits: tier.creditsLabel,
-                  })
-                : t("subscription.description")}
-            </CardDescription>
+    <>
+      {canMoveProvider && (
+        <EndpointsPage
+          logger={logger}
+          endpoint={providerSwitchDefinitions}
+          forceMethod="GET"
+          locale={locale}
+          user={user}
+          platform={Platform.NEXT_PAGE}
+        />
+      )}
+      <Card className="border-2 border-primary">
+        <CardHeader>
+          <Div className="flex flex-wrap items-start justify-between gap-3">
+            <Div className="flex flex-col gap-1">
+              <CardTitle className="flex items-center gap-3">
+                <Div className="p-2 rounded-lg bg-primary/10">
+                  <CreditCard className="h-6 w-6 text-primary" />
+                </Div>
+                {t("subscription.title")}
+              </CardTitle>
+              <CardDescription>
+                {tier
+                  ? subscriptionT("tiers.picked", {
+                      plan: productsT(tier.name),
+                      credits: tier.creditsLabel,
+                    })
+                  : t("subscription.description")}
+              </CardDescription>
+            </Div>
+            <Div className="flex flex-wrap gap-2">
+              <Badge
+                className={
+                  isCanceled
+                    ? "bg-destructive text-destructive-foreground"
+                    : isCanceling || isPastDue
+                      ? "bg-warning text-warning-foreground"
+                      : "bg-success text-success-foreground"
+                }
+              >
+                {isCanceled
+                  ? subscriptionT(status)
+                  : isCanceling
+                    ? subscriptionT("enums.status.canceling")
+                    : subscriptionT(status)}
+              </Badge>
+              <Badge variant="outline" className="flex items-center gap-1">
+                {getSubscriptionProviderIcon(initialSubscription.provider)}
+                {getProviderName(initialSubscription.provider)}
+              </Badge>
+            </Div>
           </Div>
-          <Div className="flex flex-wrap gap-2">
-            <Badge
-              className={
-                isCanceled
-                  ? "bg-destructive text-destructive-foreground"
-                  : isCanceling || isPastDue
-                    ? "bg-warning text-warning-foreground"
-                    : "bg-success text-success-foreground"
-              }
-            >
-              {isCanceled
-                ? subscriptionT(status)
-                : isCanceling
-                  ? subscriptionT("enums.status.canceling")
-                  : subscriptionT(status)}
-            </Badge>
-            <Badge variant="outline" className="flex items-center gap-1">
-              {getSubscriptionProviderIcon(initialSubscription.provider)}
-              {getProviderName(initialSubscription.provider)}
-            </Badge>
-          </Div>
-        </Div>
-      </CardHeader>
-      <CardContent>
-        {isCanceled ? (
-          <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Div className="p-4 rounded-lg bg-accent border">
-              <Div className="text-sm text-muted-foreground mb-1">
-                {t("subscription.canceledOn")}
+        </CardHeader>
+        <CardContent>
+          {isCanceled ? (
+            <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Div className="p-4 rounded-lg bg-accent border">
+                <Div className="text-sm text-muted-foreground mb-1">
+                  {t("subscription.canceledOn")}
+                </Div>
+                <Div className="text-lg font-semibold">
+                  {initialSubscription.canceledAt
+                    ? formatSimpleDate(
+                        new Date(initialSubscription.canceledAt),
+                        locale,
+                      )
+                    : initialSubscription.endedAt
+                      ? formatSimpleDate(
+                          new Date(initialSubscription.endedAt),
+                          locale,
+                        )
+                      : appT("common.notAvailable")}
+                </Div>
               </Div>
-              <Div className="text-lg font-semibold">
-                {initialSubscription.canceledAt
-                  ? formatSimpleDate(
-                      new Date(initialSubscription.canceledAt),
-                      locale,
-                    )
-                  : initialSubscription.endedAt
+              <Div className="p-4 rounded-lg bg-accent border">
+                <Div className="text-sm text-muted-foreground mb-1">
+                  {t("subscription.endedOn")}
+                </Div>
+                <Div className="text-lg font-semibold">
+                  {initialSubscription.endedAt
                     ? formatSimpleDate(
                         new Date(initialSubscription.endedAt),
                         locale,
                       )
-                    : appT("common.notAvailable")}
-              </Div>
-            </Div>
-            <Div className="p-4 rounded-lg bg-accent border">
-              <Div className="text-sm text-muted-foreground mb-1">
-                {t("subscription.endedOn")}
-              </Div>
-              <Div className="text-lg font-semibold">
-                {initialSubscription.endedAt
-                  ? formatSimpleDate(
-                      new Date(initialSubscription.endedAt),
-                      locale,
-                    )
-                  : initialSubscription.currentPeriodEnd
-                    ? formatSimpleDate(
-                        new Date(initialSubscription.currentPeriodEnd),
-                        locale,
-                      )
-                    : appT("common.notAvailable")}
-              </Div>
-            </Div>
-          </Div>
-        ) : (
-          <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Div className="p-4 rounded-lg bg-accent border">
-              <Div className="text-sm text-muted-foreground mb-1">
-                {t("subscription.billingInterval")}
-              </Div>
-              <Div className="text-lg font-semibold capitalize">
-                {subscriptionT(billingInterval)}
-              </Div>
-            </Div>
-            <Div className="p-4 rounded-lg bg-accent border">
-              <Div className="text-sm text-muted-foreground mb-1">
-                {t("subscription.currentPeriodStart")}
-              </Div>
-              <Div className="text-lg font-semibold">
-                {currentPeriodStart
-                  ? formatSimpleDate(new Date(currentPeriodStart), locale)
-                  : appT("common.notAvailable")}
-              </Div>
-            </Div>
-            <Div className="p-4 rounded-lg bg-accent border">
-              <Div className="text-sm text-muted-foreground mb-1">
-                {isCanceling
-                  ? t("subscription.endsOn")
-                  : t("subscription.nextBillingDate")}
-              </Div>
-              <Div className="text-lg font-semibold">
-                {isCanceling
-                  ? formatSimpleDate(
-                      new Date(initialSubscription.cancelAt!),
-                      locale,
-                    )
-                  : initialSubscription.currentPeriodEnd
-                    ? formatSimpleDate(
-                        new Date(initialSubscription.currentPeriodEnd),
-                        locale,
-                      )
-                    : appT("common.notAvailable")}
-              </Div>
-            </Div>
-          </Div>
-        )}
-
-        {isCanceling && (
-          <Div className="mt-4 p-4 rounded-lg bg-warning/10 border border-warning/30">
-            <Div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-              <Div className="text-sm text-warning">
-                <Div className="font-semibold mb-1">
-                  {t("subscription.cancellation.title")}
-                </Div>
-                <Div>
-                  {t("subscription.cancellation.description", {
-                    date: initialSubscription.cancelAt
+                    : initialSubscription.currentPeriodEnd
                       ? formatSimpleDate(
-                          new Date(initialSubscription.cancelAt),
+                          new Date(initialSubscription.currentPeriodEnd),
                           locale,
                         )
-                      : appT("common.notAvailable"),
-                  })}
+                      : appT("common.notAvailable")}
                 </Div>
               </Div>
             </Div>
-          </Div>
-        )}
-
-        {isPastDue && (
-          <SubscriptionPastDueNotice
-            locale={locale}
-            gracePeriodEndsAt={initialSubscription.gracePeriodEndsAt}
-            retryPaymentUrl={initialSubscription.retryPaymentUrl}
-            cardCountry={initialSubscription.cardCountry}
-            onUpdatePaymentMethod={handleManageSubscription}
-          />
-        )}
-
-        {isCanceled && (
-          <Div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
-            <Div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-              <Div className="text-sm text-destructive">
-                <Div className="font-semibold mb-1">
-                  {t("subscription.canceled.title")}
+          ) : (
+            <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Div className="p-4 rounded-lg bg-accent border">
+                <Div className="text-sm text-muted-foreground mb-1">
+                  {t("subscription.billingInterval")}
                 </Div>
-                <Div>{t("subscription.canceled.description")}</Div>
+                <Div className="text-lg font-semibold capitalize">
+                  {subscriptionT(billingInterval)}
+                </Div>
+              </Div>
+              <Div className="p-4 rounded-lg bg-accent border">
+                <Div className="text-sm text-muted-foreground mb-1">
+                  {t("subscription.currentPeriodStart")}
+                </Div>
+                <Div className="text-lg font-semibold">
+                  {currentPeriodStart
+                    ? formatSimpleDate(new Date(currentPeriodStart), locale)
+                    : appT("common.notAvailable")}
+                </Div>
+              </Div>
+              <Div className="p-4 rounded-lg bg-accent border">
+                <Div className="text-sm text-muted-foreground mb-1">
+                  {isCanceling
+                    ? t("subscription.endsOn")
+                    : t("subscription.nextBillingDate")}
+                </Div>
+                <Div className="text-lg font-semibold">
+                  {isCanceling
+                    ? formatSimpleDate(
+                        new Date(initialSubscription.cancelAt!),
+                        locale,
+                      )
+                    : initialSubscription.currentPeriodEnd
+                      ? formatSimpleDate(
+                          new Date(initialSubscription.currentPeriodEnd),
+                          locale,
+                        )
+                      : appT("common.notAvailable")}
+                </Div>
               </Div>
             </Div>
-          </Div>
-        )}
+          )}
 
-        {!isCanceled && (
-          <Div className="mt-6 pt-4 border-t">
-            <Button
-              type="button"
-              onClick={handleManageSubscription}
-              variant="outline"
-              className="w-full"
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              {initialSubscription.provider === PaymentProvider.NOWPAYMENTS
-                ? t("subscription.manage.nowpayments.button")
-                : t("subscription.manage.stripe.button")}
-            </Button>
-          </Div>
-        )}
-      </CardContent>
-    </Card>
+          {isCanceling && (
+            <Div className="mt-4 p-4 rounded-lg bg-warning/10 border border-warning/30">
+              <Div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                <Div className="text-sm text-warning">
+                  <Div className="font-semibold mb-1">
+                    {t("subscription.cancellation.title")}
+                  </Div>
+                  <Div>
+                    {t("subscription.cancellation.description", {
+                      date: initialSubscription.cancelAt
+                        ? formatSimpleDate(
+                            new Date(initialSubscription.cancelAt),
+                            locale,
+                          )
+                        : appT("common.notAvailable"),
+                    })}
+                  </Div>
+                </Div>
+              </Div>
+            </Div>
+          )}
+
+          {isPastDue && (
+            <SubscriptionPastDueNotice
+              locale={locale}
+              gracePeriodEndsAt={initialSubscription.gracePeriodEndsAt}
+              retryPaymentUrl={initialSubscription.retryPaymentUrl}
+              cardCountry={initialSubscription.cardCountry}
+              onUpdatePaymentMethod={handleManageSubscription}
+            />
+          )}
+
+          {isCanceled && (
+            <Div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
+              <Div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <Div className="text-sm text-destructive">
+                  <Div className="font-semibold mb-1">
+                    {t("subscription.canceled.title")}
+                  </Div>
+                  <Div>{t("subscription.canceled.description")}</Div>
+                </Div>
+              </Div>
+            </Div>
+          )}
+
+          {!isCanceled && (
+            <Div className="mt-6 pt-4 border-t flex flex-col gap-2">
+              {moveOfferLive && (
+                <P className="m-0 text-sm text-muted-foreground">
+                  {switchT("manage.moveFirst")}
+                </P>
+              )}
+              <Button
+                type="button"
+                onClick={handleManageSubscription}
+                variant="outline"
+                className="w-full h-auto min-h-10 whitespace-normal"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                {moveOfferLive
+                  ? switchT("manage.cancelOld")
+                  : initialSubscription.provider === PaymentProvider.NOWPAYMENTS
+                    ? t("subscription.manage.nowpayments.button")
+                    : t("subscription.manage.stripe.button")}
+              </Button>
+            </Div>
+          )}
+        </CardContent>
+      </Card>
+    </>
   );
 }

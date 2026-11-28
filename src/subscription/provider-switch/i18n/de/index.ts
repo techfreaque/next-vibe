@@ -59,6 +59,11 @@ export const translations: typeof enTranslations = {
     notEligible: "Kein Kartenplan zum Umziehen.",
   },
 
+  manage: {
+    cancelOld: "Alten Kartenplan kündigen",
+    moveFirst: "Plan behalten? Zieh ihn oben um. Kündigen hier beendet ihn.",
+  },
+
   enums: {
     carryOver: {
       extendFirstPeriod:
