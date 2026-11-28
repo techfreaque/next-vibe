@@ -34,9 +34,9 @@ export const translations = {
 
   widget: {
     badge: "Action needed",
-    title: "Move your plan in one click",
+    title: "Too free for our card processor",
     description:
-      "Our card processor stopped taking payments for us. Your plan and credits are safe.",
+      "They decided an AI that answers freely doesn't fit their rules. We're not changing a single answer. Your plan and credits are safe.",
     deadline:
       "Your plan runs until {{date}}. Move it before then to keep it going.",
     carryExtend:

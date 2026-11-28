@@ -36,9 +36,9 @@ export const translations: typeof enTranslations = {
 
   widget: {
     badge: "Action requise",
-    title: "Transférez votre forfait en un clic",
+    title: "Trop libre pour notre prestataire de cartes",
     description:
-      "Notre prestataire de paiement par carte n'encaisse plus pour nous. Votre forfait et vos crédits sont en sécurité.",
+      "Selon eux, une IA qui répond librement ne rentre pas dans leurs règles. Nous ne toucherons à aucune réponse. Votre forfait et vos crédits sont en sécurité.",
     deadline:
       "Votre forfait est actif jusqu'au {{date}}. Transférez-le avant pour qu'il continue.",
     carryExtend:

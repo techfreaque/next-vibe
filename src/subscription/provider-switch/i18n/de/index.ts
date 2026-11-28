@@ -36,9 +36,9 @@ export const translations: typeof enTranslations = {
 
   widget: {
     badge: "Handlung nötig",
-    title: "Zieh deinen Plan mit einem Klick um",
+    title: "Zu frei für unseren Kartenanbieter",
     description:
-      "Unser Kartenzahlungsanbieter nimmt für uns keine Zahlungen mehr an. Dein Plan und deine Credits sind sicher.",
+      "Die haben entschieden: Eine KI, die frei antwortet, passt nicht in ihre Regeln. Wir ändern keine einzige Antwort. Dein Plan und deine Credits sind sicher.",
     deadline:
       "Dein Plan läuft bis zum {{date}}. Zieh ihn vorher um, damit er weiterläuft.",
     carryExtend:

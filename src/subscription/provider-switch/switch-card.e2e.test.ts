@@ -126,13 +126,51 @@ describe("E2E: provider switch card", () => {
         true,
       );
 
+      // The shield sits centered on the first line of the footer text.
+      const footer = card.getByText(t("widget.noDoubleCharge"));
+      const offset = await footer.evaluate((text) => {
+        const icon = text.previousElementSibling;
+        const lineHeight = Number.parseFloat(getComputedStyle(text).lineHeight);
+        const textTop = text.getBoundingClientRect().top;
+        const iconBox = icon?.getBoundingClientRect();
+        return iconBox
+          ? iconBox.top + iconBox.height / 2 - (textTop + lineHeight / 2)
+          : Number.NaN;
+      });
+      expect(Math.abs(offset)).toBeLessThanOrEqual(1);
+
       if (SHOT_DIR) {
         await page.screenshot({
           path: `${SHOT_DIR}/overview-desktop.png`,
           fullPage: true,
         });
-        await page.setViewportSize({ width: 390, height: 844 });
-        await card.scrollIntoViewIfNeeded();
+        for (const scheme of ["light", "dark"] as const) {
+          await page.emulateMedia({ colorScheme: scheme });
+          /* oxlint-disable restricted/no-browser-globals -- browser screenshot setup */
+          await page.evaluate((value) => {
+            const key = "theme_v2";
+            const oldValue = localStorage.getItem(key);
+            localStorage.setItem(key, value);
+            window.dispatchEvent(
+              new StorageEvent("storage", { key, oldValue, newValue: value }),
+            );
+          }, scheme);
+          await page.waitForFunction(
+            (dark) => document.documentElement.classList.contains("dark") === dark,
+            scheme === "dark",
+          );
+          /* oxlint-enable restricted/no-browser-globals */
+          for (const { device, width, height } of [
+            { device: "desktop", width: 1440, height: 900 },
+            { device: "phone", width: 390, height: 844 },
+          ]) {
+            await page.setViewportSize({ width, height });
+            await card.scrollIntoViewIfNeeded();
+            await card.screenshot({
+              path: `${SHOT_DIR}/card-${device}-${scheme}.png`,
+            });
+          }
+        }
         await page.screenshot({
           path: `${SHOT_DIR}/overview-phone.png`,
           fullPage: true,

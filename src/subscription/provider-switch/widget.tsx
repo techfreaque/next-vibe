@@ -128,7 +128,7 @@ function ProviderSwitchCard(): JSX.Element {
         {data.pastDue ? (
           <Div className="flex items-start gap-2 text-sm text-foreground">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-            <P className="m-0">{t("widget.pastDue")}</P>
+            <P className="m-0 leading-5">{t("widget.pastDue")}</P>
           </Div>
         ) : (
           data.deadline && (
@@ -151,7 +151,7 @@ function ProviderSwitchCard(): JSX.Element {
         {error && (
           <Div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <P className="m-0">{error}</P>
+            <P className="m-0 leading-5">{error}</P>
           </Div>
         )}
 
@@ -180,7 +180,7 @@ function ProviderSwitchCard(): JSX.Element {
 
         <Div className="flex items-start gap-2 text-xs text-muted-foreground">
           <Shield className="mt-0.5 h-4 w-4 shrink-0" />
-          <P className="m-0 leading-snug">{t("widget.noDoubleCharge")}</P>
+          <P className="m-0 leading-5">{t("widget.noDoubleCharge")}</P>
         </Div>
       </Div>
     </Div>

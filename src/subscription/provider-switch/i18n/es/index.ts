@@ -36,9 +36,9 @@ export const translations: typeof enTranslations = {
 
   widget: {
     badge: "Acción necesaria",
-    title: "Mueve tu plan con un clic",
+    title: "Demasiado libre para nuestro procesador de tarjetas",
     description:
-      "Nuestro procesador de tarjetas dejó de cobrar para nosotros. Tu plan y tus créditos están a salvo.",
+      "Decidieron que una IA que responde libremente no encaja en sus reglas. No vamos a cambiar ni una sola respuesta. Tu plan y tus créditos están a salvo.",
     deadline:
       "Tu plan dura hasta el {{date}}. Muévelo antes para que siga activo.",
     carryExtend:

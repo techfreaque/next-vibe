@@ -36,9 +36,9 @@ export const translations: typeof enTranslations = {
 
   widget: {
     badge: "Azione richiesta",
-    title: "Sposta il tuo piano con un clic",
+    title: "Troppa libertà per il nostro gestore carte",
     description:
-      "Il nostro gestore dei pagamenti con carta non accetta più pagamenti per noi. Il tuo piano e i tuoi crediti sono al sicuro.",
+      "Hanno deciso che un'AI che risponde liberamente non rientra nelle loro regole. Noi non cambiamo nemmeno una risposta. Il tuo piano e i tuoi crediti sono al sicuro.",
     deadline:
       "Il tuo piano è attivo fino al {{date}}. Spostalo prima per non interromperlo.",
     carryExtend:

@@ -36,9 +36,9 @@ export const translations: typeof enTranslations = {
 
   widget: {
     badge: "Treba konať",
-    title: "Presuň svoj plán jedným klikom",
+    title: "Príliš veľa slobody pre nášho kartového spracovateľa",
     description:
-      "Náš spracovateľ platieb kartou pre nás prestal prijímať platby. Tvoj plán aj kredity sú v bezpečí.",
+      "Rozhodli, že AI, ktorá odpovedá slobodne, nezapadá do ich pravidiel. Nezmeníme ani jednu odpoveď. Tvoj plán aj kredity sú v bezpečí.",
     deadline: "Tvoj plán beží do {{date}}. Presuň ho skôr, nech pokračuje.",
     carryExtend:
       "Zaplatíš teraz a tvoje prvé nové obdobie trvá do {{date}}. Už zaplatené dni sa prenesú.",

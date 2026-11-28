@@ -36,9 +36,9 @@ export const translations: typeof enTranslations = {
 
   widget: {
     badge: "Wymagane działanie",
-    title: "Przenieś plan jednym kliknięciem",
+    title: "Za dużo wolności dla operatora kart",
     description:
-      "Nasz operator płatności kartą przestał przyjmować dla nas płatności. Twój plan i kredyty są bezpieczne.",
+      "Uznali, że AI, która odpowiada swobodnie, nie pasuje do ich zasad. Nie zmienimy ani jednej odpowiedzi. Twój plan i kredyty są bezpieczne.",
     deadline:
       "Twój plan działa do {{date}}. Przenieś go wcześniej, żeby działał dalej.",
     carryExtend:

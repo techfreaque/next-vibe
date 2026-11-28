@@ -175,8 +175,20 @@ function sweepWsClientsForDrain(
       });
     }
   }, WS_DRAIN_FORCE_AFTER_MS);
-  timer.unref();
+  // Never keep a draining process alive just for the straggler sweep.
+  unrefTimer(timer);
   return swept.length;
+}
+
+/**
+ * Node/Bun timers are objects with unref(). Taken as a parameter so the union
+ * survives (a typed const narrows to whichever setTimeout overload the active
+ * lib picked).
+ */
+function unrefTimer(handle: number | { unref?: () => void }): void {
+  if (typeof handle === "object") {
+    handle.unref?.();
+  }
 }
 
 /**
