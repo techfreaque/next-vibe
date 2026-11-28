@@ -13999,6 +13999,110 @@
           },
           "schemaType": "primitive"
         },
+        "providers": {
+          "type": "text",
+          "label": "Metodi di pagamento",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                    },
+                    "options": [
+                      "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop"
+                    ]
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                  },
+                  "options": [
+                    "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop"
+                  ]
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "nowPaymentsAcceptsCards": {
+          "type": "text",
+          "label": "Pagamenti con carta tramite NOWPayments",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "cryptoMinUsd": {
+          "type": "text",
+          "label": "Importo cripto minimo (USD)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "plan": {
           "type": "text",
           "label": "Piano",
@@ -14549,9 +14653,61 @@
     "description": "Apre il pagamento presso il nuovo fornitore per il tuo piano attuale. Il vecchio piano con carta si ferma una volta pagato il nuovo. Nessun doppio addebito.",
     "fields": {
       "usage": {
+        "request": "data",
         "response": true
       },
       "children": {
+        "provider": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Metodo di pagamento",
+          "description": "Carta (Whop) o cripto (NOWPayments). Predefinito: il metodo principale.",
+          "options": [
+            {
+              "value": "enums.paymentProvider.stripe",
+              "label": "enums.paymentProvider.stripe"
+            },
+            {
+              "value": "enums.paymentProvider.nowpayments",
+              "label": "enums.paymentProvider.nowpayments"
+            },
+            {
+              "value": "enums.paymentProvider.whop",
+              "label": "enums.paymentProvider.whop"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                },
+                "options": [
+                  "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "checkoutUrl": {
           "type": "text",
           "label": "Link di pagamento",

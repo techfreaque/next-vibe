@@ -13999,6 +13999,110 @@
           },
           "schemaType": "primitive"
         },
+        "providers": {
+          "type": "text",
+          "label": "Metody płatności",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                    },
+                    "options": [
+                      "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop"
+                    ]
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                  },
+                  "options": [
+                    "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop"
+                  ]
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "nowPaymentsAcceptsCards": {
+          "type": "text",
+          "label": "Płatności kartą przez NOWPayments",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "cryptoMinUsd": {
+          "type": "text",
+          "label": "Najniższa kwota krypto (USD)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "plan": {
           "type": "text",
           "label": "Plan",
@@ -14549,9 +14653,61 @@
     "description": "Otwiera płatność u nowego operatora dla Twojego obecnego planu. Stary plan kartowy kończy się po opłaceniu nowego. Bez podwójnej opłaty.",
     "fields": {
       "usage": {
+        "request": "data",
         "response": true
       },
       "children": {
+        "provider": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Metoda płatności",
+          "description": "Karta (Whop) lub krypto (NOWPayments). Domyślnie główna metoda.",
+          "options": [
+            {
+              "value": "enums.paymentProvider.stripe",
+              "label": "enums.paymentProvider.stripe"
+            },
+            {
+              "value": "enums.paymentProvider.nowpayments",
+              "label": "enums.paymentProvider.nowpayments"
+            },
+            {
+              "value": "enums.paymentProvider.whop",
+              "label": "enums.paymentProvider.whop"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                },
+                "options": [
+                  "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "checkoutUrl": {
           "type": "text",
           "label": "Link do płatności",

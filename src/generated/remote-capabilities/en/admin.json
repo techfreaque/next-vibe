@@ -337048,6 +337048,110 @@
           },
           "schemaType": "primitive"
         },
+        "providers": {
+          "type": "text",
+          "label": "Payment methods",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                        "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                    },
+                    "options": [
+                      "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop"
+                    ]
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                      "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                  },
+                  "options": [
+                    "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop"
+                  ]
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "nowPaymentsAcceptsCards": {
+          "type": "text",
+          "label": "Card payments via NOWPayments",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "cryptoMinUsd": {
+          "type": "text",
+          "label": "Lowest crypto amount (USD)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "plan": {
           "type": "text",
           "label": "Plan",
@@ -337598,9 +337702,61 @@
     "description": "Opens checkout at the new payment provider for your current plan. Your old card plan stops once it is paid. No double charge.",
     "fields": {
       "usage": {
+        "request": "data",
         "response": true
       },
       "children": {
+        "provider": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Payment method",
+          "description": "Card (Whop) or crypto (NOWPayments). Defaults to the main method.",
+          "options": [
+            {
+              "value": "enums.paymentProvider.stripe",
+              "label": "enums.paymentProvider.stripe"
+            },
+            {
+              "value": "enums.paymentProvider.nowpayments",
+              "label": "enums.paymentProvider.nowpayments"
+            },
+            {
+              "value": "enums.paymentProvider.whop",
+              "label": "enums.paymentProvider.whop"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                    "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop": "enums.paymentProvider.whop"
+                },
+                "options": [
+                  "enums.paymentProvider.stripe",
+                  "enums.paymentProvider.nowpayments",
+                  "enums.paymentProvider.whop"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "checkoutUrl": {
           "type": "text",
           "label": "Checkout link",

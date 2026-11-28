@@ -20326,6 +20326,7 @@ export const endpointsMeta: EndpointMeta[] = [
     subCategory: "Management",
     tags: ["Abbonamento", "Fatturazione"],
     examples: {
+      inputs: { default: { provider: "enums.paymentProvider.whop" } },
       responses: {
         default: {
           checkoutUrl: "https://nowpayments.io/payment/?iid=123456",
