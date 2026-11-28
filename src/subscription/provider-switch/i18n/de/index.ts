@@ -53,9 +53,9 @@ export const translations: typeof enTranslations = {
     description:
       "Die haben entschieden: Eine KI, die frei antwortet, passt nicht in ihre Regeln. Wir ändern keine einzige Antwort. Dein Plan und deine Credits sind sicher.",
     deadline:
-      "Dein Plan läuft bis zum {{date}}. Zieh ihn vorher um, damit er weiterläuft.",
+      "Kein Stress: Dein Plan läuft bis zum {{date}}. Zieh ihn jederzeit vorher um.",
     carryExtend:
-      "Du zahlst jetzt, und dein erster neuer Zeitraum läuft bis zum {{date}}. Bereits bezahlte Tage werden übernommen.",
+      "Früh umziehen kostet nichts extra: Bereits bezahlte Tage werden übernommen (der erste neue Zeitraum läuft bis zum {{date}}).",
     carryDeferred:
       "Heute wird nichts abgebucht. Die Abrechnung beim neuen Anbieter beginnt am {{date}}, wenn deine bezahlte Zeit endet.",
     pastDue:

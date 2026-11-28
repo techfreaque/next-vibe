@@ -52,9 +52,10 @@ export const translations: typeof enTranslations = {
     title: "Príliš veľa slobody pre nášho kartového spracovateľa",
     description:
       "Rozhodli, že AI, ktorá odpovedá slobodne, nezapadá do ich pravidiel. Nezmeníme ani jednu odpoveď. Tvoj plán aj kredity sú v bezpečí.",
-    deadline: "Tvoj plán beží do {{date}}. Presuň ho skôr, nech pokračuje.",
+    deadline:
+      "Bez náhlenia: tvoj plán beží do {{date}}. Presuň ho kedykoľvek pred týmto dátumom.",
     carryExtend:
-      "Zaplatíš teraz a tvoje prvé nové obdobie trvá do {{date}}. Už zaplatené dni sa prenesú.",
+      "Skorší presun nestojí nič navyše: už zaplatené dni sa prenesú (prvé nové obdobie trvá do {{date}}).",
     carryDeferred:
       "Dnes sa nič nestrhne. Fakturácia u nového poskytovateľa začne {{date}}, keď skončí tvoj zaplatený čas.",
     pastDue:

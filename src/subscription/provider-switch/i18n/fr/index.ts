@@ -53,9 +53,9 @@ export const translations: typeof enTranslations = {
     description:
       "Selon eux, une IA qui répond librement ne rentre pas dans leurs règles. Nous ne toucherons à aucune réponse. Votre forfait et vos crédits sont en sécurité.",
     deadline:
-      "Votre forfait est actif jusqu'au {{date}}. Transférez-le avant pour qu'il continue.",
+      "Pas de précipitation : votre forfait est actif jusqu'au {{date}}. Transférez-le quand vous voulez avant cette date.",
     carryExtend:
-      "Vous payez maintenant, et votre première nouvelle période dure jusqu'au {{date}}. Les jours déjà payés sont conservés.",
+      "Transférer tôt ne coûte rien de plus : les jours déjà payés sont conservés (la première nouvelle période dure jusqu'au {{date}}).",
     carryDeferred:
       "Rien n'est prélevé aujourd'hui. La facturation chez le nouveau prestataire commence le {{date}}, à la fin de votre temps payé.",
     pastDue:

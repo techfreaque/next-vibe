@@ -51,9 +51,9 @@ export const translations = {
     description:
       "They decided an AI that answers freely doesn't fit their rules. We're not changing a single answer. Your plan and credits are safe.",
     deadline:
-      "Your plan runs until {{date}}. Move it before then to keep it going.",
+      "No rush: your plan runs until {{date}}. Move it any time before then.",
     carryExtend:
-      "You pay now, and your first new period runs until {{date}}. The days you already paid for carry over.",
+      "Moving early costs nothing extra: the days you already paid for carry over (first new period runs until {{date}}).",
     carryDeferred:
       "Nothing is charged today. Billing on the new provider starts on {{date}}, when your paid time ends.",
     pastDue:

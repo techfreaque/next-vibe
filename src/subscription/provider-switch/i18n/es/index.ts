@@ -53,9 +53,9 @@ export const translations: typeof enTranslations = {
     description:
       "Decidieron que una IA que responde libremente no encaja en sus reglas. No vamos a cambiar ni una sola respuesta. Tu plan y tus créditos están a salvo.",
     deadline:
-      "Tu plan dura hasta el {{date}}. Muévelo antes para que siga activo.",
+      "Sin prisa: tu plan dura hasta el {{date}}. Muévelo cuando quieras antes de esa fecha.",
     carryExtend:
-      "Pagas ahora y tu primer período nuevo dura hasta el {{date}}. Los días que ya pagaste se mantienen.",
+      "Moverlo antes no cuesta nada extra: los días que ya pagaste se mantienen (el primer período nuevo dura hasta el {{date}}).",
     carryDeferred:
       "Hoy no se cobra nada. La facturación con el nuevo proveedor empieza el {{date}}, cuando termina tu tiempo pagado.",
     pastDue:
