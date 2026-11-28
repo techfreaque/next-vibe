@@ -319,18 +319,26 @@ cmd_app_wait() {
     sleep "$WS_GRACE"
     return 0
   fi
-  local i hub_drained
+  local i hub_drained hub_seen=0
   for i in $(seq 1 "$WS_GRACE"); do
     sleep 1
     line="$(app_busy || true)"
     [ -n "$line" ] || continue
+    hub_seen=1
     read -r busy ws hub_drained parts <<<"$line"
     if [ "$hub_drained" = 1 ]; then
       log "app: WS hub acknowledged the 1012 sweep and has zero clients"
       return 0
     fi
   done
-  die "WS hub did not confirm the 1012 sweep and zero clients in ${WS_GRACE}s (last count: ${ws:-unknown})"
+  # The hub force-terminates sockets that ignore the 1012 close frame (it logs
+  # how many, by client class and age), so leftovers here are never fatal: the
+  # recreate drops them. Only an unreachable hub (no fresh status) fails.
+  if [ "$hub_seen" = 1 ]; then
+    log "WARN: WS hub still reports ${ws:-unknown} client(s) after ${WS_GRACE}s; continuing (stragglers are force-closed by the hub, the recreate drops the rest)"
+    return 0
+  fi
+  die "WS hub unreachable: no fresh drain status within ${WS_GRACE}s of the 1012 sweep request"
 }
 
 cmd_app_undrain() {

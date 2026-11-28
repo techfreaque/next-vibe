@@ -69,6 +69,7 @@ import {
   describeSubscribeIdentity,
   isRequestedUidLinkedLead,
 } from "./ws-channel-auth";
+import { closeSockets, terminateStragglers } from "./ws-drain-sweep";
 import {
   diagnoseWsClose,
   WS_HEARTBEAT_TIMEOUT_CODE,
@@ -138,17 +139,44 @@ const WS_SERVER_DRAIN_REASON = "server-draining";
  * waiting on such a signal keeps running here until the process stops.
  */
 function closeAllWsClients(reason: string, keepSelfHub = false): number {
-  const sockets = [...wsClients].filter(
-    (ws) => !keepSelfHub || ws.data.selfHub !== true,
+  return closeSockets(wsClients, WS_SERVER_RESTART_CODE, reason, keepSelfHub)
+    .length;
+}
+
+/** Grace for clients to finish the 1012 close handshake before termination. */
+const WS_DRAIN_FORCE_AFTER_MS = 3000;
+
+/**
+ * Deploy drain sweep: 1012 to every client, then after the grace period
+ * terminate whoever is still open (a client that ignores close frames must not
+ * fail the deploy) and log how many, by client class and age.
+ */
+function sweepWsClientsForDrain(
+  logger: EndpointLogger,
+  onTerminated: (ws: ServerWebSocket<WsConnectionData>) => void,
+): number {
+  const swept = closeSockets(
+    wsClients,
+    WS_SERVER_RESTART_CODE,
+    WS_SERVER_DRAIN_REASON,
+    true,
   );
-  for (const ws of sockets) {
-    try {
-      ws.close(WS_SERVER_RESTART_CODE, reason);
-    } catch {
-      /* already closing */
+  const timer = setTimeout(() => {
+    const forced = terminateStragglers(swept, wsClients, Date.now(), (ws) => {
+      wsClients.delete(ws);
+      onTerminated(ws);
+    });
+    if (forced.forced > 0) {
+      logger.warn("[WS] Deploy drain force-closed unresponsive clients", {
+        forced: forced.forced,
+        swept: swept.length,
+        byClass: forced.byClass,
+        oldestAgeMs: forced.oldestAgeMs,
+      });
     }
-  }
-  return sockets.length;
+  }, WS_DRAIN_FORCE_AFTER_MS);
+  timer.unref();
+  return swept.length;
 }
 
 /**
@@ -710,6 +738,7 @@ export function startWebSocketServer(
             connectorInstanceId,
             requestId,
             selfHub: selfHub || undefined,
+            userAgent: req.headers.get("user-agent") ?? undefined,
           } satisfies WsConnectionDataWithProxy,
         });
 
@@ -1034,10 +1063,13 @@ export function startWebSocketServer(
       server.stop(true);
     },
     clientCount: () => ({
-      clients: wsClients.size,
+      clients: [...wsClients].filter((ws) => ws.data.selfHub !== true).length,
       connectors: connectorSockets.size,
     }),
-    closeClients: () => closeAllWsClients(WS_SERVER_DRAIN_REASON, true),
+    closeClients: () =>
+      sweepWsClientsForDrain(logger, (ws) => {
+        heartbeatSockets.delete(ws);
+      }),
     nextPort,
   };
 }

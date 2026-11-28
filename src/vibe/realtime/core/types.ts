@@ -310,6 +310,8 @@ export interface WsConnectionData {
    * move to the peer node. Set only for loopback upgrades without an Origin.
    */
   selfHub?: boolean;
+  /** User-Agent of the upgrade request (deploy-drain diagnostics only). */
+  userAgent?: string;
   /**
    * Channels whose subscribe ack is still being prepared (replay read in
    * flight). Live events for such a channel are held here and flushed after
