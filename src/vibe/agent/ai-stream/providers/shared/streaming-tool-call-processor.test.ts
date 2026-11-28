@@ -68,7 +68,10 @@ function upstream(
   );
 }
 
-async function run(response: Response): Promise<{
+async function run(
+  response: Response,
+  allowToolCalls = true,
+): Promise<{
   text: string;
   toolCalls: string[];
   finishReason: string | undefined;
@@ -78,6 +81,8 @@ async function run(response: Response): Promise<{
     logger,
     "test",
     true,
+    undefined,
+    allowToolCalls,
   );
   const raw = await out.text();
   let text = "";
@@ -268,5 +273,21 @@ describe("parseToolCalls entry validation", () => {
     expect(bare.toolCalls).toEqual([
       { name: "rename-thread", arguments: { title: "Trip" } },
     ]);
+  });
+
+  it("drops tool-call markup and emits stop when allowToolCalls is false (toolChoice=none)", async () => {
+    const result = await run(
+      upstream(
+        [
+          "Here is the answer.",
+          '<tool_calls>[{"name": "contact-form", "arguments": {"email": "a@b.c"}}]</tool_calls>',
+        ],
+        "stop",
+      ),
+      false,
+    );
+    expect(result.text).toBe("Here is the answer.");
+    expect(result.toolCalls).toEqual([]);
+    expect(result.finishReason).toBe("stop");
   });
 });

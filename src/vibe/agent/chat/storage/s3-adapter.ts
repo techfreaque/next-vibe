@@ -2,6 +2,8 @@
  * S3 storage adapter for chat file attachments
  */
 
+import { setImmediate as yieldToEventLoop } from "node:timers/promises";
+
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -23,9 +25,9 @@ import type {
 } from "./index";
 import { buildStorageFileUrl } from "./url-utils";
 
-// S3 SDK XML parsing runs on the application thread. Large listings
-// overlapped multi-second production stalls during guest cleanup.
-const ATTACHMENT_LIST_PAGE_SIZE = 100;
+// S3 SDK XML parsing runs on the application thread. Keep pages small and
+// yield between pages so guest cleanup never stalls concurrent HTTP traffic.
+const ATTACHMENT_LIST_PAGE_SIZE = 25;
 
 export class S3StorageAdapter implements StorageAdapter {
   private client!: S3Client;
@@ -447,6 +449,7 @@ export class S3StorageAdapter implements StorageAdapter {
         if (metadata) {
           results.push(metadata);
         }
+        await yieldToEventLoop();
       }
     } catch (error) {
       if (options?.strict) {
@@ -510,6 +513,9 @@ export class S3StorageAdapter implements StorageAdapter {
       continuationToken = response.IsTruncated
         ? response.NextContinuationToken
         : undefined;
+      if (continuationToken) {
+        await yieldToEventLoop();
+      }
     } while (continuationToken);
 
     return { keys, prefixes };

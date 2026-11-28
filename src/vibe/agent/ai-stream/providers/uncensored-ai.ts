@@ -118,6 +118,9 @@ export function createUncensoredAI(
 
     const parsedBody = JSON.parse(init.body as string) as OpenAIRequestBody;
     parsedBody.max_tokens ??= DEFAULT_MAX_OUTPUT_TOKENS;
+    const allowTools =
+      parsedBody.tool_choice !== "none" &&
+      Boolean(parsedBody.tools && parsedBody.tools.length > 0);
 
     let bodyString: string;
 
@@ -139,13 +142,14 @@ export function createUncensoredAI(
         2,
       );
     } else {
-      // Prompt engineering mode: strip tools, inject instructions into system prompt
+      // Prompt engineering mode: strip tools, inject instructions into system
+      // prompt only when tool calls are allowed (tool_choice !== "none").
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { tools, tool_choice, messages, ...restBody } = parsedBody;
 
       let modifiedMessages = convertDeveloperToSystemMessages(messages);
       modifiedMessages = convertToolMessagesToUserMessages(modifiedMessages);
-      if (tools && tools.length > 0) {
+      if (allowTools && tools) {
         modifiedMessages = injectToolInstructions(modifiedMessages, tools);
       }
       modifiedMessages = flattenArrayContent(modifiedMessages);
@@ -218,6 +222,8 @@ export function createUncensoredAI(
         logger,
         "UncensoredAI",
         false,
+        undefined,
+        allowTools,
       );
     }
 

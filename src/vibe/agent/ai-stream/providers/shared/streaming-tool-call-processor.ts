@@ -105,6 +105,10 @@ export async function processStreamingResponseWithToolCalls(
   /** Sees every parsed upstream chunk as received (e.g. to read a cost field
    *  the re-emitted chunks drop). */
   onUpstreamChunk?: (chunk: OpenAIResponse) => void,
+  /** When false (e.g. tool_choice: "none"), strip any `<tool_calls>` markup
+   *  the model echoed from history instead of emitting tool_calls chunks that
+   *  would violate toolChoice="none" in the AI SDK. */
+  allowToolCalls = true,
 ): Promise<Response> {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -157,8 +161,14 @@ export async function processStreamingResponseWithToolCalls(
       hasDetectedToolCalls,
     });
 
-    // Parse accumulated content for tool calls
-    const { toolCalls } = parseToolCalls(accumulatedContent, logger);
+    // Parse accumulated content for tool calls only when tool calls are allowed.
+    const parsedToolCalls = allowToolCalls
+      ? parseToolCalls(accumulatedContent, logger).toolCalls
+      : undefined;
+    const toolCalls =
+      allowToolCalls && parsedToolCalls && parsedToolCalls.length > 0
+        ? parsedToolCalls
+        : undefined;
 
     // Release visible text not streamed yet: a held-back partial tag that
     // never became `<tool_calls>` ("... <" at the very end), or text that
@@ -173,7 +183,17 @@ export async function processStreamingResponseWithToolCalls(
       );
       forwardedUpTo = releaseEnd;
     }
-    if (hasDetectedToolCalls && (!toolCalls || toolCalls.length === 0)) {
+    if (!allowToolCalls && hasDetectedToolCalls) {
+      logger.info(
+        `[${providerName}] Dropped tool-call markup while toolChoice=none`,
+        {
+          model,
+          visibleOutputChars: toolMarkupStart,
+          markupChars: accumulatedContent.length - toolMarkupStart,
+          finishReason,
+        },
+      );
+    } else if (hasDetectedToolCalls && !toolCalls) {
       // Markup that never parsed: nothing reaches the user from it, so make
       // the turn diagnosable (the loop reports it as an empty answer).
       const markup = accumulatedContent.slice(toolMarkupStart);

@@ -180,7 +180,13 @@ export async function ensureDreamTask(
   const enabled = settings.dreamerEnabled ?? false;
   const schedule = settings.dreamerSchedule ?? DREAM_DEFAULT_SCHEDULE;
   const lastExecutedAt = pulseEnableWatermark(existing, enabled, schedule);
-  const favoriteId = settings.dreamerFavoriteId ?? undefined;
+  const rawFavoriteId = settings.dreamerFavoriteId ?? undefined;
+  // Never store the bare skill slug as a favoriteId (legacy tasks did this
+  // and failed resolveFavorite on every scheduled Dreaming run).
+  const favoriteId =
+    rawFavoriteId && rawFavoriteId !== "thea-dreamer"
+      ? rawFavoriteId
+      : undefined;
   const prompt = settings.dreamerPrompt ?? DREAM_DEFAULT_PROMPT;
 
   const subFolderId = await ensurePulseSubFolder(
@@ -254,7 +260,11 @@ export async function ensureAutopilotTask(
   const enabled = settings.autopilotEnabled ?? false;
   const schedule = settings.autopilotSchedule ?? AUTOPILOT_DEFAULT_SCHEDULE;
   const lastExecutedAt = pulseEnableWatermark(existing, enabled, schedule);
-  const favoriteId = settings.autopilotFavoriteId ?? undefined;
+  const rawFavoriteId = settings.autopilotFavoriteId ?? undefined;
+  const favoriteId =
+    rawFavoriteId && rawFavoriteId !== "hermes-autopilot"
+      ? rawFavoriteId
+      : undefined;
   const prompt = settings.autopilotPrompt ?? AUTOPILOT_DEFAULT_PROMPT;
 
   const subFolderId = await ensurePulseSubFolder(

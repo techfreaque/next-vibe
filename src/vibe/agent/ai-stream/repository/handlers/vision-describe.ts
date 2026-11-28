@@ -38,6 +38,8 @@ export async function describeWithVisionFallback<
 >(params: {
   model: TOption;
   mediaSource: "inline-upload" | "storage-file" | "remote-url";
+  /** Non-PII diagnostics for remote media URLs (host + file extension). */
+  mediaContext?: { remoteHost?: string; urlExt?: string | null };
   /** Second-chance model after `failedId` refused/failed; null = none. */
   resolveFallback: (failedId: string) => TOption | null;
   checkCredits?: (model: TOption) => Promise<ResponseType<number>>;
@@ -46,7 +48,15 @@ export async function describeWithVisionFallback<
   /** Log prefix, e.g. "[DescribeImage]". */
   logTag: string;
 }): Promise<VisionDescribeOutcome<TOption>> {
-  const { model, mediaSource, resolveFallback, run, logger, logTag } = params;
+  const {
+    model,
+    mediaSource,
+    mediaContext,
+    resolveFallback,
+    run,
+    logger,
+    logTag,
+  } = params;
   const reasons: string[] = [];
   let current: TOption | null = model;
   let isFallback = false;
@@ -87,6 +97,7 @@ export async function describeWithVisionFallback<
           modelId: current.id,
           visionAttempt: { apiProvider: current.apiProvider, isFallback },
           mediaSource,
+          ...mediaContext,
           error: reason,
         },
       );
@@ -101,6 +112,7 @@ export async function describeWithVisionFallback<
       logger.warn(`${logTag} Retrying with fallback vision model`, {
         failedModelId: model.id,
         mediaSource,
+        ...mediaContext,
         fallbackModelId: current.id,
       });
     }
@@ -110,6 +122,7 @@ export async function describeWithVisionFallback<
   logger.error(`${logTag} No vision model produced a description`, {
     reason,
     mediaSource,
+    ...mediaContext,
   });
   return { ok: false, reason };
 }

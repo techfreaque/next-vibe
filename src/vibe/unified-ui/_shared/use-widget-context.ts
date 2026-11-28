@@ -11,6 +11,7 @@ import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { TranslatedKeyType } from "../../core/i18n/core/scoped-translation";
 import type { TParams } from "../../core/i18n/core/static-types";
+import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { type UseNavigationStackReturn } from "../hooks/use-navigation-stack";
 import type { ReactWidgetContext } from "./react-types";
@@ -386,4 +387,22 @@ export function useOptionalWidgetLocale(): CountryLanguage | undefined {
   const store = useContext(WidgetContextStoreContext);
   // The provider is stable for a mounted subtree, so this call is stable too.
   return store?.((state) => state.context.locale);
+}
+
+/**
+ * User of the surrounding widget context, or undefined when rendered outside
+ * one (e.g. standalone Next/TanStack pages that pass `user` as a prop).
+ */
+export function useOptionalWidgetUser(): JwtPayloadType | undefined {
+  const store = useContext(WidgetContextStoreContext);
+  return store?.((state) => state.context.user);
+}
+
+/**
+ * Logger of the surrounding widget context, or undefined when rendered outside
+ * one (e.g. standalone Next/TanStack pages that pass `logger` as a prop).
+ */
+export function useOptionalWidgetLogger(): EndpointLogger | undefined {
+  const store = useContext(WidgetContextStoreContext);
+  return store?.((state) => state.context.logger);
 }

@@ -17,6 +17,8 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
@@ -28,11 +30,12 @@ import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
-  useWidgetLogger,
-  useWidgetUser,
+  useOptionalWidgetLogger,
+  useOptionalWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import type { JSX } from "react";
@@ -71,18 +74,32 @@ type Notice =
 
 interface CreditOffersProps {
   locale: CountryLanguage;
+  /** Passed by standalone pages rendered outside WidgetContextStoreProvider. */
+  user?: JwtPayloadType;
+  /** Passed by standalone pages rendered outside WidgetContextStoreProvider. */
+  logger?: EndpointLogger;
   /** Tiles side by side from this container width up. */
   className?: string;
 }
 
 export function CreditOffers({
   locale,
+  user: propUser,
+  logger: propLogger,
   className,
 }: CreditOffersProps): JSX.Element | null {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: productsT } = productsScopedTranslation.scopedT(locale);
-  const user = useWidgetUser();
-  const logger = useWidgetLogger();
+  const ctxUser = useOptionalWidgetUser();
+  const ctxLogger = useOptionalWidgetLogger();
+  const fallbackLogger = useLogger();
+  const resolvedUser = propUser ?? ctxUser;
+  const user: JwtPayloadType = resolvedUser ?? {
+    isPublic: true,
+    leadId: "",
+    roles: [],
+  };
+  const logger = propLogger ?? ctxLogger ?? fallbackLogger;
   const subscriptionRead = useSubscription(logger, user).read;
   const packCheckout = useApiMutation(purchaseDefinitions.POST, logger, user);
   const planCheckout = useApiMutation(
@@ -95,7 +112,7 @@ export function CreditOffers({
   const [confirmUpgrade, setConfirmUpgrade] = useState(false);
   const [notice, setNotice] = useState<Notice>({ kind: "none" });
 
-  if (user.isPublic) {
+  if (!resolvedUser || resolvedUser.isPublic) {
     return null;
   }
   // Until the plan is known, showing either set would flip under the finger.

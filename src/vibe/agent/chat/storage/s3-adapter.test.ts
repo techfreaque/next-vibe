@@ -43,8 +43,8 @@ test("attachment namespace listing bounds each page and follows continuation tok
     const adapter = new S3StorageAdapter();
     await expect(adapter.listThreadIds()).resolves.toEqual(["first", "second"]);
     expect(requests).toEqual([
-      { maxKeys: "100", delimiter: "/", token: null },
-      { maxKeys: "100", delimiter: "/", token: "next-page" },
+      { maxKeys: "25", delimiter: "/", token: null },
+      { maxKeys: "25", delimiter: "/", token: "next-page" },
     ]);
   } finally {
     await server.stop(true);

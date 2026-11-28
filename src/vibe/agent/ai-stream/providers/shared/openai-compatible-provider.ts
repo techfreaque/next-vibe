@@ -218,13 +218,15 @@ export function createPromptEngineeredProvider(
       applyClientCache(parsedBody, config.clientCache);
     }
     // Strip tools/tool_choice — these models don't support native tool calling.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { tools, tool_choice, messages, ...restBody } = parsedBody;
+    const allowTools =
+      tool_choice !== "none" && Boolean(tools && tools.length > 0);
 
-    // Convert developer→system, tool→user, then inject tool instructions.
+    // Convert developer→system, tool→user, then inject tool instructions only
+    // when tool calls are allowed on this step (tool_choice !== "none").
     let modifiedMessages = convertDeveloperToSystemMessages(messages);
     modifiedMessages = convertToolMessagesToUserMessages(modifiedMessages);
-    if (tools && tools.length > 0) {
+    if (allowTools && tools) {
       modifiedMessages = injectToolInstructions(
         modifiedMessages,
         tools,
@@ -292,6 +294,7 @@ export function createPromptEngineeredProvider(
               readVeniceCostUsd(chunk) ?? costCapture.costUsd;
           }
         : undefined,
+      allowTools,
     );
   };
 

@@ -290,7 +290,11 @@ export function CreditsTabHeaderContent({
       {/* Free credits held back: say why, and what lifts it */}
       {!isAdmin && data?.freeStatus === FreeCreditsStatus.VERIFY_EMAIL && (
         <Div className="px-5 pb-5 sm:px-6">
-          <VerifyEmailCreditsPrompt locale={locale} />
+          <VerifyEmailCreditsPrompt
+            locale={locale}
+            user={widgetUser}
+            logger={logger}
+          />
         </Div>
       )}
       {!isAdmin && data?.freeStatus === FreeCreditsStatus.SUBNET_LIMIT && (
@@ -363,7 +367,12 @@ export function CreditsTabHeaderContent({
             {/* One tap to card checkout; the buy tab below already has it all. */}
             {activeTab !== "buy" && (
               <Suspense fallback={null}>
-                <DeferredCreditOffers locale={locale} className="mt-3" />
+                <DeferredCreditOffers
+                  locale={locale}
+                  user={widgetUser}
+                  logger={logger}
+                  className="mt-3"
+                />
               </Suspense>
             )}
           </Div>

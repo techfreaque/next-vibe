@@ -85,6 +85,7 @@ export class RouteExecutionExecutor {
     // as a fallback: canonical ids (`user_public_signup_POST`) ARE underscored.
     const trimmedToolName = params.toolName.trim();
     const hyphenatedToolName = trimmedToolName.replaceAll("_", "-");
+    const underscoredToolName = trimmedToolName.replaceAll("-", "_");
     let effectiveToolName = trimmedToolName;
     try {
       let handlerResult = params.preloadedHandler ?? null;
@@ -102,6 +103,7 @@ export class RouteExecutionExecutor {
         if (
           isRouteExcludedFromBuild(trimmedToolName) ||
           isRouteExcludedFromBuild(hyphenatedToolName) ||
+          isRouteExcludedFromBuild(underscoredToolName) ||
           isRouteExcludedFromBuild(`vibe_${trimmedToolName}`)
         ) {
           params.logger.warn(
@@ -129,7 +131,15 @@ export class RouteExecutionExecutor {
             handlerResult = await getRouteHandler(trimmedToolName);
             if (!handlerResult && hyphenatedToolName !== trimmedToolName) {
               handlerResult = await getRouteHandler(hyphenatedToolName);
-              effectiveToolName = hyphenatedToolName;
+              if (handlerResult) {
+                effectiveToolName = hyphenatedToolName;
+              }
+            }
+            if (!handlerResult && underscoredToolName !== trimmedToolName) {
+              handlerResult = await getRouteHandler(underscoredToolName);
+              if (handlerResult) {
+                effectiveToolName = underscoredToolName;
+              }
             }
             // Canonical ids stored before the framework moved under src/vibe/
             // (graph nodes, skill tool lists) lack the "vibe_" segment, e.g.

@@ -281,21 +281,28 @@ export async function resolveModelSkill(params: {
         user,
         logger,
         locale,
+        skill,
       );
       if (!resolved) {
-        return fail({
-          message: t("headless.errors.favoriteNotFound"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
+        if (!skill) {
+          return fail({
+            message: t("headless.errors.favoriteNotFound"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+        // Scheduled pulse tasks (e.g. Dreaming) may hold a deleted favorite or
+        // legacy skill slug in favoriteId alongside an explicit skill; fall
+        // through to step 3 so the skill still runs.
+      } else {
+        if (isRetiredChatModel(resolved.model)) {
+          return retiredModelError(resolved.model, t);
+        }
+        return success({
+          model: resolved.model,
+          skill: resolved.skill,
+          favoriteConfig: resolved.favoriteConfig,
         });
       }
-      if (isRetiredChatModel(resolved.model)) {
-        return retiredModelError(resolved.model, t);
-      }
-      return success({
-        model: resolved.model,
-        skill: resolved.skill,
-        favoriteConfig: resolved.favoriteConfig,
-      });
     }
     if (favoriteConfig) {
       const skillVariant = await resolveSkillVariant(

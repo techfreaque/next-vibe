@@ -142,6 +142,8 @@ export class ChatMessageByIdRepositoryClient {
       if (!message) {
         const thread = await getIncognitoThread(threadId, logger);
         logger.warn("Incognito delete could not find the message in storage", {
+          threadId,
+          messageId,
           hasStoredThread: thread !== null,
           storedMessageCount: messages.length,
           hasStoredChildren: messages.some((row) => row.parentId === messageId),

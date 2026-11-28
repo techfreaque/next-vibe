@@ -47,10 +47,20 @@ export async function POST(
     const signature = headersList.get("webhook-signature");
 
     if (!id || !timestamp || !signature) {
+      const presentWebhookHeaders: string[] = [];
+      for (const key of headersList.keys()) {
+        if (/webhook|svix|whop|signature/i.test(key)) {
+          presentWebhookHeaders.push(key);
+        }
+      }
       logger.error("payment.webhook.whop.signature.missing", {
         hasId: Boolean(id),
         hasTimestamp: Boolean(timestamp),
         hasSignature: Boolean(signature),
+        contentType: headersList.get("content-type"),
+        bodyLength: body.length,
+        userAgent: headersList.get("user-agent")?.slice(0, 120) ?? null,
+        presentWebhookHeaders: presentWebhookHeaders.join(", ") || null,
       });
       return NextResponse.json(
         { error: ERROR_MISSING_SIGNATURE },

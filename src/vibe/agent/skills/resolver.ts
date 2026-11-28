@@ -359,6 +359,7 @@ export async function resolveFavorite(
   user: JwtPayloadType,
   logger: EndpointLogger,
   locale: CountryLanguage,
+  fallbackSkill?: string,
 ): Promise<{
   model: ChatModelId;
   skill: string;
@@ -367,11 +368,20 @@ export async function resolveFavorite(
   const favorite = await resolveFavoriteConfig(favoriteId, userId);
 
   if (!favorite) {
-    logger.error("[Headless AI] Favorite not found", {
-      favoriteId,
-      userId,
-      locale,
-    });
+    if (fallbackSkill) {
+      logger.warn("[Headless AI] Favorite not found, falling back to skill", {
+        favoriteId,
+        fallbackSkill,
+        userId,
+        locale,
+      });
+    } else {
+      logger.error("[Headless AI] Favorite not found", {
+        favoriteId,
+        userId,
+        locale,
+      });
+    }
     return null;
   }
 

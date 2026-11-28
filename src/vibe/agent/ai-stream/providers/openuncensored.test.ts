@@ -264,6 +264,59 @@ describe("OpenUncensored chat model", () => {
     expect(charge.credits).toBeGreaterThan(0);
   });
 
+  it("non-streaming without ou.cost_usd: bills serving host from response headers", async () => {
+    const seen: SeenRequest[] = [];
+    const provider = createOpenUncensored(
+      logger,
+      fakeFetch(seen, ({ url }) =>
+        url.endsWith("/chat/completions")
+          ? Response.json(
+              {
+                id: "chatcmpl-host-1",
+                object: "chat.completion",
+                created: 1,
+                model: "deepseek-v4.1-flash-uncensored",
+                choices: [
+                  {
+                    index: 0,
+                    message: { role: "assistant", content: "Described." },
+                    finish_reason: "stop",
+                  },
+                ],
+                usage: USAGE,
+              },
+              {
+                headers: {
+                  "X-OU-Model": "deepseek-v4.1-flash-uncensored",
+                  "X-OU-Provider": "self-hosted-deepseek",
+                },
+              },
+            )
+          : Response.json({
+              id: "deepseek-v4.1-flash-uncensored",
+              providers: [
+                {
+                  name: "self-hosted-deepseek",
+                  status: "online",
+                  pricing: {
+                    input_per_mtok: 0.28,
+                    output_per_mtok: 1.12,
+                    cache_read_per_mtok: 0.007,
+                  },
+                },
+              ],
+            }),
+      ),
+    );
+    const result = await generateText({
+      model: provider.chat("deepseek-v4.1-flash-uncensored"),
+      prompt: "Describe image",
+    });
+    const upstream = readStepUpstreamCost(result.providerMetadata);
+    expect(upstream.provider).toBe("self-hosted-deepseek");
+    expect(upstream.costUsd).toBeCloseTo((12 * 0.28 + 3 * 1.12) / 1_000_000, 12);
+  });
+
   it("no reported cost: listed-price fallback (no cost metadata)", async () => {
     const provider = createOpenUncensored(
       logger,

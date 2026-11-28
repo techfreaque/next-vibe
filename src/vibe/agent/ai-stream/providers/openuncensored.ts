@@ -63,9 +63,79 @@ class OpenUncensoredChatModel extends OpenAICompatibleChatLanguageModel {
 
   override async doGenerate(options: CallOptions): Promise<GenerateResult> {
     const result = await super.doGenerate(options);
-    const cost = readOpenUncensoredCostUsd(result.response?.body);
-    if (cost === null) {
-      return result;
+    const headers = new Headers(result.response?.headers);
+    const host = headers.get("x-ou-provider")?.trim() || null;
+    const model = headers.get("x-ou-model")?.trim() || this.modelId;
+    const reportedCost = readOpenUncensoredCostUsd(result.response?.body);
+    if (reportedCost !== null) {
+      return {
+        ...result,
+        providerMetadata: {
+          ...result.providerMetadata,
+          [ApiProvider.OPENUNCENSORED]: {
+            ...result.providerMetadata?.[ApiProvider.OPENUNCENSORED],
+            provider: host,
+            model,
+            usage: { cost: reportedCost },
+          },
+        },
+      };
+    }
+
+    // Non-streamed calls (e.g. vision bridge, describe_image) may omit
+    // `ou.cost_usd`; compute the serving host's cost from headers + usage,
+    // matching doStream().
+    const inputTokens = Math.max(0, result.usage.inputTokens.total ?? 0);
+    const outputTokens = Math.max(0, result.usage.outputTokens.total ?? 0);
+    const cache = readCacheUsage({
+      inputTokenDetails: {
+        cacheReadTokens: result.usage.inputTokens.cacheRead,
+        cacheWriteTokens: result.usage.inputTokens.cacheWrite,
+      },
+      raw: result.usage.raw,
+    });
+    const cachedInputTokens = Math.min(
+      inputTokens,
+      Math.max(0, cache.cachedInputTokens),
+    );
+    const cacheWriteTokens = Math.min(
+      inputTokens - cachedInputTokens,
+      Math.max(0, cache.cacheWriteTokens),
+    );
+    const rates = host
+      ? await fetchOpenUncensoredHostPrice(model, host, this.fetchImpl)
+      : undefined;
+    const usd = rates
+      ? calculateTokenCostUsd(
+          {
+            inputTokenCost: rates.input,
+            outputTokenCost: rates.output,
+            cacheReadTokenCost: rates.cacheRead,
+          },
+          inputTokens,
+          outputTokens,
+          cachedInputTokens,
+          cacheWriteTokens,
+        )
+      : 0;
+    const cost = Number.isFinite(usd) && usd > 0 ? usd : null;
+    const usage = {
+      inputTokens,
+      outputTokens,
+      cachedInputTokens,
+      cacheWriteTokens,
+      hostPriceFound: rates !== undefined,
+      cost,
+    };
+    if (cost !== null) {
+      this.logger.info("[OpenUncensored] Generate host cost", {
+        model,
+        host,
+        inputTokenCost: rates?.input,
+        outputTokenCost: rates?.output,
+        cacheReadTokenCost: rates?.cacheRead ?? rates?.input,
+        ...usage,
+      });
     }
     return {
       ...result,
@@ -73,7 +143,9 @@ class OpenUncensoredChatModel extends OpenAICompatibleChatLanguageModel {
         ...result.providerMetadata,
         [ApiProvider.OPENUNCENSORED]: {
           ...result.providerMetadata?.[ApiProvider.OPENUNCENSORED],
-          usage: { cost },
+          provider: host,
+          model,
+          usage,
         },
       },
     };

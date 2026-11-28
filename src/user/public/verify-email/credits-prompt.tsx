@@ -9,6 +9,8 @@
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
@@ -17,10 +19,11 @@ import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
-  useWidgetLogger,
-  useWidgetUser,
+  useOptionalWidgetLogger,
+  useOptionalWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import type { JSX } from "react";
@@ -38,6 +41,10 @@ type ResendState =
 
 interface VerifyEmailCreditsPromptProps {
   locale: CountryLanguage;
+  /** Passed by standalone pages rendered outside WidgetContextStoreProvider. */
+  user?: JwtPayloadType;
+  /** Passed by standalone pages rendered outside WidgetContextStoreProvider. */
+  logger?: EndpointLogger;
   /**
    * "banner": standalone warning box (credits / subscription pages).
    * "lead": the headline of the chat's out-of-credits card (sits in its
@@ -49,16 +56,25 @@ interface VerifyEmailCreditsPromptProps {
 
 export function VerifyEmailCreditsPrompt({
   locale,
+  user: propUser,
+  logger: propLogger,
   variant = "banner",
   className,
 }: VerifyEmailCreditsPromptProps): JSX.Element | null {
   const { t } = scopedTranslation.scopedT(locale);
-  const user = useWidgetUser();
-  const logger = useWidgetLogger();
-  const mutation = useApiMutation(verifyEmailDefinitions.POST, logger, user);
+  const ctxUser = useOptionalWidgetUser();
+  const ctxLogger = useOptionalWidgetLogger();
+  const fallbackLogger = useLogger();
+  const user = propUser ?? ctxUser;
+  const logger = propLogger ?? ctxLogger ?? fallbackLogger;
+  const mutation = useApiMutation(
+    verifyEmailDefinitions.POST,
+    logger,
+    user ?? { isPublic: true, leadId: "", roles: [] },
+  );
   const [state, setState] = useState<ResendState>({ kind: "idle" });
 
-  if (user.isPublic) {
+  if (!user || user.isPublic) {
     return null;
   }
 

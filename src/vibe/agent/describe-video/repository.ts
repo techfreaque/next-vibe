@@ -134,6 +134,18 @@ export class DescribeVideoRepository {
       });
     }
 
+    const remoteUrlContext =
+      !inlineFile && URL.canParse(fileReference)
+        ? ((): { remoteHost: string; urlExt: string | null } => {
+            const parsedUrl = new URL(fileReference);
+            const extMatch = /\.([a-z0-9]{2,6})$/i.exec(parsedUrl.pathname);
+            return {
+              remoteHost: parsedUrl.hostname,
+              urlExt: extMatch?.[1]?.toLowerCase() ?? null,
+            };
+          })()
+        : undefined;
+
     try {
       const outcome = await describeWithVisionFallback({
         model: visionModel,
@@ -142,6 +154,7 @@ export class DescribeVideoRepository {
             ? "inline-upload"
             : "storage-file"
           : "remote-url",
+        mediaContext: remoteUrlContext,
         checkCredits: (model) =>
           protectedBalance(
             user.id,
